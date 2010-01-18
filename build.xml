@@ -65,5 +65,14 @@
         </copy>
     </target>
 
+    <target name="release-plugin" depends="test" description="Releases the plugin in our P1 plugin repository">
+        <exec executable="${grails}" failonerror="true" resolveexecutable="true">
+            <arg value="release-plugin"/>
+            <arg value="-repository=pillarone"/>
+            <arg value="-zipOnly"/>
+            <env key="GRAILS_HOME" value="${GRAILS_HOME}"/>
+        </exec>
+    </target>
+
 
 </project>

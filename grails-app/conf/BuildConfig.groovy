@@ -1,3 +1,8 @@
+grails.plugin.repos.discovery.pillarone = "https://svn.intuitive-collaboration.com/GrailsPlugins/"
+grails.plugin.repos.distribution.pillarone = "https://svn.intuitive-collaboration.com/GrailsPlugins/"
+
+grails.plugin.repos.resolveOrder = ['pillarone', 'default', 'core']
+
 coverage {
     exclusions = [
             'models/**',

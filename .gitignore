@@ -1,5 +1,7 @@
+dist/*
 target/*
 web-app/plugins/*
 .idea/workspace.xml
 stacktrace.log
+cobertura.ser
 exportParam.groovy

@@ -1,6 +1,4 @@
-grails.plugin.repos.discovery.pillarone = "https://svn.intuitive-collaboration.com/GrailsPlugins/"
-user.svn.username.discovery.pillarone = ""
-user.svn.password.discovery.pillarone = ""
+grails.plugin.repos.discovery.pillarone = "https://msp@svn.intuitive-collaboration.com/GrailsPlugins/"
 
 grails.plugin.repos.resolveOrder = ['pillarone', 'default', 'core']
 

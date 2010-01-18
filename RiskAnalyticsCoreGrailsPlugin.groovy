@@ -1,27 +1,29 @@
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "0.1"
+    def version = "0.4.5"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.2.0 > *"
     // the other plugins this plugin depends on
-    def dependsOn = [:]
+    def dependsOn = [
+            "backgroundThread": "1.3",
+            "jodaTime": "0.5",
+            "quartz": "0.4.1"
+    ]
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
             "grails-app/views/error.gsp"
     ]
 
-    // TODO Fill in these fields
-    def author = "Your name"
-    def authorEmail = ""
-    def title = "Plugin summary/headline"
+    def author = "Intuitive Collaboration GmbH"
+    def authorEmail = "info@pillarone.org"
+    def title = "RiskAnalytics core"
     def description = '''\\
-Brief description of the plugin.
+Persistence & Simulation engine.
 '''
 
-    // URL to the plugin's documentation
-    def documentation = "http://grails.org/plugin/risk-analytics-core"
+    def documentation = "http://www.pillarone.org"
 
-    def doWithWebDescriptor = { xml ->
+    def doWithWebDescriptor = {xml ->
         // TODO Implement additions to web.xml (optional), this event occurs before 
     }
 
@@ -29,21 +31,21 @@ Brief description of the plugin.
         // TODO Implement runtime spring config (optional)
     }
 
-    def doWithDynamicMethods = { ctx ->
+    def doWithDynamicMethods = {ctx ->
         // TODO Implement registering dynamic methods to classes (optional)
     }
 
-    def doWithApplicationContext = { applicationContext ->
+    def doWithApplicationContext = {applicationContext ->
         // TODO Implement post initialization spring config (optional)
     }
 
-    def onChange = { event ->
+    def onChange = {event ->
         // TODO Implement code that is executed when any artefact that this plugin is
         // watching is modified and reloaded. The event contains: event.source,
         // event.application, event.manager, event.ctx, and event.plugin.
     }
 
-    def onConfigChange = { event ->
+    def onConfigChange = {event ->
         // TODO Implement code that is executed when the project configuration changes.
         // The event is the same as for 'onChange'.
     }

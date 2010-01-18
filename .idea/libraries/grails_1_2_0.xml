@@ -94,12 +94,7 @@
       <root url="file://$PROJECT_DIR$/../grails/doc/api" />
     </JAVADOC>
     <SOURCES>
-      <root url="file://$PROJECT_DIR$/../grails/src/commons" />
-      <root url="file://$PROJECT_DIR$/../grails/src/groovy" />
-      <root url="file://$PROJECT_DIR$/../grails/src/persistence" />
-      <root url="file://$PROJECT_DIR$/../grails/src/scaffolding" />
-      <root url="file://$PROJECT_DIR$/../grails/src/tiger" />
-      <root url="file://$PROJECT_DIR$/../grails/src/web" />
+      <root url="file://$PROJECT_DIR$/../grails/src/java" />
     </SOURCES>
   </library>
 </component>

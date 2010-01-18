@@ -1,0 +1,4 @@
+target/*
+web-app/plugins/*
+.idea/workspace.xml
+stacktrace.log

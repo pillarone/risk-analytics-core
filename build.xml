@@ -65,7 +65,7 @@
         </copy>
     </target>
 
-    <target name="release-plugin" depends="test" description="Releases the plugin in our P1 plugin repository">
+    <target name="release-plugin" depends="cruise" description="Releases the plugin in our P1 plugin repository">
         <exec executable="${grails}" failonerror="true" resolveexecutable="true">
             <arg value="release-plugin"/>
             <arg value="-repository=pillarone"/>

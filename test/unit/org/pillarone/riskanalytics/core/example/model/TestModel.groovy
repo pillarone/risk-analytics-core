@@ -19,7 +19,7 @@ class TestModel extends StochasticModel {
     }
 
     public void wireComponents() {
-        claimsGenerator.inClaimCount = frequencyGenerator.outFrequency
+        claimsGenerator.inValue = frequencyGenerator.outValue
     }
 }
 class TestModelForInjection extends StochasticModel {

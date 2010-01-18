@@ -2,7 +2,6 @@ package org.pillarone.riskanalytics.core.output
 
 import grails.test.GrailsUnitTestCase
 import models.core.CoreModel
-import org.pillarone.riskanalytics.core.example.model.TestModel
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.parameterization.StructureInformation
 import org.pillarone.riskanalytics.core.parameterization.StructureInformationInjector
@@ -20,19 +19,19 @@ class PacketCollectorTests extends GrailsUnitTestCase {
     }
 
     void testAttachToModel() {
-        TestModel model = new TestModel()
+        CoreModel model = new CoreModel()
         model.init()
 
 
         PacketCollector collector = new PacketCollector()
-        collector.path = "Test:frequencyGenerator:outFrequency"
+        collector.path = "Core:exampleOutputComponent:outValue1"
 
         collector.attachToModel(model, null)
 
-        assertEquals "#outTransmitter", 1, model.frequencyGenerator.allOutputTransmitter.size()
+        assertEquals "#outTransmitter", 1, model.exampleOutputComponent.allOutputTransmitter.size()
 
         shouldFail(IllegalArgumentException) {
-            collector.path = "TestModel:frequencyGenerator:outFrequency"
+            collector.path = "TestModel:exampleOutputComponent:outValue1"
             collector.attachToModel(model, null)
         }
 

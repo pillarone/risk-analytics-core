@@ -5,7 +5,7 @@ import org.joda.time.DateTime
 class DateParameterTests extends GroovyTestCase {
 
     void testInsert() {
-        DateParameter parameter = new DateParameter(path: "path", dateValue: new DateTime(1972, 6, 14))
+        DateParameter parameter = new DateParameter(path: "path", dateValue: new DateTime(1972, 6, 14, 0, 0, 0, 0))
 
         DateParameter savedParam = parameter.save()
         assertNotNull(savedParam)
@@ -14,16 +14,16 @@ class DateParameterTests extends GroovyTestCase {
     }
 
     void testGetInstance() {
-        DateParameter parameter = new DateParameter(path: "path", dateValue: new DateTime(1972, 6, 14))
-        assertEquals new DateTime(1972, 6, 14), parameter.getParameterInstance()
+        DateParameter parameter = new DateParameter(path: "path", dateValue: new DateTime(1972, 6, 14, 0, 0, 0, 0))
+        assertEquals new DateTime(1972, 6, 14, 0, 0, 0, 0), parameter.getParameterInstance()
     }
 
     void testSetInstance() {
-        DateParameter parameter = new DateParameter(path: "path", dateValue: new DateTime(1972, 6, 14))
-        assertEquals new DateTime(1972, 6, 14), parameter.dateValue
+        DateParameter parameter = new DateParameter(path: "path", dateValue: new DateTime(1972, 6, 14, 0, 0, 0, 0))
+        assertEquals new DateTime(1972, 6, 14, 0, 0, 0, 0), parameter.dateValue
 
-        parameter.setParameterInstance(new DateTime(2009, 4, 3))
-        assertEquals new DateTime(2009, 4, 3), parameter.dateValue
+        parameter.setParameterInstance(new DateTime(2009, 4, 3, 0, 0, 0, 0))
+        assertEquals new DateTime(2009, 4, 3, 0, 0, 0, 0), parameter.dateValue
 
     }
 }

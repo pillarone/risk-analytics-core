@@ -23,10 +23,10 @@ class AbstractBatchInsertTests extends GrailsUnitTestCase {
     void testFactoryMethod() {
         switchEnvironment Environment.DEVELOPMENT
 
-        assertEquals "GenericlBatchInsert expected in environment ${Environment.getCurrent().name}", GenericBulkInsert, AbstractBulkInsert.getBulkInsertInstance().class
+        assertEquals "GenericBatchInsert expected in environment ${Environment.getCurrent().name}", GenericBulkInsert, AbstractBulkInsert.getBulkInsertInstance().class
 
         switchEnvironment Environment.TEST
-        assertEquals "GenericlBatchInsert expected in environment ${Environment.getCurrent().name}", GenericBulkInsert, AbstractBulkInsert.getBulkInsertInstance().class
+        assertEquals "GenericBatchInsert expected in environment ${Environment.getCurrent().name}", GenericBulkInsert, AbstractBulkInsert.getBulkInsertInstance().class
 
         switchEnvironment "mysql"
         assertEquals "MysqlBatchInsert expected in environment ${Environment.getCurrent().name}", MysqlBulkInsert, AbstractBulkInsert.getBulkInsertInstance().class

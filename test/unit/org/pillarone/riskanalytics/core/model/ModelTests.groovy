@@ -1,11 +1,11 @@
 package org.pillarone.riskanalytics.core.model
 
-import org.pillarone.riskanalytics.core.example.model.TestModel
 import org.pillarone.riskanalytics.core.components.Component
+import org.pillarone.riskanalytics.core.example.model.TestModel
 
 class ModelTests extends GroovyTestCase {
 
-    Model model = new TestModel()
+    TestModel model = new TestModel()
 
     void testAllComponents() {
         model.initComponents()

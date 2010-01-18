@@ -37,13 +37,13 @@ class FileImportServiceTests extends GrailsUnitTestCase {
                 prepare: {File file -> }
         ] as FileImportService
 
-        List filesToImport = fileImportService.scanImportFolder(["Sparrow"])
+        List filesToImport = fileImportService.scanImportFolder(["Core"])
 
         assertNotNull filesToImport
         assertFalse filesToImport.empty
 
         filesToImport.each {File file ->
-            assertTrue "wrong file selected ${file.name}", file.name.startsWith("Sparrow")
+            assertTrue "wrong file selected ${file.name}", file.name.startsWith("Core")
             assertTrue "wrong file selected ${file.name}", file.name.endsWith("Parameters.groovy")
         }
     }
@@ -55,11 +55,11 @@ class FileImportServiceTests extends GrailsUnitTestCase {
                 getDaoClass: {return ParameterizationDAO},
                 lookUpItem: {Class c, String name -> return false},
                 saveItemObject: {fileContent -> true},
-                getModelClassName :{return "models.sparrow.SparrowModel"},
+                getModelClassName: {return "models.core.CoreModel"},
                 prepare: {File file -> return "notYetImported"}
         ] as FileImportService
 
-        assertTrue fileImportService.importFile(new File(getModelFolder(), "/sparrow/SparrowParameters.groovy"))
+        assertTrue fileImportService.importFile(new File(getModelFolder(), "/core/CoreParameters.groovy"))
 
     }
 
@@ -70,11 +70,11 @@ class FileImportServiceTests extends GrailsUnitTestCase {
                 getDaoClass: {return ParameterizationDAO},
                 lookUpItem: {Class c, String name -> return true},
                 saveItemObject: {fileContent -> true},
-                getModelClassName :{return "models.sparrow.SparrowModel"},
+                getModelClassName: {return "models.core.CoreModel"},
                 prepare: {File file -> return "notYetImported"}
         ] as FileImportService
 
-        assertFalse fileImportService.importFile(new File(getModelFolder(), "sparrow/SparrowParameters.groovy"))
+        assertFalse fileImportService.importFile(new File(getModelFolder(), "/core/CoreParameters.groovy"))
 
     }
 
@@ -85,11 +85,11 @@ class FileImportServiceTests extends GrailsUnitTestCase {
                 getDaoClass: {return ParameterizationDAO},
                 lookUpItem: {Class c, String name -> return true},
                 saveItemObject: {fileContent -> false},
-                getModelClassName :{return "models.sparrow.SparrowModel"},
+                getModelClassName: {return "models.core.CoreModel"},
                 prepare: {File file -> return "notYetImported"}
         ] as FileImportService
 
-        assertFalse fileImportService.importFile(new File(getModelFolder(), "sparrow/SparrowParameters.groovy"))
+        assertFalse fileImportService.importFile(new File(getModelFolder(), "/core/CoreParameters.groovy"))
 
     }
 
@@ -101,10 +101,10 @@ class FileImportServiceTests extends GrailsUnitTestCase {
                 prepare: {File file -> }
         ] as FileImportService
 
-        assertTrue "no model specified", fileImportService.shouldImportModel("SparrowParameters.groovy", null)
-        assertTrue "no model specified", fileImportService.shouldImportModel("SparrowParameters.groovy", [])
-        assertTrue "matching model specified", fileImportService.shouldImportModel("SparrowParameters.groovy", ["Sparrow"])
-        assertFalse "non-matching model specified", fileImportService.shouldImportModel("SparrowParameters.groovy", ["CapitalEagle"])
+        assertTrue "no model specified", fileImportService.shouldImportModel("CoreParameters.groovy", null)
+        assertTrue "no model specified", fileImportService.shouldImportModel("CoreParameters.groovy", [])
+        assertTrue "matching model specified", fileImportService.shouldImportModel("CoreParameters.groovy", ["Core"])
+        assertFalse "non-matching model specified", fileImportService.shouldImportModel("CoreParameters.groovy", ["CapitalEagle"])
 
     }
 }

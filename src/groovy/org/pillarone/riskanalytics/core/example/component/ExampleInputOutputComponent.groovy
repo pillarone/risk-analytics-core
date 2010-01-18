@@ -9,6 +9,7 @@ import org.pillarone.riskanalytics.core.packets.PacketList
 class ExampleInputOutputComponent extends Component {
 
     PacketList<Packet> outValue = new PacketList<Packet>()
+    PacketList<Packet> inValue = new PacketList<Packet>()
     ExampleParameterObject parmParameterObject = ExampleParameterObjectClassifier.TYPE0.getParameterObject(["a": 0d, "b": 1d])
 
     protected void doCalculation() {

@@ -1,0 +1,69 @@
+<project name="RiskAnalyticsCore" default="cruise">
+
+    <property environment="env"/>
+    <property name="GRAILS_HOME" value="../grails"/>
+    <import file="${GRAILS_HOME}/src/grails/grails-macros.xml"/>
+
+    <property file="application.properties"/>
+
+    <property name="dist.dir" value="dist"/>
+    <property name="target.dir" value="target"/>
+
+    <condition property="grails" value="${GRAILS_HOME}/bin/grails.bat">
+        <os family="windows"/>
+    </condition>
+    <property name="grails" value="${GRAILS_HOME}/bin/grails"/>
+
+    <tstamp>
+        <format property="build-timestamp" pattern="dd.MM.yyyy HH:mm"/>
+    </tstamp>
+
+    <target name="init">
+        <echo message="GRAILS_HOME: ${GRAILS_HOME}"/>
+        <echo message="app.name: ${app.name}"/>
+        <echo message="user.language: ${user.language}, user.country: ${user.country}"/>
+    </target>
+
+    <target name="cruise" depends="clean,compile,test"
+            description="to be started by the CruiseControl build server"/>
+
+
+    <target name="clean" depends="init" description="--> Cleans a Grails application">
+        <delete dir="${dist.dir}"/>
+
+        <mkdir dir="${dist.dir}"/>
+        <grails command="clean" jvmargs="-Dtools.jar=../jre1.5.0_11/lib/tools.jar"/>
+        <delete verbose="true">
+            <fileset dir="." includes="*Db.script"/>
+            <fileset dir="." includes="**Db.properties"/>
+            <fileset dir="." includes="*.tsl"/>
+            <fileset dir="." includes="*.log"/>
+        </delete>
+    </target>
+
+
+    <target name="compile" depends="init" description="--> Compiles a Grails application">
+        <grails command="compile" jvmargs="-Xmx1024m -XX:MaxPermSize=512m -Dtools.jar=../jre1.5.0_11/lib/tools.jar"/>
+    </target>
+
+
+    <target name="stats" depends="init" description="--> grails stats">
+        <grails command="stats"/>
+    </target>
+
+
+    <target name="test" depends="init" description="--> Run a Grails applications unit tests">
+        <exec executable="${grails}" failonerror="true" resolveexecutable="true">
+            <arg value="test-app"/>
+            <!--<arg value="-coverage"/>-->
+            <env key="GRAILS_HOME" value="${GRAILS_HOME}"/>
+            <env key="JAVA_OPTS"
+                 value="-Xmx1024m -XX:MaxPermSize=512m -Dtools.jar=../jre1.5.0_11/lib/tools.jar -Djava.awt.headless=false -Duser.language='en'"/>
+        </exec>
+        <copy todir="${dist.dir}">
+            <fileset dir="target" includes="test-reports/"/>
+        </copy>
+    </target>
+
+
+</project>

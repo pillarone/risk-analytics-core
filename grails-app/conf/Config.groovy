@@ -14,6 +14,7 @@ environments {
                     'org.pillarone.riskanalytics.core.simulation',
                     'org.pillarone.riskanalytics.core.fileimport',
                     'org.pillarone.riskanalytics.core.simulation.engine',
+                    'org.pillarone.riskanalytics.core.util',
                     'org.pillarone.riskanalytics.core.parameterization'
         }
         keyFiguresToCalculate = [

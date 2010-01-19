@@ -1,6 +1,10 @@
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.pillarone.riskanalytics.core.util.GrailsConfigValidator
+import org.pillarone.riskanalytics.core.output.batch.GenericBulkInsert
+
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "0.4.5"
+    def version = "0.4.5.1"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.2.0 > *"
     // the other plugins this plugin depends on
@@ -36,7 +40,21 @@ Persistence & Simulation engine.
     }
 
     def doWithApplicationContext = {applicationContext ->
-        // TODO Implement post initialization spring config (optional)
+        //Checks at startup if certain config options required for the core are set and sets defaults otherwise
+        ConfigObject grailsConfig = ConfigurationHolder.config
+        def standardBulkInsert = GenericBulkInsert
+        def standardCalculatorOutput = [
+                'stdev': true,
+                'percentile': [0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0],
+                'var': [99, 99.5],
+                'tvar': [99, 99.5],
+                'pdf': 200
+        ]
+
+        GrailsConfigValidator.validateConfig(grailsConfig, [
+                "batchInsert": standardBulkInsert,
+                "keyFiguresToCalculate": standardCalculatorOutput
+        ])
     }
 
     def onChange = {event ->

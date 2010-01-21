@@ -1,7 +1,7 @@
 <project name="RiskAnalyticsCore" default="cruise">
 
     <property environment="env"/>
-    <property name="GRAILS_HOME" value="../grails"/>
+    <property name="GRAILS_HOME" value="${env.GRAILS_HOME}"/>
     <import file="${GRAILS_HOME}/src/grails/grails-macros.xml"/>
 
     <property file="application.properties"/>

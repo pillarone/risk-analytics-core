@@ -9,7 +9,7 @@
       <maximumHeapSize value="256" />
       <maximumStackSize value="2" />
       <properties>
-        <property name="env.GRAILS_HOME" value="../grails" />
+        <property name="env.GRAILS_HOME" value="$PILLARONE_GRAILS$" />
       </properties>
     </buildFile>
   </component>

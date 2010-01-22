@@ -28,6 +28,7 @@ public class IterationAction implements Action {
         for (int period = 0; period < numberOfPeriods && !stopped; period++) {
             periodAction.perform()
         }
+        periodAction.parameterValidationNeeded = false
         LOG.debug "end perform"
     }
 

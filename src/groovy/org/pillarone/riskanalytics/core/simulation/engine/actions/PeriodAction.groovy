@@ -18,6 +18,7 @@ public class PeriodAction implements Action {
 
     Model model
     PeriodScope periodScope
+    boolean parameterValidationNeeded = true    // true for all periods of the first iteration
 
     /**
      * Performing the periodAction means:
@@ -33,8 +34,10 @@ public class PeriodAction implements Action {
             if (periodIndex != periodScope.parameterApplicator.lastInjectedPeriod) {
                 periodScope.parameterApplicator.applyParameterForPeriod(periodIndex)
 
-                for (Component component in model.allComponents) {
-                    component.validateParameterization()
+                if (parameterValidationNeeded) {
+                    for (Component component in model.allComponents) {
+                        component.validateParameterization()
+                    }
                 }
             }
 

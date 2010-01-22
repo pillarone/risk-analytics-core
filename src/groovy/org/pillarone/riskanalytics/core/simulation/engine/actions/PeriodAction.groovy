@@ -24,8 +24,8 @@ public class PeriodAction implements Action {
      * Performing the periodAction means:
      * - prepare periodScope for next period
      * - apply current parameter to model
-     * - validate parameter (legacy code for initialising some components properties)
-     * - trigger the models startComponents
+     * - validate parameters if needed
+     * - trigger the model's startComponents
      */
     public void perform() {
         if (model) {

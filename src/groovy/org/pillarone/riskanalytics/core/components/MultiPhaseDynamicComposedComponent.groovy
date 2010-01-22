@@ -1,7 +1,5 @@
 package org.pillarone.riskanalytics.core.components
 
-import org.pillarone.riskanalytics.core.components.Component
-import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
 import org.pillarone.riskanalytics.core.packets.PacketList
 import org.pillarone.riskanalytics.core.wiring.ITransmitter
 
@@ -17,13 +15,10 @@ abstract public class MultiPhaseDynamicComposedComponent extends DynamicComposed
     private int startTransmitterNumber;
     private int calculationTransmitterNumber;
 
-    // todo(sku): replace with enum
     public static final String PHASE_START = "start";
     public static final String PHASE_DO_CALCULATION = "calculation";
 
     abstract public void allocateChannelsToPhases()
-
-    ;
 
     public void notifyTransmitted(ITransmitter transmitter) {
         String phaseOfTransmitter = "";
@@ -106,19 +101,19 @@ abstract public class MultiPhaseDynamicComposedComponent extends DynamicComposed
     }
 
     public void setTransmitterPhaseInput(PacketList packetList, String phase) {
-        boolean packetListIsSourceOfTransmitter = false;
-        for (ITransmitter transmitter: getAllInputReplicationTransmitter()) {
+        for (ITransmitter transmitter: allInputReplicationTransmitter) {
             if (transmitter.getSource().is(packetList)) {
-                packetListIsSourceOfTransmitter = true;
                 phaseTransmitterInput.put(transmitter, phase);
             }
         }
-        if (packetListIsSourceOfTransmitter) {
-            if (PHASE_DO_CALCULATION.equals(phase)) {
-                calculationTransmitterNumber++
-            }
-            else if (PHASE_START.equals(phase)) {
-                startTransmitterNumber++
+        for (ITransmitter transmitter : allInputTransmitter) {
+            if (transmitter.getTarget().is(packetList)) {
+                if (PHASE_DO_CALCULATION.equals(phase)) {
+                    calculationTransmitterNumber++
+                }
+                else if (PHASE_START.equals(phase)) {
+                    startTransmitterNumber++
+                }
             }
         }
     }

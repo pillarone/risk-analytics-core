@@ -83,7 +83,7 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
     protected void appendAdditionalConstructorArguments(StringBuffer buffer) {
         super.appendAdditionalConstructorArguments(buffer);
         buffer.append(", ");
-        buffer.append("org.pillarone.riskanalytics.core.parameterization.ConstraintsFactory.getConstraints('").append(constraints.getName()).append("')");
+        buffer.append("org.pillarone.modelling.parameterization.ConstraintsFactory.getConstraints('").append(constraints.getName()).append("')");
     }
 
     @Override
@@ -100,6 +100,10 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
             result = list.get(0);
         } else if (columnClass == BigDecimal.class) {
             result = new BigDecimal(0);
+        } else if (columnClass == Double.class) {
+            result = 0d;
+        } else if (columnClass == Integer.class) {
+            result = 0;
         } else {
             try {
                 result = columnClass.newInstance();

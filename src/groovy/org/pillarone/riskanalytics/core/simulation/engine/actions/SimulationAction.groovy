@@ -18,8 +18,6 @@ public class SimulationAction implements Action {
     SimulationScope simulationScope
     private volatile boolean stopped = false
 
-
-
     /**
      * Loops over the number of iteration and calls iterationAction.perform().
      */
@@ -40,5 +38,6 @@ public class SimulationAction implements Action {
     protected void stop() {
         stopped = true
         iterationAction.stop()
+        simulationScope.updateNumberOfIterations(iterationAction.iterationScope.currentIteration)
     }
 }

@@ -4,12 +4,12 @@ import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.ParameterizationDAO
-import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
-import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.model.DeterministicModel
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.output.CollectorFactory
 import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
+import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
+import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
 import org.pillarone.riskanalytics.core.parameterization.StructureInformation
 import org.pillarone.riskanalytics.core.simulation.SimulationState
@@ -99,6 +99,11 @@ public class SimulationScope {
 
     public void setSimulationState(SimulationState newState) {
         this.simulationState = newState
+    }
+
+    public void updateNumberOfIterations(int numberOfIterations) {
+        this.numberOfIterations = numberOfIterations
+        simulationRun?.iterations = numberOfIterations
     }
 
 }

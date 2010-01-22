@@ -53,47 +53,4 @@ class PacketCollectorTests extends GrailsUnitTestCase {
         assertSame collector, transmitter.receiver
 
     }
-
-/* // mockDomain causing StackOverflow
-    void testCreateResults() {
-        mockDomain PathMapping
-        mockDomain CollectorMapping
-        mockDomain FieldMapping
-        mockDomain SingleValueResult
-
-        FieldMapping fieldMapping = new FieldMapping(fieldName: "ultimate")
-        fieldMapping.save()
-        PathMapping pathMapping = new PathMapping(pathName: "path")
-        pathMapping.save()
-        CollectorMapping collectorMapping = new CollectorMapping(collectorName: "collector")
-        collectorMapping.save()
-
-        PeriodScope periodScope = new PeriodScope()
-        IterationScope iterationScope = new IterationScope(periodScope:periodScope)
-        SimulationScope simulationScope = new SimulationScope(iterationScope: iterationScope)
-        periodScope.currentPeriod = 1
-        iterationScope.currentIteration = 13
-
-        PacketCollector collector = new PacketCollector(simulationScope:simulationScope)
-        collector.path = "path"
-        collector.collectorName = "collector"
-
-        Claim claim = new Claim(value: 1.3d)
-
-        List results = collector.createResults(claim.valuesToSave)
-        assertNotNull results
-        assertEquals 1, results.size()
-        SingleValueResult result = results[0]
-
-        assertNotNull result.simulationRun
-        assertEquals "period", 1, result.period
-        assertEquals "iteration", 1, result.iteration
-        assertSame "pathMapping", pathMapping, result.path
-        assertSame "collector", collectorMapping, result.collector
-        assertSame "field", fieldMapping, result.field
-        assertEquals "valueIndex", 0, result.valueIndex
-        assertEquals "value", 1.3d, result.value
-
-    }
-*/
 }

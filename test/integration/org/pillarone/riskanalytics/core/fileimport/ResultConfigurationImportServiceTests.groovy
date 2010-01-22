@@ -5,17 +5,16 @@ import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 
 class ResultConfigurationImportServiceTests extends GrailsUnitTestCase {
 
-    void testImport() {
+    ResultConfigurationImportService resultConfigurationImportService
 
-        assertTrue true
-        //TODO: fix
-//        File file = new File("src/java/models/capitalEagle/CapitalEagleResultConfiguration.groovy")
-//
-//        ResultConfigurationImportService service = new ResultConfigurationImportService()
-//
-//        assertTrue "file not imported", service.importFile(file)
-//
-//        assertNotNull "ResultConfiguration not found", ResultConfigurationDAO.findByName("newCollectors")
+    void testImportResultConfiguration() {
+
+        File paramFile = new File("src/java/models/core/CoreResultConfiguration.groovy")
+
+        def count = ResultConfigurationDAO.count()
+
+        assertTrue "import not successful", resultConfigurationImportService.importFile(paramFile)
+        assertEquals count + 1, ResultConfigurationDAO.count()
 
     }
 }

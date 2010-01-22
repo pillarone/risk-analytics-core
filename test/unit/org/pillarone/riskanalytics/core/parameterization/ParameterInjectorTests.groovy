@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.parameterization
 import models.core.CoreModel
 import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObject
 import org.pillarone.riskanalytics.core.model.Model
+import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObjectClassifier
 
 class ParameterInjectorTests extends GroovyTestCase {
 
@@ -79,7 +80,6 @@ class ParameterInjectorTests extends GroovyTestCase {
         injector.checkModelMatch(parameter, model)
     }
 
-
     //TODO: fix with new model
     /*void testRecursiveComponents() {
         ParameterInjector injector = new ParameterInjector("src/java/models/sparrow/SparrowParameters")
@@ -104,54 +104,27 @@ class ParameterInjectorTests extends GroovyTestCase {
         assertNotNull model.dynamicComponent.subSubcomponent.parmParameterObject
     }
 
-    //TODO: fix with new model
-    /*void testInjectionOfModelIntoMultiDimensionalParams() {
-        ParameterInjector injector = new ParameterInjector("src/java/models/capitalEagle/CapitalEagleParameters")
-        Model model = new CapitalEagleModel()
-        model.init()
-        injector.injectConfiguration(model)
-        assertEquals model, model.mtpl.subUnderwriting.parmUnderwritingInformation.simulationModel
-    }
-    void testInjectionOfModelIntoMultiDimensionalParamsInsideParameterObjects() {
-        ParameterInjector injector = new ParameterInjector("src/java/models/capitalEagle/CapitalEagleAttritionalDependencies2Parameters")
-        Model model = new CapitalEagleAttritionalDependenciesModel()
-        model.init()
-        injector.injectConfiguration(model)
-        model.copulaAttritional.parmCopulaStrategy.parameters.values().each {
-            if (it instanceof AbstractMultiDimensionalParameter) {
-                assertEquals model, it.simulationModel
-            }
-        }
-    }
 
-    void testInjectionOfModelIntoConstrainedStrings() {
-        ParameterInjector injector = new ParameterInjector("src/java/models/dependency/DependencyParameters")
-        Model model = new DependencyModel()
-        model.init()
-        model.injectComponentNames()
-        injector.injectConfiguration(model)
-        assertNotNull model.fire.subSeverityExtractor.parmFilterCriteria.selectedComponent
-        assertEquals 'fire', model.fire.subSeverityExtractor.parmFilterCriteria.selectedComponent.name
-    }
 
     void testMultiPeriodsDynamicComponents() {
-        ParameterInjector injector = new ParameterInjector("src/java/models/asset/AssetParameters")
-        Model model = new AssetModel()
+        ParameterInjector injector = new ParameterInjector("src/java/models/core/CoreMultiPeriodParameters")
+        Model model = new CoreModel()
         model.init()
         model.injectComponentNames()
 
         injector.injectConfiguration(model, 0)
-        assertEquals 2, model.bonds.subComponentCount()
-        def subSwiss = model.bonds.subSwiss
-        assertNotNull subSwiss.parmQuantity
-        assertEquals 2000, model.bonds.subSwiss.parmQuantity
+        assertEquals 1, model.dynamicComponent.subComponentCount()
+        def subComponent = model.dynamicComponent.subSubcomponent
+        assertNotNull subComponent.parmParameterObject
+        assertEquals ExampleParameterObjectClassifier.TYPE0, model.dynamicComponent.subSubcomponent.parmParameterObject.classifier
 
         injector.injectConfiguration(model, 1)
-        assertEquals 2, model.bonds.subComponentCount()
-        assertNotNull model.bonds.subSwiss.parmQuantity
-        assertEquals 0, model.bonds.subSwiss.parmQuantity
+        assertEquals 1, model.dynamicComponent.subComponentCount()
+        assertNotNull subComponent.parmParameterObject
+        assertEquals ExampleParameterObjectClassifier.TYPE1, model.dynamicComponent.subSubcomponent.parmParameterObject.classifier
 
-        assertSame subSwiss, model.bonds.subSwiss
-    }*/
+
+        assertSame subComponent, model.dynamicComponent.subSubcomponent
+    }
 
 }

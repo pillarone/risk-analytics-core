@@ -9,6 +9,7 @@ import org.pillarone.riskanalytics.core.example.component.ExampleInputOutputComp
 import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObjectClassifier
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
+import models.core.parameterApplicator.ParameterApplicatorModel
 
 class ParameterApplicatorTests extends GrailsUnitTestCase {
 
@@ -132,11 +133,10 @@ class ParameterApplicatorTests extends GrailsUnitTestCase {
 
     }
 
-    //TODO msp create suitable test model
-    /*void testAbstractMultiDimensionalParameterHandling() {
-        ParameterizationDAO parameter = getParamDAO(new File("src/java/models/capitalEagle/CapitalEagleParameters.groovy"))
+    void testAbstractMultiDimensionalParameterHandling() {
+        ParameterizationDAO parameter = getParamDAO(new File("src/java/models/core/parameterApplicator/ParameterApplicatorParameters.groovy"))
 
-        Model model = new CapitalEagleModel()
+        Model model = new ParameterApplicatorModel()
         model.init()
 
         ParameterApplicator applicator = new ParameterApplicator(model: model, parameterization: parameter)
@@ -153,9 +153,9 @@ class ParameterApplicatorTests extends GrailsUnitTestCase {
     }
 
     void testConstraindedStringHandling() {
-        ParameterizationDAO parameter = getParamDAO(new File("src/java/models/dependency/DependencyParameters.groovy"))
+        ParameterizationDAO parameter = getParamDAO(new File("src/java/models/core/parameterApplicator/ParameterApplicatorParameters.groovy"))
 
-        Model model = new DependencyModel()
+        Model model = new ParameterApplicatorModel()
         model.init()
         model.injectComponentNames()
 
@@ -169,7 +169,7 @@ class ParameterApplicatorTests extends GrailsUnitTestCase {
         constrainedStrings.each {ApplicableParameter p ->
             assertNotNull "selectedComponent not set for ${p.parameterPropertyName}", p.parameterValue.selectedComponent
         }
-    }*/
+    }
 
     void testParameterizationPerformance() {
         ParameterizationDAO parameter = getParamDAO(new File("src/java/models/core/CoreParameters.groovy"))

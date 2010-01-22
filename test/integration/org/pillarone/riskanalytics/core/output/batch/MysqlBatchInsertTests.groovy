@@ -1,6 +1,5 @@
 package org.pillarone.riskanalytics.core.output.batch
 
-import org.pillarone.riskanalytics.core.output.batch.MysqlBulkInsert
 
 public class MysqlBatchInsertTests extends GroovyTestCase {
     void testGetPathId() {

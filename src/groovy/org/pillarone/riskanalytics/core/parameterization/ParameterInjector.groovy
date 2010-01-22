@@ -3,13 +3,18 @@ package org.pillarone.riskanalytics.core.parameterization
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
 import org.pillarone.riskanalytics.core.model.Model
-import org.pillarone.riskanalytics.core.parameterization.AbstractMultiDimensionalParameter
-import org.pillarone.riskanalytics.core.parameterization.ConstrainedString
-import org.pillarone.riskanalytics.core.parameterization.IParameterObject
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.util.ModelInjector
-
-class ParameterInjector extends ModelInjector {
+/**
+ * This was the parameter injection mechanism of the old simulation engine.
+ * It it is still used to import parameterizations in config object format
+ * by applying the values of the config object to the model and then creating a
+ * default parameterization.
+ *
+ * As a side effect sub components are added to dynamic components, if they do not exist
+ * yet. The simulation model is no longer injected into components, therefore the class is not suitable for simulations.
+ */
+@Deprecated class ParameterInjector extends ModelInjector {
 
     int periodCount = 1
 
@@ -51,7 +56,6 @@ class ParameterInjector extends ModelInjector {
             }
             else {
                 def valueToInject = value[period]
-                injectSimulationModel(valueToInject)
                 target[name] = valueToInject
             }
         }
@@ -68,24 +72,6 @@ class ParameterInjector extends ModelInjector {
                 }
                 injectConfig(value, subComponent, period)
             }
-        }
-    }
-
-    private void injectSimulationModel(def valueToInject) {
-    }
-
-    private void injectSimulationModel(ConstrainedString valueToInject) {
-        List<Component> allMarkedComponents = model.getMarkedComponents(valueToInject.markerClass)
-        valueToInject.selectedComponent = allMarkedComponents.find {Component c -> c.name == valueToInject.stringValue }
-    }
-
-    private void injectSimulationModel(AbstractMultiDimensionalParameter valueToInject) {
-        valueToInject.simulationModel = model
-    }
-
-    private void injectSimulationModel(IParameterObject valueToInject) {
-        valueToInject.parameters.values().each {
-            injectSimulationModel(it)
         }
     }
 

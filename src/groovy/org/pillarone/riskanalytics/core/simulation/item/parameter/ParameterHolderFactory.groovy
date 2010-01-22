@@ -1,20 +1,11 @@
 package org.pillarone.riskanalytics.core.simulation.item.parameter
 
-import org.pillarone.riskanalytics.core.parameter.ConstrainedStringParameter
-import org.pillarone.riskanalytics.core.parameter.DateParameter
-import org.pillarone.riskanalytics.core.parameter.DoubleParameter
-import org.pillarone.riskanalytics.core.parameter.EnumParameter
-import org.pillarone.riskanalytics.core.parameter.IntegerParameter
-import org.pillarone.riskanalytics.core.parameter.MultiDimensionalParameter
-import org.pillarone.riskanalytics.core.parameter.Parameter
-import org.pillarone.riskanalytics.core.parameter.ParameterObjectParameter
-import org.pillarone.riskanalytics.core.parameter.StringParameter
 import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.parameterization.AbstractMultiDimensionalParameter
 import org.pillarone.riskanalytics.core.parameterization.ConstrainedString
 import org.pillarone.riskanalytics.core.parameterization.IParameterObject
-import org.pillarone.riskanalytics.core.parameterization.AbstractMultiDimensionalParameter
-import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
+import org.pillarone.riskanalytics.core.parameter.*
 
 class ParameterHolderFactory {
 
@@ -124,6 +115,20 @@ class ParameterHolderFactory {
         }
         removedParameters.each {ParameterHolder parameterHolder ->
             parameterization.removeParameter parameterHolder
+        }
+        clonedParameters.each {ParameterHolder parameterHolder ->
+            parameterization.addParameter parameterHolder
+        }
+    }
+
+    public static void duplicateParameters(Parameterization parameterization, String oldPath, String newPath) {
+        List clonedParameters = []
+        parameterization.parameters.each {ParameterHolder parameterHolder ->
+            if (parameterHolder.path.startsWith(oldPath)) {
+                ParameterHolder cloned = parameterHolder.clone()
+                cloned.path = cloned.path.replace("${oldPath}", "${newPath}")
+                clonedParameters << cloned
+            }
         }
         clonedParameters.each {ParameterHolder parameterHolder ->
             parameterization.addParameter parameterHolder

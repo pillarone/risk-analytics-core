@@ -26,4 +26,26 @@ class ParameterHolderFactoryTests extends GroovyTestCase {
         assertTrue allPaths.contains("newPath:subPath")
 
     }
+
+    void testDuplicate() {
+        Parameterization parameterization = new Parameterization("Name")
+        parameterization.addParameter(new IntegerParameterHolder("myPath", 0, 0))
+        parameterization.addParameter(new IntegerParameterHolder("pathToBeReplaced", 0, 0))
+        parameterization.addParameter(new IntegerParameterHolder("pathToBeReplaced:subPath", 0, 0))
+
+        int paramCount = parameterization.parameters.size()
+
+        ParameterHolderFactory.duplicateParameters(parameterization, "pathToBeReplaced", "newPath")
+
+        List allPaths = parameterization.parameters*.path
+
+        assertEquals paramCount + 2, parameterization.parameters.size()
+
+        assertTrue allPaths.contains("myPath")
+        assertTrue allPaths.contains("pathToBeReplaced")
+        assertTrue allPaths.contains("pathToBeReplaced:subPath")
+        assertTrue allPaths.contains("newPath")
+        assertTrue allPaths.contains("newPath:subPath")
+
+    }
 }

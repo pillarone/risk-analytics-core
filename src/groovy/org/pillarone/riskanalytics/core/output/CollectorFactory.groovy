@@ -1,8 +1,5 @@
 package org.pillarone.riskanalytics.core.output
 
-import org.pillarone.riskanalytics.core.output.CollectorInformation
-import org.pillarone.riskanalytics.core.output.PathMapping
-import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
 import org.pillarone.riskanalytics.core.model.Model

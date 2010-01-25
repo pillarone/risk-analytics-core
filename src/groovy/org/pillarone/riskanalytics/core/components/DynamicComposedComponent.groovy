@@ -1,7 +1,5 @@
 package org.pillarone.riskanalytics.core.components
 
-import org.pillarone.riskanalytics.core.wiring.PortReplicatorCategory as PRC
-
 /*
 do not remove the following imports:
 import org.pillarone.riskanalytics.core.components.Component
@@ -10,13 +8,15 @@ import org.pillarone.riskanalytics.core.components.ComposedComponent
 even though they are not required groovy will throw a TypeNotPresentException during unit test compilation
 if they are not here...
  */
-import org.pillarone.riskanalytics.core.components.Component
-import org.pillarone.riskanalytics.core.components.ComposedComponent
+
+import org.pillarone.riskanalytics.core.wiring.PortReplicatorCategory as PRC
+
 import org.pillarone.riskanalytics.core.wiring.WiringUtils
 
 abstract class DynamicComposedComponent extends ComposedComponent {
 
     private final List<Component> componentList = []
+    private Map props = null
 
     public List<Component> getComponentList() {
         return componentList
@@ -40,6 +40,8 @@ abstract class DynamicComposedComponent extends ComposedComponent {
                 if (subComponent.name == null) {subComponent.name = propertyName}
             }
             componentList << component
+            //invalidate cached properties
+            props = null
         }
         else {
             throw new IllegalArgumentException("A component with the name ${component.name} already exists in this dynamic composed component")
@@ -73,13 +75,20 @@ abstract class DynamicComposedComponent extends ComposedComponent {
         throw new MissingPropertyException("Property $name not found.")
     }
 
+    /**
+     * This has to be overridden so that dynamic sub components are recognized as properties.
+     * The values are cached because this method is called often. The cache is invalidated when a
+     * component is added or removed. 
+     */
     public Map getProperties() {
-        Map p = super.getProperties()
-        componentList.eachWithIndex {component, index ->
-            p[component.name] = component
+        if (props == null) {
+            props = super.getProperties()
+            for (Component component in componentList) {
+                props[component.name] = component
+            }
         }
 
-        return p
+        return props
     }
 
     boolean isDynamicSubComponent(Component component) {
@@ -98,6 +107,8 @@ abstract class DynamicComposedComponent extends ComposedComponent {
 
     void removeSubComponent(Component subComponent) {
         componentList.remove(subComponent)
+        //invalidate cached properties
+        props = null
     }
 
     int subComponentCount() {

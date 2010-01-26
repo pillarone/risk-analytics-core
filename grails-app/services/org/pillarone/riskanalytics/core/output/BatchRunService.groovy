@@ -1,19 +1,16 @@
 package org.pillarone.riskanalytics.core.output
 
-import org.pillarone.riskanalytics.core.BatchRun
-import org.pillarone.riskanalytics.core.BatchRunSimulationRun
-
-import org.pillarone.riskanalytics.core.simulation.item.Simulation
-
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.BatchRun
+import org.pillarone.riskanalytics.core.BatchRunSimulationRun
 import org.pillarone.riskanalytics.core.ParameterizationDAO
-import org.pillarone.riskanalytics.core.simulation.SimulationState
-
-import org.pillarone.riskanalytics.core.simulation.engine.SimulationRunner
-import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
-import org.pillarone.riskanalytics.core.simulation.engine.RunSimulationService
 import org.pillarone.riskanalytics.core.output.batch.OutputStrategyFactory
+import org.pillarone.riskanalytics.core.simulation.SimulationState
+import org.pillarone.riskanalytics.core.simulation.engine.RunSimulationService
+import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
+import org.pillarone.riskanalytics.core.simulation.engine.SimulationRunner
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
 class BatchRunService {
 
@@ -34,19 +31,23 @@ class BatchRunService {
         batchRun.save()
     }
 
-    public void runSimulation(BatchRunSimulationRun batchRunSimulationRun) {
+    public synchronized void runSimulation(BatchRunSimulationRun batchRunSimulationRun) {
         LOG.info "executing a simulation ${batchRunSimulationRun.simulationRun.name} at ${new Date()}"
-        long currentTime = System.currentTimeMillis()
-        ICollectorOutputStrategy strategy = OutputStrategyFactory.getInstance(batchRunSimulationRun.strategy)
+        if (batchRunSimulationRun.simulationRun.endTime == null) {
+            long currentTime = System.currentTimeMillis()
+            ICollectorOutputStrategy strategy = OutputStrategyFactory.getInstance(batchRunSimulationRun.strategy)
 
-        SimulationRunner runner = SimulationRunner.createRunner()
-        SimulationConfiguration configuration = new SimulationConfiguration(simulationRun: batchRunSimulationRun.simulationRun, outputStrategy: strategy)
+            SimulationRunner runner = SimulationRunner.createRunner()
+            SimulationConfiguration configuration = new SimulationConfiguration(simulationRun: batchRunSimulationRun.simulationRun, outputStrategy: strategy)
 
-        RunSimulationService.getService().runSimulation(runner, configuration)
+            RunSimulationService.getService().runSimulation(runner, configuration)
 
-        batchRunSimulationRun.simulationState = runner.getSimulationState()
-        batchRunSimulationRun.save()
-        LOG.info "simulation ${batchRunSimulationRun.simulationRun.name} executed, it tooks ${System.currentTimeMillis() - currentTime}"
+            batchRunSimulationRun.simulationState = runner.getSimulationState()
+            batchRunSimulationRun.save()
+            LOG.info "simulation ${batchRunSimulationRun.simulationRun.name} executed, it tooks ${System.currentTimeMillis() - currentTime}"
+        } else {
+            LOG.info "simulation ${batchRunSimulationRun.simulationRun.name} is already executed at ${batchRunSimulationRun.simulationRun.endTime}"
+        }
     }
 
 

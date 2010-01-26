@@ -18,10 +18,6 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
         this.constraints = constraints;
     }
 
-    public ConstrainedMultiDimensionalParameter(String cellValues, List titles, IMultiDimensionalConstraints constraints) {
-        super(cellValues, titles);
-        this.constraints = constraints;
-    }
 
     @Override
     public void setValueAt(Object value, int row, int column) {

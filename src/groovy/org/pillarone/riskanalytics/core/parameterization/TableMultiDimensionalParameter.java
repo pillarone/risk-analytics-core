@@ -1,8 +1,5 @@
 package org.pillarone.riskanalytics.core.parameterization;
 
-import org.pillarone.riskanalytics.core.util.GroovyUtils;
-import org.pillarone.riskanalytics.core.parameterization.AbstractMultiDimensionalParameter;
-
 import java.util.List;
 
 public class TableMultiDimensionalParameter extends AbstractMultiDimensionalParameter {
@@ -11,17 +8,14 @@ public class TableMultiDimensionalParameter extends AbstractMultiDimensionalPara
 
     public TableMultiDimensionalParameter(List cellValues, List titles) {
         super(cellValues);
-        this.titles = titles;                                                     
+        this.titles = titles;
         if (!valuesConverted && (cellValues.size() != titles.size())) {
             throw new IllegalArgumentException("cell values and titles must be of same dimension but were " +
                     "cell values: " + cellValues.size() +
-                    " and titles: " + titles.size() );
+                    " and titles: " + titles.size());
         }
     }
 
-    public TableMultiDimensionalParameter(String cellValues, List titles) {
-         this(GroovyUtils.toList(cellValues), titles);
-    }
 
     public int getTitleColumnCount() {
         return 0;
@@ -34,8 +28,7 @@ public class TableMultiDimensionalParameter extends AbstractMultiDimensionalPara
     public Object getValueAt(int row, int column) {
         if (row == 0) {
             return titles.get(column).toString();
-        }
-        else {
+        } else {
             return super.getValueAt(row - 1, column);
         }
     }

@@ -18,10 +18,6 @@ public class ComboBoxMatrixMultiDimensionalParameter extends MatrixMultiDimensio
         this.markerClass = markerClass;
     }
 
-    public ComboBoxMatrixMultiDimensionalParameter(String cellValues, List columnTitles, Class markerClass) {
-        super(cellValues, columnTitles, columnTitles);
-        this.markerClass = markerClass;
-    }
 
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
         if (rowIndex > 0 && columnIndex > 0) {

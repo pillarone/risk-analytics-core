@@ -19,10 +19,6 @@ public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensiona
         this.markerClass = markerClass;
     }
 
-    public ComboBoxTableMultiDimensionalParameter(String cellValues, List titles, Class markerClass) {
-        super(cellValues, titles);
-        this.markerClass = markerClass;
-    }
 
     public void setSimulationModel(Model simulationModel) {
         super.setSimulationModel(simulationModel);
@@ -52,8 +48,7 @@ public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensiona
     public Object getPossibleValues(int row, int column) {
         if (row == 0) {
             return getValueAt(row, column);
-        }
-        else {
+        } else {
             List names = new LinkedList();
             for (Object c : comboBoxValues.values()) {
                 names.add(normalizeName(((Component) c).getName()));
@@ -71,8 +66,7 @@ public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensiona
                     result.add(comboBoxValues.get(o));
                 }
             }
-        }
-        else {
+        } else {
             for (Object o : getValues()) {
                 List l = new ArrayList();
                 for (Object obj : (List) o) {

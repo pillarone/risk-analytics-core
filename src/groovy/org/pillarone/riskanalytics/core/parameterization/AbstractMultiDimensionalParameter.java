@@ -1,7 +1,7 @@
 package org.pillarone.riskanalytics.core.parameterization;
 
-import org.pillarone.riskanalytics.core.util.GroovyUtils;
 import org.pillarone.riskanalytics.core.model.Model;
+import org.pillarone.riskanalytics.core.util.GroovyUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,7 +13,7 @@ public abstract class AbstractMultiDimensionalParameter {
     protected List<List> values;
     protected Model simulationModel;
     protected boolean valuesConverted = false;
-    public int max_tokens = 20000;
+    public int max_tokens = 500;
 
     public AbstractMultiDimensionalParameter(List cellValues) {
         Iterator iterator = cellValues.iterator();
@@ -33,9 +33,6 @@ public abstract class AbstractMultiDimensionalParameter {
         }
     }
 
-     public AbstractMultiDimensionalParameter(String cellValues) {
-         this(GroovyUtils.toList(cellValues));
-     }
 
     public int getColumnCount() {
         return getValueColumnCount() + getTitleColumnCount();
@@ -168,32 +165,16 @@ public abstract class AbstractMultiDimensionalParameter {
     public String toString() {
         StringBuffer buffer = new StringBuffer("new ");
         buffer.append(this.getClass().getName());
-        boolean isBigList = isBigList(values);
-        buffer.append(isBigList?  "(\n\"\"\"\\\n": "(" );
+        buffer.append("(");
         if (!valuesConverted) {
-            buffer.append("[");
-            for (List list : values) {
-                appendList(buffer, list);
-                buffer.append(",\n");
-            }
-            buffer.deleteCharAt(buffer.length() - 2);
-            buffer.append("]");
+            buffer.append("org.pillarone.riskanalytics.core.util.GroovyUtils.toList(" + GroovyUtils.listToString(GroovyUtils.getSplitList(values, max_tokens)) + ")");
         } else {
-            appendList(buffer, values.get(0));
+            buffer.append("org.pillarone.riskanalytics.core.util.GroovyUtils.toList(" + GroovyUtils.listToString(GroovyUtils.getSplitList(values.get(0), max_tokens)) + ")");
         }
-        buffer.append(isBigList ? "\n\"\"\"\n" : "");
         appendAdditionalConstructorArguments(buffer);
         buffer.append(")");
         return buffer.toString();
 
-    }
-
-    boolean isBigList(List<List> values ){
-        int size=0;
-        for (List list : values) {
-            size += list.size();
-        }
-        return size > max_tokens;
     }
 
 

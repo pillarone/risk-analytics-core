@@ -1,7 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
 import org.apache.log4j.Logger
-
 import org.springframework.transaction.TransactionStatus
 
 abstract class ModellingItem {

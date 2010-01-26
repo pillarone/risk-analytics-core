@@ -1,7 +1,5 @@
 package org.pillarone.riskanalytics.core.parameterization;
 
-import org.pillarone.riskanalytics.core.parameterization.AbstractMultiDimensionalParameter;
-
 import java.util.List;
 
 public class MatrixMultiDimensionalParameter extends AbstractMultiDimensionalParameter {
@@ -15,11 +13,6 @@ public class MatrixMultiDimensionalParameter extends AbstractMultiDimensionalPar
         this.rowTitles = rowTitles;
     }
 
-    public MatrixMultiDimensionalParameter(String cellValues, List rowTitles, List columnTitles) {
-        super(cellValues);
-        this.columnTitles = columnTitles;
-        this.rowTitles = rowTitles;
-    }
 
     public int getTitleColumnCount() {
         return 1;

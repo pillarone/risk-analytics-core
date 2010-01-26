@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.parameterization
 
 import org.pillarone.riskanalytics.core.example.marker.ITestComponentMarker
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 class MultiDimensionalParameterTests extends GroovyTestCase {
 
@@ -159,59 +160,39 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
 
     void testToString() {
         AbstractMultiDimensionalParameter param = new SimpleMultiDimensionalParameter([1, 2, 3])
-        param.max_tokens = 1
-        String output = "new org.pillarone.riskanalytics.core.parameterization.SimpleMultiDimensionalParameter(\n" +
-                "\"\"\"\\\n" +
-                "[1,2,3]\n" +
-                "\"\"\"\n" +
-                ")"
+        param.max_tokens = 2
+        String output = "new org.pillarone.riskanalytics.core.parameterization.SimpleMultiDimensionalParameter(org.pillarone.riskanalytics.core.util.GroovyUtils.toList(['[1, 2]', '[3]']))"
 
-        assertEquals output, param.toString()
+        String parmStringValue = param.toString()
+        assertTrue output.equals(parmStringValue)
+        assertEquals GroovyUtils.toList(["[1, 2]", "[3]"]), [1, 2, 3]
 
-        param = new SimpleMultiDimensionalParameter([[1, 2, 3], [4, 5, 6]])
-        param.max_tokens = 1
-        output = "new org.pillarone.riskanalytics.core.parameterization.SimpleMultiDimensionalParameter(\n" +
-                "\"\"\"\\\n" +
-                "[[1,2,3],\n" +
-                "[4,5,6]\n" +
-                "]\n" +
-                "\"\"\"\n" +
-                ")"
+        param = new SimpleMultiDimensionalParameter([[1, 2, 3], ["a", "b", "c"]])
+        param.max_tokens = 2
+        output = "new org.pillarone.riskanalytics.core.parameterization.SimpleMultiDimensionalParameter(org.pillarone.riskanalytics.core.util.GroovyUtils.toList([['[1, 2]', '[3]'], ['[\"a\", \"b\"]', '[\"c\"]']]))"
 
-        assertEquals output, param.toString()
+        assertTrue output.equals(param.toString())
+        assertEquals GroovyUtils.toList([["[1, 2]", "[3]"], ['["a", "b"]', '["c"]']]), [[1, 2, 3], ["a", "b", "c"]]
+
         param = new TableMultiDimensionalParameter([[1, 2, 3], [4, 5, 6], [7, 8, 9]], ['title1', 'title2', 'title3'])
-        param.max_tokens = 1
-        output = "new org.pillarone.riskanalytics.core.parameterization.TableMultiDimensionalParameter(\n" +
-                "\"\"\"\\\n" +
-                "[[1,2,3],\n" +
-                "[4,5,6],\n" +
-                "[7,8,9]\n" +
-                "]\n" +
-                "\"\"\"\n" +
-                ",[\"title1\",\"title2\",\"title3\"])"
-        assertEquals output, param.toString()
+        param.max_tokens = "[1, 2, 3]".length() + 1
+        output = 'new org.pillarone.riskanalytics.core.parameterization.TableMultiDimensionalParameter(org.pillarone.riskanalytics.core.util.GroovyUtils.toList([[1, 2, 3], [4, 5, 6], [7, 8, 9]]),["title1","title2","title3"])'
+
+        assertTrue output.equals(param.toString())
+        assertEquals GroovyUtils.toList([[1, 2, 3], [4, 5, 6], [7, 8, 9]]), [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 
         param = new MatrixMultiDimensionalParameter([[1, 2, 3], [4, 5, 6]], ["row1", "row2"], ["col1", "col2"])
-        param.max_tokens = 1
-        output = "new org.pillarone.riskanalytics.core.parameterization.MatrixMultiDimensionalParameter(\n" +
-                "\"\"\"\\\n" +
-                "[[1,2,3],\n" +
-                "[4,5,6]\n" +
-                "]\n" +
-                "\"\"\"\n" +
-                ",[\"row1\",\"row2\"],[\"col1\",\"col2\"])"
-        assertEquals output, param.toString()
+        param.max_tokens = 2
+        output = "new org.pillarone.riskanalytics.core.parameterization.MatrixMultiDimensionalParameter(org.pillarone.riskanalytics.core.util.GroovyUtils.toList([['[1, 2]', '[3]'], ['[4, 5]', '[6]']]),[\"row1\",\"row2\"],[\"col1\",\"col2\"])"
+        assertTrue output.equals(param.toString())
+        assertEquals GroovyUtils.toList([["[1, 2]", "[3]"], ["[4, 5]", "[6]"]]), [[1, 2, 3], [4, 5, 6]]
 
         param = new ConstrainedMultiDimensionalParameter([[1, 2, 3], [4, 5, 6]], ["row1", "row2"], ConstraintsFactory.getConstraints(SimpleConstraint.IDENTIFIER))
         param.max_tokens = 1
-        output = "new org.pillarone.riskanalytics.core.parameterization.ConstrainedMultiDimensionalParameter(\n" +
-                "\"\"\"\\\n" +
-                "[[1,2,3],\n" +
-                "[4,5,6]\n" +
-                "]\n" +
-                "\"\"\"\n" +
-                ",[\"row1\",\"row2\"], org.pillarone.riskanalytics.core.parameterization.ConstraintsFactory.getConstraints('SIMPLE_CONSTRAINT'))"
-        assertEquals output, param.toString()
+        output = "new org.pillarone.riskanalytics.core.parameterization.ConstrainedMultiDimensionalParameter(org.pillarone.riskanalytics.core.util.GroovyUtils.toList([['[1, 2]', '[3]'], ['[4, 5]', '[6]']]),[\"row1\",\"row2\"], org.pillarone.riskanalytics.core.parameterization.ConstraintsFactory.getConstraints('SIMPLE_CONSTRAINT'))"
+
+        assertTrue output.equals(param.toString())
+        assertEquals GroovyUtils.toList([['[1, 2]', '[3]'], ['[4, 5]', '[6]']]), [[1, 2, 3], [4, 5, 6]]
     }
 
 }

@@ -3,9 +3,21 @@ package org.pillarone.riskanalytics.core.simulation.engine
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.output.SimulationRun
-import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
 import org.pillarone.riskanalytics.core.simulation.SimulationState
-import org.pillarone.riskanalytics.core.simulation.engine.actions.*
+import org.pillarone.riskanalytics.core.simulation.engine.actions.Action
+import org.pillarone.riskanalytics.core.simulation.engine.actions.CalculatorAction
+import org.pillarone.riskanalytics.core.simulation.engine.actions.CreatePeriodCounterAction
+import org.pillarone.riskanalytics.core.simulation.engine.actions.FinishOutputAction
+import org.pillarone.riskanalytics.core.simulation.engine.actions.InitModelAction
+import org.pillarone.riskanalytics.core.simulation.engine.actions.InjectScopesAction
+import org.pillarone.riskanalytics.core.simulation.engine.actions.IterationAction
+import org.pillarone.riskanalytics.core.simulation.engine.actions.PeriodAction
+import org.pillarone.riskanalytics.core.simulation.engine.actions.PrepareParameterizationAction
+import org.pillarone.riskanalytics.core.simulation.engine.actions.PrepareStructureInformationAction
+import org.pillarone.riskanalytics.core.simulation.engine.actions.RandomSeedAction
+import org.pillarone.riskanalytics.core.simulation.engine.actions.SimulationAction
+import org.pillarone.riskanalytics.core.simulation.engine.actions.WireModelAction
+import org.springframework.transaction.TransactionStatus
 
 /**
  * This is the main entity to run a simulation. To do this, create a runner object (SimulationRunner.createRunner()).
@@ -59,11 +71,17 @@ public class SimulationRunner {
             }
             LOG.debug "perform simulationAction"
             simulationState = SimulationState.RUNNING
-            simulationAction.perform()
+            //Transaction is necessary because PathMappings etc might be inserted when writing bulk insert files
+            SimulationRun.withTransaction {TransactionStatus status ->
+                simulationAction.perform()
+            }
 
             LOG.debug "perform postSimulationActions"
-            for (Action action in postSimulationActions) {
-                action.perform()
+            //Transaction because of saving results to db
+            SimulationRun.withTransaction {TransactionStatus status ->
+                for (Action action in postSimulationActions) {
+                    action.perform()
+                }
             }
         } catch (Throwable t) {
             simulationState = SimulationState.ERROR

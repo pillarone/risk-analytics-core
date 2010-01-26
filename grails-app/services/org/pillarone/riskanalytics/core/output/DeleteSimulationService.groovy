@@ -1,20 +1,32 @@
 package org.pillarone.riskanalytics.core.output
 
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.hibernate.SessionFactory
 
 public class DeleteSimulationService {
+
     static transactional = true
+
     SessionFactory sessionFactory
 
+    private static Log LOG = LogFactory.getLog(DeleteSimulationService)
+
+    /**
+     * Marks a simulation run as to be deleted. Simulations are not deleted right away because
+     * it might take a while if there are many results.
+     * Parameterization and result configuration are set to null in order not to block them
+     * from editing if this was the only simulation that used them.
+     */
     Object deleteSimulation(SimulationRun simulationRun) {
         simulationRun.withTransaction {
             simulationRun.name = simulationRun.name + "TOBEDELETED" + System.currentTimeMillis()
             simulationRun.toBeDeleted = true
             simulationRun.parameterization = null
             simulationRun.resultConfiguration = null
-            simulationRun.save(flush: true)
-            if (!simulationRun) {
-                simulationRun.errors.each { log.error it }
+            if (!simulationRun.save(flush: true)) {
+                simulationRun.errors.each { LOG.error it }
             }
         }
         return simulationRun
@@ -28,5 +40,12 @@ public class DeleteSimulationService {
                 simulationRun.delete(flush: true)
             }
         }
+    }
+
+    /**
+     * Returns the singleton spring bean from the application context.
+     */
+    static DeleteSimulationService getInstance() {
+        return (DeleteSimulationService) ApplicationHolder.getApplication().getMainContext().getBean('deleteSimulationService')
     }
 }

@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.simulation.engine
 
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.output.DeleteSimulationService
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.engine.actions.Action
@@ -93,6 +94,7 @@ public class SimulationRunner {
             )
             LOG.error this, t
             LOG.debug error.dump()
+            DeleteSimulationService.instance.deleteSimulation(currentScope.simulationRun)
             return
         }
 

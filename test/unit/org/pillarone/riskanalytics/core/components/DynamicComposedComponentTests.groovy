@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.components
 
+import org.pillarone.riskanalytics.core.example.component.ExampleDynamicComponent
+import org.pillarone.riskanalytics.core.example.component.ExampleInputOutputComponent
 import org.pillarone.riskanalytics.core.example.component.TestComponent
 import org.pillarone.riskanalytics.core.example.component.TestDynamicComposedComponent
 
@@ -48,6 +50,23 @@ class DynamicComposedComponentTests extends GroovyTestCase {
 
         shouldFail(MissingPropertyException, {composedComponent.subSomething})
         shouldFail(MissingPropertyException, {composedComponent.subSomething = component1})
+    }
+
+    void testAllSubComponents() {
+        ExampleDynamicComponent dynamicComponent = new ExampleDynamicComponent()
+        ExampleInputOutputComponent component = dynamicComponent.createDefaultSubComponent()
+        component.name = 'c1'
+        dynamicComponent.addSubComponent(component)
+
+        assertEquals 1, dynamicComponent.componentList.size()
+        assertEquals 1, dynamicComponent.allSubComponents().size()
+
+        component = dynamicComponent.createDefaultSubComponent()
+        component.name = 'c2'
+        dynamicComponent.addSubComponent(component)
+
+        assertEquals 2, dynamicComponent.componentList.size()
+        assertEquals 2, dynamicComponent.allSubComponents().size()
     }
 }
 

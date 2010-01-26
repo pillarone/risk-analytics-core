@@ -104,7 +104,8 @@ abstract public class ComposedComponent extends Component {
         }
     }
 
-    protected List<Component> cachedComponentList = null;
+    protected LinkedList<Component> cachedComponentList = null;
+
     /**
      * Sub components are either properties on the component or in case
      * of dynamically composed components stored in its componentList.
@@ -113,14 +114,14 @@ abstract public class ComposedComponent extends Component {
      */
     public List<Component> allSubComponents() {
         if (cachedComponentList != null) return cachedComponentList;
-        List<Component> result = new LinkedList<Component>();
+        LinkedList<Component> result = new LinkedList<Component>();
         for (Object prop : this.allCachedComponentProperties().values()) {
             if (prop instanceof Component) {
                 result.add((Component) prop);
             }
         }
         cachedComponentList = result; // avoid premature leaking
-        return cachedComponentList;
+        return (List<Component>) cachedComponentList.clone(); //clone in order to make sure no one can modify the cached list
     }
 
     public void optimizeWiring() {

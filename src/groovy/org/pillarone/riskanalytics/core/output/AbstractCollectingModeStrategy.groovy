@@ -1,7 +1,5 @@
 package org.pillarone.riskanalytics.core.output
 
-import org.pillarone.riskanalytics.core.output.SingleValueResult
-
 abstract class AbstractCollectingModeStrategy implements ICollectingModeStrategy {
 
     PacketCollector packetCollector
@@ -20,8 +18,8 @@ abstract class AbstractCollectingModeStrategy implements ICollectingModeStrategy
             result.simulationRun = packetCollector.simulationScope.simulationRun
             result.iteration = packetCollector.simulationScope.iterationScope.currentIteration
             result.period = packetCollector.simulationScope.iterationScope.periodScope.currentPeriod
-            result.path = packetCollector.getPathMapping()
-            result.collector = packetCollector.getCollectorMapping()
+            result.path = packetCollector.pathMapping()
+            result.collector = packetCollector.collectorMapping()
             result.field = packetCollector.getFieldMapping(name)
             result.valueIndex = valueIndex
             result.value = value

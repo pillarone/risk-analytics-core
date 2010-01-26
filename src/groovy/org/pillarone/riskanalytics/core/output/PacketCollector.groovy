@@ -1,9 +1,5 @@
 package org.pillarone.riskanalytics.core.output
 
-import org.pillarone.riskanalytics.core.output.CollectorMapping
-import org.pillarone.riskanalytics.core.output.FieldMapping
-import org.pillarone.riskanalytics.core.output.PathMapping
-
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.output.batch.AbstractBulkInsert
@@ -56,26 +52,27 @@ public class PacketCollector extends Component {
         outputStrategy << mode.collect(inPackets)
     }
 
-    PathMapping getPathMapping() {
+    //Do not rename this method to getPathMapping, otherwise it will be called from getProperties which has a performance impact
+
+    PathMapping pathMapping() {
         if (!pathMapping) {
             pathMapping = PathMapping.findByPathName(path)
             if (!pathMapping) {
                 pathMapping = new PathMapping(pathName: path)
                 assert pathMapping.save()
             }
-
         }
         return pathMapping
     }
+    //Do not rename this method to getCollectorMapping, otherwise it will be called from getProperties which has a performance impact
 
-    CollectorMapping getCollectorMapping() {
+    CollectorMapping collectorMapping() {
         if (!collectorMapping) {
             collectorMapping = CollectorMapping.findByCollectorName(collectorName)
             if (!collectorMapping) {
                 collectorMapping = new CollectorMapping(collectorName: collectorName)
                 assert collectorMapping.save()
             }
-
         }
         return collectorMapping
     }

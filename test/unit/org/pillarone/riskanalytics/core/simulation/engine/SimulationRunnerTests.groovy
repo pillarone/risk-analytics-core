@@ -1,12 +1,13 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
 import grails.test.GrailsUnitTestCase
+import groovy.mock.interceptor.StubFor
 import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.pillarone.riskanalytics.core.output.DeleteSimulationService
+import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
+import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.SimulationState
-import org.pillarone.riskanalytics.core.simulation.engine.IterationScope
-import org.pillarone.riskanalytics.core.simulation.engine.PeriodScope
-import org.pillarone.riskanalytics.core.simulation.engine.SimulationRunner
-import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 import org.pillarone.riskanalytics.core.simulation.engine.actions.Action
 import org.pillarone.riskanalytics.core.simulation.engine.actions.IterationAction
 import org.pillarone.riskanalytics.core.simulation.engine.actions.PeriodAction
@@ -14,7 +15,27 @@ import org.pillarone.riskanalytics.core.simulation.engine.actions.SimulationActi
 
 class SimulationRunnerTests extends GrailsUnitTestCase {
 
+    StubFor transactionStub
+    StubFor deletionServiceStub
+
+    void setUp() {
+        transactionStub = new StubFor(SimulationRun)
+        deletionServiceStub = new StubFor(DeleteSimulationService)
+    }
+
     void testSimulationRun() {
+        transactionStub.demand.withTransaction(2..2) {
+            Closure c -> c.call()
+        }
+        deletionServiceStub.demand.getInstance(1..1) {
+            return [
+                    deleteSimulation: {
+                        //should never be called
+                        assertTrue false
+                    }
+            ] as DeleteSimulationService
+        }
+
         PeriodScope periodScope = new PeriodScope()
         IterationScope iterationScope = new IterationScope(periodScope: periodScope, numberOfPeriods: 2)
         SimulationScope simulationScope = new SimulationScope(iterationScope: iterationScope, numberOfIterations: 2)
@@ -32,7 +53,11 @@ class SimulationRunnerTests extends GrailsUnitTestCase {
         runner.simulationAction = simulationAction
         runner.postSimulationActions << postSimulationAction
 
-        runner.start()
+        transactionStub.use {
+            deletionServiceStub.use {
+                runner.start()
+            }
+        }
 
     }
 
@@ -79,9 +104,22 @@ class SimulationRunnerTests extends GrailsUnitTestCase {
     }
 
     void testErrorDuringSimulation() {
+        transactionStub.demand.withTransaction(2..2) {
+            Closure c -> throw new Exception()
+        }
+        deletionServiceStub.demand.getInstance(1..1) {
+            return [
+                    deleteSimulation: {SimulationRun run ->
+                        //simulating marked to delete
+                        run.parameterization = null
+                        run.resultConfiguration = null
+                    }
+            ] as DeleteSimulationService
+        }
+
         PeriodScope periodScope = new PeriodScope()
         IterationScope iterationScope = new IterationScope(periodScope: periodScope, numberOfPeriods: 2)
-        SimulationScope simulationScope = new SimulationScope(iterationScope: iterationScope, numberOfIterations: 10)
+        SimulationScope simulationScope = new SimulationScope(iterationScope: iterationScope, numberOfIterations: 10, simulationRun: new SimulationRun(parameterization: new ParameterizationDAO(), resultConfiguration: new ResultConfigurationDAO()))
 
         PeriodAction periodAction = [perform: {throw new Exception()}] as PeriodAction
         Action iterationAction = new IterationAction(iterationScope: iterationScope, periodAction: periodAction)
@@ -96,10 +134,17 @@ class SimulationRunnerTests extends GrailsUnitTestCase {
         runner.simulationAction = simulationAction
         runner.postSimulationActions << postSimulationAction
 
-        runner.start()
+        transactionStub.use {
+            deletionServiceStub.use {
+                runner.start()
+            }
+        }
 
         assertSame "simulation state after error", SimulationState.ERROR, runner.simulationState
         assertNotNull "error object not set", runner.error
+
+        assertNull simulationScope.simulationRun.parameterization
+        assertNull simulationScope.simulationRun.resultConfiguration
     }
 
     // TODO (Oct 21, 2009, msh): maybe dk has an idea why this test doesn't work

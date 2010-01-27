@@ -1,13 +1,7 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
-import org.pillarone.riskanalytics.core.output.CollectorInformation
-import org.pillarone.riskanalytics.core.output.PathMapping
-import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
-import org.pillarone.riskanalytics.core.output.SimulationRun
-import org.pillarone.riskanalytics.core.output.PacketCollector
-import org.pillarone.riskanalytics.core.output.ResultConfigurationWriter
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
-import org.pillarone.riskanalytics.core.output.CollectingModeFactory
+import org.pillarone.riskanalytics.core.output.*
 
 class ResultConfiguration extends ModellingItem {
 
@@ -43,7 +37,14 @@ class ResultConfiguration extends ModellingItem {
     }
 
     protected ResultConfigurationDAO loadFromDB() {
-        return ResultConfigurationDAO.findByNameAndItemVersion(name, versionNumber.toString())
+        def criteria = ResultConfigurationDAO.createCriteria()
+        def results = criteria.list {
+            eq('name', name)
+            eq('itemVersion', versionNumber.toString())
+            if (getModelClass() != null)
+                eq('modelClassName', getModelClass().name)
+        }
+        return results.size() > 0 ? results.get(0) : null
     }
 
     protected void mapFromDao(Object dao) {

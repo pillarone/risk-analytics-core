@@ -13,15 +13,12 @@ class CoreBootStrap {
 
     def init = {servletContext ->
 
-        CollectingModeFactory.registerStrategy(new SingleValueCollectingModeStrategy())
-        CollectingModeFactory.registerStrategy(new AggregatedCollectingModeStrategy())
-
-        ConstraintsFactory.registerConstraint(new SimpleConstraint())
-
         if (Environment.current == Environment.TEST) {
             return
         }
 
+        //File import must be executed after the registration of all Constraints and CollectingModeStrategies
+        //-> registration in the plugin descriptors / fileimport in bootstrap
         def modelFilter = ApplicationHolder.application.config?.models
 
         List models = null

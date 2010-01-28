@@ -1,6 +1,11 @@
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pillarone.riskanalytics.core.util.GrailsConfigValidator
 import org.pillarone.riskanalytics.core.output.batch.GenericBulkInsert
+import org.pillarone.riskanalytics.core.parameterization.SimpleConstraint
+import org.pillarone.riskanalytics.core.parameterization.ConstraintsFactory
+import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
+import org.pillarone.riskanalytics.core.output.CollectingModeFactory
+import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
@@ -55,6 +60,11 @@ Persistence & Simulation engine.
                 "batchInsert": standardBulkInsert,
                 "keyFiguresToCalculate": standardCalculatorOutput
         ])
+
+        CollectingModeFactory.registerStrategy(new SingleValueCollectingModeStrategy())
+        CollectingModeFactory.registerStrategy(new AggregatedCollectingModeStrategy())
+
+        ConstraintsFactory.registerConstraint(new SimpleConstraint())
     }
 
     def onChange = {event ->

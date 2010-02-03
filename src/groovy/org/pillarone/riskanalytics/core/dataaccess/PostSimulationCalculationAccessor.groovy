@@ -42,8 +42,8 @@ class PostSimulationCalculationAccessor {
         }
     }
 
-    static List<BigDecimal> getPercentiles(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
-        List<BigDecimal> res = PostSimulationCalculation.executeQuery("SELECT result FROM org.pillarone.modelling.output.PostSimulationCalculation as p " +
+    static List getPercentiles(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
+        List res = PostSimulationCalculation.executeQuery("SELECT result FROM org.pillarone.riskanalytics.core.output.PostSimulationCalculation as p " +
                 " WHERE p.path.pathName = ? AND " +
                 "p.collector.collectorName = ? AND " +
                 "p.field.fieldName = ? AND " +
@@ -54,7 +54,7 @@ class PostSimulationCalculationAccessor {
     }
 
     static List getPDFValues(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
-        List res = PostSimulationCalculation.executeQuery("SELECT new Map (p.keyFigureParameter as keyFigureParameter , p.result as result) FROM org.pillarone.modelling.output.PostSimulationCalculation as p " +
+        List res = PostSimulationCalculation.executeQuery("SELECT new Map (p.keyFigureParameter as keyFigureParameter , p.result as result) FROM org.pillarone.riskanalytics.core.output.PostSimulationCalculation as p " +
                 " WHERE p.path.pathName = ? AND " +
                 "p.collector.collectorName = ? AND " +
                 "p.field.fieldName = ? AND " +

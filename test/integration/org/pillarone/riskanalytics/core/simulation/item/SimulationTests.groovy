@@ -1,17 +1,11 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
 import models.core.CoreModel
+import org.pillarone.riskanalytics.core.BatchRun
 import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
-import org.pillarone.riskanalytics.core.output.CollectorMapping
-import org.pillarone.riskanalytics.core.output.DBCleanUpService
-import org.pillarone.riskanalytics.core.output.DeleteSimulationService
-import org.pillarone.riskanalytics.core.output.FieldMapping
-import org.pillarone.riskanalytics.core.output.PathMapping
-import org.pillarone.riskanalytics.core.output.PostSimulationCalculation
-import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
-import org.pillarone.riskanalytics.core.output.SimulationRun
-import org.pillarone.riskanalytics.core.output.SingleValueResult
+import org.pillarone.riskanalytics.core.output.*
 
 class SimulationTests extends GroovyTestCase {
 
@@ -140,5 +134,47 @@ class SimulationTests extends GroovyTestCase {
         deleteSimulationService.deleteAllMarkedSimulations()
         assertNull SimulationRun.findByToBeDeleted(true)
     }
+
+    void deleteSimulationAndBacthRunSimulationRun() {
+        new DBCleanUpService().cleanUp()
+
+        BatchRun batchRun = new BatchRun()
+        batchRun.name = "Test"
+        batchRun.executionTime = new Date()
+        batchRun.save()
+
+        BatchRun batch = BatchRun.findByName("Test")
+        assertNotNull batch
+
+        def bRuns = batch.batchRunService.getSimulationRuns(batch)
+        assertTrue bRuns.size() == 0
+
+        Simulation simulation = createSimulation("simulation")
+        batch.batchRunService.addSimulationRun(batch, simulation, OutputStrategy.BATCH_DB_OUTPUT)
+
+        BatchRun bRun = BatchRun.findByName(batch.name)
+
+        assertTrue batch.batchRunService.getSimulationRuns(bRun).size() == 1
+        assertTrue batchRun.batchRunService.getSimulationRunAt(bRun, 0).name == simulation.name
+
+        assertTrue "Simulation deleted", simulation.delete()
+        assertNotNull "simulation toBeDeleted == true ", SimulationRun.findByToBeDeleted(true)
+
+        deleteSimulationService.deleteAllMarkedSimulations()
+        assertNull SimulationRun.findByToBeDeleted(true)
+    }
+
+    private Simulation createSimulation(String simulationName) {
+        createParameterization()
+        createResultConfiguration()
+        Simulation simulation = new Simulation(simulationName)
+        simulation.parameterization = new Parameterization("params")
+        simulation.template = new ResultConfiguration("template")
+        simulation.periodCount = 1
+        simulation.numberOfIterations = 10
+        simulation.modelClass = EmptyModel
+        return simulation
+    }
+
 
 }

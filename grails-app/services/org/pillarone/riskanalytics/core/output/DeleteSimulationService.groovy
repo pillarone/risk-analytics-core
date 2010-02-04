@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.hibernate.SessionFactory
+import org.pillarone.riskanalytics.core.BatchRunSimulationRun
 
 public class DeleteSimulationService {
 
@@ -35,10 +36,17 @@ public class DeleteSimulationService {
     void deleteAllMarkedSimulations() {  // todo (dk): wait until no simulation is running
         SimulationRun.withTransaction {
             SimulationRun.findAllByToBeDeleted(true).each {SimulationRun simulationRun ->
+                deleteBatchRunSimulationRun(simulationRun)
                 PostSimulationCalculation.findAllByRun(simulationRun)*.delete() // there are only few of them...
                 SingleValueResult.executeUpdate("delete from $SingleValueResult.name where simulationRun = ?", [simulationRun])
                 simulationRun.delete(flush: true)
             }
+        }
+    }
+
+    private void deleteBatchRunSimulationRun(SimulationRun simulationRun) {
+        BatchRunSimulationRun.findBySimulationRun(simulationRun).each {BatchRunSimulationRun batchRunSimulationRun ->
+            batchRunSimulationRun.delete()
         }
     }
 

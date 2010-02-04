@@ -66,6 +66,9 @@ class DynamicComposedComponentTests extends GroovyTestCase {
         dynamicComponent.addSubComponent(component)
 
         assertEquals 2, dynamicComponent.componentList.size()
+        //call allSubComponents multiple time to test different cases when values are read for the first time
+        //and when they're already cached
+        assertEquals 2, dynamicComponent.allSubComponents().size()
         assertEquals 2, dynamicComponent.allSubComponents().size()
     }
 }

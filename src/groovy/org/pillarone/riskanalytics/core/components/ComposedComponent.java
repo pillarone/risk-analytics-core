@@ -113,14 +113,15 @@ abstract public class ComposedComponent extends Component {
      * @return all sub components
      */
     public List<Component> allSubComponents() {
-        if (cachedComponentList != null) return cachedComponentList;
-        LinkedList<Component> result = new LinkedList<Component>();
-        for (Object prop : this.allCachedComponentProperties().values()) {
-            if (prop instanceof Component) {
-                result.add((Component) prop);
+        if (cachedComponentList == null) {
+            LinkedList<Component> result = new LinkedList<Component>();
+            for (Object prop : this.allCachedComponentProperties().values()) {
+                if (prop instanceof Component) {
+                    result.add((Component) prop);
+                }
             }
+            cachedComponentList = result; // avoid premature leaking
         }
-        cachedComponentList = result; // avoid premature leaking
         return (List<Component>) cachedComponentList.clone(); //clone in order to make sure no one can modify the cached list
     }
 

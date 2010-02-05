@@ -24,6 +24,7 @@ class BatchRunService {
     }
 
     public void runBatch(BatchRun batchRun) {
+        batchRun = BatchRun.findByName(batchRun?.name)
         getSimulationRuns(batchRun)?.each {BatchRunSimulationRun batchRunSimulationRun ->
             runSimulation(batchRunSimulationRun)
         }
@@ -72,16 +73,7 @@ class BatchRunService {
     }
 
     List<BatchRunSimulationRun> getSimulationRuns(BatchRun batchRun) {
-        List<BatchRunSimulationRun> items = null
-        BatchRunSimulationRun.withTransaction {
-            items = new ArrayList<BatchRunSimulationRun>()
-            BatchRunSimulationRun.findAllByBatchRunAndSimulationState(batchRun, SimulationState.NOT_RUNNING, [sort: "priority", order: "asc"]).each {BatchRunSimulationRun batchRunSimulationRun ->
-                SimulationRun simulationRun = SimulationRun.findByName(batchRunSimulationRun.simulationRun.name)
-                simulationRun.parameterization = ParameterizationDAO.findByNameAndItemVersion(simulationRun.parameterization.name, simulationRun.parameterization.itemVersion.toString())
-                items << batchRunSimulationRun
-            }
-        }
-        return items
+        return BatchRunSimulationRun.findAllByBatchRunAndSimulationState(batchRun, SimulationState.NOT_RUNNING, [sort: "priority", order: "asc"])
     }
 
     public BatchRunSimulationRun getSimulationRun(BatchRun batchRun, SimulationRun simulationRun) {

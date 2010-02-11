@@ -1,4 +1,5 @@
 dist/*
+docs/*
 target/*
 web-app/plugins/*
 .idea/workspace.xml

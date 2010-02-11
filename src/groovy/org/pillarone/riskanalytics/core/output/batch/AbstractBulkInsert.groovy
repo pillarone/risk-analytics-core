@@ -3,7 +3,12 @@ package org.pillarone.riskanalytics.core.output.batch
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.pillarone.riskanalytics.core.output.*
+import org.pillarone.riskanalytics.core.FileConstants
+import org.pillarone.riskanalytics.core.output.CollectorMapping
+import org.pillarone.riskanalytics.core.output.FieldMapping
+import org.pillarone.riskanalytics.core.output.PathMapping
+import org.pillarone.riskanalytics.core.output.SimulationRun
+import org.pillarone.riskanalytics.core.output.SingleValueResult
 
 abstract class AbstractBulkInsert {
     static String DEFAULT_COLLECTOR_NAME = "aggregated"
@@ -16,9 +21,7 @@ abstract class AbstractBulkInsert {
 
     private void init() {
         if (!initialized) {
-            URL url = getClass().getResource('/data')
-            String currentDirectory = new File(url.toURI()).path
-            String filename = "${currentDirectory}${File.separatorChar}${simulationRun.id}"
+            String filename = "${FileConstants.TEMP_FILE_DIRECTORY}${File.separatorChar}${simulationRun.id}"
             LOG.info("Temp file at: $filename")
 
             tempFile = new File(filename)

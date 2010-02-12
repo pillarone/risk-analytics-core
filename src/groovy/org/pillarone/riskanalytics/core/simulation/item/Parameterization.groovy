@@ -8,8 +8,8 @@ import org.pillarone.riskanalytics.core.parameterization.ParameterWriter
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
-import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.util.PropertiesUtils
+import org.springframework.transaction.TransactionStatus
 
 class Parameterization extends ModellingItem {
     // TODO (msh): introduce timeRange for periods
@@ -169,14 +169,7 @@ class Parameterization extends ModellingItem {
     }
 
     protected loadFromDB() {
-        def criteria = ParameterizationDAO.createCriteria()
-        def results = criteria.list {
-            eq('name', name)
-            eq('itemVersion', versionNumber.toString())
-            if (getModelClass() != null)
-                eq('modelClassName', getModelClass().name)
-        }
-        return results.size() > 0 ? results.get(0) : null
+        return ParameterizationDAO.find(name, getModelClass()?.name, versionNumber.toString())
     }
 
 

@@ -50,7 +50,7 @@ class Simulation extends ModellingItem {
         run.name = name
         run.comment = comment
         run.model = getModelClass()?.name
-        run.parameterization = ParameterizationDAO.findByNameAndItemVersion(parameterization.name, parameterization.versionNumber.toString())
+        run.parameterization = ParameterizationDAO.find(parameterization.name, run.model, parameterization.versionNumber.toString())
         run.resultConfiguration = ResultConfigurationDAO.findByNameAndItemVersion(template.name, template.versionNumber.toString())
         run.startTime = start
         run.endTime = end

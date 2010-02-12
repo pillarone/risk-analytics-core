@@ -81,7 +81,7 @@ class BatchRunService {
         BatchRunSimulationRun.withTransaction {
             item = BatchRunSimulationRun.findByBatchRunAndSimulationRun(batchRun, simulationRun)
             item.simulationRun = SimulationRun.findByName(simulationRun.name)
-            item.simulationRun.parameterization = ParameterizationDAO.findByNameAndItemVersion(simulationRun.parameterization.name, simulationRun.parameterization.itemVersion.toString())
+            item.simulationRun.parameterization = ParameterizationDAO.find(simulationRun.parameterization.name, simulationRun.model, simulationRun.parameterization.itemVersion.toString())
         }
         return item
     }

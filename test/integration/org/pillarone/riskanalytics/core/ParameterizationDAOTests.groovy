@@ -5,6 +5,7 @@ import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObject
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.ParameterObjectParameter
 import org.pillarone.riskanalytics.core.parameter.StringParameter
+import models.core.CoreModel
 
 class ParameterizationDAOTests extends GroovyTestCase {
 
@@ -141,6 +142,18 @@ class ParameterizationDAOTests extends GroovyTestCase {
         assertEquals parameterizationCount, ParameterizationDAO.count()
         assertEquals parameterCount, Parameter.count()
 
+    }
+
+    void testFind() {
+        ParameterizationDAO p1 = new ParameterizationDAO(name: 'name1', modelClassName: CoreModel.name, itemVersion: "1", valid: true, periodCount: 1).save()
+        assertNotNull p1
+
+        ParameterizationDAO p2 = new ParameterizationDAO(name: 'name1', modelClassName: EmptyModel.name, itemVersion: "1", valid: true, periodCount: 1).save()
+        assertNotNull p2
+
+        assertSame p1, ParameterizationDAO.find("name1", CoreModel.name, "1")
+        assertSame p2, ParameterizationDAO.find("name1", EmptyModel.name, "1")
+        assertNotSame ParameterizationDAO.find("name1", CoreModel.name, "1"), ParameterizationDAO.find("name1", EmptyModel.name, "1")
     }
 
 }

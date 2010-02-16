@@ -36,28 +36,6 @@ class ParameterizationHelperTests extends GroovyTestCase {
         assertSame model.exampleInputOutputComponent.parmParameterObject, parameter["exampleInputOutputComponent:parmParameterObject"]
     }
 
-    void testGetDateParameter() {
-        Date date = new GregorianCalendar(2009, 0, 1).getTime()
-        DateTime dateTime = new DateTime(date.getTime())
-
-        Parameter dateParam = ParameterizationHelper.getParameter("path", date)
-        Parameter dateTimeParam = ParameterizationHelper.getParameter("path", dateTime)
-
-        assertEquals dateParam.parameterInstance, dateTimeParam.parameterInstance
-    }
-
-    void testGetParameters() {
-        Map parameterMap = [
-                "a": "A",
-                "a.b": new Integer(1),
-                "a.b.c": new Double(1.2),
-                "a.b.c.d": ExampleParameterObjectClassifier.TYPE0.getParameterObject(["a": 0, "b": 1])]
-
-        List parameterList = ParameterizationHelper.getParameter(parameterMap)
-        assertNotNull parameterList
-        assertTrue parameterList.every {it instanceof Parameter}
-    }
-
     void testCreateDefaultParameterization() {
         int initialParameterCount = Parameter.count()
         CoreModel model = new CoreModel()

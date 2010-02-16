@@ -5,6 +5,7 @@ import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObject
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.ParameterObjectParameter
 import org.pillarone.riskanalytics.core.parameter.StringParameter
+import org.pillarone.riskanalytics.core.parameter.EnumParameter
 
 class ParameterizationDAOTests extends GroovyTestCase {
 
@@ -94,7 +95,7 @@ class ParameterizationDAOTests extends GroovyTestCase {
         parameterization.addToParameters(parameter)
 
         ParameterObjectParameter parameter2 = new ParameterObjectParameter(path: 'path2')
-        parameter2.parameterInstance = ExampleParameterObjectClassifier.TYPE0.getParameterObject(ExampleParameterObjectClassifier.TYPE0.parameters)
+        parameter2.type = new EnumParameter(parameterType: " ", parameterValue: " ", path: "path")
         parameterization.addToParameters(parameter2)
 
 

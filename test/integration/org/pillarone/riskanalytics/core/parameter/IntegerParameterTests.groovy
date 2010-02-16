@@ -4,12 +4,12 @@ class IntegerParameterTests extends GroovyTestCase {
 
     void testObjectCreation() {
         IntegerParameter parameter = new IntegerParameter(path: "path", integerValue: 1)
-        assertEquals 1, parameter.getParameterInstance()
-        parameter = new IntegerParameter(path: "path", parameterInstance: new Integer(2))
-        int instance = parameter.getParameterInstance()
+        assertEquals 1, parameter.integerValue
+        parameter = new IntegerParameter(path: "path", integerValue: new Integer(2))
+        int instance = parameter.integerValue
         assertEquals new Integer(2), instance
-        parameter = new IntegerParameter(path: "path", parameterInstance: 3)
-        assertEquals 3, parameter.getParameterInstance()
+        parameter = new IntegerParameter(path: "path", integerValue: 3)
+        assertEquals 3, parameter.integerValue
     }
 
     void testInsert() {
@@ -21,20 +21,4 @@ class IntegerParameterTests extends GroovyTestCase {
 
     }
 
-    void testGetInstance() {
-        IntegerParameter parameter = new IntegerParameter(path: "path", integerValue: 2)
-        assertEquals 2, parameter.getParameterInstance()
-    }
-
-    void testSetInstance() {
-        IntegerParameter parameter = new IntegerParameter(path: "path", integerValue: 1)
-        assertEquals 1, parameter.integerValue
-
-        parameter.setParameterInstance(new Integer(2))
-        assertEquals 2, parameter.integerValue
-
-        parameter.setParameterInstance(3)
-        assertEquals 3, parameter.integerValue
-
-    }
 }

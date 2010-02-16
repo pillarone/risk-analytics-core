@@ -11,9 +11,4 @@ class StringParameterTests extends GroovyTestCase {
 
     }
 
-    void testGetInstance() {
-        StringParameter parameter = new StringParameter(path: "path", parameterValue: 'string')
-        assertEquals 'string', parameter.getParameterInstance()
-    }
-
 }

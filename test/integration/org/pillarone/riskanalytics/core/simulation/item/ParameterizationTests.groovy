@@ -158,7 +158,7 @@ class ParameterizationTests extends GroovyTestCase {
     void testSaveOfParameter() {
         Parameterization parameterization = new Parameterization("newParams")
         parameterization.modelClass = EmptyModel
-        StringParameter parameter = new StringParameter(path: "path", parameterInstance: "value", periodIndex: 0)
+        StringParameter parameter = new StringParameter(path: "path", parameterValue: "value", periodIndex: 0)
         assertNull parameter.id
         parameterization.periodCount = 1
         parameterization.addParameter(new StringParameterHolder(parameter))
@@ -172,8 +172,8 @@ class ParameterizationTests extends GroovyTestCase {
         Parameterization parameterization = new Parameterization("newParams")
         parameterization.modelClass = EmptyModel
         parameterization.periodCount = 1
-        StringParameterHolder parameterA = new StringParameterHolder(new StringParameter(path: "a", parameterInstance: "value"))
-        StringParameterHolder parameterB = new StringParameterHolder(new StringParameter(path: "a.b", parameterInstance: "value"))
+        StringParameterHolder parameterA = new StringParameterHolder(new StringParameter(path: "a", parameterValue: "value"))
+        StringParameterHolder parameterB = new StringParameterHolder(new StringParameter(path: "a.b", parameterValue: "value"))
 
         parameterization.addParameter(parameterA)
         parameterization.addParameter(parameterB)
@@ -191,10 +191,10 @@ class ParameterizationTests extends GroovyTestCase {
         Parameterization parameterization = new Parameterization("newParams")
         parameterization.modelClass = EmptyModel
         parameterization.periodCount = 4
-        StringParameterHolder parameterD = new StringParameterHolder(new StringParameter(path: "a", parameterInstance: "value", periodIndex: 3))
-        StringParameterHolder parameterC = new StringParameterHolder(new StringParameter(path: "a", parameterInstance: "value", periodIndex: 2))
-        StringParameterHolder parameterB = new StringParameterHolder(new StringParameter(path: "a", parameterInstance: "value", periodIndex: 1))
-        StringParameterHolder parameterA = new StringParameterHolder(new StringParameter(path: "a", parameterInstance: "value", periodIndex: 0))
+        StringParameterHolder parameterD = new StringParameterHolder(new StringParameter(path: "a", parameterValue: "value", periodIndex: 3))
+        StringParameterHolder parameterC = new StringParameterHolder(new StringParameter(path: "a", parameterValue: "value", periodIndex: 2))
+        StringParameterHolder parameterB = new StringParameterHolder(new StringParameter(path: "a", parameterValue: "value", periodIndex: 1))
+        StringParameterHolder parameterA = new StringParameterHolder(new StringParameter(path: "a", parameterValue: "value", periodIndex: 0))
 
         parameterization.addParameter(parameterA)
         parameterization.addParameter(parameterB)

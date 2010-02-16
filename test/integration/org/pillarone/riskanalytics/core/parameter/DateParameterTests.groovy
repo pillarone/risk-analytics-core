@@ -15,14 +15,14 @@ class DateParameterTests extends GroovyTestCase {
 
     void testGetInstance() {
         DateParameter parameter = new DateParameter(path: "path", dateValue: new DateTime(1972, 6, 14, 0, 0, 0, 0))
-        assertEquals new DateTime(1972, 6, 14, 0, 0, 0, 0), parameter.getParameterInstance()
+        assertEquals new DateTime(1972, 6, 14, 0, 0, 0, 0), parameter.dateValue
     }
 
     void testSetInstance() {
         DateParameter parameter = new DateParameter(path: "path", dateValue: new DateTime(1972, 6, 14, 0, 0, 0, 0))
         assertEquals new DateTime(1972, 6, 14, 0, 0, 0, 0), parameter.dateValue
 
-        parameter.setParameterInstance(new DateTime(2009, 4, 3, 0, 0, 0, 0))
+        parameter.dateValue = new DateTime(2009, 4, 3, 0, 0, 0, 0)
         assertEquals new DateTime(2009, 4, 3, 0, 0, 0, 0), parameter.dateValue
 
     }

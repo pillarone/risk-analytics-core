@@ -1,9 +1,6 @@
 package org.pillarone.riskanalytics.core.output
 
 import models.core.CoreModel
-import org.pillarone.riskanalytics.core.output.CollectorInformation
-import org.pillarone.riskanalytics.core.output.PathMapping
-import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.example.component.ExampleInputOutputComponent
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.parameterization.StructureInformation
@@ -121,5 +118,24 @@ class CollectorFactoryTests extends GroovyTestCase {
         assertEquals "# collectorInformation", 2, enhancedCollectorInformation.size()
         assertFalse "wildcard not removed", enhancedCollectorInformation.contains(collectorInformationContainingWildCard)
 
+    }
+
+    void testNestedComponentInDynamicComponent() {
+        CoreModel model = new CoreModel()
+        model.init()
+        ExampleInputOutputComponent line1 = model.dynamicComponent.createDefaultSubComponent()
+        line1.name = "subLine1"
+        model.dynamicComponent.addSubComponent(line1)
+
+        CollectorFactory factory = new CollectorFactory(new FileOutput())
+
+        CollectorInformation collectorInformationContainingWildCard = new CollectorInformation()
+        collectorInformationContainingWildCard.path = new PathMapping(pathName: "Core:dynamicComponent:subSubcomponent:subSomething:outValue")
+        collectorInformationContainingWildCard.collectingStrategyIdentifier = SingleValueCollectingModeStrategy.IDENTIFIER
+
+        List enhancedCollectorInformation = factory.enhanceCollectorInformationSet([collectorInformationContainingWildCard], model)
+        assertEquals "# collectorInformation", 1, enhancedCollectorInformation.size()
+        //PMO-734: this line tests if out channels of a sub component of a dynamically added subcomponent are resolved correctly
+        assertEquals "Core:dynamicComponent:subLine1:subSomething:outValue", enhancedCollectorInformation[0].path.pathName
     }
 }

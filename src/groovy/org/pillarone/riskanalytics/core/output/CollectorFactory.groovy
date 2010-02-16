@@ -63,13 +63,12 @@ public class CollectorFactory {
 
         def component = model
 
-        pathElements[1..-2].each {componentName ->
+        for (String componentName in pathElements[1..-2]) {
             if (component.properties.keySet().contains(componentName)) {
                 component = component[componentName]
             } else {
                 if (component instanceof DynamicComposedComponent) {
-                    resultingCollectorInformation = resolveWildcardPath(component, collectorInformation, componentName)
-                    return // leave the each closure
+                    return resolveWildcardPath(component, collectorInformation, componentName)
                 } else {
                     Map pathToComponent = structureInformation.componentPaths.inverse()
                     String path = pathElements[0..-2].join(":")

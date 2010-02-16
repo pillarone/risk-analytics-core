@@ -8,8 +8,8 @@ class RandomSeedAction implements Action {
     SimulationScope simulationScope
 
     void perform() {
-        if (simulationScope.simulationRun.randomSeed != null) {
-            MathUtils.initRandomStreamBase(simulationScope.simulationRun.randomSeed)
+        if (simulationScope.simulation.randomSeed != null) {
+            MathUtils.initRandomStreamBase(simulationScope.simulation.randomSeed)
         }
     }
 

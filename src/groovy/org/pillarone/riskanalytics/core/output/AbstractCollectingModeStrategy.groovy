@@ -15,7 +15,7 @@ abstract class AbstractCollectingModeStrategy implements ICollectingModeStrategy
             String name = entry.key
             Double value = entry.value
             SingleValueResult result = new SingleValueResult()
-            result.simulationRun = packetCollector.simulationScope.simulationRun
+            result.simulationRun = packetCollector.simulationScope.simulation.simulationRun
             result.iteration = packetCollector.simulationScope.iterationScope.currentIteration
             result.period = packetCollector.simulationScope.iterationScope.periodScope.currentPeriod
             result.path = packetCollector.pathMapping()

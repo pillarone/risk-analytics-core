@@ -13,7 +13,7 @@ class CreatePeriodCounterAction implements Action {
     SimulationScope simulationScope
 
     void perform() {
-        IPeriodCounter periodCounter = simulationScope.model.createPeriodCounter(simulationScope.simulationRun.beginOfFirstPeriod)
+        IPeriodCounter periodCounter = simulationScope.model.createPeriodCounter(simulationScope.simulation.beginOfFirstPeriod)
         simulationScope.iterationScope.periodScope.periodCounter = periodCounter
     }
 

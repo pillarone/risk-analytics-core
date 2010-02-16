@@ -18,7 +18,7 @@ public class RunSimulationService {
      *          A simulation configuration which defines the simulation run and output strategy
      */
     public synchronized SimulationRunner runSimulation(SimulationRunner runner, SimulationConfiguration configuration) {
-        backgroundService.execute(configuration.simulationRun.name) { //don't start a transaction here, but inside SimulationRunner (problems with certain dbs.)
+        backgroundService.execute(configuration.simulation.name) { //don't start a transaction here, but inside SimulationRunner (problems with certain dbs.)
             runner.simulationConfiguration = configuration
             runner.start()
         }

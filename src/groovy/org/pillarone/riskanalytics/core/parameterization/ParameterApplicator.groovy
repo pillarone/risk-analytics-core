@@ -5,6 +5,8 @@ import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
 import org.pillarone.riskanalytics.core.model.Model
+import org.pillarone.riskanalytics.core.simulation.item.Parameterization
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 
 /**
  * The ParameterApplicator is responsible for writing the parameter values defined by the ParameterizationDAO to the model.
@@ -18,7 +20,7 @@ import org.pillarone.riskanalytics.core.model.Model
 public class ParameterApplicator {
 
     Model model
-    ParameterizationDAO parameterization
+    Parameterization parameterization
     List parameterPerPeriod
     int lastInjectedPeriod = -1
 
@@ -49,13 +51,13 @@ public class ParameterApplicator {
     }
 
 
-    protected List buildApplicableParameter(ParameterizationDAO parameterizationDAO) {
+    protected List buildApplicableParameter(Parameterization parameterization) {
         List parameterPerPeriod = []
-        parameterizationDAO.periodCount.times {
+        parameterization.periodCount.times {
             parameterPerPeriod << []
         }
-        parameterizationDAO.parameters.each {Parameter p ->
-            parameterPerPeriod[p.periodIndex] << createApplicableParameter(model, p.path, p.getParameterInstance())
+        parameterization.parameterHolders.each {ParameterHolder p ->
+            parameterPerPeriod[p.periodIndex] << createApplicableParameter(model, p.path, p.getBusinessObject())
         }
 
         return parameterPerPeriod

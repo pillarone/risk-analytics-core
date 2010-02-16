@@ -12,6 +12,8 @@ import org.pillarone.riskanalytics.core.simulation.engine.actions.Action
 import org.pillarone.riskanalytics.core.simulation.engine.actions.IterationAction
 import org.pillarone.riskanalytics.core.simulation.engine.actions.PeriodAction
 import org.pillarone.riskanalytics.core.simulation.engine.actions.SimulationAction
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
+import org.pillarone.riskanalytics.core.simulation.item.ModellingItem
 
 class SimulationRunnerTests extends GrailsUnitTestCase {
 
@@ -104,8 +106,12 @@ class SimulationRunnerTests extends GrailsUnitTestCase {
     }
 
     void testErrorDuringSimulation() {
-        transactionStub.demand.withTransaction(2..2) {
-            Closure c -> throw new Exception()
+        //to simulate an error we throw an exception when the withTransaction closure is used. (during simulation)
+        transactionStub.demand.withTransaction(3..3) {
+            Closure c ->
+            //don't throw an exception when withTransaction is used from to load/delete data
+            if(c.delegate instanceof ModellingItem) return
+            throw new Exception()
         }
         deletionServiceStub.demand.getInstance(1..1) {
             return [
@@ -119,7 +125,7 @@ class SimulationRunnerTests extends GrailsUnitTestCase {
 
         PeriodScope periodScope = new PeriodScope()
         IterationScope iterationScope = new IterationScope(periodScope: periodScope, numberOfPeriods: 2)
-        SimulationScope simulationScope = new SimulationScope(iterationScope: iterationScope, numberOfIterations: 10, simulationRun: new SimulationRun(parameterization: new ParameterizationDAO(), resultConfiguration: new ResultConfigurationDAO()))
+        SimulationScope simulationScope = new SimulationScope(iterationScope: iterationScope, numberOfIterations: 10, simulation: new Simulation("simulation"))
 
         PeriodAction periodAction = [perform: {throw new Exception()}] as PeriodAction
         Action iterationAction = new IterationAction(iterationScope: iterationScope, periodAction: periodAction)
@@ -143,8 +149,8 @@ class SimulationRunnerTests extends GrailsUnitTestCase {
         assertSame "simulation state after error", SimulationState.ERROR, runner.simulationState
         assertNotNull "error object not set", runner.error
 
-        assertNull simulationScope.simulationRun.parameterization
-        assertNull simulationScope.simulationRun.resultConfiguration
+        assertNull simulationScope.simulation.simulationRun?.parameterization
+        assertNull simulationScope.simulation.simulationRun?.resultConfiguration
     }
 
     // TODO (Oct 21, 2009, msh): maybe dk has an idea why this test doesn't work
@@ -178,7 +184,7 @@ class SimulationRunnerTests extends GrailsUnitTestCase {
         assertNotNull "no runner created", runner
 
         runner.simulationConfiguration = configuration
-        
+
         SimulationScope simulationScope = runner.simulationAction.simulationScope
 
         assertEquals "iterationCount", simulationRun.iterations, simulationScope.numberOfIterations

@@ -1,7 +1,7 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
-import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
 /**
  * The SimulationConfiguration is a descriptor for a runnable simulation. All runtime aspects e.g. numberOfIterations,
@@ -12,7 +12,7 @@ import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
  */
 public class SimulationConfiguration {
 
-    SimulationRun simulationRun
+    Simulation simulation
     ICollectorOutputStrategy outputStrategy
 
 }

@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.simulation.item
 
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.output.*
+import org.pillarone.riskanalytics.core.model.Model
 
 class ResultConfiguration extends ModellingItem {
 
@@ -45,6 +46,18 @@ class ResultConfiguration extends ModellingItem {
                 eq('modelClassName', getModelClass().name)
         }
         return results.size() > 0 ? results.get(0) : null
+    }
+
+    /**
+     * Returns ready-for-simulation collectors, which means that the wildcards of dynamic
+     * components are replaced with the actual sub component names.
+     * This is in contrast to getCollectors, which returns the collectors for UI use.
+     */
+    public List<PacketCollector> getResolvedCollectors(Model model, CollectorFactory collectorFactory) {
+        if (dao) {
+            return collectorFactory.createCollectors(dao, model)
+        }
+        return null
     }
 
     protected void mapFromDao(Object dao) {

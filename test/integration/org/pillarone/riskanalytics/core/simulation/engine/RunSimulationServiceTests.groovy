@@ -11,6 +11,10 @@ import org.pillarone.riskanalytics.core.fileimport.ResultConfigurationImportServ
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.output.NoOutput
+import org.pillarone.riskanalytics.core.simulation.item.Parameterization
+import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
+import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 
 class RunSimulationServiceTests extends GrailsUnitTestCase {
 
@@ -32,32 +36,24 @@ class RunSimulationServiceTests extends GrailsUnitTestCase {
         new ResultConfigurationImportService().compareFilesAndWriteToDB(["CoreResultConfiguration"])
         new ModelStructureImportService().compareFilesAndWriteToDB(["CoreStructure"])
 
-        def parameter = ParameterizationDAO.findByName('CoreParameters')
-        assertNotNull parameter
+        def parameter = new Parameterization('CoreParameters')
+        parameter.load()
 
-        def resultConfig = ResultConfigurationDAO.findByName('CoreResultConfiguration')
-        assertNotNull resultConfig
+        def resultConfig = new ResultConfiguration('CoreResultConfiguration')
+        resultConfig.load()
 
 
-        SimulationRun run = new SimulationRun()
-        run.name = "Core_${new Date()}"
+        Simulation run = new Simulation("Core_${new Date().toString()}")
         run.parameterization = parameter
-        run.resultConfiguration = resultConfig
-        run.model = CoreModel.name
-        run.modelVersionNumber = "1"
+        run.template = resultConfig
+        run.modelClass = CoreModel
+        run.modelVersionNumber = new VersionNumber("1")
         run.periodCount = 1
-        run.iterations = 1000
-
-        if (!run.save()) {
-
-            run.errors.each {
-                log.error it
-                fail("Error saving SimulationRun")
-            }
-        }
+        run.numberOfIterations = 1000
+        run.save()
 
         SimulationConfiguration simulationConfiguration = new SimulationConfiguration()
-        simulationConfiguration.simulationRun = run
+        simulationConfiguration.simulation = run
         simulationConfiguration.outputStrategy = new NoOutput()
 
         SimulationRunner runner = runSimulationService.runSimulation(SimulationRunner.createRunner(), simulationConfiguration)

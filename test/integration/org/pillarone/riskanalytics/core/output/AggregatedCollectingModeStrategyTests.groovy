@@ -2,33 +2,50 @@ package org.pillarone.riskanalytics.core.output
 
 import org.pillarone.riskanalytics.core.packets.ITestPacketApple
 import org.pillarone.riskanalytics.core.packets.ITestPacketOrange
-
 import org.pillarone.riskanalytics.core.packets.PacketList
-import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 import org.pillarone.riskanalytics.core.simulation.engine.IterationScope
 import org.pillarone.riskanalytics.core.simulation.engine.PeriodScope
+import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
+import org.pillarone.riskanalytics.core.fileimport.ParameterizationImportService
+import org.pillarone.riskanalytics.core.fileimport.ResultConfigurationImportService
+import org.pillarone.riskanalytics.core.simulation.item.Parameterization
+import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 
 class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
 
     AggregatedCollectingModeStrategy strategy
-    SimulationRun run
+    Simulation run
     FieldMapping fieldMapping
     PathMapping pathMapping
     CollectorMapping collectorMapping
 
     void setUp() {
+
+        new ParameterizationImportService().compareFilesAndWriteToDB(['CoreParameters'])
+        new ResultConfigurationImportService().compareFilesAndWriteToDB(['CoreResultConfiguration'])
+
         fieldMapping = getFieldMapping("ultimate")
         pathMapping = getPathMapping("path")
         collectorMapping = getCollectorMapping("collector")
 
-        run = new SimulationRun()
+        Parameterization parameterization = new Parameterization("CoreParameters")
+        parameterization.load()
+
+        ResultConfiguration resultConfiguration = new ResultConfiguration("CoreResultConfiguration")
+        resultConfiguration.load()
+
+        run = new Simulation("name")
+        run.template = resultConfiguration
+        run.parameterization = parameterization
+        run.save()
 
         PeriodScope periodScope = new PeriodScope()
         IterationScope iterationScope = new IterationScope(periodScope: periodScope)
         SimulationScope simulationScope = new SimulationScope(iterationScope: iterationScope)
         periodScope.currentPeriod = 1
         iterationScope.currentIteration = 13
-        simulationScope.simulationRun = run
+        simulationScope.simulation = run
 
         strategy = new AggregatedCollectingModeStrategy()
         PacketCollector collector = new PacketCollector(strategy)
@@ -52,7 +69,7 @@ class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
 
         SingleValueResult singleValueResult = aggregatedValues.get(0)
 
-        assertSame "simulationRun", run, singleValueResult.simulationRun
+        assertSame "simulationRun", run.simulationRun, singleValueResult.simulationRun
         assertEquals "period", 1, singleValueResult.period
         assertEquals "iteration", 13, singleValueResult.iteration
         assertSame "pathMapping", pathMapping, singleValueResult.path

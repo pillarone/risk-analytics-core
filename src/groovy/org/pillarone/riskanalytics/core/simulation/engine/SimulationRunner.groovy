@@ -64,7 +64,7 @@ public class SimulationRunner {
         simulationState = SimulationState.INITIALIZING
         LOG.debug "start simulation"
         start = System.currentTimeMillis()
-        currentScope?.simulationRun?.startTime = new Date(start)
+        currentScope?.simulation?.start = new Date(start)
         try {
             LOG.debug "perform preSimulationActions"
             for (Action action in preSimulationActions) {
@@ -87,22 +87,22 @@ public class SimulationRunner {
         } catch (Throwable t) {
             simulationState = SimulationState.ERROR
             error = new SimulationError(
-                    simulationRunID: currentScope.simulationRun?.id,
+                    simulationRunID: currentScope.simulation?.id,
                     iteration: currentScope.iterationScope.currentIteration,
                     period: currentScope.iterationScope.periodScope.currentPeriod,
                     error: t
             )
             LOG.error this, t
             LOG.debug error.dump()
-            DeleteSimulationService.instance.deleteSimulation(currentScope.simulationRun)
+            currentScope.simulation.delete()
             return
         }
 
         LOG.debug "end simulation"
         simulationState = SimulationState.FINISHED
         long end = System.currentTimeMillis()
-        currentScope?.simulationRun?.endTime = new Date(end)
-        currentScope?.simulationRun?.save(flush: true)
+        currentScope?.simulation?.end = new Date(end)
+        currentScope?.simulation?.save()
         LogFactory.getLog(SimulationRunner).info "simulation took ${end - start} ms"
 
     }
@@ -144,11 +144,11 @@ public class SimulationRunner {
      * All information about the simulation will be gathered from the configuration and the actions and scopes get the requiered parameter.
      */
     public void setSimulationConfiguration(SimulationConfiguration configuration) {
-        SimulationRun run = SimulationRun.get(configuration.simulationRun.id)
-        currentScope.simulationRun = run
-        currentScope.model = this.class.classLoader.loadClass(run.model).newInstance()
+        def simulation = configuration.simulation
+        currentScope.simulation = simulation
+        currentScope.model = simulation.modelClass.newInstance()
         currentScope.outputStrategy = configuration.outputStrategy
-        currentScope.iterationScope.numberOfPeriods = run.periodCount
+        currentScope.iterationScope.numberOfPeriods = simulation.periodCount
 
         simulationAction.iterationAction.periodAction.model = currentScope.model
     }

@@ -7,6 +7,7 @@ import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.output.CollectorFactory
 import org.pillarone.riskanalytics.core.output.PacketCollector
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
+import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 
 public class WireModelAction implements Action {
 
@@ -18,7 +19,7 @@ public class WireModelAction implements Action {
         LOG.debug "Wiring model"
 
         Model model = simulationScope.model
-        ResultConfigurationDAO resultConfig = simulationScope.resultConfiguration
+        ResultConfiguration resultConfig = simulationScope.resultConfiguration
         // TODO (Oct 27, 2009, msh): Really required here ? ParameterApplicator creates subComponents for DCC already
         //TODO (msp 24.12.09): I don't think so..  Parameters for the 1st period are also injected twice this way
 //        simulationScope.parameterApplicator.applyParameterForPeriod(0)
@@ -30,7 +31,7 @@ public class WireModelAction implements Action {
         CollectorFactory collectorFactory = simulationScope.collectorFactory
         collectorFactory.structureInformation = simulationScope.structureInformation
 
-        List collectors = collectorFactory.createCollectors(resultConfig, model)
+        List collectors = resultConfig.getResolvedCollectors(model, collectorFactory)
         collectors.each {PacketCollector it ->
             it.attachToModel(model, simulationScope.structureInformation)
         }

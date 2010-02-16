@@ -14,13 +14,11 @@ import models.core.parameterApplicator.ParameterApplicatorModel
 class ParameterApplicatorTests extends GrailsUnitTestCase {
 
 
-    private ParameterizationDAO getParamDAO(File paramFile) {
+    private Parameterization getParameterization(File paramFile) {
         ConfigObject params = new ConfigSlurper().parse(paramFile.toURL())
         Parameterization parameterization = ParameterizationHelper.createParameterizationFromConfigObject(params, "dummy")
         parameterization.save()
-        def parameter = parameterization.dao
-        parameter.periodCount = params.periodCount
-        return parameter
+        return parameterization
     }
 
     void testCreateApplicableParameter() {
@@ -41,7 +39,7 @@ class ParameterApplicatorTests extends GrailsUnitTestCase {
     }
 
     void testBuildApplicableParameter() {
-        ParameterizationDAO parameter = getParamDAO(new File("src/java/models/core/CoreParameters.groovy"))
+        Parameterization parameter = getParameterization(new File("src/java/models/core/CoreParameters.groovy"))
 
         Model m = new CoreModel()
         m.init()
@@ -59,7 +57,7 @@ class ParameterApplicatorTests extends GrailsUnitTestCase {
     }
 
     void testInit() {
-        ParameterizationDAO parameter = getParamDAO(new File("src/java/models/core/CoreParameters.groovy"))
+        Parameterization parameter = getParameterization(new File("src/java/models/core/CoreParameters.groovy"))
 
         Model m = new CoreModel()
         m.init()
@@ -76,7 +74,7 @@ class ParameterApplicatorTests extends GrailsUnitTestCase {
     //TODO msp: create better test model
     void testApplyParameter() {
 
-        ParameterizationDAO parameter = getParamDAO(new File("src/java/models/core/CoreParameters.groovy"))
+        Parameterization parameter = getParameterization(new File("src/java/models/core/CoreParameters.groovy"))
 
         Model m = new CoreModel()
         m.init()
@@ -94,7 +92,7 @@ class ParameterApplicatorTests extends GrailsUnitTestCase {
 
     void testDynamicComposedComponentExpansion() {
 
-        ParameterizationDAO parameter = getParamDAO(new File("src/java/models/core/CoreParameters.groovy"))
+        Parameterization parameter = getParameterization(new File("src/java/models/core/CoreParameters.groovy"))
 
         CoreModel m = new CoreModel()
         m.init()
@@ -134,7 +132,7 @@ class ParameterApplicatorTests extends GrailsUnitTestCase {
     }
 
     void testAbstractMultiDimensionalParameterHandling() {
-        ParameterizationDAO parameter = getParamDAO(new File("src/java/models/core/parameterApplicator/ParameterApplicatorParameters.groovy"))
+        Parameterization parameter = getParameterization(new File("src/java/models/core/parameterApplicator/ParameterApplicatorParameters.groovy"))
 
         Model model = new ParameterApplicatorModel()
         model.init()
@@ -153,7 +151,7 @@ class ParameterApplicatorTests extends GrailsUnitTestCase {
     }
 
     void testConstraindedStringHandling() {
-        ParameterizationDAO parameter = getParamDAO(new File("src/java/models/core/parameterApplicator/ParameterApplicatorParameters.groovy"))
+        Parameterization parameter = getParameterization(new File("src/java/models/core/parameterApplicator/ParameterApplicatorParameters.groovy"))
 
         Model model = new ParameterApplicatorModel()
         model.init()
@@ -172,7 +170,7 @@ class ParameterApplicatorTests extends GrailsUnitTestCase {
     }
 
     void testParameterizationPerformance() {
-        ParameterizationDAO parameter = getParamDAO(new File("src/java/models/core/CoreParameters.groovy"))
+        Parameterization parameter = getParameterization(new File("src/java/models/core/CoreParameters.groovy"))
 
         Model model = new CoreModel()
         model.init()

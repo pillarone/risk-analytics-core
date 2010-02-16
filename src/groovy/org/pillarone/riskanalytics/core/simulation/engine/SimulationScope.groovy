@@ -13,6 +13,9 @@ import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
 import org.pillarone.riskanalytics.core.parameterization.StructureInformation
 import org.pillarone.riskanalytics.core.simulation.SimulationState
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
+import org.pillarone.riskanalytics.core.simulation.item.Parameterization
+import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 
 /**
  * The SimulationScope provides information, that is valid throughout the whole simulation.
@@ -30,21 +33,21 @@ public class SimulationScope {
     int iterationsDone
 
     Model model
-    SimulationRun simulationRun
+    Simulation simulation
     StructureInformation structureInformation
-    ParameterizationDAO parameters
-    ResultConfigurationDAO resultConfiguration
+    Parameterization parameters
+    ResultConfiguration resultConfiguration
 
     ParameterApplicator parameterApplicator
     ICollectorOutputStrategy outputStrategy
 
     private volatile SimulationState simulationState = SimulationState.NOT_RUNNING
 
-    public void setSimulationRun(SimulationRun run) {
-        this.simulationRun = run
-        numberOfIterations = run.iterations
-        parameters = run.parameterization
-        resultConfiguration = run.resultConfiguration
+    public void setSimulation(Simulation simulation) {
+        this.simulation = simulation
+        numberOfIterations = simulation.numberOfIterations
+        parameters = simulation.parameterization
+        resultConfiguration = simulation.template
     }
 
     public CollectorFactory getCollectorFactory() {
@@ -72,7 +75,7 @@ public class SimulationScope {
     }
 
     public DateTime getBeginOfFirstPeriodDate() {
-        simulationRun.beginOfFirstPeriod
+        simulation.beginOfFirstPeriod
     }
 
     @Deprecated
@@ -103,7 +106,7 @@ public class SimulationScope {
 
     public void updateNumberOfIterations(int numberOfIterations) {
         this.numberOfIterations = numberOfIterations
-        simulationRun?.iterations = numberOfIterations
+        simulation?.numberOfIterations = numberOfIterations
     }
 
 }

@@ -52,45 +52,6 @@ public class PacketCollector extends Component {
         outputStrategy << mode.collect(inPackets)
     }
 
-    //Do not rename this method to getPathMapping, otherwise it will be called from getProperties which has a performance impact
-
-    PathMapping pathMapping() {
-        if (!pathMapping) {
-            pathMapping = PathMapping.findByPathName(path)
-            if (!pathMapping) {
-                pathMapping = new PathMapping(pathName: path)
-                assert pathMapping.save()
-            }
-        }
-        return pathMapping
-    }
-    //Do not rename this method to getCollectorMapping, otherwise it will be called from getProperties which has a performance impact
-
-    CollectorMapping collectorMapping() {
-        if (!collectorMapping) {
-            collectorMapping = CollectorMapping.findByCollectorName(collectorName)
-            if (!collectorMapping) {
-                collectorMapping = new CollectorMapping(collectorName: collectorName)
-                assert collectorMapping.save()
-            }
-        }
-        return collectorMapping
-    }
-
-    FieldMapping getFieldMapping(String name) {
-
-        def fieldMapping = fieldMappings[name]
-        if (!fieldMapping) {
-            fieldMapping = FieldMapping.findByFieldName(name)
-            if (!fieldMapping) {
-                fieldMapping = new FieldMapping(fieldName: name)
-                fieldMapping.save()
-            }
-            fieldMappings[name] = fieldMapping
-        }
-        return fieldMapping
-    }
-
     /**
      * Find the component matching the path information and wire to its outputChannel.
      */

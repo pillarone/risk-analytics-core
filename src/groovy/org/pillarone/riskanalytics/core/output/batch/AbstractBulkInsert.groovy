@@ -11,7 +11,7 @@ import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.output.SingleValueResult
 
 abstract class AbstractBulkInsert {
-    static String DEFAULT_COLLECTOR_NAME = "aggregated"
+    public static final String DEFAULT_COLLECTOR_NAME = "aggregated"
     protected static Log LOG = LogFactory.getLog(AbstractBulkInsert)
 
     File tempFile

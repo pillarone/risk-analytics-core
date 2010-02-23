@@ -57,7 +57,7 @@ class ResultConfiguration extends ModellingItem {
         if (dao) {
             return collectorFactory.createCollectors(dao, model)
         }
-        return null
+        return []
     }
 
     protected void mapFromDao(Object dao) {

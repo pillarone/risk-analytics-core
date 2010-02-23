@@ -19,6 +19,7 @@ import org.pillarone.riskanalytics.core.simulation.engine.actions.RandomSeedActi
 import org.pillarone.riskanalytics.core.simulation.engine.actions.SimulationAction
 import org.pillarone.riskanalytics.core.simulation.engine.actions.WireModelAction
 import org.springframework.transaction.TransactionStatus
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
 /**
  * This is the main entity to run a simulation. To do this, create a runner object (SimulationRunner.createRunner()).
@@ -145,13 +146,15 @@ public class SimulationRunner {
      * All information about the simulation will be gathered from the configuration and the actions and scopes get the requiered parameter.
      */
     public void setSimulationConfiguration(SimulationConfiguration configuration) {
-        SimulationRun run = SimulationRun.get(configuration.simulationRun.id)
-        currentScope.simulationRun = run
-        currentScope.model = this.class.classLoader.loadClass(run.model).newInstance()
+        Simulation simulation = (configuration.simulation)
+        currentScope.simulation = simulation
+        currentScope.model = simulation.modelClass.newInstance()
         currentScope.outputStrategy = configuration.outputStrategy
-        currentScope.iterationScope.numberOfPeriods = run.periodCount
+        currentScope.iterationScope.numberOfPeriods = simulation.periodCount
 
         simulationAction.iterationAction.periodAction.model = currentScope.model
+
+        currentScope.mappingCache = new MappingCache()
     }
 
     /**

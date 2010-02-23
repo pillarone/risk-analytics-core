@@ -1,5 +1,5 @@
 //Use a custom project work dir, because different branches use different plugin versions
-grails.project.work.dir = "${grailsSettings.grailsWorkDir}/projects/${appName}-0.5.x"
+grails.project.work.dir = "${grailsSettings.grailsWorkDir}/projects/${appName}-master"
 
 grails.plugin.repos.discovery.pillarone = "https://readplugins:readplugins@svn.intuitive-collaboration.com/GrailsPlugins/"
 

@@ -1,5 +1,5 @@
-//Use a custom project work dir, because different branches use different plugin versions
-grails.project.work.dir = "${grailsSettings.grailsWorkDir}/projects/${appName}-master"
+//Use a custom plugins dir, because different branches use different plugin versions
+grails.project.plugins.dir = "../local-plugins/RiskAnalyticsCore-master"
 
 grails.plugin.repos.discovery.pillarone = "https://readplugins:readplugins@svn.intuitive-collaboration.com/GrailsPlugins/"
 

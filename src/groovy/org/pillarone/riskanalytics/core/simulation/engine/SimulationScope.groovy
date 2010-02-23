@@ -41,6 +41,8 @@ public class SimulationScope {
     ParameterApplicator parameterApplicator
     ICollectorOutputStrategy outputStrategy
 
+    MappingCache mappingCache
+
     private volatile SimulationState simulationState = SimulationState.NOT_RUNNING
 
     public void setSimulation(Simulation simulation) {

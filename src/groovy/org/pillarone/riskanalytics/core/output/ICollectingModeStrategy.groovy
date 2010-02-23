@@ -5,7 +5,7 @@ import org.pillarone.riskanalytics.core.output.SingleValueResult
 
 public interface ICollectingModeStrategy {
 
-    List<SingleValueResult> collect(PacketList results)
+    List<SingleValueResult> collect(PacketList results) throws Exception
 
     String getDisplayName(Locale locale)
 

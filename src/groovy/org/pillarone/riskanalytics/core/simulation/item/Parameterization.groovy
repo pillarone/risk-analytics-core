@@ -8,8 +8,8 @@ import org.pillarone.riskanalytics.core.parameterization.ParameterWriter
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
-import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.util.PropertiesUtils
+import org.springframework.transaction.TransactionStatus
 
 class Parameterization extends ModellingItem {
     // TODO (msh): introduce timeRange for periods
@@ -56,7 +56,7 @@ class Parameterization extends ModellingItem {
     }
 
     //TODO (msp): enable again, refactoring is required because we cannot reference Business logic here (DistributionType)
-    /** @return list of validation errors                      */
+    /** @return list of validation errors                       */
     /*List validate() {
         // dk: there may be more than one validation service in the future.
         // For the moment, we only validate parameter of distribution types
@@ -169,14 +169,7 @@ class Parameterization extends ModellingItem {
     }
 
     protected loadFromDB() {
-        def criteria = ParameterizationDAO.createCriteria()
-        def results = criteria.list {
-            eq('name', name)
-            eq('itemVersion', versionNumber.toString())
-            if (getModelClass() != null)
-                eq('modelClassName', getModelClass().name)
-        }
-        return results.size() > 0 ? results.get(0): null
+        return ParameterizationDAO.find(name, getModelClass()?.name, versionNumber.toString())
     }
 
 
@@ -226,7 +219,7 @@ class Parameterization extends ModellingItem {
         try {
             result = SimulationRun.findByParameterizationAndToBeDeleted(dao, false)
         } catch (Exception e) {
-            LOG.error "Exception error in method isUsedInSimulation : $ex"
+            LOG.error("Exception in method isUsedInSimulation : $e.message", e)
         }
         result != null
     }

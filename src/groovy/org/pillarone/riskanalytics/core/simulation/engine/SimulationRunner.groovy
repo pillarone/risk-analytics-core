@@ -66,18 +66,19 @@ public class SimulationRunner {
         start = System.currentTimeMillis()
         currentScope?.simulation?.start = new Date(start)
         try {
-            LOG.debug "perform preSimulationActions"
             for (Action action in preSimulationActions) {
                 action.perform()
             }
-            LOG.debug "perform simulationAction"
+            long initializationTime = System.currentTimeMillis() - start
+            LOG.info "Initialization completed in ${initializationTime}ms"
+
             simulationState = SimulationState.RUNNING
             //Transaction is necessary because PathMappings etc might be inserted when writing bulk insert files
             SimulationRun.withTransaction {TransactionStatus status ->
                 simulationAction.perform()
             }
+            LOG.info "${currentScope?.numberOfIterations} iterations completed in ${System.currentTimeMillis() - (start + initializationTime)}ms"
 
-            LOG.debug "perform postSimulationActions"
             //Transaction because of saving results to db
             SimulationRun.withTransaction {TransactionStatus status ->
                 for (Action action in postSimulationActions) {
@@ -103,7 +104,7 @@ public class SimulationRunner {
         long end = System.currentTimeMillis()
         currentScope?.simulation?.end = new Date(end)
         currentScope?.simulation?.save()
-        LogFactory.getLog(SimulationRunner).info "simulation took ${end - start} ms"
+        LOG.info "simulation took ${end - start} ms"
 
     }
 
@@ -144,11 +145,11 @@ public class SimulationRunner {
      * All information about the simulation will be gathered from the configuration and the actions and scopes get the requiered parameter.
      */
     public void setSimulationConfiguration(SimulationConfiguration configuration) {
-        def simulation = configuration.simulation
-        currentScope.simulation = simulation
-        currentScope.model = simulation.modelClass.newInstance()
+        SimulationRun run = SimulationRun.get(configuration.simulationRun.id)
+        currentScope.simulationRun = run
+        currentScope.model = this.class.classLoader.loadClass(run.model).newInstance()
         currentScope.outputStrategy = configuration.outputStrategy
-        currentScope.iterationScope.numberOfPeriods = simulation.periodCount
+        currentScope.iterationScope.numberOfPeriods = run.periodCount
 
         simulationAction.iterationAction.periodAction.model = currentScope.model
     }

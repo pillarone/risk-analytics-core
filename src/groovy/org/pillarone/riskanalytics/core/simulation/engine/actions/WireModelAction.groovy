@@ -31,7 +31,8 @@ public class WireModelAction implements Action {
         CollectorFactory collectorFactory = simulationScope.collectorFactory
         collectorFactory.structureInformation = simulationScope.structureInformation
 
-        List collectors = resultConfig.getResolvedCollectors(model, collectorFactory)
+        //PMO-654: make sure that the collectors are always wired in the same order to enable robust model reference result comparison
+        List collectors = resultConfig.getResolvedCollectors(model, collectorFactory).sort { it.path }
         collectors.each {PacketCollector it ->
             it.attachToModel(model, simulationScope.structureInformation)
         }

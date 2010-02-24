@@ -1,14 +1,12 @@
 package org.pillarone.riskanalytics.core.output
 
 import java.sql.ResultSet
-
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.jfree.data.statistics.HistogramDataset
 import org.pillarone.riskanalytics.core.dataaccess.ResultAccessor
 import org.pillarone.riskanalytics.core.util.MathUtils
-import org.pillarone.riskanalytics.core.output.*
-import org.jfree.data.statistics.HistogramDataset
 
 class Calculator {
 
@@ -27,7 +25,7 @@ class Calculator {
         this.run = run
         paths = ResultAccessor.getPaths(run)
         keyFigures = ApplicationHolder.application.config.keyFiguresToCalculate
-        int keyFigureCount = 2 //isStochastic + mean
+        int keyFigureCount = 5 //isStochastic(4) + mean
         keyFigures.entrySet().each {Map.Entry entry ->
             if (entry.value instanceof List) {
                 keyFigureCount += entry.value.size()

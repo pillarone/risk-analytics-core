@@ -8,6 +8,7 @@
 
     <property name="dist.dir" value="dist"/>
     <property name="target.dir" value="target"/>
+    <property name="doc.dir" value="docs/gapi"/>
 
     <condition property="grails" value="${GRAILS_HOME}/bin/grails.bat">
         <os family="windows"/>
@@ -75,5 +76,14 @@
         </exec>
     </target>
 
+    <target name="doc" depends="init" description=" combined groovy and javadoc">
+        <grails command="doc"/>
+        <copy todir="${doc.dir}">
+            <fileset dir="${doc.dir}/src/java"/>
+        </copy>
+        <copy todir="${doc.dir}">
+            <fileset dir="${doc.dir}/src/groovy"/>
+        </copy>
+    </target>
 
 </project>

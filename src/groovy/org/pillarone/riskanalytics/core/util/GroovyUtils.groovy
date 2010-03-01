@@ -52,8 +52,8 @@ public class GroovyUtils {
             return concatList(list)
         List<List> resultList = []
         list.each {List actList ->
-            def item = actList.get(0)
-            def itemValue = getItemValue(item)
+            def item = actList.size() > 0 ? actList.get(0) : null
+            def itemValue = item ? getItemValue(item) : null
             if (itemValue && (itemValue instanceof List)) {
                 List tempList = concatList(actList)
                 resultList << tempList

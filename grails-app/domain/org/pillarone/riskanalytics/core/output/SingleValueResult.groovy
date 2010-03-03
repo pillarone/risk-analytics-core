@@ -27,4 +27,8 @@ class SingleValueResult {
         id generator: 'identity'
         path lazy: false, fetchMode: FetchMode.JOIN
     }
+
+    String toString() {
+        "${path.pathName}, ${field.fieldName}, $value" 
+    }
 }

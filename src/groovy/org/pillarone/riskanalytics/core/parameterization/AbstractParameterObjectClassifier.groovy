@@ -1,7 +1,5 @@
 package org.pillarone.riskanalytics.core.parameterization
 
-import org.pillarone.riskanalytics.core.parameterization.IParameterObjectClassifier
-
 abstract class AbstractParameterObjectClassifier implements IParameterObjectClassifier {
 
     final Map parameters
@@ -35,4 +33,24 @@ abstract class AbstractParameterObjectClassifier implements IParameterObjectClas
         getParameters().get(propName)
     }
 
+    public String getConstructionString(Map parameters) {
+        StringBuffer parameterString = new StringBuffer('[')
+        parameters.each {k, v ->
+            if (v.class.isEnum()) {
+                parameterString << "\"$k\":${v.class.name}.$v,"
+            }
+            else if (v instanceof IParameterObject) {
+                parameterString << "\"$k\":${v.type.getConstructionString(v.parameters)},"
+            }
+            else {
+                parameterString << "\"$k\":$v,"
+            }
+        }
+        if (parameterString.size() == 1) {
+            parameterString << ':'
+        }
+        parameterString << ']'
+        String clazz = getClass().toString().replaceFirst("class\\s","")
+        return clazz + ".getStrategy(${this.class.name}.${typeName.toUpperCase()}, ${parameterString})"
+    }
 }

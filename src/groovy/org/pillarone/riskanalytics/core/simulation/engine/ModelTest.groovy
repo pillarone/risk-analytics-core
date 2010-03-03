@@ -8,13 +8,14 @@ import org.pillarone.riskanalytics.core.fileimport.ModelStructureImportService
 import org.pillarone.riskanalytics.core.fileimport.ParameterizationImportService
 import org.pillarone.riskanalytics.core.fileimport.ResultConfigurationImportService
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
-import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.output.FileOutput
 import org.pillarone.riskanalytics.core.util.MathUtils
-import org.pillarone.riskanalytics.core.model.StochasticModel
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
+import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
+import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 
 /**
  * An abstract class which provides functionality to run model tests.
@@ -69,7 +70,7 @@ abstract class ModelTest extends GroovyTestCase {
         10
     }
 
-    SimulationRun run
+    Simulation run
 
     protected void setUp() {
         super.setUp()
@@ -88,17 +89,19 @@ abstract class ModelTest extends GroovyTestCase {
         def resultConfig = ResultConfigurationDAO.findByName(getResultConfigurationDisplayName())
         assertNotNull resultConfig
 
+        ResultConfiguration resultConfiguration = new ResultConfiguration(resultConfig.name)
+        resultConfiguration.load()
+
         Class modelClass = getModelClass()
         def modelInstance = modelClass.newInstance() as Model
 
-        run = new SimulationRun()
-        run.name = getResultFileName()
-        run.parameterization = parameter
-        run.resultConfiguration = resultConfig
-        run.model = modelClass.name
-        run.modelVersionNumber = "1"
-        run.periodCount = modelInstance instanceof StochasticModel ? modelInstance.getSimulationPeriodCount(parameterization.parameters, parameterization.periodCount) : getPeriodCount()
-        run.iterations = getIterationCount()
+        run = new Simulation(getResultFileName())
+        run.parameterization = parameterization
+        run.template = resultConfiguration
+        run.modelClass = modelClass
+        run.modelVersionNumber = new VersionNumber("1")
+        run.periodCount = getPeriodCount()
+        run.numberOfIterations = getIterationCount()
 
         if (modelInstance.requiresStartDate()) {
             run.beginOfFirstPeriod = new DateTime(2009, 1, 1, 0, 0, 0, 0)
@@ -113,7 +116,7 @@ abstract class ModelTest extends GroovyTestCase {
     final void testModelRun() {
         SimulationRunner runner = SimulationRunner.createRunner()
         ICollectorOutputStrategy output = getOutputStrategy()
-        runner.simulationConfiguration = new SimulationConfiguration(simulationRun: run, outputStrategy: output)
+        runner.simulationConfiguration = new SimulationConfiguration(simulation: run, outputStrategy: output)
 
 
         runner.start()

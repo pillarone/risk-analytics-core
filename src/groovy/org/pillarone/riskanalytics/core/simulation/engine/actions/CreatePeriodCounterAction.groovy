@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.simulation.engine.actions
 
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
+import org.pillarone.riskanalytics.core.simulation.VariableLengthPeriodCounter
 
 /**
  * A pre-simulation action which creates a period counter from the model and sets it to the period scope.
@@ -15,6 +16,9 @@ class CreatePeriodCounterAction implements Action {
     void perform() {
         IPeriodCounter periodCounter = simulationScope.model.createPeriodCounter(simulationScope.simulation.beginOfFirstPeriod)
         simulationScope.iterationScope.periodScope.periodCounter = periodCounter
+        if (periodCounter instanceof VariableLengthPeriodCounter) {
+            simulationScope.simulation.periodCount = periodCounter.periodCount()
+        }
     }
 
 

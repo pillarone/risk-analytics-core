@@ -190,14 +190,14 @@ public class SimulationRunner {
         SimulationRunner runner = new SimulationRunner()
 
         //The order of the pre & post simulation actions is important.
-        // PrepareParameterizationAction must be before CreatePeriodCounterAction
+        // WireModelAction must be before CreatePeriodCounterAction
         // PrepareStructureInformationAction must be before WireModelAction
         runner.preSimulationActions << initModel
         runner.preSimulationActions << randomSeed
         runner.preSimulationActions << initParams
-        runner.preSimulationActions << periodCounter
         runner.preSimulationActions << prepareStructure
         runner.preSimulationActions << wireModel
+        runner.preSimulationActions << periodCounter
         runner.preSimulationActions << injectScopes
 
         runner.simulationAction = simulationAction

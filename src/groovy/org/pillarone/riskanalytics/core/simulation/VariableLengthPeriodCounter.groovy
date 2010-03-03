@@ -60,5 +60,8 @@ class VariableLengthPeriodCounter implements IPeriodCounter {
         }
     }
 
+    int periodCount() {
+        return dates.size()
+    }
 
 }

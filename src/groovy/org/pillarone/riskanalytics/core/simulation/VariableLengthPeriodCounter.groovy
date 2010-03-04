@@ -6,7 +6,7 @@ import org.joda.time.DateTime
  * A period counter which is backed by a list of dates.
  * Because the period length may vary, certain operations are not supported in the last period.
  */
-class VariableLengthPeriodCounter implements IPeriodCounter {
+class VariableLengthPeriodCounter implements ILimitedPeriodCounter {
 
     private List<DateTime> dates
     final int currentPeriod

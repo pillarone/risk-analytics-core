@@ -19,9 +19,8 @@ public class WireModelAction implements Action {
 
         Model model = simulationScope.model
         ResultConfigurationDAO resultConfig = simulationScope.resultConfiguration
-        // TODO (Oct 27, 2009, msh): Really required here ? ParameterApplicator creates subComponents for DCC already
-        //TODO (msp 24.12.09): I don't think so..  Parameters for the 1st period are also injected twice this way
-//        simulationScope.parameterApplicator.applyParameterForPeriod(0)
+        // PMO-758: Applying parameters before wiring is necessary
+        simulationScope.parameterApplicator.applyParameterForPeriod(0)
 
         model.wire()
         LOG.debug "Model wired"
@@ -30,7 +29,8 @@ public class WireModelAction implements Action {
         CollectorFactory collectorFactory = simulationScope.collectorFactory
         collectorFactory.structureInformation = simulationScope.structureInformation
 
-        List collectors = collectorFactory.createCollectors(resultConfig, model)
+        //PMO-654: make sure that the collectors are always wired in the same order to enable robust model reference result comparison
+        List collectors = collectorFactory.createCollectors(resultConfig, model).sort { it.path }
         collectors.each {PacketCollector it ->
             it.attachToModel(model, simulationScope.structureInformation)
         }

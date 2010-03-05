@@ -47,7 +47,11 @@ public class PeriodStore {
             throw new IllegalArgumentException("No write access to history of PeriodStore (periodOffset=${periodOffset})")
         }
         List list = store.get(key, [])
-        list.add(periodScope.currentPeriod + periodOffset, s)
+        int insertPeriod = periodScope.currentPeriod + periodOffset
+        while (list.size() <= insertPeriod) {
+            list.add(null);
+        }
+        list.set(insertPeriod, s)
     }
 
     /**

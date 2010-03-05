@@ -1,12 +1,14 @@
 package org.pillarone.riskanalytics.core.output
 
+import org.pillarone.riskanalytics.core.example.model.EmptyModel
+import org.pillarone.riskanalytics.core.output.batch.AbstractBulkInsert
 import org.pillarone.riskanalytics.core.packets.ITestPacketApple
 import org.pillarone.riskanalytics.core.packets.ITestPacketOrange
-
 import org.pillarone.riskanalytics.core.packets.PacketList
-import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 import org.pillarone.riskanalytics.core.simulation.engine.IterationScope
+import org.pillarone.riskanalytics.core.simulation.engine.MappingCache
 import org.pillarone.riskanalytics.core.simulation.engine.PeriodScope
+import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 
 class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
 
@@ -18,8 +20,8 @@ class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
 
     void setUp() {
         fieldMapping = getFieldMapping("ultimate")
-        pathMapping = getPathMapping("path")
-        collectorMapping = getCollectorMapping("collector")
+        pathMapping = getPathMapping("Empty:path")
+        collectorMapping = getCollectorMapping(AbstractBulkInsert.DEFAULT_COLLECTOR_NAME)
 
         run = new SimulationRun()
 
@@ -29,12 +31,13 @@ class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
         periodScope.currentPeriod = 1
         iterationScope.currentIteration = 13
         simulationScope.simulationRun = run
+        simulationScope.mappingCache = new MappingCache(new EmptyModel())
 
         strategy = new AggregatedCollectingModeStrategy()
         PacketCollector collector = new PacketCollector(strategy)
         collector.simulationScope = simulationScope
-        collector.path = "path"
-        collector.collectorName = "collector"
+        collector.path = "Empty:path"
+        collector.collectorName = AbstractBulkInsert.DEFAULT_COLLECTOR_NAME
     }
 
     void testCollectAndCreateResults() {

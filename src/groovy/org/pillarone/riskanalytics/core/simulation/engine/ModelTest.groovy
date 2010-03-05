@@ -14,6 +14,7 @@ import org.pillarone.riskanalytics.core.output.FileOutput
 import org.pillarone.riskanalytics.core.util.MathUtils
 import org.pillarone.riskanalytics.core.model.StochasticModel
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
+import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
 
 /**
  * An abstract class which provides functionality to run model tests.
@@ -111,8 +112,7 @@ abstract class ModelTest extends GroovyTestCase {
 
     final void testModelRun() {
         SimulationRunner runner = SimulationRunner.createRunner()
-        FileOutput output = new FileOutput()
-        output.resultLocation = getPath()
+        ICollectorOutputStrategy output = getOutputStrategy()
         runner.simulationConfiguration = new SimulationConfiguration(simulationRun: run, outputStrategy: output)
 
 
@@ -122,7 +122,16 @@ abstract class ModelTest extends GroovyTestCase {
         if (shouldCompareResults()) {
             compareResults()
         }
+        postSimulationEvaluation()
     }
+
+    protected ICollectorOutputStrategy getOutputStrategy() {
+        FileOutput output = new FileOutput()
+        output.resultLocation = getPath()
+        output
+    }
+
+    public void postSimulationEvaluation() {}
 
     protected boolean shouldCompareResults() {
         false

@@ -1,4 +1,4 @@
-<plugin name='risk-analytics-core' version='0.6-ALPHA-2' grailsVersion='1.2.0 &gt; *'>
+<plugin name='risk-analytics-core' version='0.6-ALPHA-3' grailsVersion='1.2.0 &gt; *'>
   <author>Intuitive Collaboration GmbH</author>
   <authorEmail>info@pillarone.org</authorEmail>
   <title>RiskAnalytics core</title>
@@ -27,6 +27,7 @@ Persistence &amp; Simulation engine.
     <resource>org.pillarone.riskanalytics.core.output.SimulationRun</resource>
     <resource>org.pillarone.riskanalytics.core.output.SingleValueResult</resource>
     <resource>org.pillarone.riskanalytics.core.output.SymbolicValueResult</resource>
+    <resource>org.pillarone.riskanalytics.core.parameter.BooleanParameter</resource>
     <resource>org.pillarone.riskanalytics.core.parameter.ConstrainedStringParameter</resource>
     <resource>org.pillarone.riskanalytics.core.parameter.DateParameter</resource>
     <resource>org.pillarone.riskanalytics.core.parameter.DoubleParameter</resource>

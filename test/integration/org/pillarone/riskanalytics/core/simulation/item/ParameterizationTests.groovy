@@ -63,11 +63,9 @@ class ParameterizationTests extends GroovyTestCase {
         assertNull parameterization.getModelClass()
 
         parameterization.setModelClass(EmptyModel)
-        assertEquals EmptyModel.name, parameterization.dao.modelClassName
         assertSame EmptyModel, parameterization.getModelClass()
 
         parameterization.modelClass = CoreModel
-        assertEquals CoreModel.name, parameterization.dao.modelClassName
         assertSame CoreModel, parameterization.modelClass
     }
 

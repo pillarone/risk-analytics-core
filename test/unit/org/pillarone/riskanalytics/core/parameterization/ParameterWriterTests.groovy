@@ -121,6 +121,21 @@ class ParameterWriterTests extends GroovyTestCase {
         assertEquals("${ExampleEnum.name}.${ExampleEnum.FIRST_VALUE.toString()}", writer.toString().tokenize("=")[1].trim())
     }
 
+    void testWriteLineWriteBoolean() {
+        ParameterWriter parameterWriter = new ParameterWriter()
+        StringWriter writer = new StringWriter()
+        BufferedWriter bufferedWriter = new BufferedWriter(writer)
+        parameterWriter.writeLine("key", "a.b.c.key", bufferedWriter, Boolean.TRUE)
+        bufferedWriter.flush()
+        assertEquals("true", writer.toString().tokenize("=")[1].trim())
+
+        writer = new StringWriter()
+        bufferedWriter = new BufferedWriter(writer)
+        parameterWriter.writeLine("key", "a.b.c.key", bufferedWriter, Boolean.FALSE)
+        bufferedWriter.flush()
+        assertEquals("false", writer.toString().tokenize("=")[1].trim())
+    }
+
     void testWriteLineWriteStandard() {
         ParameterWriter parameterWriter = new ParameterWriter()
         StringWriter writer = new StringWriter()

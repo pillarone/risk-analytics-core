@@ -1,8 +1,6 @@
 package org.pillarone.riskanalytics.core.parameterization
 
 import org.joda.time.DateTime
-import org.pillarone.riskanalytics.core.parameterization.IParameterObjectClassifier
-import org.pillarone.riskanalytics.core.parameterization.IParameterObject
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 
 class ParameterWriter implements IConfigObjectWriter {
@@ -89,6 +87,10 @@ class ParameterWriter implements IConfigObjectWriter {
 
     private void appendValue(BufferedWriter out, GString value) {
         out << "\"$value\""
+    }
+
+    private void appendValue(BufferedWriter out, Boolean value) {
+        out << value.toString()
     }
 
     private void appendValue(BufferedWriter out, DateTime value) {

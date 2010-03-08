@@ -17,6 +17,10 @@ class ParameterHolderFactory {
         return new DoubleParameterHolder(path, periodIndex, value)
     }
 
+    public static ParameterHolder getHolder(String path, int periodIndex, boolean value) {
+        return new BooleanParameterHolder(path, periodIndex, value)
+    }
+
     public static ParameterHolder getHolder(String path, int periodIndex, String value) {
         return new StringParameterHolder(path, periodIndex, value)
     }
@@ -47,6 +51,8 @@ class ParameterHolderFactory {
                 return createIntegerHolder(parameter)
             case DoubleParameter:
                 return createDoubleHolder(parameter)
+            case BooleanParameter:
+                return createBooleanHolder(parameter)
             case StringParameter:
                 return createStringHolder(parameter)
             case ConstrainedStringParameter:
@@ -71,6 +77,10 @@ class ParameterHolderFactory {
 
     private static ParameterHolder createDoubleHolder(Parameter parameter) {
         return new DoubleParameterHolder(parameter)
+    }
+
+    private static ParameterHolder createBooleanHolder(Parameter parameter) {
+        return new BooleanParameterHolder(parameter)
     }
 
     private static ParameterHolder createStringHolder(Parameter parameter) {

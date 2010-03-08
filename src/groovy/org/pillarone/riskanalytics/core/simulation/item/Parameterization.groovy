@@ -120,6 +120,7 @@ class Parameterization extends ModellingItem {
         dao.creationDate = creationDate
         dao.modificationDate = modificationDate
         dao.valid = valid
+        dao.modelClassName = modelClass.name
         saveParameters(dao)
     }
 
@@ -155,6 +156,7 @@ class Parameterization extends ModellingItem {
         creationDate = dao.creationDate
         modificationDate = dao.modificationDate
         valid = dao.valid
+        modelClass = getClass().getClassLoader().loadClass(dao.modelClassName)
 
         loadParameters(dao)
         LOG.info("Parameterization $name loaded in ${System.currentTimeMillis() - time}ms")
@@ -172,17 +174,6 @@ class Parameterization extends ModellingItem {
         return ParameterizationDAO.find(name, getModelClass()?.name, versionNumber.toString())
     }
 
-
-    public void setModelClass(Class modelClass) {
-        dao.modelClassName = modelClass.name
-    }
-
-    public Class getModelClass() {
-        if (dao.modelClassName == null) {
-            return null
-        }
-        return getClass().classLoader.loadClass(dao.modelClassName)
-    }
 
     public getDao() {
         if (parameterizationDAO == null) {

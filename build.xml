@@ -86,4 +86,13 @@
         </copy>
     </target>
 
+    <target name="standalone-compile" depends="init" description="--> Run a Grails applications unit tests">
+        <exec executable="${grails}" failonerror="true" resolveexecutable="true">
+            <arg value="jar -destination=out/production/RiskAnalyticsCore"/>
+            <env key="GRAILS_HOME" value="${GRAILS_HOME}"/>
+            <env key="JAVA_OPTS"
+                 value="-Xmx1024m -XX:MaxPermSize=512m -Duser.language='en'"/>
+        </exec>
+    </target>
+
 </project>

@@ -82,7 +82,15 @@ class ItemComparator {
             return false
         }
 
-        if (!aObject.values.equals(bObject.values)) {
+        List aValues = aObject.values
+        List bValues = bObject.values
+        if(aValues.size() == 1 && aValues[0] instanceof List) {
+            aValues = aValues[0]
+        }
+        if(bValues.size() == 1 && bValues[0] instanceof List) {
+            bValues = bValues[0]
+        }
+        if (!aValues.equals(bValues)) {
             return false
         }
 

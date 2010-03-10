@@ -18,6 +18,7 @@ class Calculator {
     private int completedCalculations
     private Map keyFigures
     private long startTime
+    int keyFigureCount
 
     boolean stopped = false
 
@@ -25,7 +26,7 @@ class Calculator {
         this.run = run
         paths = ResultAccessor.getPaths(run)
         keyFigures = ApplicationHolder.application.config.keyFiguresToCalculate
-        int keyFigureCount = 5 //isStochastic(4) + mean
+        keyFigureCount = 0 //isStochastic + mean
         keyFigures.entrySet().each {Map.Entry entry ->
             if (entry.value instanceof List) {
                 keyFigureCount += entry.value.size()
@@ -54,8 +55,8 @@ class Calculator {
     void calculate() {
 
         startTime = System.currentTimeMillis()
-
         ResultSet result = ResultAccessor.getAvgAndIsStochasticForSimulationRun(run)
+        totalCalculations = keyFigureCount * ResultAccessor.getAvgAndIsStochasticForSimulationRunCount(run)
 
         while (result.next()) {
             long path = result.getLong("path_id")
@@ -90,22 +91,20 @@ class Calculator {
                 def vars = keyFigures.get(PostSimulationCalculation.VAR)
                 def tvars = keyFigures.get(PostSimulationCalculation.TVAR)
                 def pdf = keyFigures.get(PostSimulationCalculation.PDF)
-                if (percentiles || vars || tvars || pdf) {
-                    percentiles.each {double p ->
-                        calculatePercentile(periodIndex, path, collector, field, values, p)
-                        completedCalculations++
-                    }
-                    vars.each {double p ->
-                        calculateVar(periodIndex, path, collector, field, values, p, avg)
-                        completedCalculations++
-                    }
-                    tvars.each {double p ->
-                        calculateTvar(periodIndex, path, collector, field, values, p)
-                        completedCalculations++
-                    }
-                    if (pdf) {
-                        calculatePDF(periodIndex, path, collector, field, values, pdf)
-                    }
+                percentiles?.each {double p ->
+                    calculatePercentile(periodIndex, path, collector, field, values, p)
+                    completedCalculations++
+                }
+                vars?.each {double p ->
+                    calculateVar(periodIndex, path, collector, field, values, p, avg)
+                    completedCalculations++
+                }
+                tvars?.each {double p ->
+                    calculateTvar(periodIndex, path, collector, field, values, p)
+                    completedCalculations++
+                }
+                if (pdf) {
+                    calculatePDF(periodIndex, path, collector, field, values, pdf)
                 }
             }
         }
@@ -214,6 +213,7 @@ class Calculator {
 
         LOG.debug("Calculated tvar $percentile ($pathId, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
     }
+
 
 }
 

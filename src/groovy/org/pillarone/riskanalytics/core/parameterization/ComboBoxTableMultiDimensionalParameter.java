@@ -107,6 +107,6 @@ public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensiona
     @Override
     protected Object createDefaultValue(int column) {
         List list = (List) getPossibleValues(1, 0);
-        return list.get(0);
+        return list.size() > 0 ? list.get(0) : "";
     }
 }

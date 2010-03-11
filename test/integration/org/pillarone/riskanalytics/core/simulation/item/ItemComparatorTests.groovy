@@ -1,14 +1,15 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
 import org.pillarone.riskanalytics.core.ParameterizationDAO
-import org.pillarone.riskanalytics.core.parameterization.SimpleMultiDimensionalParameter
-import org.pillarone.riskanalytics.core.parameterization.TableMultiDimensionalParameter
+import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.example.parameter.ExampleEnum
 import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObjectClassifier
 import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
 import org.pillarone.riskanalytics.core.output.CollectingModeFactory
 import org.pillarone.riskanalytics.core.output.PacketCollector
 import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
+import org.pillarone.riskanalytics.core.parameterization.SimpleMultiDimensionalParameter
+import org.pillarone.riskanalytics.core.parameterization.TableMultiDimensionalParameter
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 
 class ItemComparatorTests extends GroovyTestCase {
@@ -351,7 +352,7 @@ class ItemComparatorTests extends GroovyTestCase {
     void testPositivePMO768() {
         ParameterizationDAO dao = new ParameterizationDAO()
         dao.name = 'testPositivePMO768'
-        dao.modelClassName = 'modelClass'
+        dao.modelClassName = EmptyModel.name
         dao.itemVersion = '1'
         dao.periodCount = 1
         dao.save()
@@ -363,7 +364,7 @@ class ItemComparatorTests extends GroovyTestCase {
 
         ParameterizationDAO dao2 = new ParameterizationDAO()
         dao2.name = 'testPositivePMO768'
-        dao2.modelClassName = 'modelClass'
+        dao2.modelClassName = EmptyModel.name
         dao2.itemVersion = '2'
         dao2.periodCount = 1
         dao2.save()

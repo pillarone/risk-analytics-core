@@ -1,10 +1,12 @@
-import org.pillarone.riskanalytics.core.output.batch.SQLServerBulkInsert
-import org.pillarone.riskanalytics.core.output.batch.MysqlBulkInsert
-import org.pillarone.riskanalytics.core.output.batch.DerbyBulkInsert
+import org.pillarone.riskanalytics.core.output.batch.results.SQLServerBulkInsert
+import org.pillarone.riskanalytics.core.output.batch.results.MysqlBulkInsert
+import org.pillarone.riskanalytics.core.output.batch.results.DerbyBulkInsert
+import org.pillarone.riskanalytics.core.output.batch.calculations.MysqlCalculationsBulkInsert
 
 environments {
 
-    batchInsert = null
+    resultBulkInsert = null
+    calculationBulkInsert = null
     keyFiguresToCalculate = null
 
     development {
@@ -33,7 +35,7 @@ environments {
     }
     sqlserver {
         models = ["FiniteReModel"]
-        batchInsert = SQLServerBulkInsert
+        resultBulkInsert = SQLServerBulkInsert
         keyFiguresToCalculate = [
                 'stdev': true,
                 'percentile': [0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0],
@@ -52,7 +54,8 @@ environments {
         }
     }
     mysql {
-        batchInsert = MysqlBulkInsert
+        resultBulkInsert = MysqlBulkInsert
+        calculationBulkInsert = MysqlCalculationsBulkInsert
         log4j = {
             appenders {
                 console name: 'stdout', layout: pattern(conversionPattern: '[%d] %-5p %c{1} %m%n')
@@ -82,7 +85,8 @@ environments {
 
 
     production {
-        batchInsert = MysqlBulkInsert
+        resultBulkInsert = MysqlBulkInsert
+        calculationBulkInsert = MysqlCalculationsBulkInsert
         userLogin = true
         maxIterations = 10000
         models = ["CapitalEagleModel", "DependencyModel", "DynamicCapitalEagleModel", "MultiLineReinsuranceModel", "TwoLobDependencyModel", "PodraModel"]
@@ -96,7 +100,7 @@ environments {
     }
 
     standalone {
-        batchInsert = DerbyBulkInsert
+        resultBulkInsert = DerbyBulkInsert
         maxIterations = 10000
         models = ["CapitalEagleModel", "DependencyModel", "DynamicCapitalEagleModel", "MultiLineReinsuranceModel", "TwoLobDependencyModel", "PodraModel"]
         keyFiguresToCalculate = [

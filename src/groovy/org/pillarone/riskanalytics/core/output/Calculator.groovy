@@ -6,6 +6,7 @@ import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.jfree.data.statistics.HistogramDataset
 import org.pillarone.riskanalytics.core.dataaccess.ResultAccessor
+import org.pillarone.riskanalytics.core.output.batch.calculations.AbstractCalculationsBulkInsert
 import org.pillarone.riskanalytics.core.util.MathUtils
 
 class Calculator {
@@ -20,9 +21,13 @@ class Calculator {
     private long startTime
     int keyFigureCount
 
+    private AbstractCalculationsBulkInsert bulkInsert
+
     boolean stopped = false
 
     public Calculator(SimulationRun run) {
+        bulkInsert = AbstractCalculationsBulkInsert.getBulkInsertInstance()
+        bulkInsert.simulationRun = run
         this.run = run
         paths = ResultAccessor.getPaths(run)
         keyFigures = ApplicationHolder.application.config.keyFiguresToCalculate
@@ -65,22 +70,9 @@ class Calculator {
             long field = result.getLong("field_id")
             double avg = result.getDouble("average")
             int isStochastic = result.getDouble("minimum") == result.getDouble("maximum") ? 1 : 0
-            new PostSimulationCalculation(
-                    run: run,
-                    keyFigure: PostSimulationCalculation.MEAN,
-                    path: PathMapping.get(path),
-                    collector: CollectorMapping.get(collector),
-                    field: FieldMapping.get(field),
-                    period: periodIndex,
-                    result: avg).save()
-            new PostSimulationCalculation(
-                    run: run,
-                    keyFigure: PostSimulationCalculation.IS_STOCHASTIC,
-                    path: PathMapping.get(path),
-                    collector: CollectorMapping.get(collector),
-                    field: FieldMapping.get(field),
-                    period: periodIndex,
-                    result: isStochastic).save()
+            bulkInsert.addResults(periodIndex, PostSimulationCalculation.MEAN, null, path, field, collector, avg)
+            bulkInsert.addResults(periodIndex, PostSimulationCalculation.IS_STOCHASTIC, null, path, field, collector, isStochastic)
+
             if (isStochastic == 0) {
                 double[] values = loadValues(path, periodIndex, collector, field)
                 if (keyFigures.get(PostSimulationCalculation.STDEV)) {
@@ -108,9 +100,8 @@ class Calculator {
                 }
             }
         }
+        bulkInsert.saveToDB()
         LOG.info("Post Simulation Calculation done in ${System.currentTimeMillis() - startTime}ms (#paths ${paths.size()})")
-
-
     }
 
     /**
@@ -131,14 +122,7 @@ class Calculator {
         long time = System.currentTimeMillis()
 
         Double stdev = MathUtils.calculateStandardDeviation(results, mean)
-        new PostSimulationCalculation(
-                run: run,
-                keyFigure: PostSimulationCalculation.STDEV,
-                path: PathMapping.get(pathId),
-                collector: CollectorMapping.get(collectorId),
-                field: FieldMapping.get(fieldId),
-                period: periodIndex,
-                result: stdev).save()
+        bulkInsert.addResults(periodIndex, PostSimulationCalculation.STDEV, null, pathId, fieldId, collectorId, stdev)
 
         LOG.debug("Calculated stdev ($pathId, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
     }
@@ -147,15 +131,8 @@ class Calculator {
         long time = System.currentTimeMillis()
 
         BigDecimal p = MathUtils.calculatePercentileOfSortedValues(results, percentile)
-        new PostSimulationCalculation(
-                run: run,
-                keyFigure: PostSimulationCalculation.PERCENTILE,
-                keyFigureParameter: percentile,
-                path: PathMapping.get(pathId),
-                collector: CollectorMapping.get(collectorId),
-                field: FieldMapping.get(fieldId),
-                period: periodIndex,
-                result: p).save()
+        bulkInsert.addResults(periodIndex, PostSimulationCalculation.PERCENTILE, percentile, pathId, fieldId, collectorId, p)
+
 
         LOG.debug("Calculated percentile $percentile ($pathId, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
     }
@@ -165,15 +142,7 @@ class Calculator {
         HistogramDataset data = new KiloHistogramDataset()
         Map pdfData = data.createPdfData(results, run, pdf)
         pdfData.each {BigDecimal k, v ->
-            new PostSimulationCalculation(
-                    run: run,
-                    keyFigure: PostSimulationCalculation.PDF,
-                    keyFigureParameter: k,
-                    path: PathMapping.get(pathId),
-                    collector: CollectorMapping.get(collectorId),
-                    field: FieldMapping.get(fieldId),
-                    period: periodIndex,
-                    result: v).save()
+            bulkInsert.addResults(periodIndex, PostSimulationCalculation.PDF, k, pathId, fieldId, collectorId, v)
         }
 
         LOG.debug("Calculated pdf $pdf ($pathId, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
@@ -184,15 +153,8 @@ class Calculator {
         long time = System.currentTimeMillis()
 
         BigDecimal var = MathUtils.calculateVarOfSortedValues(results, percentile, mean)
-        new PostSimulationCalculation(
-                run: run,
-                keyFigure: PostSimulationCalculation.VAR,
-                keyFigureParameter: percentile,
-                path: PathMapping.get(pathId),
-                collector: CollectorMapping.get(collectorId),
-                field: FieldMapping.get(fieldId),
-                period: periodIndex,
-                result: var).save()
+        bulkInsert.addResults(periodIndex, PostSimulationCalculation.VAR, percentile, pathId, fieldId, collectorId, var)
+
 
         LOG.debug("Calculated var $percentile ($pathId, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
     }
@@ -201,15 +163,8 @@ class Calculator {
         long time = System.currentTimeMillis()
 
         BigDecimal tvar = MathUtils.calculateTvarOfSortedValues(results, percentile)
-        new PostSimulationCalculation(
-                run: run,
-                keyFigure: PostSimulationCalculation.TVAR,
-                keyFigureParameter: percentile,
-                path: PathMapping.get(pathId),
-                collector: CollectorMapping.get(collectorId),
-                field: FieldMapping.get(fieldId),
-                period: periodIndex,
-                result: tvar).save()
+        bulkInsert.addResults(periodIndex, PostSimulationCalculation.TVAR, percentile, pathId, fieldId, collectorId, tvar)
+
 
         LOG.debug("Calculated tvar $percentile ($pathId, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
     }

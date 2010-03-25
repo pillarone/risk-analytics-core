@@ -1,9 +1,9 @@
-package org.pillarone.riskanalytics.core.output.batch
+package org.pillarone.riskanalytics.core.output.batch.results
 
 import groovy.sql.Sql
 import org.pillarone.riskanalytics.core.output.batch.AbstractBulkInsert
 
-public class DerbyBulkInsert extends AbstractBulkInsert {
+public class DerbyBulkInsert extends AbstractResultsBulkInsert {
 
     protected void writeResult(List values) {
         values << 0 //derby needs version column explicitly

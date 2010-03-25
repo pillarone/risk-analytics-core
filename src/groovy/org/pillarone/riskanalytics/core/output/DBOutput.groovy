@@ -3,15 +3,16 @@ package org.pillarone.riskanalytics.core.output
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.output.batch.AbstractBulkInsert
+import org.pillarone.riskanalytics.core.output.batch.results.AbstractResultsBulkInsert
 
 public class DBOutput implements ICollectorOutputStrategy {
 
     private static final Log LOG = LogFactory.getLog(ICollectorOutputStrategy)
 
-    public AbstractBulkInsert batchInsert
+    public AbstractResultsBulkInsert batchInsert
 
     public DBOutput() {
-        this.batchInsert = AbstractBulkInsert.getBulkInsertInstance()
+        this.batchInsert = AbstractResultsBulkInsert.getBulkInsertInstance()
     }
 
     public ICollectorOutputStrategy leftShift(List results) {

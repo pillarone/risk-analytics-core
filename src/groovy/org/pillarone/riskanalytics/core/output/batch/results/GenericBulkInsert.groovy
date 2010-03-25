@@ -1,11 +1,11 @@
-package org.pillarone.riskanalytics.core.output.batch
+package org.pillarone.riskanalytics.core.output.batch.results
 
-import org.pillarone.riskanalytics.core.output.SingleValueResult
-import org.pillarone.riskanalytics.core.output.PathMapping
-import org.pillarone.riskanalytics.core.output.FieldMapping
 import org.pillarone.riskanalytics.core.output.CollectorMapping
+import org.pillarone.riskanalytics.core.output.FieldMapping
+import org.pillarone.riskanalytics.core.output.PathMapping
+import org.pillarone.riskanalytics.core.output.SingleValueResult
 
-class GenericBulkInsert extends AbstractBulkInsert {
+class GenericBulkInsert extends AbstractResultsBulkInsert {
 
     protected void save() {
         tempFile.eachLine { String line ->
@@ -26,6 +26,4 @@ class GenericBulkInsert extends AbstractBulkInsert {
     protected void writeResult(List values) {
         writer.writeLine(values.join(","))
     }
-
-
 }

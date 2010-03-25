@@ -1,9 +1,8 @@
-package org.pillarone.riskanalytics.core.output.batch
+package org.pillarone.riskanalytics.core.output.batch.results
 
-import org.pillarone.riskanalytics.core.output.batch.AbstractBulkInsert
 import groovy.sql.Sql
 
-class SQLServerBulkInsert extends AbstractBulkInsert {
+class SQLServerBulkInsert extends AbstractResultsBulkInsert {
 
     protected void save() {
         File formatFile = new File(getClass().getResource("/single_value_result_formatfile.xml").toURI())

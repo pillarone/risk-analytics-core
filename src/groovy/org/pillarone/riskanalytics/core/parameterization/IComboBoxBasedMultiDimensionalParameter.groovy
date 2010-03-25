@@ -5,4 +5,5 @@ public interface IComboBoxBasedMultiDimensionalParameter {
 
     Class getMarkerClass()
 
+    void validateValues()
 }

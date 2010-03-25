@@ -2,6 +2,8 @@ package org.pillarone.riskanalytics.core.parameterization
 
 import org.pillarone.riskanalytics.core.example.marker.ITestComponentMarker
 import org.pillarone.riskanalytics.core.util.GroovyUtils
+import org.pillarone.riskanalytics.core.model.Model
+import models.core.CoreModel
 
 class MultiDimensionalParameterTests extends GroovyTestCase {
 
@@ -193,6 +195,26 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
 
         assertTrue output.equals(param.toString())
         assertEquals GroovyUtils.toList([['[1, 2]', '[3]'], ['[4, 5]', '[6]']]), [[1, 2, 3], [4, 5, 6]]
+    }
+
+    void testSetSimulationModel() {
+        Model model = new CoreModel()
+        model.init()
+        model.injectComponentNames()
+
+        AbstractMultiDimensionalParameter mdp = new ComboBoxMatrixMultiDimensionalParameter([[0, 1], [1, 0]], ['invalid name', 'hierarchy output component'], ITestComponentMarker)
+        mdp.setSimulationModel(model)
+        mdp.validateValues()
+
+        assertFalse "invalid name" == mdp.getValueAt(0, 1)
+        assertEquals "hierarchy output component", mdp.getValueAt(0, 2)
+
+        mdp = new ComboBoxTableMultiDimensionalParameter([['invalid name', 'hierarchy output component']], ['title'], ITestComponentMarker)
+        mdp.setSimulationModel(model)
+        mdp.validateValues()
+
+        assertFalse "invalid name" == mdp.getValueAt(1, 0)
+        assertEquals "hierarchy output component", mdp.getValueAt(2, 0)
     }
 
 }

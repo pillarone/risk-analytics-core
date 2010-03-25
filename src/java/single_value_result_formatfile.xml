@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<BCPFORMAT xmlns="http://schemas.microsoft.com/sqlserver/2004/bulkload/format" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+ <RECORD>
+  <FIELD ID="1" xsi:type="CharTerm" TERMINATOR="," MAX_LENGTH="41"/>
+  <FIELD ID="2" xsi:type="CharTerm" TERMINATOR="," MAX_LENGTH="41"/>
+  <FIELD ID="3" xsi:type="CharTerm" TERMINATOR="," MAX_LENGTH="41"/>
+  <FIELD ID="4" xsi:type="CharTerm" TERMINATOR="," MAX_LENGTH="12"/>
+  <FIELD ID="5" xsi:type="CharTerm" TERMINATOR="," MAX_LENGTH="12"/>
+  <FIELD ID="6" xsi:type="CharTerm" TERMINATOR="," MAX_LENGTH="41"/>
+  <FIELD ID="7" xsi:type="CharTerm" TERMINATOR="," MAX_LENGTH="41"/>
+  <FIELD ID="8" xsi:type="CharTerm" TERMINATOR="," MAX_LENGTH="41"/>
+  <FIELD ID="9" xsi:type="CharTerm" TERMINATOR="," MAX_LENGTH="30"/>
+  <FIELD ID="10" xsi:type="CharTerm" TERMINATOR="\r\n" MAX_LENGTH="12"/>
+ </RECORD>
+ <ROW>
+  <COLUMN SOURCE="1" NAME="id" xsi:type="SQLNUMERIC" PRECISION="19" SCALE="0"/>
+  <COLUMN SOURCE="2" NAME="version" xsi:type="SQLNUMERIC" PRECISION="19" SCALE="0"/>
+  <COLUMN SOURCE="8" NAME="collector_id" xsi:type="SQLNUMERIC" PRECISION="19" SCALE="0"/>
+  <COLUMN SOURCE="7" NAME="field_id" xsi:type="SQLNUMERIC" PRECISION="19" SCALE="0"/>
+  <COLUMN SOURCE="5" NAME="iteration" xsi:type="SQLINT"/>
+  <COLUMN SOURCE="6" NAME="path_id" xsi:type="SQLNUMERIC" PRECISION="19" SCALE="0"/>
+  <COLUMN SOURCE="4" NAME="period" xsi:type="SQLINT"/>
+  <COLUMN SOURCE="3" NAME="simulation_run_id" xsi:type="SQLNUMERIC" PRECISION="19" SCALE="0"/>
+  <COLUMN SOURCE="9" NAME="value" xsi:type="SQLFLT8"/>
+  <COLUMN SOURCE="10" NAME="value_index" xsi:type="SQLINT"/>
+ </ROW>
+</BCPFORMAT>

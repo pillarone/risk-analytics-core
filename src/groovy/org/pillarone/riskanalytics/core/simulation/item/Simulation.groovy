@@ -122,8 +122,4 @@ class Simulation extends ModellingItem {
         modelVersionNumber = versionNumber
     }
 
-    public ModelStructure getStructure() {
-        // TODO (Sep 9, 2009, msh): method can be deleted as soon as mapped from DAO
-        return ModelStructure.getStructureForModel(modelClass)
-    }
 }

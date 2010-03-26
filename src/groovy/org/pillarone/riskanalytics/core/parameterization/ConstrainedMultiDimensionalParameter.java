@@ -34,11 +34,9 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
 
     public void setSimulationModel(Model simulationModel) {
         this.simulationModel = simulationModel;
-        //TODO: (msp) enable when new simulation engine is used
-//        checkAndCorrectValues();
     }
 
-    protected void checkAndCorrectValues() {
+    public void validateValues() {
         int col = 0;
         for (List list : values) {
             int row = 0;

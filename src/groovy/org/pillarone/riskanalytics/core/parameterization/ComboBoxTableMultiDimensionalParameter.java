@@ -22,15 +22,14 @@ public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensiona
 
     public void setSimulationModel(Model simulationModel) {
         super.setSimulationModel(simulationModel);
-        for (Component c : simulationModel.getMarkedComponents(markerClass)) {
+        List<Component> markedComponents = simulationModel.getMarkedComponents(markerClass);
+        for (Component c : markedComponents) {
             comboBoxValues.put(normalizeName(c.getName()), c);
         }
         LOG.debug("Marker: " + markerClass + ", comboBoxValues: " + comboBoxValues.values());
-        //TODO: (msp) enable when new simulation engine is used
-//        checkAndCorrectValues();
     }
 
-    protected void checkAndCorrectValues() {
+    public void validateValues() {
         for (List list : values) {
             int i = 0;
             for (Object value : list) {

@@ -60,11 +60,9 @@ public class ComboBoxMatrixMultiDimensionalParameter extends MatrixMultiDimensio
         for (Component component : components) {
             comboBoxValues.put(component.getNormalizedName(), component);
         }
-        //TODO: (msp) enable when new simulation engine is used
-//        checkAndCorrectValues();
     }
 
-    protected void checkAndCorrectValues() {
+    public void validateValues() {
         int i = 0;
         for (Object value : columnTitles) {
             if (!comboBoxValues.keySet().contains(value)) {

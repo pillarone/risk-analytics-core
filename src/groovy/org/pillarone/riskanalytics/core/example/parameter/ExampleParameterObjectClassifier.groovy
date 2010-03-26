@@ -42,13 +42,12 @@ class ExampleParameterObjectClassifier extends AbstractParameterObjectClassifier
         return [TYPE0, TYPE1, TYPE2, NESTED_PARAMETER_OBJECT, NESTED_MDP];
     }
 
-    String getConstructionString(Map parameters) {
-        "org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObjectClassifier.${typeName}.getParameterObject(${parameters.toString()})"
-    }
-
     IParameterObject getParameterObject(Map parameters) {
         return new ExampleParameterObject(classifier: this, parameters: parameters)
     }
 
+    public static ExampleParameterObject getStrategy(ExampleParameterObjectClassifier classifier, Map parameters) {
+        return new ExampleParameterObject(classifier: classifier, parameters: parameters)
+    }
 
 }

@@ -1,11 +1,7 @@
 package org.pillarone.riskanalytics.core.output
 
 import grails.test.GrailsUnitTestCase
-import org.apache.commons.logging.Log
-import org.apache.commons.logging.LogFactory
-
-import org.pillarone.riskanalytics.core.output.batch.AbstractBulkInsert
-import org.pillarone.riskanalytics.core.output.*
+import org.pillarone.riskanalytics.core.output.batch.results.AbstractResultsBulkInsert
 
 class BatchDBOutputTests extends GrailsUnitTestCase {
 
@@ -30,10 +26,7 @@ class BatchDBOutputTests extends GrailsUnitTestCase {
     }
 }
 
-public class LoggingBulkInsert extends AbstractBulkInsert {
-
-
-    private static final Log LOG = LogFactory.getLog(AbstractBulkInsert)
+public class LoggingBulkInsert extends AbstractResultsBulkInsert {
 
     protected void writeResult(List values) {
         LOG.debug values

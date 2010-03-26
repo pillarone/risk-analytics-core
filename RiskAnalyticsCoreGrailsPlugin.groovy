@@ -1,6 +1,6 @@
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pillarone.riskanalytics.core.util.GrailsConfigValidator
-import org.pillarone.riskanalytics.core.output.batch.GenericBulkInsert
+import org.pillarone.riskanalytics.core.output.batch.results.GenericBulkInsert
 import org.pillarone.riskanalytics.core.parameterization.SimpleConstraint
 import org.pillarone.riskanalytics.core.parameterization.ConstraintsFactory
 import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
@@ -57,7 +57,7 @@ Persistence & Simulation engine.
         ]
 
         GrailsConfigValidator.validateConfig(grailsConfig, [
-                "batchInsert": standardBulkInsert,
+                "resultBulkInsert": standardBulkInsert,
                 "keyFiguresToCalculate": standardCalculatorOutput
         ])
 

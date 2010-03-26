@@ -1,15 +1,13 @@
-package org.pillarone.riskanalytics.core.output.batch
+package org.pillarone.riskanalytics.core.output.batch.results
 
 import groovy.sql.Sql
 
-class MysqlBulkInsert extends AbstractBulkInsert {
+class MysqlBulkInsert extends AbstractResultsBulkInsert {
 
     protected void writeResult(List values) {
         writer.append(values.join(","))
         writer.append(";")
     }
-
-
 
     void save() {
         long time = System.currentTimeMillis()

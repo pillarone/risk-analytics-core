@@ -1,10 +1,14 @@
 package org.pillarone.riskanalytics.core.parameterization;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import static org.pillarone.riskanalytics.core.parameterization.MatrixMultiDimensionalParameter.generateValue;
 
 public class TableMultiDimensionalParameter extends AbstractMultiDimensionalParameter {
 
-    private List titles;
+    protected List titles;
 
     public TableMultiDimensionalParameter(List cellValues, List titles) {
         super(cellValues);
@@ -27,9 +31,10 @@ public class TableMultiDimensionalParameter extends AbstractMultiDimensionalPara
 
     public Object getValueAt(int row, int column) {
         if (row == 0) {
-            return titles.get(column).toString();
+            if (column == 0) return "";
+            return titles.get(column - 1).toString();
         } else {
-            return super.getValueAt(row - 1, column);
+            return super.getValueAt(row - 1, column - 1);
         }
     }
 
@@ -38,9 +43,48 @@ public class TableMultiDimensionalParameter extends AbstractMultiDimensionalPara
     }
 
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
-        if (rowIndex > 0) {
-            super.setValueAt(value, rowIndex - 1, columnIndex);
+        if (rowIndex > 0 && columnIndex > 0) {
+            super.setValueAt(value, rowIndex - 1, columnIndex - 1);
         }
+    }
+
+    public void addColumnAt(int columnIndex) {
+        List emptyList = new ArrayList();
+        for (int i = 1; i < getRowCount(); i++) {
+            emptyList.add(generateValue(values.get(columnIndex), i - 1));
+        }
+        if (columnIndex >= values.size()) {
+            values.add(emptyList);
+            titles.add("new title");
+        } else {
+            values.add(columnIndex, emptyList);
+            titles.add(columnIndex, "new title");
+        }
+    }
+
+    public void removeColumnAt(int columnIndex) {
+        values.remove(columnIndex);
+        titles.remove(columnIndex);
+    }
+
+    public void addRowAt(int rowIndex) {
+        for (List list : values) {
+            if (rowIndex >= list.size())
+                list.add(generateValue(list, list.size() - 1));
+            else
+                list.add(rowIndex, generateValue(list, rowIndex));
+        }
+    }
+
+    public void removeRowAt(int rowIndex) {
+        for (List list : values) {
+            list.remove(rowIndex);
+        }
+    }
+
+    public void moveColumnTo(int from, int to) {
+        super.moveColumnTo(from, to);
+        Collections.swap(titles, from, to);
     }
 
     protected void rowsAdded(int i) {
@@ -63,7 +107,7 @@ public class TableMultiDimensionalParameter extends AbstractMultiDimensionalPara
     }
 
     public boolean isCellEditable(int row, int column) {
-        return row > 0;
+        return column != 0;
     }
 
     protected void appendAdditionalConstructorArguments(StringBuffer buffer) {

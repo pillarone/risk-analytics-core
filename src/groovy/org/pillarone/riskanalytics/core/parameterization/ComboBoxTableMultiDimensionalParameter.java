@@ -46,7 +46,7 @@ public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensiona
     }
 
     public Object getPossibleValues(int row, int column) {
-        if (row == 0) {
+        if (row == 0 || column == 0) {
             return getValueAt(row, column);
         } else {
             List names = new LinkedList();
@@ -105,7 +105,7 @@ public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensiona
     }
 
     @Override
-    protected Object createDefaultValue(int column) {
+    protected Object createDefaultValue(int row, int column, Object object) {
         List list = (List) getPossibleValues(1, 0);
         return list.size() > 0 ? list.get(0) : "";
     }

@@ -3,10 +3,7 @@ package org.pillarone.riskanalytics.core.parameterization;
 import org.pillarone.riskanalytics.core.model.Model;
 import org.pillarone.riskanalytics.core.util.GroovyUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public abstract class AbstractMultiDimensionalParameter {
 
@@ -84,6 +81,31 @@ public abstract class AbstractMultiDimensionalParameter {
         return valuesConverted ? values.get(0) : values;
     }
 
+    public void addColumnAt(int columnIndex) {
+    }
+
+    public void removeColumnAt(int columnIndex) {
+    }
+
+    public void addRowAt(int columnIndex) {
+    }
+
+    public void removeRowAt(int columnIndex) {
+    }
+
+    public void moveColumnTo(int from, int to) {
+        Collections.swap(values, from, to);
+    }
+
+    public void moveRowTo(int from, int to) {
+        for (List rowList : values)
+            Collections.swap(rowList, from, to);
+    }
+
+
+    protected void setDiagonalValue() {
+    }
+
     protected abstract void rowsAdded(int i);
 
     protected abstract void columnsAdded(int i);
@@ -103,11 +125,10 @@ public abstract class AbstractMultiDimensionalParameter {
             for (int i = 0; i < (newColumnCount - currentColumnCount); i++) {
                 List lastList = values.get(values.size() - 1);
                 ArrayList newList = new ArrayList();
+                int rowIndex = 0;
                 for (Object object : lastList) {
-                    if (object instanceof Date) {
-                        object = ((Date) object).clone();
-                    }
-                    newList.add(object);
+                    newList.add(createDefaultValue(rowIndex, currentColumnCount, object));
+                    rowIndex++;
                 }
                 values.add(newList);
             }
@@ -123,7 +144,7 @@ public abstract class AbstractMultiDimensionalParameter {
                 List list = iterator.next();
                 if (list.size() == currentRowCount) {
                     for (int i = 0; i < (newRowCount - currentRowCount); i++) {
-                        list.add(createDefaultValue(currentColumn));
+                        list.add(createDefaultValue(currentRowCount + i, currentColumn, null));
                     }
                 }
                 currentColumn++;
@@ -150,10 +171,16 @@ public abstract class AbstractMultiDimensionalParameter {
             }
             columnsRemoved(currentColumnCount - newColumnCount);
         }
+        setDiagonalValue();
     }
 
-    protected Object createDefaultValue(int column) {
-        return values.get(column).get(0);
+    protected Object createDefaultValue(int row, int column, Object object) {
+        if (object == null)
+            object = values.get(column).get(0);
+        if (object instanceof Date) return ((Date) object).clone();
+        if (object instanceof String) return object;
+        if (object instanceof Integer) return new Integer(0);
+        return new Double(0);
     }
 
     public boolean supportsZeroRows() {

@@ -21,7 +21,7 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
 
     @Override
     public void setValueAt(Object value, int row, int column) {
-        if (constraints.matches(row, column, value)) {
+        if (constraints.matches(row, column - 1, value)) {
             super.setValueAt(value, row, column);
         } else {
             throw new IllegalArgumentException("Value does not pass constraints");
@@ -58,10 +58,10 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
 
     @Override
     public Object getPossibleValues(int row, int column) {
-        if (row == 0) {
+        if (row == 0 || column == 0) {
             return new Object();
         }
-        Class columnClass = constraints.getColumnType(column);
+        Class columnClass = constraints.getColumnType(column - 1);
         if (IComponentMarker.class.isAssignableFrom(columnClass)) {
             List<String> names = new ArrayList<String>();
             List components = simulationModel.getMarkedComponents(columnClass);
@@ -86,7 +86,7 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
     }
 
     @Override
-    protected Object createDefaultValue(int column) {
+    protected Object createDefaultValue(int row, int column, Object object) {
         Object result = "";
         Class columnClass = constraints.getColumnType(column);
         if (IComponentMarker.class.isAssignableFrom(columnClass)) {

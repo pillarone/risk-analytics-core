@@ -4,6 +4,9 @@ import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.util.ConfigObjectUtils
 import org.pillarone.riskanalytics.core.ParameterizationDAO
+import java.util.zip.ZipEntry
+import java.util.jar.JarInputStream
+import java.util.zip.ZipInputStream
 
 abstract class FileImportService {
 
@@ -15,13 +18,13 @@ abstract class FileImportService {
 
     abstract protected boolean saveItemObject(String fileContent)
 
-    abstract String prepare(File file)
+    abstract String prepare(URL file, String itemName)
 
     public int compareFilesAndWriteToDB(List modelNames = null) {
 
         int recordCount = 0
-        scanImportFolder(modelNames).each {File file ->
-            if (importFile(file)) {
+        scanImportFolder(modelNames).each {URL url ->
+            if (importFile(url)) {
                 recordCount++
             }
         }
@@ -29,22 +32,60 @@ abstract class FileImportService {
     }
 
     protected List scanImportFolder(List modelNames = null) {
-        File modelSourceFolder = searchModelImportFolder()
-        List matchingFiles = []
-        modelSourceFolder.eachFileRecurse {File file ->
+        URL modelSourceFolder = searchModelImportFolder()
+        return modelSourceFolder.toExternalForm().startsWith("jar") ? findURLsInJar(modelSourceFolder, modelNames) : findURLsInDirectory(modelSourceFolder, modelNames)
+    }
+
+    protected List<URL> findURLsInDirectory(URL url, List modelNames) {
+        LOG.trace "Importing from directory ${url.toExternalForm()}"
+
+        List<URL> matchingFiles = []
+        new File(url.toURI()).eachFileRecurse {File file ->
             if (file.isFile() && file.name.endsWith("${fileSuffix}.groovy") && shouldImportModel(file.name, modelNames)) {
-                matchingFiles << file
+                matchingFiles << file.toURI().toURL()
             }
         }
         return matchingFiles
     }
 
-    protected boolean importFile(File file) {
-        LOG.debug("importing $file.name")
-        boolean success = false
-        String itemName = prepare(file)
+    protected List<URL> findURLsInJar(URL url, List modelNames) {
+        LOG.trace "Importing from JAR file ${url.toExternalForm()}"
 
-        def fileContent = file.getText()
+        List<URL> matchingFiles = []
+
+        JarURLConnection connection
+        ZipInputStream inputStream
+
+        try {
+            connection = (JarURLConnection) url.openConnection()
+            URL jarUrl = connection.getJarFileURL()
+            inputStream = new JarInputStream(jarUrl.openStream())
+            ZipEntry entry = null
+            while ((entry = inputStream.getNextEntry()) != null) {
+                String entryName = entry.getName()
+                if (entryName.contains("models") && entryName.endsWith("${fileSuffix}.groovy") && shouldImportModel(entryName.substring(entryName.lastIndexOf("/") + 1), modelNames)) {
+                    URL resource = getClass().getResource("/" + entryName)
+                    if (resource != null) {
+                        matchingFiles << resource
+                    }
+                }
+                inputStream.closeEntry()
+
+            }
+        } finally {
+            inputStream.close()
+        }
+
+        return matchingFiles
+    }
+
+    protected boolean importFile(URL url) {
+        LOG.debug("importing ${url.toExternalForm()}")
+        boolean success = false
+        String urlString = url.toExternalForm()
+        String itemName = prepare(url, urlString.substring(urlString.lastIndexOf("/") + 1))
+
+        def fileContent = readFromURL(url)
         boolean alreadyImported = lookUpItem(getDaoClass(), itemName)
 
         if (!alreadyImported) {
@@ -60,13 +101,18 @@ abstract class FileImportService {
         return success
     }
 
+    protected String readFromURL(URL url) {
+        Scanner scanner = new Scanner(url.openStream()).useDelimiter("\\Z")
+        return scanner.next()
+    }
+
     protected boolean lookUpItem(String itemName) {
         return getDaoClass().findByName(itemName) != null
     }
 
     protected boolean lookUpItem(def daoClass, String itemName) {
         if (daoClass == ParameterizationDAO) {
-            return  getDaoClass().findByNameAndModelClassName(itemName, getModelClassName()) != null
+            return getDaoClass().findByNameAndModelClassName(itemName, getModelClassName()) != null
         } else {
             return lookUpItem(itemName)
         }
@@ -76,19 +122,19 @@ abstract class FileImportService {
         if (!models) {
             return true
         }
+        LOG.trace "filtering $filename with $models"
         models.any {String it ->
             filename.startsWith(it)
         }
     }
 
-    protected File searchModelImportFolder() {
+    protected URL searchModelImportFolder() {
         URL modelFolder = getClass().getResource("/models")
         if (modelFolder == null) {
             throw new RuntimeException("Model folder not found")
         }
-        File modelSourceFolder = new File(modelFolder.toURI())
-        LOG.debug "modelSource: ${modelSourceFolder.path}"
-        return modelSourceFolder
+        LOG.debug "Model source URL: ${modelFolder.toExternalForm()}"
+        return modelFolder
     }
 
     public static void spreadRanges(ConfigObject config) {

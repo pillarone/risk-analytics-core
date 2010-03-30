@@ -25,9 +25,9 @@ public class ParameterizationImportService extends FileImportService {
         ParameterizationDAO
     }
 
-    public String prepare(File file) {
-        currentConfigObject = new ConfigSlurper().parse(file.text)
-        String name = file.name - ".groovy"
+    public String prepare(URL file, String itemName) {
+        currentConfigObject = new ConfigSlurper().parse(readFromURL(file))
+        String name = itemName - ".groovy"
         if (currentConfigObject.containsKey('displayName')) {
             name = currentConfigObject.displayName
         } else {

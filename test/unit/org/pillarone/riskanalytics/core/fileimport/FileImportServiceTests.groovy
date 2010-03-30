@@ -23,8 +23,8 @@ class FileImportServiceTests extends GrailsUnitTestCase {
         assertNotNull filesToImport
         assertFalse filesToImport.empty
 
-        filesToImport.each {File file ->
-            assertTrue "wrong file selected ${file.name}", file.name.endsWith("Parameters.groovy")
+        filesToImport.each {URL file ->
+            assertTrue "wrong file selected ${file.toExternalForm()}", file.toExternalForm().endsWith("Parameters.groovy")
         }
     }
 
@@ -42,9 +42,9 @@ class FileImportServiceTests extends GrailsUnitTestCase {
         assertNotNull filesToImport
         assertFalse filesToImport.empty
 
-        filesToImport.each {File file ->
-            assertTrue "wrong file selected ${file.name}", file.name.startsWith("Core")
-            assertTrue "wrong file selected ${file.name}", file.name.endsWith("Parameters.groovy")
+        filesToImport.each {URL file ->
+            assertTrue "wrong file selected ${file.getFile()}", file.getFile().contains("Core")
+            assertTrue "wrong file selected ${file.getFile()}", file.getFile().endsWith("Parameters.groovy")
         }
     }
 
@@ -56,10 +56,10 @@ class FileImportServiceTests extends GrailsUnitTestCase {
                 lookUpItem: {Class c, String name -> return false},
                 saveItemObject: {fileContent -> true},
                 getModelClassName: {return "models.core.CoreModel"},
-                prepare: {File file -> return "notYetImported"}
+                prepare: { file, name -> return "notYetImported"}
         ] as FileImportService
 
-        assertTrue fileImportService.importFile(new File(getModelFolder(), "/core/CoreParameters.groovy"))
+        assertTrue fileImportService.importFile(new File(getModelFolder(), "/core/CoreParameters.groovy").toURI().toURL())
 
     }
 
@@ -71,10 +71,10 @@ class FileImportServiceTests extends GrailsUnitTestCase {
                 lookUpItem: {Class c, String name -> return true},
                 saveItemObject: {fileContent -> true},
                 getModelClassName: {return "models.core.CoreModel"},
-                prepare: {File file -> return "notYetImported"}
+                prepare: {file, name -> return "notYetImported"}
         ] as FileImportService
 
-        assertFalse fileImportService.importFile(new File(getModelFolder(), "/core/CoreParameters.groovy"))
+        assertFalse fileImportService.importFile(new File(getModelFolder(), "/core/CoreParameters.groovy").toURI().toURL())
 
     }
 
@@ -86,10 +86,10 @@ class FileImportServiceTests extends GrailsUnitTestCase {
                 lookUpItem: {Class c, String name -> return true},
                 saveItemObject: {fileContent -> false},
                 getModelClassName: {return "models.core.CoreModel"},
-                prepare: {File file -> return "notYetImported"}
+                prepare: {file, name -> return "notYetImported"}
         ] as FileImportService
 
-        assertFalse fileImportService.importFile(new File(getModelFolder(), "/core/CoreParameters.groovy"))
+        assertFalse fileImportService.importFile(new File(getModelFolder(), "/core/CoreParameters.groovy").toURI().toURL())
 
     }
 
@@ -98,7 +98,7 @@ class FileImportServiceTests extends GrailsUnitTestCase {
                 getFileSuffix: {return "Parameters"},
                 getDaoClass: {return null},
                 saveItemObject: {itemObject ->},
-                prepare: {File file -> }
+                prepare: {file, name -> }
         ] as FileImportService
 
         assertTrue "no model specified", fileImportService.shouldImportModel("CoreParameters.groovy", null)

@@ -13,7 +13,7 @@ class ModelStructureImportServiceTests extends GroovyTestCase {
 
         File modelFile = new File(getModelFolder(), "core/CoreStructure.groovy")
         def count = ModelStructureDAO.count()
-        assertTrue "import not successful", service.importFile(modelFile)
+        assertTrue "import not successful", service.importFile(modelFile.toURI().toURL())
 
         assertEquals count + 1, ModelStructureDAO.count()
 
@@ -23,7 +23,7 @@ class ModelStructureImportServiceTests extends GroovyTestCase {
 
         File modelFile = new File(getModelFolder(), "core/CoreStructure.groovy")
         FileImportService modelStructureService = getService()
-        assertEquals "wrong itemName", "CoreStructure", modelStructureService.prepare(modelFile)
+        assertEquals "wrong itemName", "CoreStructure", modelStructureService.prepare(modelFile.toURI().toURL(), modelFile.name)
         assertNotNull modelStructureService.currentConfigObject
         assertEquals "wrong name in config", "CoreStructure", modelStructureService.currentConfigObject.displayName
 

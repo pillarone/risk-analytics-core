@@ -10,8 +10,6 @@ class MysqlCalculationsBulkInsert extends AbstractCalculationsBulkInsert {
         writer.append(";")
     }
 
-
-
     protected void save() {
         long time = System.currentTimeMillis()
         Sql sql = new Sql(simulationRun.dataSource)
@@ -22,5 +20,8 @@ class MysqlCalculationsBulkInsert extends AbstractCalculationsBulkInsert {
         sql.close()
     }
 
+    protected String getNull() {
+        return "\\N"
+    }
 
 }

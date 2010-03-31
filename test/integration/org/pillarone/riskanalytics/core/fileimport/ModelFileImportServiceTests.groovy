@@ -12,7 +12,7 @@ public class ModelFileImportServiceTests extends GroovyTestCase {
 
         File modelFile = new File(getModelFolder(), "core/CoreModel.groovy")
         def count = ModelDAO.count()
-        assertTrue "import not successful", service.importFile(modelFile)
+        assertTrue "import not successful", service.importFile(modelFile.toURI().toURL())
 
         assertEquals count + 1, ModelDAO.count()
 
@@ -22,7 +22,7 @@ public class ModelFileImportServiceTests extends GroovyTestCase {
 
         File modelFile = new File(getModelFolder(), "core/CoreModel.groovy")
 
-        assertEquals "wrong itemName", "CoreModel", service.prepare(modelFile)
+        assertEquals "wrong itemName", "CoreModel", service.prepare(modelFile.toURI().toURL(), modelFile.name)
 
     }
 

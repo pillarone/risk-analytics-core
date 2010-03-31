@@ -16,7 +16,7 @@ class ParameterizationImportServiceTests extends GroovyTestCase {
 
         def count = ParameterizationDAO.count()
 
-        assertTrue "import not successful", service.importFile(paramFile)
+        assertTrue "import not successful", service.importFile(paramFile.toURI().toURL())
         assertEquals count + 1, ParameterizationDAO.count()
 
     }
@@ -27,7 +27,7 @@ class ParameterizationImportServiceTests extends GroovyTestCase {
         File paramFile = new File(getModelFolder(), "core/CoreParameters.groovy")
 
         ParameterizationImportService parameterizationImportService = getService()
-        assertEquals "wrong itemName", "CoreParameters", parameterizationImportService.prepare(paramFile)
+        assertEquals "wrong itemName", "CoreParameters", parameterizationImportService.prepare(paramFile.toURI().toURL(), paramFile.name)
         assertNotNull parameterizationImportService.currentConfigObject
         assertEquals "wrong name in config", "CoreParameters", parameterizationImportService.currentConfigObject.displayName
 

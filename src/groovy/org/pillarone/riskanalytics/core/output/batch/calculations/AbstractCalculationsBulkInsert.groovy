@@ -13,13 +13,14 @@ abstract class AbstractCalculationsBulkInsert extends AbstractBulkInsert {
         values << field
         values << collector
         values << keyFigure
-        values << keyFigureParameter != null ? keyFigureParameter : "null"
+        values << (keyFigureParameter != null ? keyFigureParameter : getNull())
         values << value
         writeResult(values)
         values.clear()
         writer.flush()
     }
 
+    protected abstract String getNull()
 
     public static AbstractCalculationsBulkInsert getBulkInsertInstance() {
         Class bulkClass = ApplicationHolder.application?.config?.calculationBulkInsert

@@ -27,4 +27,10 @@ class GenericBulkInsert extends AbstractCalculationsBulkInsert {
     protected void writeResult(List values) {
         writer.writeLine(values.join(","))
     }
+
+    protected String getNull() {
+        return "null"
+    }
+
+
 }

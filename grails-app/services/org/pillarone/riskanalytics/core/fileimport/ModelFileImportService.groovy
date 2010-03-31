@@ -26,8 +26,8 @@ class ModelFileImportService extends FileImportService {
     }
 
 
-    public String prepare(File file) {
-        fileName = file.name - '.groovy'
+    public String prepare(URL file, String itemName) {
+        fileName = itemName - '.groovy'
         return fileName
     }
 }

@@ -52,12 +52,12 @@ public class ResultConfigurationImportService extends FileImportService {
         }
     }
 
-    public String prepare(File file) {
-        configObject = new ConfigSlurper().parse(file.toURI().toURL())
+    public String prepare(URL file, String itemName) {
+        configObject = new ConfigSlurper().parse(readFromURL(file))
         if (configObject.containsKey("displayName")) {
             name = configObject.displayName
         } else {
-            name = file.name - ".groovy"
+            name = itemName - ".groovy"
         }
         return name
     }

@@ -13,7 +13,7 @@ class ResultConfigurationImportServiceTests extends GrailsUnitTestCase {
 
         def count = ResultConfigurationDAO.count()
 
-        assertTrue "import not successful", resultConfigurationImportService.importFile(paramFile)
+        assertTrue "import not successful", resultConfigurationImportService.importFile(paramFile.toURI().toURL())
         assertEquals count + 1, ResultConfigurationDAO.count()
 
     }

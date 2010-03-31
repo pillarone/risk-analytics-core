@@ -1,6 +1,7 @@
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pillarone.riskanalytics.core.util.GrailsConfigValidator
-import org.pillarone.riskanalytics.core.output.batch.results.GenericBulkInsert
+import org.pillarone.riskanalytics.core.output.batch.results.GenericBulkInsert as GenericResultBulkInsert
+import org.pillarone.riskanalytics.core.output.batch.calculations.GenericBulkInsert as GenericCalculationBulkInsert
 import org.pillarone.riskanalytics.core.parameterization.SimpleConstraint
 import org.pillarone.riskanalytics.core.parameterization.ConstraintsFactory
 import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
@@ -47,7 +48,6 @@ Persistence & Simulation engine.
     def doWithApplicationContext = {applicationContext ->
         //Checks at startup if certain config options required for the core are set and sets defaults otherwise
         ConfigObject grailsConfig = ConfigurationHolder.config
-        def standardBulkInsert = GenericBulkInsert
         def standardCalculatorOutput = [
                 'stdev': true,
                 'percentile': [0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0],
@@ -57,7 +57,8 @@ Persistence & Simulation engine.
         ]
 
         GrailsConfigValidator.validateConfig(grailsConfig, [
-                "resultBulkInsert": standardBulkInsert,
+                "resultBulkInsert": GenericResultBulkInsert,
+                "calculationBulkInsert": GenericCalculationBulkInsert,
                 "keyFiguresToCalculate": standardCalculatorOutput
         ])
 

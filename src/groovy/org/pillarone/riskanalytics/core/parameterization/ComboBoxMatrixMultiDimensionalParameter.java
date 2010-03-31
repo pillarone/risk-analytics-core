@@ -3,10 +3,7 @@ package org.pillarone.riskanalytics.core.parameterization;
 import org.pillarone.riskanalytics.core.components.Component;
 import org.pillarone.riskanalytics.core.model.Model;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ComboBoxMatrixMultiDimensionalParameter extends MatrixMultiDimensionalParameter implements IComboBoxBasedMultiDimensionalParameter {
 
@@ -18,6 +15,9 @@ public class ComboBoxMatrixMultiDimensionalParameter extends MatrixMultiDimensio
         this.markerClass = markerClass;
     }
 
+    public void moveColumnTo(int from, int to) {
+        Collections.swap(values, from, to);
+    }
 
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
         if (rowIndex > 0 && columnIndex > 1) {

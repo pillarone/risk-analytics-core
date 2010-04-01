@@ -37,7 +37,8 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
     }
 
     public void validateValues() {
-        int col = 0;
+        // column 0 for the index 0,1,2,3,...
+        int col = 1;
         for (List list : values) {
             int row = 0;
             for (Object value : list) {
@@ -90,7 +91,7 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
         Object result = "";
         Class columnClass = constraints.getColumnType(column);
         if (IComponentMarker.class.isAssignableFrom(columnClass)) {
-            List list = (List) getPossibleValues(1, column);
+            List list = (List) getPossibleValues(1, column + 1);
             result = list.get(0);
         } else if (columnClass == BigDecimal.class) {
             result = new BigDecimal(0);

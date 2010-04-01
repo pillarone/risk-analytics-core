@@ -74,8 +74,7 @@ public class MatrixMultiDimensionalParameter extends AbstractMultiDimensionalPar
 
     public void removeColumnAt(int columnIndex) {
         values.remove(columnIndex);
-        columnTitles.remove(columnIndex);
-
+//        columnTitles.remove(columnIndex);
     }
 
     public void addRowAt(int rowIndex) {

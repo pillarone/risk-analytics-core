@@ -132,7 +132,7 @@ public class TableMultiDimensionalParameter extends AbstractMultiDimensionalPara
     }
 
     public int getColumnIndex(String name) {
-        return titles.indexOf(name);
+        return titles.indexOf(name) + 1;
     }
 
     public boolean columnCountChangeable() {

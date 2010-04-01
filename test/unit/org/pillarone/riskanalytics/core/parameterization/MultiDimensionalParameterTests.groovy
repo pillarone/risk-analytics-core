@@ -217,4 +217,13 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertEquals "hierarchy output component", mdp.getValueAt(2, 1)
     }
 
+    void testGetColumnIndex() {
+        TableMultiDimensionalParameter mdp = new TableMultiDimensionalParameter([[1], [2]], ['title1', 'title2'])
+        int index = mdp.getColumnIndex("title1")
+        assertEquals "title1", mdp.getValueAt(0, index)
+
+        index = mdp.getColumnIndex("title2")
+        assertEquals "title2", mdp.getValueAt(0, index)
+    }
+
 }

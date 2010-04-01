@@ -10,7 +10,8 @@ public class FileConstants {
     public static final String EXTERNAL_DATABASE_DIRECTORY;
 
     static {
-        StringBuilder builder = new StringBuilder(System.getProperty("user.home"));
+        String baseDir = System.getProperty("p1.temp");
+        StringBuilder builder = new StringBuilder(baseDir != null ? baseDir : System.getProperty("user.home"));
         builder.append(File.separatorChar);
         builder.append(".pillarone");
         builder.append(File.separatorChar);

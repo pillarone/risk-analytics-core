@@ -6,6 +6,7 @@ import org.pillarone.riskanalytics.core.parameter.ParameterEntry
 import org.pillarone.riskanalytics.core.parameter.ParameterObjectParameter
 import org.pillarone.riskanalytics.core.parameterization.IParameterObjectClassifier
 import org.pillarone.riskanalytics.core.parameterization.IParameterObject
+import org.pillarone.riskanalytics.core.parameterization.AbstractMultiDimensionalParameter
 
 class ParameterObjectParameterHolder extends ParameterHolder {
 
@@ -88,7 +89,11 @@ class ParameterObjectParameterHolder extends ParameterHolder {
             if (classifierParameters.containsKey(entry.key) && classifierParameters.get(entry.key) != null) {
                 holder = classifierParameters.get(entry.key)
             } else {
-                holder = ParameterHolderFactory.getHolder(path + ":$entry.key", periodIndex, entry.value)
+                Object entryValue = entry.value
+                if(entryValue instanceof AbstractMultiDimensionalParameter) {
+                    entryValue = entryValue.clone()
+                }
+                holder = ParameterHolderFactory.getHolder(path + ":$entry.key", periodIndex, entryValue)
             }
             newClassifierParameters.put(entry.key, holder)
         }

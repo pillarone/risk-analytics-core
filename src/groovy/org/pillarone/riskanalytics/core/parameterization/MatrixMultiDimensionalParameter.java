@@ -61,7 +61,7 @@ public class MatrixMultiDimensionalParameter extends AbstractMultiDimensionalPar
 
         if (columnIndex >= values.size()) {
             values.add(emptyList);
-            //rowTitle and colTitles are the same object 
+            //rowTitle and colTitles are the same object
             if (columnTitles.size() < values.size())
                 columnTitles.add(columnTitles.get(0));
         } else {
@@ -187,5 +187,19 @@ public class MatrixMultiDimensionalParameter extends AbstractMultiDimensionalPar
         if (o instanceof String) return o;
         if (o instanceof Integer) return new Integer(0);
         return new Double(0);
+    }
+
+    @Override
+    public MatrixMultiDimensionalParameter clone() throws CloneNotSupportedException {
+        final MatrixMultiDimensionalParameter clone = (MatrixMultiDimensionalParameter) super.clone();
+        clone.columnTitles = new ArrayList(columnTitles.size());
+        for (Object o : columnTitles) {
+            clone.columnTitles.add(o);
+        }
+        clone.rowTitles = new ArrayList(rowTitles.size());
+        for (Object o : rowTitles) {
+            clone.rowTitles.add(o);
+        }
+        return clone;
     }
 }

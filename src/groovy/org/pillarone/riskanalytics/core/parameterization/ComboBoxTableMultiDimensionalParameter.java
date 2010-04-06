@@ -108,4 +108,14 @@ public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensiona
         List list = (List) getPossibleValues(1, 1);
         return list.size() > 0 ? list.get(0) : "";
     }
+
+    @Override
+    public ComboBoxTableMultiDimensionalParameter clone() throws CloneNotSupportedException {
+        final ComboBoxTableMultiDimensionalParameter clone = (ComboBoxTableMultiDimensionalParameter) super.clone();
+        clone.markerClass = markerClass;
+        if (simulationModel != null) {
+            setSimulationModel(simulationModel);
+        }
+        return clone;
+    }
 }

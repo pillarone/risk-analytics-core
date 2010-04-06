@@ -226,4 +226,93 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertEquals "title2", mdp.getValueAt(0, index)
     }
 
+    void testClone() {
+        SimpleMultiDimensionalParameter param1 = new SimpleMultiDimensionalParameter([[0, 1], [1, 2]])
+        SimpleMultiDimensionalParameter clone1 = param1.clone()
+
+        assertNotSame param1.values, clone1.values
+        for (int i = 0; i < param1.values.size(); i++) {
+            assertNotSame param1.values[i], clone1.values[i]
+        }
+        assertEquals param1.values, clone1.values
+        assertEquals param1.simulationModel, clone1.simulationModel
+
+        TableMultiDimensionalParameter param2 = new TableMultiDimensionalParameter([[0, 1], [1, 2]], ['title', 'title2'])
+        TableMultiDimensionalParameter clone2 = param2.clone()
+
+        assertNotSame param2.values, clone2.values
+        for (int i = 0; i < param2.values.size(); i++) {
+            assertNotSame param2.values[i], clone2.values[i]
+        }
+        assertEquals param2.values, clone2.values
+        assertEquals param2.simulationModel, clone2.simulationModel
+
+        assertNotSame param2.titles, clone2.titles
+        assertEquals param2.titles, clone2.titles
+
+        MatrixMultiDimensionalParameter param3 = new MatrixMultiDimensionalParameter([[0, 1], [1, 2]], ['title', 'title2'], ['a', 'b'])
+        MatrixMultiDimensionalParameter clone3 = param3.clone()
+
+        assertNotSame param3.values, clone3.values
+        for (int i = 0; i < param3.values.size(); i++) {
+            assertNotSame param3.values[i], clone3.values[i]
+        }
+        assertEquals param3.values, clone3.values
+        assertEquals param3.simulationModel, clone3.simulationModel
+
+        assertNotSame param3.rowTitles, clone3.rowTitles
+        assertEquals param3.rowTitles, clone3.rowTitles
+
+        assertNotSame param3.columnTitles, clone3.columnTitles
+        assertEquals param3.columnTitles, clone3.columnTitles
+
+        ComboBoxMatrixMultiDimensionalParameter param4 = new ComboBoxMatrixMultiDimensionalParameter([[0, 1], [1, 2]], ['title', 'title2'], ITestComponentMarker)
+        ComboBoxMatrixMultiDimensionalParameter clone4 = param4.clone()
+
+        assertNotSame param4.values, clone4.values
+        for (int i = 0; i < param4.values.size(); i++) {
+            assertNotSame param4.values[i], clone4.values[i]
+        }
+        assertEquals param4.values, clone4.values
+        assertEquals param4.simulationModel, clone4.simulationModel
+
+        assertNotSame param4.rowTitles, clone4.rowTitles
+        assertEquals param4.rowTitles, clone4.rowTitles
+
+        assertNotSame param4.columnTitles, clone4.columnTitles
+        assertEquals param4.columnTitles, clone4.columnTitles
+
+        assertEquals param4.markerClass, clone4.markerClass
+
+        ComboBoxTableMultiDimensionalParameter param5 = new ComboBoxTableMultiDimensionalParameter([[0, 1], [1, 2]], ['title', 'title2'], ITestComponentMarker)
+        ComboBoxTableMultiDimensionalParameter clone5 = param5.clone()
+
+        assertNotSame param5.values, clone5.values
+        for (int i = 0; i < param5.values.size(); i++) {
+            assertNotSame param5.values[i], clone5.values[i]
+        }
+        assertEquals param5.values, clone5.values
+        assertEquals param5.simulationModel, clone5.simulationModel
+
+        assertNotSame param5.titles, clone5.titles
+        assertEquals param5.titles, clone5.titles
+
+        assertEquals param5.markerClass, clone5.markerClass
+
+        ConstrainedMultiDimensionalParameter param6 = new ConstrainedMultiDimensionalParameter([[0, 1], [1, 2]], ['title', 'title2'], ConstraintsFactory.getConstraints(SimpleConstraint.IDENTIFIER))
+        ConstrainedMultiDimensionalParameter clone6 = param6.clone()
+
+        assertNotSame param6.values, clone6.values
+        for (int i = 0; i < param6.values.size(); i++) {
+            assertNotSame param6.values[i], clone6.values[i]
+        }
+        assertEquals param6.values, clone6.values
+        assertEquals param6.simulationModel, clone6.simulationModel
+
+        assertNotSame param6.titles, clone6.titles
+        assertEquals param6.titles, clone6.titles
+
+        assertEquals param6.constraints, clone6.constraints
+    }
+
 }

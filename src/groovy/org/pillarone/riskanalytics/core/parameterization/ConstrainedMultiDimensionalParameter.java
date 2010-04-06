@@ -11,7 +11,6 @@ import java.util.List;
 public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalParameter {
 
     private IMultiDimensionalConstraints constraints;
-    private Model simulationModel;
 
     public ConstrainedMultiDimensionalParameter(List cellValues, List titles, IMultiDimensionalConstraints constraints) {
         super(cellValues, titles);
@@ -107,5 +106,12 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
             }
         }
         return result;
+    }
+
+    @Override
+    public ConstrainedMultiDimensionalParameter clone() throws CloneNotSupportedException {
+        final ConstrainedMultiDimensionalParameter clone = (ConstrainedMultiDimensionalParameter) super.clone();
+        clone.constraints = constraints;
+        return clone;
     }
 }

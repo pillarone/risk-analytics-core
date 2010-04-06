@@ -100,4 +100,14 @@ public class ComboBoxMatrixMultiDimensionalParameter extends MatrixMultiDimensio
     public boolean columnCountChangeable() {
         return true;
     }
+
+    @Override
+    public ComboBoxMatrixMultiDimensionalParameter clone() throws CloneNotSupportedException {
+        final ComboBoxMatrixMultiDimensionalParameter clone = (ComboBoxMatrixMultiDimensionalParameter) super.clone();
+        clone.markerClass = markerClass;
+        if (simulationModel != null) {
+            setSimulationModel(simulationModel);
+        }
+        return clone;
+    }
 }

@@ -5,7 +5,7 @@ import org.pillarone.riskanalytics.core.util.GroovyUtils;
 
 import java.util.*;
 
-public abstract class AbstractMultiDimensionalParameter {
+public abstract class AbstractMultiDimensionalParameter implements Cloneable {
 
     protected List<List> values;
     protected Model simulationModel;
@@ -294,6 +294,27 @@ public abstract class AbstractMultiDimensionalParameter {
     public abstract boolean columnCountChangeable();
 
     public abstract boolean rowCountChangeable();
+
+    @Override
+    public AbstractMultiDimensionalParameter clone() throws CloneNotSupportedException {
+        final AbstractMultiDimensionalParameter clone = (AbstractMultiDimensionalParameter) super.clone();
+        clone.valuesConverted = valuesConverted;
+        clone.simulationModel = simulationModel;
+        clone.values = new ArrayList<List>(values.size());
+        for (List list : values) {
+            if (list instanceof Cloneable) {
+                List newList = null;
+                if (list instanceof ArrayList) {
+                    newList = (List) ((ArrayList) list).clone();
+                }
+                if (list instanceof LinkedList) {
+                    newList = (List) ((LinkedList) list).clone();
+                }
+                clone.values.add(newList);
+            }
+        }
+        return clone;
+    }
 }
 
 

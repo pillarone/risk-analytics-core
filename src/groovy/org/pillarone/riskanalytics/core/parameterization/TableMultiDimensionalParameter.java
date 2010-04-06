@@ -142,4 +142,14 @@ public class TableMultiDimensionalParameter extends AbstractMultiDimensionalPara
     public boolean rowCountChangeable() {
         return true;
     }
+
+    @Override
+    public TableMultiDimensionalParameter clone() throws CloneNotSupportedException {
+        final TableMultiDimensionalParameter clone = (TableMultiDimensionalParameter) super.clone();
+        clone.titles = new ArrayList(titles.size());
+        for (Object o : titles) {
+            clone.titles.add(o);
+        }
+        return clone;
+    }
 }

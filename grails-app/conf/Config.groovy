@@ -5,6 +5,7 @@ import org.pillarone.riskanalytics.core.output.batch.calculations.MysqlCalculati
 
 environments {
 
+    databaseSupportClass = null
     resultBulkInsert = null
     calculationBulkInsert = null
     keyFiguresToCalculate = null

@@ -9,10 +9,7 @@ class StandaloneConfigLoader {
     static void loadLog4JConfig(String environment) {
         Closure configuration = null
 
-        Class configClass = StandaloneConfigLoader.class.getClassLoader().loadClass(GrailsApplication.CONFIG_CLASS)
-
-        ConfigSlurper configSlurper = new ConfigSlurper(environment)
-        ConfigObject configObject = configSlurper.parse(configClass)
+        ConfigObject configObject = loadConfig(environment)
 
         if (configObject.containsKey("log4j") && configObject["log4j"] instanceof Closure) {
             configuration = configObject["log4j"]
@@ -24,5 +21,23 @@ class StandaloneConfigLoader {
         } else {
             new Log4jConfig().configure();
         }
+    }
+
+    static def getValue(String environment, String key) {
+        ConfigObject config = loadConfig(environment)
+        return config.containsKey(key) ? config.get(key) : null
+    }
+
+    static IExternalDatabaseSupport getExternalDatabaseSupport(String env) {
+        Class dbSupportClass = (Class) getValue(env, "databaseSupportClass");
+        return (IExternalDatabaseSupport) dbSupportClass?.newInstance();
+    }
+
+    private static ConfigObject loadConfig(String environment) {
+        Class configClass = StandaloneConfigLoader.class.getClassLoader().loadClass(GrailsApplication.CONFIG_CLASS)
+
+        ConfigSlurper configSlurper = new ConfigSlurper(environment)
+        ConfigObject configObject = configSlurper.parse(configClass)
+        return configObject
     }
 }

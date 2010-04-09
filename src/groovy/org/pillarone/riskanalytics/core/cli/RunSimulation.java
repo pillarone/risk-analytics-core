@@ -4,11 +4,9 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.groovy.grails.commons.ApplicationHolder;
-import org.hibernate.Transaction;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.pillarone.riskanalytics.core.fileimport.ModelStructureImportService;
 import org.pillarone.riskanalytics.core.initialization.GrailsEnvironment;
-import org.pillarone.riskanalytics.core.output.NoOutput;
+import org.pillarone.riskanalytics.core.initialization.IExternalDatabaseSupport;
+import org.pillarone.riskanalytics.core.initialization.StandaloneConfigLoader;
 import org.pillarone.riskanalytics.core.simulation.engine.RunSimulationService;
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration;
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationRunner;
@@ -19,9 +17,6 @@ import org.springframework.context.support.AbstractApplicationContext;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 
 public class RunSimulation {
@@ -29,7 +24,15 @@ public class RunSimulation {
     private static Log LOG = LogFactory.getLog(RunSimulation.class);
 
     public static void main(String[] args) throws Exception {
+        IExternalDatabaseSupport databaseSupport = null;
         try {
+            String env = System.getProperty("grails.env") != null ? System.getProperty("grails.env") : "environment";
+            databaseSupport = StandaloneConfigLoader.getExternalDatabaseSupport(env);
+            if (databaseSupport != null) {
+                databaseSupport.startDatabase();
+            }
+
+
             System.setProperty("skipImport", "true");
             GrailsEnvironment.setUp();
             ArgumentParser parser = new ArgumentParser();
@@ -38,7 +41,7 @@ public class RunSimulation {
                 StringWriter writer = new StringWriter();
                 parser.printHelp(new PrintWriter(writer));
                 LOG.error(writer.toString());
-                shutdown();
+                shutdown(databaseSupport);
                 return;
             }
 
@@ -53,8 +56,10 @@ public class RunSimulation {
                 logger.wait();
             }
             LOG.info("Simulation completed with simulation run id: " + runner.getCurrentScope().getSimulation().id);
+        } catch (Throwable t) {
+            LOG.error("Simulation run failed", t);
         } finally {
-            shutdown();
+            shutdown(databaseSupport);
         }
     }
 
@@ -69,13 +74,16 @@ public class RunSimulation {
         return configuration;
     }
 
-    private static void shutdown() {
+    private static void shutdown(IExternalDatabaseSupport databaseSupport) {
         AbstractApplicationContext applicationContext = (AbstractApplicationContext) ApplicationHolder.getApplication().getMainContext();
         applicationContext.close();
         try {
             StdSchedulerFactory.getDefaultScheduler().shutdown();
         } catch (SchedulerException e) {
             LOG.warn("Error shutting down quartz scheduler", e);
+        }
+        if (databaseSupport != null) {
+            databaseSupport.stopDatabase();
         }
     }
 }

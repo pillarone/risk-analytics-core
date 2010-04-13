@@ -21,6 +21,10 @@ class ExampleParameterObjectClassifier extends AbstractParameterObjectClassifier
             "TYPE2", ["p1": 0d, "p2": 1d, "p3": "string"]
     )
 
+    public static final ExampleParameterObjectClassifier TYPE3 = new ExampleParameterObjectClassifier(
+            "TYPE3", ["p1": 0d, "p2": 1d, "p3": 2d]
+    )
+
     public static final ExampleParameterObjectClassifier NESTED_PARAMETER_OBJECT = new ExampleParameterObjectClassifier(
             "NESTED_PARAMETER_OBJECT", ["nested": TYPE0.getParameterObject(TYPE0.parameters)]
     )

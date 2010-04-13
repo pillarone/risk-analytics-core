@@ -6,6 +6,7 @@ import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.ParameterEntry
 import org.pillarone.riskanalytics.core.parameter.ParameterObjectParameter
 import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObjectClassifier
+import org.pillarone.riskanalytics.core.parameter.StringParameter
 
 class ParameterObjectParameterHolderTests extends GroovyTestCase {
 
@@ -176,6 +177,32 @@ class ParameterObjectParameterHolderTests extends GroovyTestCase {
 
         assertTrue holder.classifierParameters.containsKey("p2")
         assertEquals 33, holder.classifierParameters.get("p2").businessObject
+
+    }
+
+    void testUpdateValueReplaceExistingValuesWithDifferentTypes() {
+        ParameterObjectParameter parameter = new ParameterObjectParameter(path: 'path', periodIndex: 0)
+        parameter.type = new EnumParameter(parameterType: ExampleParameterObjectClassifier.getName(), parameterValue: "TYPE2", path: 'path', periodIndex: 0)
+
+        parameter.addToParameterEntries(new ParameterEntry(parameterEntryKey: "p1", parameterEntryValue: new DoubleParameter(doubleValue: 22, path: 'path', periodIndex: 0)))
+        parameter.addToParameterEntries(new ParameterEntry(parameterEntryKey: "p2", parameterEntryValue: new DoubleParameter(doubleValue: 33, path: 'path', periodIndex: 0)))
+        parameter.addToParameterEntries(new ParameterEntry(parameterEntryKey: "p3", parameterEntryValue: new StringParameter(parameterValue: "33", path: 'path', periodIndex: 0)))
+
+        ParameterObjectParameterHolder holder = new ParameterObjectParameterHolder(parameter)
+        holder.value = "TYPE3"
+
+        assertEquals ExampleParameterObjectClassifier.TYPE3, holder.classifier
+        assertEquals 3, holder.classifierParameters.size()
+
+        assertTrue holder.classifierParameters.containsKey("p1")
+        assertEquals 22, holder.classifierParameters.get("p1").businessObject
+
+        assertTrue holder.classifierParameters.containsKey("p2")
+        assertEquals 33, holder.classifierParameters.get("p2").businessObject
+
+        assertTrue holder.classifierParameters.containsKey("p3")
+        //should be the default value, because we don't want to keep the value if it has the same name, but is a different type
+        assertEquals 2d, holder.classifierParameters.get("p3").businessObject
 
     }
 

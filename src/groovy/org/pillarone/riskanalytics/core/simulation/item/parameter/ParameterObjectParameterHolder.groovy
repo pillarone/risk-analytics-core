@@ -86,11 +86,12 @@ class ParameterObjectParameterHolder extends ParameterHolder {
         Map<String, ParameterHolder> newClassifierParameters = new HashMap<String, ParameterHolder>()
         for (Map.Entry entry in classifier.parameters) {
             ParameterHolder holder = null
-            if (classifierParameters.containsKey(entry.key) && classifierParameters.get(entry.key) != null) {
+            ParameterHolder oldEntry = classifierParameters.get(entry.key)
+            if (oldEntry != null && oldEntry.businessObject.class.name == entry.value.class.name) {
                 holder = classifierParameters.get(entry.key)
             } else {
                 Object entryValue = entry.value
-                if(entryValue instanceof AbstractMultiDimensionalParameter) {
+                if (entryValue instanceof AbstractMultiDimensionalParameter) {
                     entryValue = entryValue.clone()
                 }
                 holder = ParameterHolderFactory.getHolder(path + ":$entry.key", periodIndex, entryValue)

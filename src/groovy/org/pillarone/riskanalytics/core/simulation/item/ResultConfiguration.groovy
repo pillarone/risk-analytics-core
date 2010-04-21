@@ -1,8 +1,8 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
+import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.output.*
-import org.pillarone.riskanalytics.core.model.Model
 
 class ResultConfiguration extends ModellingItem {
 
@@ -119,6 +119,14 @@ class ResultConfiguration extends ModellingItem {
         }
         return SimulationRun.findByResultConfigurationAndToBeDeleted(dao, false) != null
     }
+
+    public List<SimulationRun> getSimulations() {
+        if (!isLoaded()) {
+            load()
+        }
+        return SimulationRun.findAllByResultConfigurationAndToBeDeleted(dao, false)
+    }
+
 
     ConfigObject toConfigObject() {
         if (!isLoaded()) {

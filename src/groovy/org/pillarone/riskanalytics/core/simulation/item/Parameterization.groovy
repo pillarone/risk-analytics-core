@@ -56,7 +56,7 @@ class Parameterization extends ModellingItem {
     }
 
     //TODO (msp): enable again, refactoring is required because we cannot reference Business logic here (DistributionType)
-    /** @return list of validation errors                       */
+    /** @return list of validation errors                        */
     /*List validate() {
         // dk: there may be more than one validation service in the future.
         // For the moment, we only validate parameter of distribution types
@@ -214,6 +214,20 @@ class Parameterization extends ModellingItem {
         }
         result != null
     }
+
+    public List<SimulationRun> getSimulations() {
+        if (!isLoaded()) {
+            load()
+        }
+        List<SimulationRun> result
+        try {
+            result = SimulationRun.findAllByParameterizationAndToBeDeleted(dao, false)
+        } catch (Exception e) {
+            LOG.error("Exception in method isUsedInSimulation : $e.message", e)
+        }
+        return result
+    }
+
 
     void addParameter(ParameterHolder parameter) {
         parameterHolders << parameter

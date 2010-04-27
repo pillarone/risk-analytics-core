@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core;
 
+import org.pillarone.riskanalytics.core.util.PropertiesUtils;
+
 import java.io.File;
 
 public class FileConstants {
@@ -15,7 +17,9 @@ public class FileConstants {
         builder.append(File.separatorChar);
         builder.append(".pillarone");
         builder.append(File.separatorChar);
-        builder.append("RiskAnalytics");
+        builder.append("RiskAnalytics-");
+        String appVersion = new PropertiesUtils().getProperties("/version.properties").getProperty("version", "");
+        builder.append(appVersion);
         BASE_DATA_DIRECTORY = builder.toString();
         File file = new File(BASE_DATA_DIRECTORY);
         file.mkdirs();

@@ -306,4 +306,12 @@ abstract public class Component implements Cloneable {
     public Component clone() throws CloneNotSupportedException {
         return (Component) super.clone();
     }
+
+    /**
+     * @return name of the component
+     */
+    @Override
+    public String toString() {
+        return name;
+    }
 }

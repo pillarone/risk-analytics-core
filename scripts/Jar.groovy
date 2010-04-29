@@ -53,25 +53,12 @@ Options:
 
 }
 
-target(createStarterFile: '''
-Creates starter files
-''') {
-    String mainClass = argsMap.mainClass
-    String env = argsMap.env
-
-    String target = "${projectTargetDir}/runner"
-    List classPath = getRelativeClassPaths("$target/lib")
-    String jvmArgs = "-Xmx1024m -XX:MaxPermSize=512m -Dgrails.env=$env"
-
-    String cmd = "java $jvmArgs -classpath \"./classes;${classPath.join(";")}\" $mainClass"
-    ant.echo(file: "${target}/Run${grailsAppName}${env}.cmd", message: cmd.toString())
-    ant.echo(file: "${target}/Run${grailsAppName}${env}.sh", message: cmd.toString())
-}
-
 //Creates an executable jar file including manifest
 private void buildJar() {
-    String mainClass = argsMap.mainClass
-    if (!mainClass) throw new RuntimeException("no main class set")
+    String mainClasses = argsMap.mainClass
+    if (!mainClasses) throw new RuntimeException("no main class set")
+
+    String[] mains = mainClasses.split(",")
 
     String jarTarget = "${projectTargetDir}/jar"
     ant.mkdir(dir: jarTarget)
@@ -85,7 +72,6 @@ private void buildJar() {
 
     String manifestTarget = "${jarTarget}/MANIFEST.MF"
     ant.manifest(file: manifestTarget) {
-        attribute(name: "Main-Class", value: mainClass)
         attribute(name: "Class-Path", value: classPath.join(" "))
         section(name: "Grails Application") {
             attribute(name: "Implementation-Title", value: "${grailsAppName}")
@@ -93,15 +79,27 @@ private void buildJar() {
             attribute(name: "Grails-Version", value: "${metadata.getGrailsVersion()}")
         }
     }
-    ant.jar(destfile: "${jarTarget}/${grailsAppName}.jar", basedir: stagingDir, manifest: manifestTarget)
+    String excludes = mains.collect { it.replace(".", "/") + ".class" }.join(" ")
+    ant.jar(destfile: "${jarTarget}/${grailsAppName}.jar", basedir: stagingDir, manifest: manifestTarget, excludes: excludes)
+
+    classPath.add("${grailsAppName}.jar")
+    for (String main in mains) {
+        ant.manifest(file: manifestTarget) {
+            attribute(name: "Main-Class", value: main)
+            attribute(name: "Class-Path", value: classPath.join(" "))
+            section(name: "Grails Application") {
+                attribute(name: "Implementation-Title", value: "${grailsAppName}")
+                attribute(name: "Implementation-Version", value: "${metadata.getApplicationVersion()}")
+                attribute(name: "Grails-Version", value: "${metadata.getGrailsVersion()}")
+            }
+        }
+        ant.jar(destfile: "${jarTarget}/${main}.jar", basedir: stagingDir, manifest: manifestTarget, includes: "${main.replace(".", "/")}.class")
+    }
     ant.delete(file: manifestTarget)
 }
 
-//Copies all classes & resources to a directory and creates a .cmd file which starts the appplication
+//Copies all classes & resources to a directory
 private void createRunnableFiles() {
-    String mainClass = argsMap.mainClass
-    if (!mainClass) throw new RuntimeException("no main class set")
-
     String target = "${projectTargetDir}/runner"
     ant.mkdir(dir: target)
 

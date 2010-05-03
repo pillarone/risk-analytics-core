@@ -17,6 +17,7 @@ public class SimulationAction implements Action {
     IterationAction iterationAction
     SimulationScope simulationScope
     private volatile boolean stopped = false
+    private volatile boolean canceled = false
 
     /**
      * Loops over the number of iteration and calls iterationAction.perform().
@@ -24,7 +25,7 @@ public class SimulationAction implements Action {
     public void perform() {
         LOG.debug "start perform"
         int numberOfIterations = simulationScope.numberOfIterations
-        for (int iteration = 0; iteration < numberOfIterations && !stopped; iteration++) {
+        for (int iteration = 0; iteration < numberOfIterations && !stopped && !canceled; iteration++) {
             iterationAction.perform()
             simulationScope.iterationsDone = simulationScope.iterationsDone + 1 // do not use simulationScope.iterationsDone++ because of a issue in StubFor
         }
@@ -39,5 +40,10 @@ public class SimulationAction implements Action {
         stopped = true
         iterationAction.stop()
         simulationScope.updateNumberOfIterations(iterationAction.iterationScope.currentIteration)
+    }
+
+    protected void cancel() {
+        canceled = true
+        iterationAction.cancel()
     }
 }

@@ -2,24 +2,11 @@ package org.pillarone.riskanalytics.core.simulation.engine
 
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.pillarone.riskanalytics.core.output.DeleteSimulationService
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.SimulationState
-import org.pillarone.riskanalytics.core.simulation.engine.actions.Action
-import org.pillarone.riskanalytics.core.simulation.engine.actions.CalculatorAction
-import org.pillarone.riskanalytics.core.simulation.engine.actions.CreatePeriodCounterAction
-import org.pillarone.riskanalytics.core.simulation.engine.actions.FinishOutputAction
-import org.pillarone.riskanalytics.core.simulation.engine.actions.InitModelAction
-import org.pillarone.riskanalytics.core.simulation.engine.actions.InjectScopesAction
-import org.pillarone.riskanalytics.core.simulation.engine.actions.IterationAction
-import org.pillarone.riskanalytics.core.simulation.engine.actions.PeriodAction
-import org.pillarone.riskanalytics.core.simulation.engine.actions.PrepareParameterizationAction
-import org.pillarone.riskanalytics.core.simulation.engine.actions.PrepareStructureInformationAction
-import org.pillarone.riskanalytics.core.simulation.engine.actions.RandomSeedAction
-import org.pillarone.riskanalytics.core.simulation.engine.actions.SimulationAction
-import org.pillarone.riskanalytics.core.simulation.engine.actions.WireModelAction
-import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
+import org.springframework.transaction.TransactionStatus
+import org.pillarone.riskanalytics.core.simulation.engine.actions.*
 
 /**
  * This is the main entity to run a simulation. To do this, create a runner object (SimulationRunner.createRunner()).
@@ -83,6 +70,7 @@ public class SimulationRunner {
             //Transaction because of saving results to db
             SimulationRun.withTransaction {TransactionStatus status ->
                 for (Action action in postSimulationActions) {
+                    if (simulationState == SimulationState.CANCELED) break;
                     action.perform()
                 }
             }
@@ -96,6 +84,12 @@ public class SimulationRunner {
             )
             LOG.error this, t
             LOG.debug error.dump()
+            currentScope.simulation.delete()
+            return
+        }
+
+        if (simulationState == SimulationState.CANCELED) {
+            LOG.info "canceled simulation ${currentScope.simulation.name} will be deleted"
             currentScope.simulation.delete()
             return
         }
@@ -117,6 +111,12 @@ public class SimulationRunner {
         simulationAction.stop()
         simulationState = SimulationState.STOPPED
     }
+
+    public void cancel() {
+        simulationAction.cancel()
+        simulationState = SimulationState.CANCELED
+    }
+
 
     Date getEstimatedSimulationEnd() {
         int progress = currentScope.getProgress()

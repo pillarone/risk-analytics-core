@@ -8,5 +8,6 @@ public enum SimulationState {
     POST_SIMULATION_CALCULATIONS,
     FINISHED,
     STOPPED,
+    CANCELED,
     ERROR
 }

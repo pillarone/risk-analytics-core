@@ -39,7 +39,8 @@ class BatchRunService {
             ICollectorOutputStrategy strategy = OutputStrategyFactory.getInstance(batchRunSimulationRun.strategy)
 
             SimulationRunner runner = SimulationRunner.createRunner()
-            SimulationConfiguration configuration = new SimulationConfiguration(simulationRun: batchRunSimulationRun.simulationRun, outputStrategy: strategy)
+            Simulation simulation = createSimulation(batchRunSimulationRun.simulationRun.name)
+            SimulationConfiguration configuration = new SimulationConfiguration(simulation: simulation, outputStrategy: strategy)
 
             RunSimulationService.getService().runSimulation(runner, configuration)
 
@@ -131,6 +132,14 @@ class BatchRunService {
 
     public List<BatchRun> getAllBatchRuns() {
         return BatchRun.executeQuery("from org.pillarone.riskanalytics.core.BatchRun as b order by b.executionTime asc")
+    }
+
+    private Simulation createSimulation(String simulationName) {
+        Simulation simulation = new Simulation(simulationName)
+        simulation.load()
+        simulation.getParameterization().load();
+        simulation.getTemplate().load();
+        return simulation
     }
 
 }

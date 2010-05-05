@@ -91,7 +91,8 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
         Class columnClass = constraints.getColumnType(column);
         if (IComponentMarker.class.isAssignableFrom(columnClass)) {
             List list = (List) getPossibleValues(1, column + 1);
-            result = list.get(0);
+            if (list != null && list.size() > 0)
+                result = list.get(0);
         } else if (columnClass == BigDecimal.class) {
             result = new BigDecimal(0);
         } else if (columnClass == Double.class) {

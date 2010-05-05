@@ -25,7 +25,7 @@ class ModelItem extends ModellingItem {
         target.srcCode = srcCode
     }
 
-    protected void mapFromDao(def dao) {
+    protected void mapFromDao(def dao, boolean completeLoad) {
         if (dao) {
             versionNumber = new VersionNumber(dao.itemVersion)
             srcCode = dao.srcCode

@@ -10,9 +10,15 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolde
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.util.PropertiesUtils
 import org.springframework.transaction.TransactionStatus
+import org.pillarone.riskanalytics.core.model.Model
+import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
+import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
+import java.text.SimpleDateFormat
+import org.pillarone.riskanalytics.core.simulation.ILimitedPeriodCounter
 
 class Parameterization extends ModellingItem {
-    // TODO (msh): introduce timeRange for periods
+
+    public static final String PERIOD_DATE_FORMAT = "yyyy-MM-dd"
 
     String comment
     VersionNumber versionNumber
@@ -56,7 +62,7 @@ class Parameterization extends ModellingItem {
     }
 
     //TODO (msp): enable again, refactoring is required because we cannot reference Business logic here (DistributionType)
-    /** @return list of validation errors                        */
+    /** @return list of validation errors                           */
     /*List validate() {
         // dk: there may be more than one validation service in the future.
         // For the moment, we only validate parameter of distribution types
@@ -112,11 +118,36 @@ class Parameterization extends ModellingItem {
         return result
     }
 
+    private List obtainPeriodLabelsFromParameters() {
+        try {
+            Model model = modelClass.newInstance()
+            model.init()
+            ParameterApplicator applicator = new ParameterApplicator(model: model, parameterization: this)
+            applicator.init()
+            applicator.applyParameterForPeriod(0)
+            SimpleDateFormat dateFormat = new SimpleDateFormat(PERIOD_DATE_FORMAT)
+            IPeriodCounter counter = model.createPeriodCounter(null)
+            if (counter == null) {
+                return null
+            }
+            List result = []
+            if (counter instanceof ILimitedPeriodCounter) {
+                for (int i = 0; i < counter.periodCount(); i++) {
+                    result << dateFormat.format(counter.getCurrentPeriodStart().toDate())
+                    counter.next()
+                }
+            }
+            return result
+        } catch (Exception e) {
+            return null
+        }
+    }
+
     protected void mapToDao(Object dao) {
         dao.itemVersion = versionNumber.toString()
         dao.name = name
         dao.periodCount = periodCount
-        dao.periodLabels = periodLabels?.join(";")
+        dao.periodLabels = periodLabels != null && !periodLabels.empty ? periodLabels.join(";") : obtainPeriodLabelsFromParameters()?.join(";")
         dao.creationDate = creationDate
         dao.modificationDate = modificationDate
         dao.valid = valid
@@ -146,7 +177,7 @@ class Parameterization extends ModellingItem {
         }
     }
 
-    protected void mapFromDao(Object dao) {
+    protected void mapFromDao(Object dao, boolean completeLoad) {
         long time = System.currentTimeMillis()
         id = dao.id
         versionNumber = new VersionNumber(dao.itemVersion)
@@ -158,7 +189,9 @@ class Parameterization extends ModellingItem {
         valid = dao.valid
         modelClass = getClass().getClassLoader().loadClass(dao.modelClassName)
 
-        loadParameters(dao)
+        if (completeLoad) {
+            loadParameters(dao)
+        }
         LOG.info("Parameterization $name loaded in ${System.currentTimeMillis() - time}ms")
     }
 

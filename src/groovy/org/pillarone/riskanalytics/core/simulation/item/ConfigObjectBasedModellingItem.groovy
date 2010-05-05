@@ -86,7 +86,7 @@ abstract class ConfigObjectBasedModellingItem extends ModellingItem {
         daoClass.findByNameAndItemVersion(name, versionNumber.toString())
     }
 
-    protected void mapFromDao(def source) {
+    protected void mapFromDao(def source, boolean completeLoad) {
         if (source) {
             data = new ConfigSlurper().parse(source.stringData.data)
             comment = source.comment

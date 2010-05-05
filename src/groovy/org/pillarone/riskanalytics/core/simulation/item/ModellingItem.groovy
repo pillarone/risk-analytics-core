@@ -30,7 +30,7 @@ abstract class ModellingItem {
     abstract protected void mapToDao(def dao) {
     }
 
-    abstract protected void mapFromDao(def dao) {
+    abstract protected void mapFromDao(def dao, boolean completeLoad) {
     }
 
     protected void saveDependentData(def dao) {}
@@ -52,11 +52,11 @@ abstract class ModellingItem {
         changed = false
     }
 
-    public void load() {
+    public void load(boolean completeLoad = true) {
         daoClass.withTransaction {TransactionStatus status ->
             def loadedDao = loadFromDB()
             if (loadedDao) {
-                mapFromDao(loadedDao)
+                mapFromDao(loadedDao, completeLoad)
             }
             dao = loadedDao
         }

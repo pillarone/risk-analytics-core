@@ -235,8 +235,9 @@ class ParameterizationTests extends GroovyTestCase {
         ConfigObject configObject = parameterization.toConfigObject()
 
 
-        assertEquals 5, configObject.size()
+        assertEquals 6, configObject.size()
         assertTrue configObject.containsKey("applicationVersion")
+        assertTrue configObject.containsKey("periodLabels")
         assertEquals CoreModel, configObject.model
         assertEquals 1, configObject.periodCount
         assertEquals 'CoreParameters', configObject.displayName

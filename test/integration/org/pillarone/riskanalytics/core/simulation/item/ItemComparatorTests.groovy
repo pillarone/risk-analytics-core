@@ -355,25 +355,19 @@ class ItemComparatorTests extends GroovyTestCase {
         dao.modelClassName = EmptyModel.name
         dao.itemVersion = '1'
         dao.periodCount = 1
-        dao.save()
 
         Parameterization item = new Parameterization(dao.name)
-        item.load()
         item.addParameter(ParameterHolderFactory.getHolder('path', 0, new SimpleMultiDimensionalParameter([1])))
-        item.save()
 
         ParameterizationDAO dao2 = new ParameterizationDAO()
         dao2.name = 'testPositivePMO768'
         dao2.modelClassName = EmptyModel.name
         dao2.itemVersion = '2'
         dao2.periodCount = 1
-        dao2.save()
 
         Parameterization item2 = new Parameterization(dao2.name)
         item2.versionNumber = new VersionNumber(dao2.itemVersion)
-        item2.load()
         item2.addParameter(ParameterHolderFactory.getHolder('path', 0, new SimpleMultiDimensionalParameter([[1]])))
-        item2.save()
 
         assertTrue ItemComparator.contentEquals(item, item2)
     }

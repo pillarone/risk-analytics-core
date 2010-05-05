@@ -63,7 +63,7 @@ class Simulation extends ModellingItem {
         run.randomSeed = randomSeed
     }
 
-    protected void mapFromDao(def source) {
+    protected void mapFromDao(def source, boolean completeLoad) {
         SimulationRun run = source as SimulationRun
         comment = run.comment
         modelClass = this.class.classLoader.loadClass(run.model)

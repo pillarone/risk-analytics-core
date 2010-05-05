@@ -60,7 +60,7 @@ class ResultConfiguration extends ModellingItem {
         return []
     }
 
-    protected void mapFromDao(Object dao) {
+    protected void mapFromDao(Object dao, boolean completeLoad) {
         dao = dao as ResultConfigurationDAO
         name = dao.name
         modelClass = getClass().getClassLoader().loadClass(dao.modelClassName)

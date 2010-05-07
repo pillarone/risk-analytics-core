@@ -32,11 +32,10 @@ class ParameterValidationService {
      * @return list of validation errors or null if candidate is ok
      */
     List<ParameterValidationError> validate(Object classifier, Object candidate) {
-        List errors = null
+        List errors = []
         for (validator in findValidators(classifier)) {
             def result = validator(candidate)
             if (null == result || true == result) continue  // validation ok
-            if (null == errors) errors = []                 // lazy init for performance
             errors << new ParameterValidationError(classifier.toString(), result)
         }
         return errors

@@ -44,7 +44,7 @@ class ParameterObjectParameterHolder extends ParameterHolder {
         return businessObject
     }
 
-    private Map getParameterMap() {
+    Map getParameterMap() {
         Map result = [:]
         for (Map.Entry entry in classifierParameters) {
             result.put(entry.key, entry.value.getBusinessObject())

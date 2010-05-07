@@ -10,15 +10,15 @@ class ParameterValidationServiceTests extends GroovyTestCase {
     }
 
     void testNoValidatorsRegistered() {
-        assertNull service.validate(new Object())
+        assertEquals 0, service.validate(new Object()).size()
     }
 
-    void testOneSingletonValidatorRegistered() { 
+    void testOneSingletonValidatorRegistered() {
         def singleton = new Object()
         service.register(singleton) { ["errorkey", 1, 2] }
         def errors = service.validate(singleton)
         assertEquals 1, errors.size()
-        assert errors[0].toString().contains('errorkey') 
+        assert errors[0].toString().contains('errorkey')
     }
 
     void testSingletonRegisteredTwoValidators() {
@@ -32,7 +32,7 @@ class ParameterValidationServiceTests extends GroovyTestCase {
         def singleton = new Object()
         service.register(singleton) { true }
         service.register(singleton) { null }
-        assertNull service.validate(singleton)
+        assertEquals 0, service.validate(singleton).size()
     }
 
     void testClassValidatorRegistered() {

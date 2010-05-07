@@ -15,6 +15,9 @@ import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
 import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
 import java.text.SimpleDateFormat
 import org.pillarone.riskanalytics.core.simulation.ILimitedPeriodCounter
+import org.pillarone.riskanalytics.core.parameterization.validation.IParameterizationValidator
+import org.pillarone.riskanalytics.core.parameterization.validation.ValidatorRegistry
+import org.pillarone.riskanalytics.core.parameterization.ParameterValidationError
 
 class Parameterization extends ModellingItem {
 
@@ -61,30 +64,14 @@ class Parameterization extends ModellingItem {
         ParameterizationDAO
     }
 
-    //TODO (msp): enable again, refactoring is required because we cannot reference Business logic here (DistributionType)
-    /** @return list of validation errors                           */
-    /*List validate() {
-        // dk: there may be more than one validation service in the future.
-        // For the moment, we only validate parameter of distribution types
-        ParameterValidationService validationService = DistributionType.validationService
-        def result = []
-        validate(dao.parameters, result, validationService)
-        return result
-    }*/
-
-    //TODO (dko): Test!
-    /*void validate(Collection params, List result, ParameterValidationService validationService) {
-        for (Parameter parameter in params) {
-            if (!(parameter in ParameterObjectParameter)) continue // only POPs may have a Distribution
-            AbstractParameterObjectClassifier type = parameter.type.parameterInstance
-            Map parameterMap = parameter.parameterMap()
-            def errors = validationService.validate(type, parameterMap)
-            errors.each { it.path = parameter.path }
-            if (errors) result << errors
-
-            validate(parameter.parameterEntries*.parameterEntryValue, result, validationService)
+    List validate() {
+        List<ParameterValidationError> errors = []
+        for (IParameterizationValidator validator in ValidatorRegistry.getValidators()) {
+            errors.addAll(validator.validate(parameterHolders))
         }
-    }*/
+
+        return errors
+    }
 
     public save() {
         def result = null
@@ -105,15 +92,15 @@ class Parameterization extends ModellingItem {
             dao = daoToBeSaved
             result = daoToBeSaved.id
             id = daoToBeSaved.id
-        }
 
-//        validationErrors = validate()
-//        if (validationErrors) {
-//            LOG.warn("${daoToBeSaved} is not valid\n" + validationErrors.join("\n"))
-//        } else {
-//            daoToBeSaved.valid = true
-//            daoToBeSaved.save(flush: true)
-//        }
+            validationErrors = validate()
+            if (validationErrors) {
+                LOG.warn("${daoToBeSaved} is not valid\n" + validationErrors.join("\n"))
+            } else {
+                daoToBeSaved.valid = true
+                daoToBeSaved.save(flush: true)
+            }
+        }
 
         return result
     }

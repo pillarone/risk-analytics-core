@@ -76,6 +76,8 @@ class ParameterizationTests extends GroovyTestCase {
         parameterization.periodCount = 1
         parameterization.save()
 
+        assertTrue parameterization.valid
+
         Parameterization savedParameterization = new Parameterization("newParams")
         savedParameterization.load()
         assertEquals parameterization.name, savedParameterization.name

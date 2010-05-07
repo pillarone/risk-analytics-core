@@ -104,8 +104,13 @@ public class ArgumentParser {
         simulation.setTemplate(resultConfiguration);
         simulation.setNumberOfIterations(Integer.parseInt(commandLine.getOptionValue(ITERATIONS_OPTION)));
         simulation.setPeriodCount(parameterization.getPeriodCount());
+        simulation.setModelVersionNumber(new VersionNumber("1"));
         if (commandLine.hasOption(SEED_OPTION)) {
             simulation.setRandomSeed(Integer.parseInt(commandLine.getOptionValue(SEED_OPTION)));
+        } else {
+            long millis = System.currentTimeMillis();
+            long millisE5 = (long) (millis / 1E5);
+            simulation.setRandomSeed((int) (millis - millisE5 * 1E5));
         }
         if (commandLine.hasOption(COMMENT_OPTION)) {
             simulation.setComment(commandLine.getOptionValue(COMMENT_OPTION));
@@ -196,7 +201,7 @@ public class ArgumentParser {
 
             newestParameterization.setModelClass(parameterization.getModelClass());
             newestParameterization.setVersionNumber(newestVersion);
-            newestParameterization.load();
+            newestParameterization.load(true);
         }
 
         return newestParameterization;
@@ -212,7 +217,7 @@ public class ArgumentParser {
 
             newestResultConfiguration.setModelClass(resultConfiguration.getModelClass());
             newestResultConfiguration.setVersionNumber(newestVersion);
-            newestResultConfiguration.load();
+            newestResultConfiguration.load(true);
         }
 
         return newestResultConfiguration;

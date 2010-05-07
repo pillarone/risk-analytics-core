@@ -68,8 +68,8 @@ public class RunSimulation {
         SimulationConfiguration configuration = new SimulationConfiguration();
         configuration.setOutputStrategy(parser.getOutputStrategy(commandLine));
         Simulation simulation = parser.createSimulation(commandLine);
-        simulation.getParameterization().load();
-        simulation.getTemplate().load();
+        simulation.getParameterization().load(true);
+        simulation.getTemplate().load(true);
         configuration.setSimulation(simulation);
         return configuration;
     }

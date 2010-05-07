@@ -59,6 +59,9 @@ class ArgumentParserIntegrationTests extends GroovyTestCase {
 
         Simulation simulation = argumentParser.createSimulation(commandLine)
         assertNotNull simulation
+        //must never be null even if the option isn't given
+        assertNotNull simulation.randomSeed
+        assertNotNull simulation.modelVersionNumber
 
         assertEquals initialParameterizationCount + 1, ParameterizationDAO.count()
         assertEquals "2", simulation.parameterization.versionNumber.toString()

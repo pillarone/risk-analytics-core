@@ -13,7 +13,7 @@ public class AggregatedCollectingModeStrategy extends AbstractCollectingModeStra
     private String displayName;
 
 
-    public List<SingleValueResult> collect(PacketList packets) throws IllegalAccessException {
+    public List<SingleValueResultPOJO> collect(PacketList packets) throws IllegalAccessException {
         Packet p = (Packet) packets.get(0);
         Map packetValues = p.getValuesToSave();
         for (int i = 1; i < packets.size(); i++) {

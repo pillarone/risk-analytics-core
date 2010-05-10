@@ -65,20 +65,20 @@ class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
             claims << new ITestPacketApple(ultimate: 1.1d)
             result += 1.1d
         }
-        List<SingleValueResult> aggregatedValues = strategy.collect(claims)
+        List<SingleValueResultPOJO> aggregatedValues = strategy.collect(claims)
         assertNotNull "no aggregatedValues", aggregatedValues
         assertFalse "empty values", aggregatedValues.isEmpty()
         assertEquals 1, aggregatedValues.size()
         assertEquals result, aggregatedValues.get(0).value
 
-        SingleValueResult singleValueResult = aggregatedValues.get(0)
+        SingleValueResultPOJO singleValueResult = aggregatedValues.get(0)
 
         assertSame "simulationRun", run.simulationRun, singleValueResult.simulationRun
         assertEquals "period", 1, singleValueResult.period
         assertEquals "iteration", 13, singleValueResult.iteration
-        assertSame "pathMapping", pathMapping, singleValueResult.path
-        assertSame "collector", collectorMapping, singleValueResult.collector
-        assertSame "field", fieldMapping, singleValueResult.field
+        assertEquals "pathMapping", pathMapping.id, singleValueResult.pathId
+        assertEquals "collector", collectorMapping.id, singleValueResult.collectorId
+        assertEquals "field", fieldMapping.id, singleValueResult.fieldId
         assertEquals "valueIndex", 0, singleValueResult.valueIndex
 
         PacketList<ITestPacketOrange> underwritingInfos = []
@@ -92,9 +92,8 @@ class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
         aggregatedValues = strategy.collect(underwritingInfos)
         assertNotNull "no aggregatedValues", aggregatedValues
         assertFalse "empty values", aggregatedValues.isEmpty()
-        assertEquals aResult, aggregatedValues.find {it.field.fieldName == "a"}.value
-        assertEquals bResult, aggregatedValues.find {it.field.fieldName == "b"}.value
-
+        assertEquals aResult, aggregatedValues.find {it.fieldId == FieldMapping.findByFieldName("a").id}.value
+        assertEquals bResult, aggregatedValues.find {it.fieldId == FieldMapping.findByFieldName("b").id}.value
     }
 
     private FieldMapping getFieldMapping(String fieldName) {

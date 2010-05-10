@@ -15,18 +15,18 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
      * Information about current simulation is gathered from the scopes.
      * The key of the value map is the field name.
      */
-    protected List<SingleValueResult> createSingleValueResults(Map<String, Number> valueMap, int valueIndex) {
-        List<SingleValueResult> results = new ArrayList(valueMap.size());
+    protected List<SingleValueResultPOJO> createSingleValueResults(Map<String, Number> valueMap, int valueIndex) {
+        List<SingleValueResultPOJO> results = new ArrayList(valueMap.size());
         for (Map.Entry<String, Number> entry : valueMap.entrySet()) {
             String name = entry.getKey();
             Double value = entry.getValue().doubleValue();
-            SingleValueResult result = new SingleValueResult();
+            SingleValueResultPOJO result = new SingleValueResultPOJO();
             result.setSimulationRun(packetCollector.getSimulationScope().getSimulation().getSimulationRun());
             result.setIteration(packetCollector.getSimulationScope().getIterationScope().getCurrentIteration());
             result.setPeriod(packetCollector.getSimulationScope().getIterationScope().getPeriodScope().getCurrentPeriod());
-            result.setPath(packetCollector.getSimulationScope().getMappingCache().lookupPath(packetCollector.getPath()));
-            result.setCollector(packetCollector.getSimulationScope().getMappingCache().lookupCollector(AbstractBulkInsert.DEFAULT_COLLECTOR_NAME));
-            result.setField(packetCollector.getSimulationScope().getMappingCache().lookupField(name));
+            result.setPathId(packetCollector.getSimulationScope().getMappingCache().lookupPath(packetCollector.getPath()));
+            result.setCollectorId(packetCollector.getSimulationScope().getMappingCache().lookupCollector(AbstractBulkInsert.DEFAULT_COLLECTOR_NAME));
+            result.setFieldId(packetCollector.getSimulationScope().getMappingCache().lookupField(name));
             result.setValueIndex(valueIndex);
             result.setValue(value);
             results.add(result);

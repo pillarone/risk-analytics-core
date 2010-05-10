@@ -29,12 +29,11 @@ class MappingCacheTests extends GroovyTestCase {
     void testLookup() {
         MappingCache cache = new MappingCache(new EmptyModel())
 
-        assertEquals "Empty:path1", cache.lookupPath("Empty:path1").pathName
+        assertEquals PathMapping.findByPathName("Empty:path1").id, cache.lookupPath("Empty:path1")
         assertEquals 3, cache.paths.size()
 
-        PathMapping path = cache.lookupPath("Empty:newPath")
-        assertEquals "Empty:newPath", path.pathName
-        assertNotNull path.id
+        Long id = cache.lookupPath("Empty:newPath")
+        assertEquals "Empty:newPath", PathMapping.get(id).pathName
         assertEquals 4, cache.paths.size()
 
     }

@@ -17,6 +17,8 @@ abstract class AbstractBulkInsert {
     File tempFile
     BufferedWriter writer
     SimulationRun simulationRun
+    //cache simulation run id, to avoid using domain objects too often (causes unnecessary hibernate calls in the background)
+    long simulationRunId
     boolean initialized = false
 
     private void init() {
@@ -33,6 +35,7 @@ abstract class AbstractBulkInsert {
 
     void setSimulationRun(SimulationRun simulationRun) {
         this.@simulationRun = simulationRun
+        this.simulationRunId = simulationRun.id
         init()
     }
 
@@ -40,6 +43,7 @@ abstract class AbstractBulkInsert {
 
     final void saveToDB() {
         if (initialized) {
+            writer.flush()
             writer.close()
             save()
             tempFile.delete()

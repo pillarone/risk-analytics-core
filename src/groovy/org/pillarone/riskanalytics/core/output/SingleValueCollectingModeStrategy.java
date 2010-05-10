@@ -15,8 +15,8 @@ public class SingleValueCollectingModeStrategy extends AbstractCollectingModeStr
     private static final String RESOURCE_BUNDLE = "org.pillarone.riskanalytics.core.output.applicationResources";
     private String displayName;
 
-    public List<SingleValueResult> collect(PacketList results) throws IllegalAccessException {
-        List<SingleValueResult> result = new ArrayList<SingleValueResult>(results.size());
+    public List<SingleValueResultPOJO> collect(PacketList results) throws IllegalAccessException {
+        List<SingleValueResultPOJO> result = new ArrayList<SingleValueResultPOJO>(results.size());
         int valueIndex = 0;
         for (Object p : results) {
             result.addAll(createSingleValueResults(((Packet)p).getValuesToSave(), valueIndex));

@@ -27,6 +27,7 @@ class Simulation extends ModellingItem {
     Date creationDate
     Date modificationDate
 
+    private SimulationRun run
 
     public Simulation(String name) {
         super(name)
@@ -94,7 +95,11 @@ class Simulation extends ModellingItem {
     }
 
     public SimulationRun getSimulationRun() {
-        return dao
+        //cache SimulationRun to avoid db query every time this method is called
+        if (this.run == null) {
+            this.run = dao
+        }
+        return this.run
     }
 
     public static List findSimulationNamesForModel(Class modelClass) {

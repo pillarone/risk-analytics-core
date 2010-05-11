@@ -17,9 +17,9 @@ class BatchDBOutputTests extends GrailsUnitTestCase {
         result.simulationRun = new SimulationRun(name: "BatchDBOuptuMtTests", id: 1)
         result.period = 1
         result.iteration = 1
-        result.pathId = 2
-        result.fieldId = 3
-        result.collectorId = 4
+        result.path = new PathMapping(id: 2)
+        result.field = new FieldMapping(id: 3)
+        result.collector = new CollectorMapping(id: 4)
         result.value = 1.3d
 
         batchDBOutput << [result]

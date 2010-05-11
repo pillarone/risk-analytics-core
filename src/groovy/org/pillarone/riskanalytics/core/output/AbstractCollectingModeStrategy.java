@@ -24,9 +24,9 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
             result.setSimulationRun(packetCollector.getSimulationScope().getSimulation().getSimulationRun());
             result.setIteration(packetCollector.getSimulationScope().getIterationScope().getCurrentIteration());
             result.setPeriod(packetCollector.getSimulationScope().getIterationScope().getPeriodScope().getCurrentPeriod());
-            result.setPathId(packetCollector.getSimulationScope().getMappingCache().lookupPath(packetCollector.getPath()));
-            result.setCollectorId(packetCollector.getSimulationScope().getMappingCache().lookupCollector(AbstractBulkInsert.DEFAULT_COLLECTOR_NAME));
-            result.setFieldId(packetCollector.getSimulationScope().getMappingCache().lookupField(name));
+            result.setPath(packetCollector.getSimulationScope().getMappingCache().lookupPath(packetCollector.getPath()));
+            result.setCollector(packetCollector.getSimulationScope().getMappingCache().lookupCollector(AbstractBulkInsert.DEFAULT_COLLECTOR_NAME));
+            result.setField(packetCollector.getSimulationScope().getMappingCache().lookupField(name));
             result.setValueIndex(valueIndex);
             result.setValue(value);
             results.add(result);

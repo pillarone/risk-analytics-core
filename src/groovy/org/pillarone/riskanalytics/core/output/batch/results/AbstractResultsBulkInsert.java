@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /*
- * This is class is in java because it is called very often during a simulation and there is a significant performance boost compared to groovy. 
+ * This is class is in java because it is called very often during a simulation and there is a significant performance boost compared to groovy.
  */
 public abstract class AbstractResultsBulkInsert extends AbstractBulkInsert {
 
@@ -19,9 +19,9 @@ public abstract class AbstractResultsBulkInsert extends AbstractBulkInsert {
             values.add(getSimulationRunId());
             values.add(result.getPeriod());
             values.add(result.getIteration());
-            values.add(result.getPathId());
-            values.add(result.getFieldId());
-            values.add(result.getCollectorId());
+            values.add(result.getPath().getId());
+            values.add(result.getField().getId());
+            values.add(result.getCollector().getId());
             values.add(result.getValue());
             writeResult(values);
             values.clear();

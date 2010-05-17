@@ -29,6 +29,10 @@ public class PeriodScope {
         }
     }
 
+    public boolean isFirstPeriod() {
+        currentPeriod == 0
+    }
+
     public DateTime getCurrentPeriodStartDate() {
         return periodCounter?.currentPeriodStart
     }

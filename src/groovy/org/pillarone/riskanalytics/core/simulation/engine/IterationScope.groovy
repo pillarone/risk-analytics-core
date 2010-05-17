@@ -4,7 +4,7 @@ import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 
 /**
- * The IterationScope provides infomration that is valid throughout a single iteration.
+ * The IterationScope provides information that is valid throughout a single iteration.
  */
 public class IterationScope {
 
@@ -24,6 +24,10 @@ public class IterationScope {
         for (periodStore in periodStores) {
             periodStore.clear()
         }
+    }
+
+    public boolean isFirstIteration() {
+        currentIteration == 1
     }
 
     public String toString() {

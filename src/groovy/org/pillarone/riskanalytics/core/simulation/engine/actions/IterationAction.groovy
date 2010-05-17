@@ -26,7 +26,7 @@ public class IterationAction implements Action {
         LOG.debug "start perform"
         iterationScope.prepareNextIteration()
         int numberOfPeriods = iterationScope.numberOfPeriods
-        for (int period = 0; period < numberOfPeriods && !stopped && !canceled; period++) {
+        for (int period = 1; period <= numberOfPeriods && !stopped && !canceled; period++) {
             periodAction.perform()
         }
         periodAction.parameterValidationNeeded = false

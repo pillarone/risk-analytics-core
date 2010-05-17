@@ -22,7 +22,7 @@ class FileOutputTests extends GrailsUnitTestCase {
 
     void testCreateNewFile() {
 
-        SingleValueResult result = new SingleValueResult()
+        SingleValueResultPOJO result = new SingleValueResultPOJO()
         result.simulationRun = new SimulationRun(name: "newRun")
         result.path = new PathMapping(pathName: "path")
         result.field = new FieldMapping(fieldName: "field")
@@ -40,7 +40,7 @@ class FileOutputTests extends GrailsUnitTestCase {
 
     void testCreateNewFileWithInvalidChars() {
 
-        SingleValueResult result = new SingleValueResult()
+        SingleValueResultPOJO result = new SingleValueResultPOJO()
         result.simulationRun = new SimulationRun(name: "new?Run:")
         result.path = new PathMapping(pathName: "path")
         result.field = new FieldMapping(fieldName: "field")
@@ -57,7 +57,7 @@ class FileOutputTests extends GrailsUnitTestCase {
     }
 
     void testAppendToFile() {
-        SingleValueResult result = new SingleValueResult()
+        SingleValueResultPOJO result = new SingleValueResultPOJO()
         result.simulationRun = new SimulationRun(name: "newRun")
         result.path = new PathMapping(pathName: "path")
         result.field = new FieldMapping(fieldName: "field")

@@ -2,44 +2,43 @@ package org.pillarone.riskanalytics.core.output;
 
 /**
  * Data class which transports a single result from a collecting mode strategy to a output strategy.
- * This class is a 'copy' of SingleValueResult, but it performs better because it is no domain class
- * and it does not have any references to domain classes (id only).
+ * This class is a 'copy' of SingleValueResult, but it performs better because it is not a domain class.
  *
- * Using domain classes instead would generate hibernate overhead.
+ * Using a domain class instead would generate hibernate overhead.
  */
 public class SingleValueResultPOJO {
 
     private SimulationRun simulationRun;
     private int period;
     private int iteration;
-    private long pathId;
-    private long collectorId;
-    private long fieldId;
+    private PathMapping path;
+    private CollectorMapping collector;
+    private FieldMapping field;
     private int valueIndex;
     private Double value;
 
-    public long getCollectorId() {
-        return collectorId;
+    public CollectorMapping getCollector() {
+        return collector;
     }
 
-    public void setCollectorId(long collectorId) {
-        this.collectorId = collectorId;
+    public void setCollector(CollectorMapping collector) {
+        this.collector = collector;
     }
 
-    public long getFieldId() {
-        return fieldId;
+    public FieldMapping getField() {
+        return field;
     }
 
-    public void setFieldId(long fieldId) {
-        this.fieldId = fieldId;
+    public void setField(FieldMapping field) {
+        this.field = field;
     }
 
-    public long getPathId() {
-        return pathId;
+    public PathMapping getPath() {
+        return path;
     }
 
-    public void setPathId(long pathId) {
-        this.pathId = pathId;
+    public void setPath(PathMapping path) {
+        this.path = path;
     }
 
     public int getIteration() {

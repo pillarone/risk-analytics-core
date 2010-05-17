@@ -76,9 +76,9 @@ class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
         assertSame "simulationRun", run.simulationRun, singleValueResult.simulationRun
         assertEquals "period", 1, singleValueResult.period
         assertEquals "iteration", 13, singleValueResult.iteration
-        assertEquals "pathMapping", pathMapping.id, singleValueResult.pathId
-        assertEquals "collector", collectorMapping.id, singleValueResult.collectorId
-        assertEquals "field", fieldMapping.id, singleValueResult.fieldId
+        assertSame "pathMapping", pathMapping, singleValueResult.path
+        assertSame "collector", collectorMapping, singleValueResult.collector
+        assertSame "field", fieldMapping, singleValueResult.field
         assertEquals "valueIndex", 0, singleValueResult.valueIndex
 
         PacketList<ITestPacketOrange> underwritingInfos = []
@@ -92,8 +92,8 @@ class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
         aggregatedValues = strategy.collect(underwritingInfos)
         assertNotNull "no aggregatedValues", aggregatedValues
         assertFalse "empty values", aggregatedValues.isEmpty()
-        assertEquals aResult, aggregatedValues.find {it.fieldId == FieldMapping.findByFieldName("a").id}.value
-        assertEquals bResult, aggregatedValues.find {it.fieldId == FieldMapping.findByFieldName("b").id}.value
+        assertEquals aResult, aggregatedValues.find {it.field.fieldName == "a"}.value
+        assertEquals bResult, aggregatedValues.find {it.field.fieldName == "b"}.value
     }
 
     private FieldMapping getFieldMapping(String fieldName) {

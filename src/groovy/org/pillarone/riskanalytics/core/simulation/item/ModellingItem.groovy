@@ -12,7 +12,7 @@ abstract class ModellingItem {
 //    protected def dao
     boolean changed = false
 
-    private List itemChangedListener
+    private List<IModellingItemChangeListener> itemChangedListener
 
     public def id
 
@@ -86,6 +86,7 @@ abstract class ModellingItem {
             mapToDao(daoToBeSaved)
 
             setChangeUserInfo(daoToBeSaved)
+            notifyItemSaved()
 
             saveDependentData(daoToBeSaved)
             logErrors(daoToBeSaved)
@@ -166,9 +167,15 @@ abstract class ModellingItem {
         itemChangedListener.clear()
     }
 
-    private void notifyItemChanged() {
+    protected void notifyItemChanged() {
         itemChangedListener.each {
             it.itemChanged(this)
+        }
+    }
+
+    protected void notifyItemSaved() {
+        itemChangedListener.each {
+            it.itemSaved(this)
         }
     }
 
@@ -205,4 +212,6 @@ abstract class ModellingItem {
 interface IModellingItemChangeListener {
 
     public void itemChanged(ModellingItem item)
+
+    public void itemSaved(ModellingItem item)
 }

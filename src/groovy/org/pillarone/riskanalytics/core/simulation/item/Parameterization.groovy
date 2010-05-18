@@ -85,7 +85,8 @@ class Parameterization extends ModellingItem {
             mapToDao(daoToBeSaved)
 
             setChangeUserInfo(daoToBeSaved)
-
+            notifyItemSaved()
+            
             if (!daoToBeSaved.save(flush: true)) logErrors(daoToBeSaved)
 
             changed = false

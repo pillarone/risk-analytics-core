@@ -10,14 +10,15 @@ import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "0.6.3.1"
+    def version = "0.6.3.2"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.2.0 > *"
     // the other plugins this plugin depends on
     def dependsOn = [
             "backgroundThread": "1.3",
             "jodaTime": "0.5",
-            "quartz": "0.4.1"
+            "quartz": "0.4.1",
+            "acegi": "0.5.3"
     ]
     // resources that are excluded from plugin packaging
     def pluginExcludes = [

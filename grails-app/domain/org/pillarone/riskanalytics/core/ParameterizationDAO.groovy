@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core
 
 import org.pillarone.riskanalytics.core.parameter.Parameter
+import org.pillarone.riskanalytics.core.user.Person
 
 class ParameterizationDAO {
 
@@ -13,6 +14,8 @@ class ParameterizationDAO {
     String periodLabels
     Date creationDate
     Date modificationDate
+    Person creator
+    Person lastUpdater
     boolean valid
 
     static hasMany = [parameters: Parameter]
@@ -24,6 +27,8 @@ class ParameterizationDAO {
         periodLabels(nullable: true, blank: true)
         creationDate nullable: true
         modificationDate nullable: true
+        creator nullable: true
+        lastUpdater nullable: true
     }
 
     String toString() {

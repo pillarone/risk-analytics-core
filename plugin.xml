@@ -1,4 +1,4 @@
-<plugin name='risk-analytics-core' version='0.6.3.1' grailsVersion='1.2.0 &gt; *'>
+<plugin name='risk-analytics-core' version='0.6.3.2' grailsVersion='1.2.0 &gt; *'>
   <author>Intuitive Collaboration GmbH</author>
   <authorEmail>info@pillarone.org</authorEmail>
   <title>RiskAnalytics core</title>
@@ -11,7 +11,12 @@ Persistence &amp; Simulation engine.
     <resource>Config</resource>
     <resource>CoreBootStrap</resource>
     <resource>DataSource</resource>
+    <resource>SecurityConfig</resource>
     <resource>UrlMappings</resource>
+    <resource>AuthorityController</resource>
+    <resource>LoginController</resource>
+    <resource>LogoutController</resource>
+    <resource>PersonController</resource>
     <resource>org.pillarone.riskanalytics.core.BatchRun</resource>
     <resource>org.pillarone.riskanalytics.core.BatchRunSimulationRun</resource>
     <resource>org.pillarone.riskanalytics.core.ModelDAO</resource>
@@ -40,6 +45,9 @@ Persistence &amp; Simulation engine.
     <resource>org.pillarone.riskanalytics.core.parameter.ParameterEntry</resource>
     <resource>org.pillarone.riskanalytics.core.parameter.ParameterObjectParameter</resource>
     <resource>org.pillarone.riskanalytics.core.parameter.StringParameter</resource>
+    <resource>org.pillarone.riskanalytics.core.user.Authority</resource>
+    <resource>org.pillarone.riskanalytics.core.user.Person</resource>
+    <resource>org.pillarone.riskanalytics.core.user.UserSettings</resource>
     <resource>DBCleanUpJob</resource>
     <resource>org.pillarone.riskanalytics.core.output.batch.BatchRunner</resource>
     <resource>org.pillarone.riskanalytics.core.fileimport.FileImportService</resource>
@@ -57,6 +65,7 @@ Persistence &amp; Simulation engine.
     <plugin name='backgroundThread' version='1.3' />
     <plugin name='jodaTime' version='0.5' />
     <plugin name='quartz' version='0.4.1' />
+    <plugin name='acegi' version='0.5.3' />
     <resolvers>
       <resolver type='grailsPlugins' name='grailsPlugins' />
     </resolvers>

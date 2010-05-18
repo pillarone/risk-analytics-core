@@ -8,8 +8,6 @@ class ResultConfiguration extends ModellingItem {
 
     String comment
     VersionNumber versionNumber
-    Date creationDate
-    Date modificationDate
     List<PacketCollector> collectors
 
     public ResultConfiguration(String name) {
@@ -68,6 +66,8 @@ class ResultConfiguration extends ModellingItem {
         versionNumber = new VersionNumber(dao.itemVersion)
         creationDate = dao.creationDate
         modificationDate = dao.modificationDate
+        creator = dao.getCreator()
+        lastUpdater = dao.getLastUpdater()
 
         //These collectors are used by the UI only, therefore wildcard collectors must not be resolved here
         collectors = dao.collectorInformation.collect {CollectorInformation ci ->
@@ -86,6 +86,8 @@ class ResultConfiguration extends ModellingItem {
         dao.itemVersion = versionNumber.toString()
         dao.creationDate = creationDate
         dao.modificationDate = modificationDate
+        dao.creator = creator
+        dao.lastUpdater = lastUpdater
 
         Collection<CollectorInformation> currentCollectors = dao.collectorInformation
 

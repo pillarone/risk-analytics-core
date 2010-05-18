@@ -2,12 +2,20 @@ package org.pillarone.riskanalytics.core.simulation.item
 
 import org.apache.log4j.Logger
 import org.springframework.transaction.TransactionStatus
+import org.pillarone.riskanalytics.core.user.UserManagement
+import org.pillarone.riskanalytics.core.user.Person
 
 abstract class ModellingItem {
     final static Logger LOG = Logger.getLogger(ModellingItem)
 
     String name
     Class modelClass
+
+    Date creationDate
+    Date modificationDate
+
+    Person creator
+    Person lastUpdater
 
 //    protected def dao
     boolean changed = false
@@ -83,9 +91,9 @@ abstract class ModellingItem {
                 daoToBeSaved = createDao()
             }
 
+            setChangeUserInfo()
             mapToDao(daoToBeSaved)
 
-            setChangeUserInfo(daoToBeSaved)
             notifyItemSaved()
 
             saveDependentData(daoToBeSaved)
@@ -102,15 +110,16 @@ abstract class ModellingItem {
         return result
     }
 
-    protected def setChangeUserInfo(daoToBeSaved) {
-        //check if the object doesn't exist in DB
-        if (daoToBeSaved.properties.keySet().contains("creationDate") && daoToBeSaved.creationDate == null) {
-            daoToBeSaved.creationDate = new Date()
+    protected void setChangeUserInfo() {
+        Date date = new Date()
+        Person currentUser = UserManagement.getCurrentUser()
+        if (creationDate == null) {
+            creationDate = date
+            creator = currentUser
         }
 
-        if (daoToBeSaved.properties.keySet().contains("modificationDate")) {
-            daoToBeSaved.modificationDate = new Date()
-        }
+        modificationDate = date
+        lastUpdater = currentUser
     }
 
     public void updateChangeUserAndDate() {

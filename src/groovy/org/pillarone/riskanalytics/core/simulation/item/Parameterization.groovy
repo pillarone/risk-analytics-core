@@ -34,8 +34,6 @@ class Parameterization extends ModellingItem {
     List<ParameterHolder> parameterHolders
     List periodLabels
 
-    Date creationDate
-    Date modificationDate
     boolean orderByPath = false
     boolean valid
 
@@ -82,11 +80,11 @@ class Parameterization extends ModellingItem {
             }
             //Always set valid to true until validation actually works, because the ui already checks this flag
             valid = true
+            setChangeUserInfo()
             mapToDao(daoToBeSaved)
 
-            setChangeUserInfo(daoToBeSaved)
             notifyItemSaved()
-            
+
             if (!daoToBeSaved.save(flush: true)) logErrors(daoToBeSaved)
 
             changed = false
@@ -132,6 +130,7 @@ class Parameterization extends ModellingItem {
     }
 
     protected void mapToDao(Object dao) {
+        dao = dao as ParameterizationDAO
         dao.itemVersion = versionNumber.toString()
         dao.name = name
         dao.periodCount = periodCount
@@ -140,6 +139,8 @@ class Parameterization extends ModellingItem {
         dao.modificationDate = modificationDate
         dao.valid = valid
         dao.modelClassName = modelClass.name
+        dao.creator = creator
+        dao.lastUpdater = lastUpdater
         saveParameters(dao)
     }
 
@@ -166,6 +167,7 @@ class Parameterization extends ModellingItem {
     }
 
     protected void mapFromDao(Object dao, boolean completeLoad) {
+        dao = dao as ParameterizationDAO
         long time = System.currentTimeMillis()
         id = dao.id
         versionNumber = new VersionNumber(dao.itemVersion)
@@ -176,7 +178,8 @@ class Parameterization extends ModellingItem {
         modificationDate = dao.modificationDate
         valid = dao.valid
         modelClass = getClass().getClassLoader().loadClass(dao.modelClassName)
-
+        creator = dao.creator
+        lastUpdater = dao.lastUpdater
         if (completeLoad) {
             loadParameters(dao)
         }

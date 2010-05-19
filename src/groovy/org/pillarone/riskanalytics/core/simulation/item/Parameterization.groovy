@@ -83,6 +83,7 @@ class Parameterization extends ModellingItem {
             setChangeUserInfo()
             mapToDao(daoToBeSaved)
 
+            validationErrors = validate()
             notifyItemSaved()
 
             if (!daoToBeSaved.save(flush: true)) logErrors(daoToBeSaved)
@@ -92,7 +93,6 @@ class Parameterization extends ModellingItem {
             result = daoToBeSaved.id
             id = daoToBeSaved.id
 
-            validationErrors = validate()
             if (validationErrors) {
                 LOG.warn("${daoToBeSaved} is not valid\n" + validationErrors.join("\n"))
             } else {

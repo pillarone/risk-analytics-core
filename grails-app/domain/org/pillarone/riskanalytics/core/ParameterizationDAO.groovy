@@ -24,7 +24,7 @@ class ParameterizationDAO {
     static constraints = {
         name()
         comment(nullable: true, blank: true)
-        periodLabels(nullable: true, blank: true)
+        periodLabels(nullable: true, blank: true, maxSize: 1000)
         creationDate nullable: true
         modificationDate nullable: true
         creator nullable: true

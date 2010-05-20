@@ -1,13 +1,13 @@
-package org.pillarone.riskanalytics.core.parameterization
+package org.pillarone.riskanalytics.core.parameterization.validation
 
 /**
  https://issuetracking.intuitive-collaboration.com/jira/browse/PMO-40
  */
-class ParameterValidationService {
+abstract class AbstractParameterValidationService {
 
     boolean transactional = false
 
-    private Map validators = [:] // maps keys to a list of validating closures
+    protected Map validators = [:] // maps keys to a list of validating closures
 
     /**
      * @param classifier is the object used to find the validation closure for a candidate object in the registry.
@@ -36,10 +36,12 @@ class ParameterValidationService {
         for (validator in findValidators(classifier)) {
             def result = validator(candidate)
             if (null == result || true == result) continue  // validation ok
-            errors << new ParameterValidationError(classifier.toString(), result)
+            errors << createErrorObject(result.remove(0 as int).toString(), result)
         }
         return errors
     }
+
+    abstract ParameterValidationError createErrorObject(String msg, List args)
 
     /**
      * Convenience method for validate(obj, obj) when obj is its own classifier.
@@ -62,20 +64,3 @@ class ParameterValidationService {
     }
 }
 
-class ParameterValidationError {
-    final String classifier
-    final List args
-    final String msg
-    String path
-
-    ParameterValidationError(String classifierStr, List msgWithArgs) {
-        classifier = classifierStr
-        msg = msgWithArgs.remove(0) // better not modifying the list?
-        args = msgWithArgs
-    }
-
-    String toString() {
-        "Error '$msg' at $path with args $args for classifier $classifier"
-    }
-    // todo: localizedMessage
-}

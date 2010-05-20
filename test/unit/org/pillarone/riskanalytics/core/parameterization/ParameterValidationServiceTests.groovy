@@ -1,12 +1,15 @@
 package org.pillarone.riskanalytics.core.parameterization
 
+import org.pillarone.riskanalytics.core.parameterization.validation.AbstractParameterValidationService
+import org.pillarone.riskanalytics.core.parameterization.validation.ParameterValidationError
+
 class ParameterValidationServiceTests extends GroovyTestCase {
 
-    ParameterValidationService service
+    AbstractParameterValidationService service
 
     protected void setUp() {
         super.setUp();
-        service = new ParameterValidationService()
+        service = new TestValidationService()
     }
 
     void testNoValidatorsRegistered() {
@@ -58,5 +61,25 @@ class ParameterValidationServiceTests extends GroovyTestCase {
     }
 
 
+
+}
+
+class TestValidationError extends ParameterValidationError {
+
+    def TestValidationError(message, arguments) {
+        super(message, arguments);
+    }
+
+    String getLocalizedMessage(Locale locale) {
+        return msg;
+    }
+
+}
+
+class TestValidationService extends AbstractParameterValidationService {
+
+    ParameterValidationError createErrorObject(String msg, List args) {
+        return new TestValidationError(msg, args);
+    }
 
 }

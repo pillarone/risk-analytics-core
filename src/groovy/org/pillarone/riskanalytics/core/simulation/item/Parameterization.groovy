@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat
 import org.pillarone.riskanalytics.core.simulation.ILimitedPeriodCounter
 import org.pillarone.riskanalytics.core.parameterization.validation.IParameterizationValidator
 import org.pillarone.riskanalytics.core.parameterization.validation.ValidatorRegistry
-import org.pillarone.riskanalytics.core.parameterization.ParameterValidationError
+import org.pillarone.riskanalytics.core.parameterization.validation.ParameterValidationError
 
 class Parameterization extends ModellingItem {
 

@@ -1,4 +1,4 @@
-<plugin name='risk-analytics-core' version='0.6.3.3' grailsVersion='1.2.0 &gt; *'>
+<plugin name='risk-analytics-core' version='0.6.3.4' grailsVersion='1.2.0 &gt; *'>
   <author>Intuitive Collaboration GmbH</author>
   <authorEmail>info@pillarone.org</authorEmail>
   <title>RiskAnalytics core</title>
@@ -58,7 +58,7 @@ Persistence &amp; Simulation engine.
     <resource>org.pillarone.riskanalytics.core.output.BatchRunService</resource>
     <resource>org.pillarone.riskanalytics.core.output.DBCleanUpService</resource>
     <resource>org.pillarone.riskanalytics.core.output.DeleteSimulationService</resource>
-    <resource>org.pillarone.riskanalytics.core.parameterization.ParameterValidationService</resource>
+    <resource>org.pillarone.riskanalytics.core.parameterization.validation.AbstractParameterValidationService</resource>
     <resource>org.pillarone.riskanalytics.core.simulation.engine.RunSimulationService</resource>
   </resources>
   <dependencies>

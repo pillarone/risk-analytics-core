@@ -1,4 +1,4 @@
-<%@ page import="org.pillarone.riskanalytics.application.user.Person" %>
+<%@ page import="org.pillarone.riskanalytics.core.user.Person" %>
 <head>
 	<meta name="layout" content="main" />
 	<title>Person List</title>

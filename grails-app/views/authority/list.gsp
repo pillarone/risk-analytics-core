@@ -1,4 +1,4 @@
-<%@ page import="org.pillarone.riskanalytics.application.user.Authority" %>
+<%@ page import="org.pillarone.riskanalytics.core.user.Authority" %>
 <head>
 	<meta name="layout" content="main" />
 	<title>Authority List</title>

@@ -2,7 +2,7 @@ package org.pillarone.riskanalytics.core.output.batch
 
 import org.apache.log4j.Logger
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.pillarone.riskanalytics.core.output.BatchRunService
+import org.pillarone.riskanalytics.core.batch.BatchRunService
 import org.quartz.Job
 import org.quartz.JobExecutionContext
 

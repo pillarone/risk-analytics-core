@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.simulation.engine
 
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.batch.BatchRunInfoService
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
@@ -39,6 +40,8 @@ public class SimulationRunner {
 
     SimulationError error
 
+    BatchRunInfoService batchRunInfoService
+
     /**
      * Starting a simulation run by performing the
      *
@@ -75,6 +78,7 @@ public class SimulationRunner {
                 }
             }
         } catch (Throwable t) {
+            notifySimulationEnd(currentScope?.simulation, SimulationState.ERROR)
             simulationState = SimulationState.ERROR
             error = new SimulationError(
                     simulationRunID: currentScope.simulation?.id,
@@ -90,6 +94,7 @@ public class SimulationRunner {
 
         if (simulationState == SimulationState.CANCELED) {
             LOG.info "canceled simulation ${currentScope.simulation.name} will be deleted"
+            notifySimulationEnd(currentScope?.simulation, SimulationState.CANCELED)
             currentScope.simulation.delete()
             return
         }
@@ -100,7 +105,7 @@ public class SimulationRunner {
         currentScope?.simulation?.end = new Date(end)
         currentScope?.simulation?.save()
         LOG.info "simulation took ${end - start} ms"
-
+        notifySimulationEnd(currentScope?.simulation, SimulationState.FINISHED)
     }
 
     /**
@@ -216,5 +221,9 @@ public class SimulationRunner {
 
     protected void setSimulationState(SimulationState newState) {
         currentScope.simulationState = newState
+    }
+
+    protected void notifySimulationEnd(Simulation simulation, SimulationState simulationState) {
+        batchRunInfoService?.batchSimulationRunEnd(simulation, simulationState)
     }
 }

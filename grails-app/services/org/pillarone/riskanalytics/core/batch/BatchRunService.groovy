@@ -1,10 +1,14 @@
-package org.pillarone.riskanalytics.core.output
+package org.pillarone.riskanalytics.core.batch
 
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pillarone.riskanalytics.core.BatchRun
 import org.pillarone.riskanalytics.core.BatchRunSimulationRun
 import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
+import org.pillarone.riskanalytics.core.output.OutputStrategy
+import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.output.batch.OutputStrategyFactory
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.engine.RunSimulationService
@@ -16,6 +20,12 @@ class BatchRunService {
 
     boolean transactional = true
     Log LOG = LogFactory.getLog(BatchRunService)
+    def batchRunInfoService
+    BatchRunSimulationRun addedBatchRunSimulationRun
+
+    public static BatchRunService getService() {
+        return ApplicationHolder.getApplication().getMainContext().getBean('batchRunService')
+    }
 
     public void runBatches() {
         getActiveBatchRuns()?.each {BatchRun batchRun ->
@@ -35,18 +45,18 @@ class BatchRunService {
     public synchronized void runSimulation(BatchRunSimulationRun batchRunSimulationRun) {
         LOG.info "executing a simulation ${batchRunSimulationRun.simulationRun.name} at ${new Date()}"
         if (batchRunSimulationRun.simulationRun.endTime == null) {
-            long currentTime = System.currentTimeMillis()
+            batchRunInfoService.addActiveSimulationRun batchRunSimulationRun.simulationRun
             ICollectorOutputStrategy strategy = OutputStrategyFactory.getInstance(batchRunSimulationRun.strategy)
 
             SimulationRunner runner = SimulationRunner.createRunner()
             Simulation simulation = createSimulation(batchRunSimulationRun.simulationRun.name)
             SimulationConfiguration configuration = new SimulationConfiguration(simulation: simulation, outputStrategy: strategy)
 
-            RunSimulationService.getService().runSimulation(runner, configuration)
-
-            batchRunSimulationRun.simulationState = runner.getSimulationState()
+            batchRunSimulationRun.simulationState = SimulationState.RUNNING
             batchRunSimulationRun.save()
-            LOG.info "simulation ${batchRunSimulationRun.simulationRun.name} executed, it tooks ${System.currentTimeMillis() - currentTime}"
+            runner.batchRunInfoService = batchRunInfoService
+            RunSimulationService.getService().runSimulation(runner, configuration)
+            batchRunInfoService.addExecutedBatch batchRunSimulationRun
         } else {
             LOG.info "simulation ${batchRunSimulationRun.simulationRun.name} is already executed at ${batchRunSimulationRun.simulationRun.endTime}"
         }
@@ -58,7 +68,8 @@ class BatchRunService {
             simulation.save()
             batchRun = BatchRun.findByName(batchRun.name)
             int priority = BatchRunSimulationRun.countByBatchRun(batchRun)
-            new BatchRunSimulationRun(batchRun: batchRun, simulationRun: simulation.simulationRun, priority: priority, strategy: strategy, simulationState: SimulationState.NOT_RUNNING).save()
+            addedBatchRunSimulationRun = new BatchRunSimulationRun(batchRun: batchRun, simulationRun: simulation.simulationRun, priority: priority, strategy: strategy, simulationState: SimulationState.NOT_RUNNING)
+            addedBatchRunSimulationRun.save()
             if (batchRun.executed) {
                 batchRun.executed = false
                 batchRun.save()
@@ -74,7 +85,7 @@ class BatchRunService {
     }
 
     List<BatchRunSimulationRun> getSimulationRuns(BatchRun batchRun) {
-        return BatchRunSimulationRun.findAllByBatchRunAndSimulationState(batchRun, SimulationState.NOT_RUNNING, [sort: "priority", order: "asc"])
+        return BatchRunSimulationRun.findAllByBatchRun(batchRun, [sort: "priority", order: "asc"])
     }
 
     public BatchRunSimulationRun getSimulationRun(BatchRun batchRun, SimulationRun simulationRun) {

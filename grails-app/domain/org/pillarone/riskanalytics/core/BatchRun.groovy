@@ -1,6 +1,6 @@
 package org.pillarone.riskanalytics.core
 
-import org.pillarone.riskanalytics.core.output.BatchRunService
+import org.pillarone.riskanalytics.core.batch.BatchRunService
 
 class BatchRun {
     String name

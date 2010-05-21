@@ -21,4 +21,8 @@ class ValidatorRegistry {
     static List<IParameterizationValidator> getValidators() {
         return Collections.unmodifiableList(validators)
     }
+
+    static boolean contains(Class clazz) {
+        return validators.any { it.class.name == clazz.name }
+    }
 }

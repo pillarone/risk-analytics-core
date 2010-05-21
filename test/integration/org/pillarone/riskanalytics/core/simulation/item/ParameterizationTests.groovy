@@ -8,8 +8,16 @@ import org.pillarone.riskanalytics.core.parameter.StringParameter
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObject
 import org.pillarone.riskanalytics.core.simulation.item.parameter.StringParameterHolder
+import org.pillarone.riskanalytics.core.parameterization.validation.ValidatorRegistry
+import org.pillarone.riskanalytics.core.parameterization.validation.TestValidationService
 
 class ParameterizationTests extends GroovyTestCase {
+
+    void setUp() {
+        if (!ValidatorRegistry.contains(TestValidationService.class)) {
+            ValidatorRegistry.addValidator(new TestValidationService())
+        }
+    }
 
     void testLoad() {
 
@@ -254,6 +262,27 @@ class ParameterizationTests extends GroovyTestCase {
         configObject = parameterization.toConfigObject()
         assertEquals 6, configObject.size()
         assertEquals "periodLabels", ["Q1"], configObject.periodLabels
+    }
+
+    void testValidation() {
+        Parameterization parameterization = new Parameterization("testValidationList")
+        assertNull parameterization.validationErrors
+        parameterization.validate()
+        assertNotNull parameterization.validationErrors
+        assertEquals 0, parameterization.validationErrors.size()
+        assertTrue parameterization.valid
+
+        parameterization.addParameter(new StringParameterHolder("path", 0, "VALID"))
+        parameterization.validate()
+
+        assertEquals 0, parameterization.validationErrors.size()
+        assertTrue parameterization.valid
+
+        parameterization.addParameter(new StringParameterHolder("path", 0, "INVALID"))
+        parameterization.validate()
+        
+        assertEquals 1, parameterization.validationErrors.size()
+        assertFalse parameterization.valid
     }
 
 

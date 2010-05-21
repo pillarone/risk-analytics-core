@@ -37,7 +37,7 @@ class Parameterization extends ModellingItem {
     boolean orderByPath = false
     boolean valid
 
-    def validationErrors
+    List validationErrors
 
 
     public Parameterization(Map params) {
@@ -62,13 +62,15 @@ class Parameterization extends ModellingItem {
         ParameterizationDAO
     }
 
-    List validate() {
+    void validate() {
+        valid = false
         List<ParameterValidationError> errors = []
         for (IParameterizationValidator validator in ValidatorRegistry.getValidators()) {
             errors.addAll(validator.validate(parameterHolders))
         }
 
-        return errors
+        valid = errors.empty
+        validationErrors = errors
     }
 
     public save() {
@@ -78,12 +80,14 @@ class Parameterization extends ModellingItem {
             if (daoToBeSaved.id != null) {
                 daoToBeSaved = daoToBeSaved.merge()
             }
-            //Always set valid to true until validation actually works, because the ui already checks this flag
-            valid = true
+            validate()
+            if (!validationErrors.empty) {
+                LOG.warn("${daoToBeSaved} is not valid\n" + validationErrors.join("\n"))
+            }
+
             setChangeUserInfo()
             mapToDao(daoToBeSaved)
 
-            validationErrors = validate()
             notifyItemSaved()
 
             if (!daoToBeSaved.save(flush: true)) logErrors(daoToBeSaved)
@@ -92,13 +96,6 @@ class Parameterization extends ModellingItem {
             dao = daoToBeSaved
             result = daoToBeSaved.id
             id = daoToBeSaved.id
-
-            if (validationErrors) {
-                LOG.warn("${daoToBeSaved} is not valid\n" + validationErrors.join("\n"))
-            } else {
-                daoToBeSaved.valid = true
-                daoToBeSaved.save(flush: true)
-            }
         }
 
         return result

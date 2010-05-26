@@ -8,6 +8,7 @@ public abstract class ParameterValidationError {
     protected final Collection args;
     protected final String msg;
     private String path;
+    private int periodIndex;
 
     public ParameterValidationError(String message, Collection arguments) {
         this.msg = message;
@@ -28,6 +29,14 @@ public abstract class ParameterValidationError {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public int getPeriodIndex() {
+        return periodIndex;
+    }
+
+    public void setPeriodIndex(int periodIndex) {
+        this.periodIndex = periodIndex;
     }
 
     public abstract String getLocalizedMessage(Locale locale);

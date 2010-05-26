@@ -131,7 +131,11 @@ class Parameterization extends ModellingItem {
         dao.itemVersion = versionNumber.toString()
         dao.name = name
         dao.periodCount = periodCount
-        dao.periodLabels = periodLabels != null && !periodLabels.empty ? periodLabels.join(";") : obtainPeriodLabelsFromParameters()?.join(";")
+        List periodDates = obtainPeriodLabelsFromParameters()
+        if(periodDates != null) {
+            periodLabels = periodDates
+        }
+        dao.periodLabels = periodLabels != null && !periodLabels.empty ? periodLabels.join(";") : null
         dao.creationDate = creationDate
         dao.modificationDate = modificationDate
         dao.valid = valid

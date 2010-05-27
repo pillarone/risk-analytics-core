@@ -2,7 +2,7 @@ package org.pillarone.riskanalytics.core.simulation.item.parameter
 
 import org.pillarone.riskanalytics.core.parameter.Parameter
 
-abstract class ParameterHolder implements Cloneable{
+abstract class ParameterHolder implements Cloneable, Serializable {
 
     String path
     int periodIndex

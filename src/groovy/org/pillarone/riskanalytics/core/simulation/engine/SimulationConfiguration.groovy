@@ -10,7 +10,7 @@ import org.pillarone.riskanalytics.core.simulation.item.Simulation
  *
  * Use the SimulationConfiguration to configure a SimulationRunner instance.
  */
-public class SimulationConfiguration {
+public class SimulationConfiguration implements Serializable {
 
     Simulation simulation
     ICollectorOutputStrategy outputStrategy

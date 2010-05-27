@@ -12,7 +12,14 @@ environments {
 
     development {
         log4j = {
-            info 'org.pillarone.riskanalytics.core'
+            appenders {
+                console name: 'stdout', layout: pattern(conversionPattern: '[%d] %-5p %c{1} %m%n')
+            }
+            root {
+                error 'stdout'
+                additivity = false
+            }
+            info 'org.pillarone.riskanalytics.core', 'org.gridgain'
         }
         keyFiguresToCalculate = [
                 'stdev': true,

@@ -18,9 +18,11 @@ public class PrepareStructureInformationAction implements Action {
     public void perform() {
         LOG.debug "Preparing StructureInformation"
         Model model = simulationScope.model
-        ModelStructureDAO structure = ModelStructureDAO.findByModelClassName(model.class.name)
-        StructureInformationInjector structureInformationInjector = new StructureInformationInjector(structure, model)
-        simulationScope.structureInformation = new StructureInformation(structureInformationInjector.configObject, model)
+        ModelStructureDAO.withTransaction { status ->
+            ModelStructureDAO structure = ModelStructureDAO.findByModelClassName(model.class.name)
+            StructureInformationInjector structureInformationInjector = new StructureInformationInjector(structure, model)
+            simulationScope.structureInformation = new StructureInformation(structureInformationInjector.configObject, model)
+        }
         LOG.debug "StructureInformation published to SimulationScope"
     }
 

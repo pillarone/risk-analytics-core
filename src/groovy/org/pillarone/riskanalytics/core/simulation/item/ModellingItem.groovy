@@ -5,7 +5,7 @@ import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.user.UserManagement
 import org.pillarone.riskanalytics.core.user.Person
 
-abstract class ModellingItem {
+abstract class ModellingItem implements Serializable {
     final static Logger LOG = Logger.getLogger(ModellingItem)
 
     String name

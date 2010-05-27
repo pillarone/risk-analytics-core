@@ -1,6 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
-class VersionNumber implements Comparable, Cloneable {
+class VersionNumber implements Comparable, Cloneable, Serializable {
 
     List versionNumbers
 

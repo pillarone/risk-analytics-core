@@ -4,7 +4,7 @@ import org.joda.time.DateTime
 
 abstract class AbstractParameterObjectClassifier implements IParameterObjectClassifier {
 
-    final Map parameters
+    final transient Map parameters
     protected String displayName
     protected String typeName
 

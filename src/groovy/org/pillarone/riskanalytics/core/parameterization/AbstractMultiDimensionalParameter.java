@@ -3,9 +3,10 @@ package org.pillarone.riskanalytics.core.parameterization;
 import org.pillarone.riskanalytics.core.model.Model;
 import org.pillarone.riskanalytics.core.util.GroovyUtils;
 
+import java.io.Serializable;
 import java.util.*;
 
-public abstract class AbstractMultiDimensionalParameter implements Cloneable {
+public abstract class AbstractMultiDimensionalParameter implements Cloneable, Serializable {
 
     protected List<List> values;
     protected Model simulationModel;

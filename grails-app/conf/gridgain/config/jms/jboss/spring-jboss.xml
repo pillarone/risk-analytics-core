@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    LICENSE AGREEMENT
+    
+    GRIDGAIN - OPEN CLOUD PLATFORM.
+    COPYRIGHT (C) 2005-2008 GRIDGAIN SYSTEMS. ALL RIGHTS RESERVED.
+    
+    THIS IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR
+    MODIFY IT UNDER THE TERMS OF THE GNU LESSER GENERAL PUBLIC
+    LICENSE AS PUBLISHED BY THE FREE SOFTWARE FOUNDATION; EITHER
+    VERSION 2.1 OF THE LICENSE, OR (AT YOUR OPTION) ANY LATER 
+    VERSION.
+    
+    THIS LIBRARY IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL,
+    BUT WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF
+    MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.  SEE THE 
+    GNU LESSER GENERAL PUBLIC LICENSE FOR MORE DETAILS.
+    
+    YOU SHOULD HAVE RECEIVED A COPY OF THE GNU LESSER GENERAL PUBLIC
+    LICENSE ALONG WITH THIS LIBRARY; IF NOT, WRITE TO THE FREE 
+    SOFTWARE FOUNDATION, INC., 51 FRANKLIN ST, FIFTH FLOOR, BOSTON, MA  
+    02110-1301 USA
+-->
+
+
+<!--
+    GridGain Spring configuration file to startup grid with configuration
+    for GridJmsDiscoverySpi and GridJmsCommunicationSpi used for node discovery
+    and message exchange.
+
+    If using this configuration file to run examples, be sure to add relevant JMS
+    libraries to the example classpath and remote node classpath. Also check that
+    both nodes use JMS communication and discovery configured the same way.
+
+    When starting a standalone GridGain node, you need to execute the following command:
+    {GRIGAIN_HOME}/bin/gridgain.{bat|sh} path-to-this-file/spring-jms.xml
+
+    When starting GridGain from Java IDE, pass path to this file into GridFactory:
+    GridFactory.start("path-to-this-file/spring-jms-jboss.xml");
+
+    Be sure that JMS server is up and running. This configuration uses
+    "topic/myjmscomm" topic for message exchange and "topic/myjmsdisco" topic
+    for node discovery.
+
+    To configure JBoss JMS server you need to change
+    {JBOSS_HOME}/server/server_name/deploy/jms/jbossmq-destinations-service.xml file and
+    add corresponding topics and queues.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+    <!--
+        Optional description.
+    -->
+    <description>
+        JMS Spring file for JBoss JMS grid configuration.
+    </description>
+
+    <!--
+        Grid configuration bean.
+    -->
+    <bean id="grid.cfg" class="org.gridgain.grid.GridConfigurationAdapter" scope="singleton">
+        <!--
+            Uncomment to specify non-default grid instance name.
+        -->
+        <!--
+        <property name="gridName" value="mygrid"/>
+        -->
+
+        <!--
+            Uncomment the following section if you wish to add local node benchmark
+            to user attributes. You can also add any other node attribute specific
+            to your application.
+        -->
+        <!--
+        <property name="userAttributes">
+            <map>
+                <entry key="grid.node.benchmark">
+                    <bean class="org.gridgain.grid.benchmarks.GridLocalNodeBenchmark" init-method="start"/>
+                </entry>
+            </map>
+        </property>
+        -->
+
+        <!--
+            Configuration for GridJmsCommunicationSpi communication SPI.
+        -->
+        <property name="communicationSpi">
+            <bean class="org.gridgain.grid.spi.communication.jms.GridJmsCommunicationSpi">
+                <!-- JMS connection factory registered in JNDI. -->
+                <property name="connectionFactoryName" value="java:ConnectionFactory"/>
+
+                <!-- JMS topic name used for sending messages to multiple nddes. -->
+                <property name="topicName" value="topic/myCommTopic"/>
+
+                <!-- JNDI environment (specific to JMS provider). -->
+                <property name="jndiEnvironment">
+                    <map>
+                        <entry value="org.jnp.interfaces.NamingContextFactory">
+                            <key><util:constant static-field="javax.naming.Context.INITIAL_CONTEXT_FACTORY"/></key>
+                        </entry>
+                        <entry value="jnp://localhost:1099">
+                            <key><util:constant static-field="javax.naming.Context.PROVIDER_URL"/></key>
+                        </entry>
+                        <entry value="org.jboss.naming:org.jnp.interfaces">
+                            <key><util:constant static-field="javax.naming.Context.URL_PKG_PREFIXES"/></key>
+                        </entry>
+                    </map>
+                </property>
+            </bean>
+        </property>
+
+        <!--
+            Configuration for GridJmsDiscoverySpi discovery SPI.
+        -->
+        <property name="discoverySpi">
+            <bean class="org.gridgain.grid.spi.discovery.jms.GridJmsDiscoverySpi">
+                <!-- JMS connection factory registered in JNDI. -->
+                <property name="connectionFactoryName" value="java:ConnectionFactory"/>
+
+                <!-- JMS topic name used for node discovery. -->
+                <property name="topicName" value="topic/myDiscoTopic"/>
+
+                <!-- JNDI environment (specific to JMS provider). -->
+                <property name="jndiEnvironment">
+                    <map>
+                        <entry value="org.jnp.interfaces.NamingContextFactory">
+                            <key><util:constant static-field="javax.naming.Context.INITIAL_CONTEXT_FACTORY"/></key>
+                        </entry>
+                        <entry value="jnp://localhost:1099">
+                            <key><util:constant static-field="javax.naming.Context.PROVIDER_URL"/></key>
+                        </entry>
+                        <entry value="org.jboss.naming:org.jnp.interfaces">
+                            <key><util:constant static-field="javax.naming.Context.URL_PKG_PREFIXES"/></key>
+                        </entry>
+                    </map>
+                </property>
+            </bean>
+        </property>
+    </bean>
+</beans>

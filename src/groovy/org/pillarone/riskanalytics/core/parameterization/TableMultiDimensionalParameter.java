@@ -22,6 +22,10 @@ public class TableMultiDimensionalParameter extends AbstractMultiDimensionalPara
         }
     }
 
+    @Override
+    public int getColumnCount() {
+        return Math.max(titles.size(), super.getColumnCount());
+    }
 
     public int getTitleColumnCount() {
         return 0;

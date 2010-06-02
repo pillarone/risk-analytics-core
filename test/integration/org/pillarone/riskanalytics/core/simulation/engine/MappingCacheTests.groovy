@@ -13,7 +13,6 @@ class MappingCacheTests extends GroovyTestCase {
         assertNotNull new PathMapping(pathName: "Empty:path3").save()
         assertNotNull new PathMapping(pathName: "AnotherModel:path3").save()
 
-        assertNotNull new CollectorMapping(collectorName: "coll").save()
         assertNotNull new FieldMapping(fieldName: "field").save()
     }
 

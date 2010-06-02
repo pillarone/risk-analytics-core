@@ -17,9 +17,9 @@ import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
 import org.pillarone.riskanalytics.core.output.FileOutput
 import org.gridgain.grid.Grid
-import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationTask
-import org.gridgain.grid.GridTaskFuture
-import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjectParameterHolder
+import org.gridgain.grid.GridMessageListener
+import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
+import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationJob
 
 
 abstract class GridModelTest extends GroovyTestCase {
@@ -116,13 +116,14 @@ abstract class GridModelTest extends GroovyTestCase {
         clean()
     }
 
-    final void testModelRun() {
+    final void testGridModelRun() {
 
-        SimulationConfiguration configuration = new SimulationConfiguration(simulation: prepareSimulationForGrid(run), outputStrategy: getOutputStrategy())
+        SimulationConfiguration configuration = new SimulationConfiguration(simulation: run, outputStrategy: getOutputStrategy())
+        RunSimulationService runSimulationService = RunSimulationService.getService()
 
-        GridTaskFuture future = grid.execute(new SimulationTask(), configuration)
-        boolean result = future.get()
+        def result = runSimulationService.runSimulationOnGrid(configuration)
 
+        LOG.info result.toString()
 
 //        assertNull "${runner.error?.error?.message}", runner.error
         if (shouldCompareResults()) {
@@ -206,22 +207,4 @@ abstract class GridModelTest extends GroovyTestCase {
         return true;
     }
 
-    protected Simulation prepareSimulationForGrid(Simulation s) {
-        Simulation simulation = new Simulation(s.name)
-        simulation.numberOfIterations = s.numberOfIterations
-        simulation.beginOfFirstPeriod = s.beginOfFirstPeriod
-        simulation.randomSeed = s.randomSeed
-        simulation.modelClass = s.modelClass
-        simulation.periodCount = s.periodCount
-
-        simulation.parameterization = new Parameterization(s.parameterization.name)
-        simulation.parameterization.periodCount = s.parameterization.periodCount
-        simulation.parameterization.parameterHolders = s.parameterization.parameterHolders
-
-
-        simulation.template = new ResultConfiguration(s.template.name)
-        simulation.template.collectors = s.template.collectors
-
-        return simulation
-    }
 }

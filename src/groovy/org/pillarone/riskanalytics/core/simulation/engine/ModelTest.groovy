@@ -16,6 +16,7 @@ import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
+import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
 
 /**
  * An abstract class which provides functionality to run model tests.
@@ -102,6 +103,7 @@ abstract class ModelTest extends GroovyTestCase {
         run.modelVersionNumber = new VersionNumber("1")
         run.periodCount = getPeriodCount()
         run.numberOfIterations = getIterationCount()
+        run.structure = ModelStructure.getStructureForModel(modelClass)
 
         if (modelInstance.requiresStartDate()) {
             run.beginOfFirstPeriod = new DateTime(2009, 1, 1, 0, 0, 0, 0)

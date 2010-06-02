@@ -1,6 +1,6 @@
 package org.pillarone.riskanalytics.core.output
 
-public class FieldMapping {
+public class FieldMapping implements Serializable {
     String fieldName
 
     //Needed if we want get the id from java code

@@ -113,9 +113,7 @@ public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensiona
     public ComboBoxTableMultiDimensionalParameter clone() throws CloneNotSupportedException {
         final ComboBoxTableMultiDimensionalParameter clone = (ComboBoxTableMultiDimensionalParameter) super.clone();
         clone.markerClass = markerClass;
-        if (simulationModel != null) {
-            setSimulationModel(simulationModel);
-        }
+        clone.comboBoxValues.clear();
         return clone;
     }
 }

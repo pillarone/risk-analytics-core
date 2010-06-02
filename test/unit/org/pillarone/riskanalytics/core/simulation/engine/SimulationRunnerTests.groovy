@@ -104,8 +104,8 @@ class SimulationRunnerTests extends GrailsUnitTestCase {
         assertNotNull "no periodaction defined", runner.simulationAction.iterationAction.periodAction
 
     }
-
-    void testErrorDuringSimulation() {
+    //TODO create similar test for grid configuration
+    /*void testErrorDuringSimulation() {
         //to simulate an error we throw an exception when the withTransaction closure is used. (during simulation)
         transactionStub.demand.withTransaction(3..3) {
             Closure c ->
@@ -151,7 +151,7 @@ class SimulationRunnerTests extends GrailsUnitTestCase {
 
         assertNull simulationScope.simulation.simulationRun?.parameterization
         assertNull simulationScope.simulation.simulationRun?.resultConfiguration
-    }
+    }*/
 
     // TODO (Oct 21, 2009, msh): maybe dk has an idea why this test doesn't work
 /*

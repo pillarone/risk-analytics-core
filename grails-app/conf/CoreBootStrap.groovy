@@ -8,6 +8,8 @@ import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.user.UserSettings
 import org.grails.plugins.springsecurity.service.AuthenticateService
 import org.pillarone.riskanalytics.core.user.UserManagement
+import org.pillarone.riskanalytics.core.output.CollectorMapping
+import org.pillarone.riskanalytics.core.output.batch.AbstractBulkInsert
 
 class CoreBootStrap {
 
@@ -16,6 +18,13 @@ class CoreBootStrap {
     def init = {servletContext ->
 
         authenticateService = UserManagement.getAuthenticateService()
+
+        //All mappings must be persistent before a simulation is started
+        CollectorMapping.withTransaction { status ->
+            if (CollectorMapping.count() == 0) {
+                new CollectorMapping(collectorName: AbstractBulkInsert.DEFAULT_COLLECTOR_NAME).save()
+            }
+        }
 
         Authority.withTransaction { status ->
             if (Authority.count() == 0) {

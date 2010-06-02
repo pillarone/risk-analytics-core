@@ -17,8 +17,6 @@ public class InitModelAction implements Action {
         Model instance = simulationScope.model
         instance.init()
         instance.injectComponentNames()
-
-        simulationScope.mappingCache.initCache(instance)
     }
 
 

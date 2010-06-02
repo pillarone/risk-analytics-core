@@ -36,7 +36,7 @@ class MultiDimensionalParameterHolder extends ParameterHolder {
 
     public MultiDimensionalParameterHolder clone() {
         MultiDimensionalParameterHolder holder = (MultiDimensionalParameterHolder) super.clone();
-        holder.value = (AbstractMultiDimensionalParameter) new GroovyShell(getClass().getClassLoader()).evaluate(value.toString())
+        holder.value = (AbstractMultiDimensionalParameter) value.clone()
         return holder
     }
 

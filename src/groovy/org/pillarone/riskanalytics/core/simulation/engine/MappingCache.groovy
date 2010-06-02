@@ -16,7 +16,7 @@ import org.pillarone.riskanalytics.core.model.Model;
  * During initialization all existing field & collector mappings and all path mappings belonging to this model
  * are pre-loaded. This is more than necessary, but a lot faster than loading single objects.
  */
-public class MappingCache {
+public class MappingCache implements Serializable {
 
     private Map<String, PathMapping> paths;
     private Map<String, FieldMapping> fields;

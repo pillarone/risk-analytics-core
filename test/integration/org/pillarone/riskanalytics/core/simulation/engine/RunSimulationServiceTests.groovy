@@ -15,6 +15,7 @@ import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
+import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
 
 class RunSimulationServiceTests extends GrailsUnitTestCase {
 
@@ -50,6 +51,7 @@ class RunSimulationServiceTests extends GrailsUnitTestCase {
         run.modelVersionNumber = new VersionNumber("1")
         run.periodCount = 1
         run.numberOfIterations = 1000
+        run.structure = ModelStructure.getStructureForModel(CoreModel)
         run.save()
 
         SimulationConfiguration simulationConfiguration = new SimulationConfiguration()

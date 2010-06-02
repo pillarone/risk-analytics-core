@@ -52,10 +52,7 @@ class ResultConfiguration extends ModellingItem {
      * This is in contrast to getCollectors, which returns the collectors for UI use.
      */
     public List<PacketCollector> getResolvedCollectors(Model model, CollectorFactory collectorFactory) {
-        if (dao) {
-            return collectorFactory.createCollectors(dao, model)
-        }
-        return []
+        return collectorFactory.createCollectors(this, model)
     }
 
     protected void mapFromDao(Object dao, boolean completeLoad) {
@@ -71,10 +68,9 @@ class ResultConfiguration extends ModellingItem {
 
         //These collectors are used by the UI only, therefore wildcard collectors must not be resolved here
         collectors = dao.collectorInformation.collect {CollectorInformation ci ->
-            new PacketCollector(
-                    path: ci.path.pathName,
-                    mode: CollectingModeFactory.getStrategy(ci.collectingStrategyIdentifier)
-            )
+            PacketCollector collector = new PacketCollector(CollectingModeFactory.getStrategy(ci.collectingStrategyIdentifier))
+            collector.path = ci.path.pathName
+            return collector
         }
     }
 

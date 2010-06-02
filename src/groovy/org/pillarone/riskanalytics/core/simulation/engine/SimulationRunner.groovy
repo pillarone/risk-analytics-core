@@ -26,7 +26,7 @@ import org.pillarone.riskanalytics.core.simulation.engine.actions.*
  * A SimulationRunner instance has to be configured with a SimulationConfiguration before starting a simulation.
  * Each simulation has to use a new SimulationRunner instance.
  */
-
+//TODO: move db & progress stuff out of this class; set correct period count in simulation
 public class SimulationRunner {
 
     private static Log LOG = LogFactory.getLog(SimulationRunner)
@@ -64,18 +64,12 @@ public class SimulationRunner {
             LOG.info "Initialization completed in ${initializationTime}ms"
 
             simulationState = SimulationState.RUNNING
-            //Transaction is necessary because PathMappings etc might be inserted when writing bulk insert files
-            SimulationRun.withTransaction {TransactionStatus status ->
-                simulationAction.perform()
-            }
+            simulationAction.perform()
             LOG.info "${currentScope?.numberOfIterations} iterations completed in ${System.currentTimeMillis() - (start + initializationTime)}ms"
 
-            //Transaction because of saving results to db
-            SimulationRun.withTransaction {TransactionStatus status ->
-                for (Action action in postSimulationActions) {
-                    if (simulationState == SimulationState.CANCELED) break;
-                    action.perform()
-                }
+            for (Action action in postSimulationActions) {
+                if (simulationState == SimulationState.CANCELED) break;
+                action.perform()
             }
         } catch (Throwable t) {
             notifySimulationEnd(currentScope?.simulation, SimulationState.ERROR)
@@ -88,14 +82,14 @@ public class SimulationRunner {
             )
             LOG.error this, t
             LOG.debug error.dump()
-            currentScope.simulation.delete()
+//            currentScope.simulation.delete()
             return
         }
 
         if (simulationState == SimulationState.CANCELED) {
             LOG.info "canceled simulation ${currentScope.simulation.name} will be deleted"
             notifySimulationEnd(currentScope?.simulation, SimulationState.CANCELED)
-            currentScope.simulation.delete()
+//            currentScope.simulation.delete()
             return
         }
 
@@ -103,7 +97,7 @@ public class SimulationRunner {
         simulationState = SimulationState.FINISHED
         long end = System.currentTimeMillis()
         currentScope?.simulation?.end = new Date(end)
-        currentScope?.simulation?.save()
+//        currentScope?.simulation?.save()
         LOG.info "simulation took ${end - start} ms"
         notifySimulationEnd(currentScope?.simulation, SimulationState.FINISHED)
     }
@@ -159,7 +153,7 @@ public class SimulationRunner {
 
         simulationAction.iterationAction.periodAction.model = currentScope.model
 
-        currentScope.mappingCache = new MappingCache()
+        currentScope.mappingCache = configuration.mappingCache
     }
 
     /**
@@ -208,7 +202,7 @@ public class SimulationRunner {
         runner.simulationAction = simulationAction
 
         runner.postSimulationActions << finishOutputAction
-        runner.postSimulationActions << calculatorAction
+//        runner.postSimulationActions << calculatorAction
 
         runner.currentScope = simulationScope
 

@@ -300,7 +300,7 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable, Se
     public AbstractMultiDimensionalParameter clone() throws CloneNotSupportedException {
         final AbstractMultiDimensionalParameter clone = (AbstractMultiDimensionalParameter) super.clone();
         clone.valuesConverted = valuesConverted;
-        clone.simulationModel = simulationModel;
+        clone.simulationModel = null;
         clone.values = new ArrayList<List>(values.size());
         for (List list : values) {
             if (list instanceof Cloneable) {

@@ -1,6 +1,6 @@
 package org.pillarone.riskanalytics.core.output
 
-public class PathMapping {
+public class PathMapping implements Serializable {
     String pathName
 
     String toString() { pathName }

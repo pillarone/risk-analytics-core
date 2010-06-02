@@ -9,7 +9,7 @@ class Simulation extends ModellingItem {
 
     Parameterization parameterization
     ResultConfiguration template
-    private ModelStructure structure // TODO (Sep 9, 2009, msh): implement as query
+    ModelStructure structure // TODO (Sep 9, 2009, msh): implement as query
     private VersionNumber modelVersionNumber // TODO (Sep 9, 2009, msh): use ModelItem
 
     DateTime beginOfFirstPeriod

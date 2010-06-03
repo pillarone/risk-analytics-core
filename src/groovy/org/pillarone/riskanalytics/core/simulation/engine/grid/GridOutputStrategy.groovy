@@ -12,11 +12,15 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
 
     Grid grid
     GridNode node
-    ArrayList<Object[]> resultBuffer = new ArrayList<Object[]>(10000)
+//    ArrayList<Object[]> resultBuffer = new ArrayList<Object[]>(10000)
+    StringBuilder buffer = new StringBuilder()
+    int resCount = 0
+    private long simulationRunId;
 
-    public GridOutputStrategy(GridNode masterNode) {
+    public GridOutputStrategy(GridNode masterNode, long simulationRunId) {
         grid = getGrid()
         node = masterNode
+        this.simulationRunId=simulationRunId;
     }
 
     private Grid getGrid() {
@@ -32,23 +36,24 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
 
     ICollectorOutputStrategy leftShift(List results) {
         for (SingleValueResultPOJO result in results) {
-            Object[] r = new Object[5]
-            r[0] = result.path.id
-            r[1] = result.field.id
-            r[2] = result.collector.id
-            r[3] = result.period
-            r[4] = result.value
-
-            resultBuffer << r
+            buffer.append simulationRunId+","
+            buffer.append result.period+","
+            buffer.append result.iteration+","
+            buffer.append result.path.id+","
+            buffer.append result.field.id+","
+            buffer.append result.collector.id+","
+            buffer.append result.value+";"
+            resCount++
         }
-        if (resultBuffer.size() > 10000) {
+        if (resCount > 10000) {
             sendResults()
         }
         return this
     }
 
     private void sendResults() {
-        getGrid().sendMessage(node, resultBuffer)
-        resultBuffer.clear()
+        getGrid().sendMessage(node, buffer.toString())
+        buffer.delete(0, buffer.length())
+        resCount = 0
     }
 }

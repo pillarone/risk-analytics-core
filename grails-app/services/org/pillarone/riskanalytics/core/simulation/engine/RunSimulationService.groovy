@@ -50,15 +50,13 @@ public class RunSimulationService {
     public def runSimulationOnGrid(SimulationConfiguration configuration) {
         configuration.mappingCache = createMappingCache(configuration)
         configuration.prepareSimulationForGrid()
-        int messageCount = 0
-        grid.addMessageListener([onMessage: { uuid, item -> messageCount++ }] as GridMessageListener)
 
         long time = System.currentTimeMillis()
 
         GridTaskFuture future = grid.execute(new SimulationTask(), configuration)
         Object result = future.get()
 
-        LOG.info "Grid task executed in ${System.currentTimeMillis() - time}ms - Received ${messageCount} messages"
+        LOG.info "Grid task executed in ${System.currentTimeMillis() - time}ms"
 
         return result
     }

@@ -25,6 +25,7 @@ public class SimulationConfiguration implements Serializable {
      */
     void prepareSimulationForGrid() {
         Simulation preparedSimulation = new Simulation(simulation.name)
+        preparedSimulation.id = simulation.id
         preparedSimulation.numberOfIterations = simulation.numberOfIterations
         preparedSimulation.beginOfFirstPeriod = simulation.beginOfFirstPeriod
         preparedSimulation.randomSeed = simulation.randomSeed

@@ -23,7 +23,7 @@ abstract class AbstractBulkInsert {
 
     private void init() {
         if (!initialized) {
-            String filename = "${FileConstants.TEMP_FILE_DIRECTORY}${File.separatorChar}${simulationRun.id}"
+            String filename = "${FileConstants.TEMP_FILE_DIRECTORY}${File.separatorChar}${simulationRunId}"
             LOG.info("Temp file at: $filename")
 
             tempFile = new File(filename)
@@ -37,6 +37,11 @@ abstract class AbstractBulkInsert {
         this.@simulationRun = simulationRun
         this.simulationRunId = simulationRun.id
         init()
+    }
+
+    void setSimulationRunId(long id){
+        this.simulationRunId=id;
+        init();
     }
 
     abstract protected void writeResult(List values)

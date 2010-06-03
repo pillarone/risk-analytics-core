@@ -13,12 +13,13 @@ class SimulationJob extends GridJobAdapter<Boolean> {
     private SimulationConfiguration simulationConfiguration
     private GridNode master
 
+
     private static Log LOG = LogFactory.getLog(SimulationJob)
 
     public SimulationJob(SimulationConfiguration simulationConfiguration, GridNode gridNode) {
         this.master = gridNode
         this.simulationConfiguration = simulationConfiguration
-        this.simulationConfiguration.outputStrategy = new GridOutputStrategy(gridNode)
+        this.simulationConfiguration.outputStrategy = new GridOutputStrategy(gridNode, simulationConfiguration.simulation.id);
     }
 
     Serializable execute() {

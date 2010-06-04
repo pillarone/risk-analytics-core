@@ -123,14 +123,7 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable {
 
         if (newColumnCount > currentColumnCount) {
             for (int i = 0; i < (newColumnCount - currentColumnCount); i++) {
-                List lastList = values.get(values.size() - 1);
-                ArrayList newList = new ArrayList();
-                int rowIndex = 0;
-                for (Object object : lastList) {
-                    newList.add(createDefaultValue(rowIndex, currentColumnCount, object));
-                    rowIndex++;
-                }
-                values.add(newList);
+                addColumn(currentColumnCount);
             }
             valuesConverted = false;
             columnsAdded(newColumnCount - currentColumnCount);
@@ -139,15 +132,16 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable {
         if (newRowCount > currentRowCount) {
 
             Iterator<List> iterator = values.iterator();
-            int currentColumn = 0;
-            while (iterator.hasNext()) {
-                List list = iterator.next();
+            for (int currentColumn = 0; currentColumn < getColumnCount(); currentColumn++) {
+                if(currentColumn >= values.size()) {
+                    addColumn(currentColumn);
+                }
+                List list = values.get(currentColumn);
                 if (list.size() == currentRowCount) {
                     for (int i = 0; i < (newRowCount - currentRowCount); i++) {
                         list.add(createDefaultValue(currentRowCount + i, currentColumn, null));
                     }
                 }
-                currentColumn++;
             }
             rowsAdded(newRowCount - currentRowCount);
         }
@@ -172,6 +166,17 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable {
             columnsRemoved(currentColumnCount - newColumnCount);
         }
         setDiagonalValue();
+    }
+
+    private void addColumn(int currentColumnCount) {
+        List lastList = values.get(values.size() - 1);
+        ArrayList newList = new ArrayList();
+        int rowIndex = 0;
+        for (Object object : lastList) {
+            newList.add(createDefaultValue(rowIndex, currentColumnCount, object));
+            rowIndex++;
+        }
+        values.add(newList);
     }
 
     protected Object createDefaultValue(int row, int column, Object object) {

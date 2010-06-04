@@ -96,6 +96,20 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
 
     }
 
+    void testIncreaseDimensionEmpty() {
+        AbstractMultiDimensionalParameter param = new ConstrainedMultiDimensionalParameter([[]], ['title1', 'title2'], ConstraintsFactory.getConstraints(SimpleConstraint.IDENTIFIER))
+
+        assertEquals 0, param.valueRowCount
+        assertEquals 2, param.columnCount
+
+        param.dimension = new MultiDimensionalParameterDimension(2, 1)
+        assertEquals 1, param.valueRowCount
+        assertEquals 2, param.columnCount
+        assertEquals 2, param.values.size()
+        assertTrue param.values.every { it.size() == 1}
+
+    }
+
     void testDecreaseDimension() {
         AbstractMultiDimensionalParameter param = new SimpleMultiDimensionalParameter([[1, 2, 3], [4, 5, 6]])
 

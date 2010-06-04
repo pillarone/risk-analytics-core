@@ -115,4 +115,9 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
         clone.constraints = constraints;
         return clone;
     }
+
+    @Override
+    public int getValueColumnCount() {
+        return titles.size();
+    }
 }

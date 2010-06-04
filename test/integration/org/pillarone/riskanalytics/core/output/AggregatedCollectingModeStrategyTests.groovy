@@ -30,7 +30,7 @@ class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
 
         fieldMapping = getFieldMapping("ultimate")
         pathMapping = getPathMapping("Empty:path")
-        collectorMapping = getCollectorMapping(AbstractBulkInsert.DEFAULT_COLLECTOR_NAME)
+        collectorMapping = getCollectorMapping(AggregatedCollectingModeStrategy.IDENTIFIER)
 
         Parameterization parameterization = new Parameterization("CoreParameters")
         parameterization.load()
@@ -55,7 +55,6 @@ class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
         PacketCollector collector = new PacketCollector(strategy)
         collector.simulationScope = simulationScope
         collector.path = "Empty:path"
-        collector.collectorName = AbstractBulkInsert.DEFAULT_COLLECTOR_NAME
     }
 
     void testCollectAndCreateResults() {

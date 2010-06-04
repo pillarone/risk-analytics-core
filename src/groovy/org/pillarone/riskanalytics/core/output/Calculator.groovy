@@ -59,6 +59,8 @@ class Calculator {
 
     void calculate() {
 
+        CollectorMapping collectorMapping = CollectorMapping.findByCollectorName(AggregatedCollectingModeStrategy.IDENTIFIER)
+
         startTime = System.currentTimeMillis()
         ResultSet result = ResultAccessor.getAvgAndIsStochasticForSimulationRun(run)
         totalCalculations = keyFigureCount * ResultAccessor.getAvgAndIsStochasticForSimulationRunCount(run)
@@ -69,6 +71,12 @@ class Calculator {
             long collector = result.getInt("collector_id")
             long field = result.getLong("field_id")
             double avg = result.getDouble("average")
+
+            //use only aggregated values
+            if(collector != collectorMapping.id) {
+                continue
+            }
+
             int isStochastic = result.getDouble("minimum") == result.getDouble("maximum") ? 1 : 0
             bulkInsert.addResults(periodIndex, PostSimulationCalculation.MEAN, null, path, field, collector, avg)
             bulkInsert.addResults(periodIndex, PostSimulationCalculation.IS_STOCHASTIC, null, path, field, collector, isStochastic)

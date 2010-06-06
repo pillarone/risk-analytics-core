@@ -117,6 +117,9 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable {
     public void setDimension(MultiDimensionalParameterDimension dimension) {
         int newRowCount = dimension.getRows();
         int newColumnCount = dimension.getColumns();
+        if(newColumnCount > 1) {
+            valuesConverted = false;
+        }
 
         int currentRowCount = getValueRowCount();
         int currentColumnCount = getValueColumnCount();

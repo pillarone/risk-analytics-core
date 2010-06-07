@@ -134,8 +134,8 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable {
 
         if (newRowCount > currentRowCount) {
 
-            Iterator<List> iterator = values.iterator();
-            for (int currentColumn = 0; currentColumn < getColumnCount(); currentColumn++) {
+            int columnCount = getValueColumnCount();
+            for (int currentColumn = 0; currentColumn < columnCount; currentColumn++) {
                 if(currentColumn >= values.size()) {
                     addColumn(currentColumn);
                 }

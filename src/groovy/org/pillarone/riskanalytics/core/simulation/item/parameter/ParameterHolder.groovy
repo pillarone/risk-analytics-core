@@ -56,5 +56,7 @@ abstract class ParameterHolder implements Cloneable{
         return holder;
     }
 
+    public void clearCachedValues() { }
+
 
 }

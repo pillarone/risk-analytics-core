@@ -68,6 +68,7 @@ class Parameterization extends ModellingItem {
         for (IParameterizationValidator validator in ValidatorRegistry.getValidators()) {
             errors.addAll(validator.validate(parameterHolders))
         }
+        parameterHolders*.clearCachedValues()
 
         valid = errors.empty
         validationErrors = errors
@@ -132,7 +133,7 @@ class Parameterization extends ModellingItem {
         dao.name = name
         dao.periodCount = periodCount
         List periodDates = obtainPeriodLabelsFromParameters()
-        if(periodDates != null) {
+        if (periodDates != null) {
             periodLabels = periodDates
         }
         dao.periodLabels = periodLabels != null && !periodLabels.empty ? periodLabels.join(";") : null

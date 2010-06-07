@@ -121,4 +121,11 @@ class ParameterObjectParameterHolder extends ParameterHolder {
         return holder
     }
 
+    public void clearCachedValues() {
+        businessObject = null
+        for (ParameterHolder p in classifierParameters.values()) {
+            p.clearCachedValues()
+        }
+    }
+
 }

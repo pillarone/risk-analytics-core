@@ -10,7 +10,7 @@ import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.0-ALPHA"
+    def version = "1.0-ALPHA-2"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.2.0 > *"
     // the other plugins this plugin depends on

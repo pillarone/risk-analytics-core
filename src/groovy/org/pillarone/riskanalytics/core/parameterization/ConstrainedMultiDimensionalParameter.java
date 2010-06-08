@@ -20,7 +20,7 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
 
     @Override
     public void setValueAt(Object value, int row, int column) {
-        if (constraints.matches(row, column - 1, value)) {
+        if (constraints.matches(row, column, value)) {
             super.setValueAt(value, row, column);
         } else {
             throw new IllegalArgumentException("Value does not pass constraints");
@@ -58,10 +58,10 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
 
     @Override
     public Object getPossibleValues(int row, int column) {
-        if (row == 0 || column == 0) {
+        if (row == 0) {
             return new Object();
         }
-        Class columnClass = constraints.getColumnType(column - 1);
+        Class columnClass = constraints.getColumnType(column);
         if (IComponentMarker.class.isAssignableFrom(columnClass)) {
             List<String> names = new ArrayList<String>();
             List components = simulationModel.getMarkedComponents(columnClass);
@@ -90,7 +90,7 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
         Object result = "";
         Class columnClass = constraints.getColumnType(column);
         if (IComponentMarker.class.isAssignableFrom(columnClass)) {
-            List list = (List) getPossibleValues(1, column + 1);
+            List list = (List) getPossibleValues(row, column);
             if (list != null && list.size() > 0)
                 result = list.get(0);
         } else if (columnClass == BigDecimal.class) {

@@ -45,7 +45,7 @@ public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensiona
     }
 
     public Object getPossibleValues(int row, int column) {
-        if (row == 0 || column == 0) {
+        if (row == 0) {
             return getValueAt(row, column);
         } else {
             List names = new LinkedList();

@@ -221,14 +221,14 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         mdp.validateValues()
 
         assertFalse "invalid name" == mdp.getValueAt(0, 1)
-        assertEquals "hierarchy output component", mdp.getValueAt(0, 3)
+        assertEquals "hierarchy output component", mdp.getValueAt(0, 2)
 
         mdp = new ComboBoxTableMultiDimensionalParameter([['invalid name', 'hierarchy output component']], ['title'], ITestComponentMarker)
         mdp.setSimulationModel(model)
         mdp.validateValues()
 
         assertFalse "invalid name" == mdp.getValueAt(1, 0)
-        assertEquals "hierarchy output component", mdp.getValueAt(2, 1)
+        assertEquals "hierarchy output component", mdp.getValueAt(2, 0)
     }
 
     void testGetColumnIndex() {
@@ -238,6 +238,13 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
 
         index = mdp.getColumnIndex("title2")
         assertEquals "title2", mdp.getValueAt(0, index)
+    }
+
+    void testGetColumn() {
+        TableMultiDimensionalParameter mdp = new TableMultiDimensionalParameter([[1, 3], [2, 4]], ['title1', 'title2'])
+        assertEquals mdp.getValueAt(1, 0), mdp.getColumn(0)[0]
+        assertEquals mdp.getValueAt(2, 0), mdp.getColumn(0)[1]
+
     }
 
     void testClone() {

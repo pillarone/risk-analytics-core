@@ -37,10 +37,9 @@ public class TableMultiDimensionalParameter extends AbstractMultiDimensionalPara
 
     public Object getValueAt(int row, int column) {
         if (row == 0) {
-            if (column == 0) return "";
-            return titles.get(column - 1).toString();
+            return titles.get(column).toString();
         } else {
-            return super.getValueAt(row - 1, column - 1);
+            return super.getValueAt(row - 1, column);
         }
     }
 
@@ -49,8 +48,8 @@ public class TableMultiDimensionalParameter extends AbstractMultiDimensionalPara
     }
 
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
-        if (rowIndex > 0 && columnIndex > 0) {
-            super.setValueAt(value, rowIndex - 1, columnIndex - 1);
+        if (rowIndex > 0) {
+            super.setValueAt(value, rowIndex - 1, columnIndex);
         }
     }
 
@@ -138,7 +137,7 @@ public class TableMultiDimensionalParameter extends AbstractMultiDimensionalPara
     }
 
     public int getColumnIndex(String name) {
-        return titles.indexOf(name) + 1;
+        return titles.indexOf(name);
     }
 
     public boolean columnCountChangeable() {

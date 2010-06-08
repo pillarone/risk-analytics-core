@@ -30,21 +30,18 @@ public class MatrixMultiDimensionalParameter extends AbstractMultiDimensionalPar
     }
 
     public Object getValueAt(int row, int column) {
-        if (row == 0 && (column == 0 || column == 1)) {
+         if (row == 0 && column == 0) {
             return "";
         }
 
         if (row == 0) {
-            //-1 for index column
-            return columnTitles.get(column - getTitleRowCount() - 1).toString();
+            return columnTitles.get(column - getTitleRowCount()).toString();
         }
-        if (column == 0)
-            return row;
-        if (column == 1) {
+        if (column == 0) {
             return rowTitles.get(row - getTitleColumnCount()).toString();
         }
-        //-2 for index and combobox columns
-        return super.getValueAt(row - 1, column - 2);
+
+        return super.getValueAt(row - 1, column - 1);
     }
 
     public void setValueAt(Object value, int rowIndex, int columnIndex) {

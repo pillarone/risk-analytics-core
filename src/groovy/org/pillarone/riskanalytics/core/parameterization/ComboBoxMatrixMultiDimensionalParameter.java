@@ -20,10 +20,10 @@ public class ComboBoxMatrixMultiDimensionalParameter extends MatrixMultiDimensio
     }
 
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
-        if (rowIndex > 0 && columnIndex > 1) {
-            super.setValueAt(value, rowIndex, columnIndex - 1);
-            super.setValueAt(value, columnIndex - 1, rowIndex);
-        } else if (!(rowIndex == 0 && columnIndex == 1)) {
+        if (rowIndex > 0 && columnIndex > 0) {
+            super.setValueAt(value, rowIndex, columnIndex);
+            super.setValueAt(value, columnIndex, rowIndex);
+        } else if (!(rowIndex == 0 && columnIndex == 0)) {
             columnTitles.set(rowIndex - 1, value);
             rowTitles.set(rowIndex - 1, value);
         }
@@ -74,11 +74,11 @@ public class ComboBoxMatrixMultiDimensionalParameter extends MatrixMultiDimensio
     }
 
     public Object getPossibleValues(int row, int column) {
-        if (row == 0 && (column == 0 || column == 1)) {
+        if (row == 0 && column == 0) {
             return "";
         }
 
-        if (column == 1) {
+        if (row == 0 || column == 0) {
             List names = new LinkedList();
             for (String c : comboBoxValues.keySet()) {
                 names.add(c);

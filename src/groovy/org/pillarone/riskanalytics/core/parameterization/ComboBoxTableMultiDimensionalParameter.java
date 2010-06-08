@@ -80,14 +80,6 @@ public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensiona
         return result;
     }
 
-    // todo: this function is added due to PMO-492. It should become obsolete once the issue will be resolved properly
-    public List getValuesAsObjects(Model simulationModel) {
-        if (comboBoxValues.size() == 0) {
-            setSimulationModel(simulationModel);
-        }
-        return getValuesAsObjects();
-    }
-
     public Class getMarkerClass() {
         return markerClass;
     }

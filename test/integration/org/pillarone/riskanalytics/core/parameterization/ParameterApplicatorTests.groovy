@@ -10,6 +10,8 @@ import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObject
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import models.core.parameterApplicator.ParameterApplicatorModel
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjectParameterHolder
 
 class ParameterApplicatorTests extends GrailsUnitTestCase {
 
@@ -69,6 +71,28 @@ class ParameterApplicatorTests extends GrailsUnitTestCase {
         applicator.init()
 
         assertNotNull applicator.parameterPerPeriod
+    }
+
+    void testInitWithNestedMdp() {
+        Parameterization parameter = getParameterization(new File("src/java/models/core/CoreParameters.groovy"))
+        ParameterObjectParameterHolder param = parameter.parameterHolders.find { it.path = "exampleInputOutputComponent:parmParameterObject" }
+        param.setValue(ExampleParameterObjectClassifier.NESTED_MDP.toString())
+        param.clearCachedValues()
+        Model m = new CoreModel()
+        m.init()
+
+        ParameterApplicator applicator = new ParameterApplicator(model: m, parameterization: parameter)
+
+        assertNull applicator.parameterPerPeriod
+
+        applicator.init()
+
+        assertNotNull applicator.parameterPerPeriod
+        ApplicableParameter mdpObject = applicator.parameterPerPeriod[0].find { it.parameterValue.parameters.keySet().contains("mdp") }
+        assertNotNull mdpObject
+        AbstractMultiDimensionalParameter mdp = mdpObject.parameterValue.parameters.get("mdp")
+        assertNotNull mdp
+        assertNotNull mdp.simulationModel
     }
 
     //TODO msp: create better test model

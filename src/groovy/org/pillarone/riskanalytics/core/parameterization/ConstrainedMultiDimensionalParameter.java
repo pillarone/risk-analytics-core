@@ -5,12 +5,12 @@ import org.pillarone.riskanalytics.core.components.IComponentMarker;
 import org.pillarone.riskanalytics.core.model.Model;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalParameter {
 
     private IMultiDimensionalConstraints constraints;
+    private Map<Integer, Map<String, Component>> comboBoxValues = new HashMap<Integer, Map<String, Component>>();
 
     public ConstrainedMultiDimensionalParameter(List cellValues, List titles, IMultiDimensionalConstraints constraints) {
         super(cellValues, titles);
@@ -33,6 +33,17 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
 
     public void setSimulationModel(Model simulationModel) {
         this.simulationModel = simulationModel;
+        for (int i = 0; i < getValueColumnCount(); i++) {
+            final Class columnType = constraints.getColumnType(i);
+            if (IComponentMarker.class.isAssignableFrom(columnType)) {
+                Map<String, Component> result = new HashMap<String, Component>();
+                List<Component> componentsOfType = simulationModel.getMarkedComponents(columnType);
+                for (Component component : componentsOfType) {
+                    result.put(normalizeName(component.getName()), component);
+                }
+                comboBoxValues.put(i, result);
+            }
+        }
     }
 
     public void validateValues() {
@@ -54,6 +65,22 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
             }
             col++;
         }
+    }
+
+    public List getValuesAsObjects(int column) {
+        final Class columnType = constraints.getColumnType(column);
+        List result = new LinkedList();
+        if (IComponentMarker.class.isAssignableFrom(columnType)) {
+            Map<String,Component> componentsOfType = comboBoxValues.get(column);
+            List<String> selectedValues = values.get(column);
+            for(String selectedValue : selectedValues) {
+                result.add(componentsOfType.get(selectedValue));
+            }
+        } else {
+            result.addAll(values.get(column));
+        }
+
+        return result;
     }
 
     @Override

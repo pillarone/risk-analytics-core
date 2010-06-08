@@ -27,10 +27,7 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
             SingleValueResultPOJO result = new SingleValueResultPOJO();
             int period = packetCollector.getSimulationScope().getIterationScope().getPeriodScope().getCurrentPeriod();
             int iteration = packetCollector.getSimulationScope().getIterationScope().getCurrentIteration();
-            if (value.isInfinite() || value.isNaN()) {
-                LOG.info(packetCollector.getPath() + ":" + name +" contains invalid value " + value + " in period " + period + ", iteration " + iteration);
-                continue;
-            }
+            if (logInvalidValues(name, value, period, iteration)) continue;
             result.setSimulationRun(packetCollector.getSimulationScope().getSimulation().getSimulationRun());
             result.setIteration(iteration);
             result.setPeriod(period);
@@ -42,6 +39,20 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
             results.add(result);
         }
         return results;
+    }
+
+    private boolean logInvalidValues(String name, Double value, int period, int iteration) {
+        if (value.isInfinite() || value.isNaN()) {
+            if (LOG.isErrorEnabled()) {
+                StringBuilder message = new StringBuilder();
+                message.append(value).append(" collected at ").append(packetCollector.getPath()).append(":").append(name);
+                message.append(" (period ").append(period).append(") in iteration ");
+                message.append(iteration).append(" - ignoring.");
+                LOG.info(message);
+            }
+            return true;
+        }
+        return false;
     }
 
     public PacketCollector getPacketCollector() {

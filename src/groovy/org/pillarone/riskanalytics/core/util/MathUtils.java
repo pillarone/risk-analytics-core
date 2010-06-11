@@ -39,7 +39,7 @@ public class MathUtils {
         ArrayList<Integer> seedsList = new ArrayList<Integer>();
         for (int i = 0; i < 19; i++) {
             seedsList.add((int) source);
-            source = (source - seedsList.get(seedsList.size() - 1)) * (10 + Math.E);
+            source = (source - seedsList.get(seedsList.size() - 1)) * (100 + Math.E);
         }
         int[] seeds = new int[seedsList.size()];
 
@@ -51,7 +51,7 @@ public class MathUtils {
         seedsList = new ArrayList<Integer>();
         for (int i = 0; i < 3; i++) {
             seedsList.add((int) source);
-            source = (source - seedsList.get(seedsList.size() - 1)) * (10 + Math.E);
+            source = (source - seedsList.get(seedsList.size() - 1)) * (100 + Math.E);
         }
 
         seeds = new int[seedsList.size()];

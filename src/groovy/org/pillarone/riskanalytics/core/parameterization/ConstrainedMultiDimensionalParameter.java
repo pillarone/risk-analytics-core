@@ -71,9 +71,9 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
         final Class columnType = constraints.getColumnType(column);
         List result = new LinkedList();
         if (IComponentMarker.class.isAssignableFrom(columnType)) {
-            Map<String,Component> componentsOfType = comboBoxValues.get(column);
+            Map<String, Component> componentsOfType = comboBoxValues.get(column);
             List<String> selectedValues = values.get(column);
-            for(String selectedValue : selectedValues) {
+            for (String selectedValue : selectedValues) {
                 result.add(componentsOfType.get(selectedValue));
             }
         } else {
@@ -117,7 +117,7 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
         Object result = "";
         Class columnClass = constraints.getColumnType(column);
         if (IComponentMarker.class.isAssignableFrom(columnClass)) {
-            List list = (List) getPossibleValues(row, column);
+            List list = (List) getPossibleValues(row + 1, column);
             if (list != null && list.size() > 0)
                 result = list.get(0);
         } else if (columnClass == BigDecimal.class) {

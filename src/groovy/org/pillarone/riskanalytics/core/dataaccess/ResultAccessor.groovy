@@ -1,9 +1,9 @@
 package org.pillarone.riskanalytics.core.dataaccess
 
-import java.sql.ResultSet
-import java.sql.Statement
 import org.pillarone.riskanalytics.core.util.MathUtils
 import org.pillarone.riskanalytics.core.output.*
+import groovy.sql.Sql
+import groovy.sql.GroovyRowResult
 
 class ResultAccessor {
 
@@ -166,22 +166,31 @@ class ResultAccessor {
 
 
 
-    public static ResultSet getAvgAndIsStochasticForSimulationRun(SimulationRun simulationRun) {
-        Statement stmt = simulationRun.dataSource.connection.createStatement()
-        ResultSet res = stmt.executeQuery("SELECT path_id, period,collector_id, field_id, AVG(value) as average, MIN(value) as minimum, MAX(value) as maximum " +
+    public static List<Object[]> getAvgAndIsStochasticForSimulationRun(SimulationRun simulationRun) {
+        Sql sql = new Sql(simulationRun.dataSource)
+        List<GroovyRowResult> rows = sql.rows("SELECT path_id, period,collector_id, field_id, AVG(value) as average, MIN(value) as minimum, MAX(value) as maximum " +
                 "FROM single_value_result s " +
                 " WHERE simulation_run_id = " + simulationRun.id +
                 " GROUP BY period, path_id, collector_id, field_id")
-        return res
+        def result = []
+        for (GroovyRowResult row in rows) {
+            def array = new Object[7]
+            for (int i = 0; i < 7; i++) {
+                array[i] = row.getAt(i)
+            }
+            result << array
+        }
+        sql.close()
+        return result
     }
 
 
 
     public static int getAvgAndIsStochasticForSimulationRunCount(SimulationRun simulationRun) {
-        ResultSet result = getAvgAndIsStochasticForSimulationRun(simulationRun)
+        List result = getAvgAndIsStochasticForSimulationRun(simulationRun)
         int count = 0
-        while (result.next()) {
-            int isStochastic = result.getDouble("minimum") == result.getDouble("maximum") ? 1 : 0
+        for (array in result) {
+            int isStochastic = array[5] == array[6] ? 1 : 0
             if (isStochastic == 0)
                 count++
         }

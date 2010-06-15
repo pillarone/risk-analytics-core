@@ -48,7 +48,7 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
 
     public void validateValues() {
         // column 0 for the index 0,1,2,3,...
-        int col = 1;
+        int col = 0;
         for (List list : values) {
             int row = 0;
             for (Object value : list) {

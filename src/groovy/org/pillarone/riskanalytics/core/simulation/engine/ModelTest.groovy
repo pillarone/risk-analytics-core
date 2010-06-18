@@ -191,7 +191,7 @@ abstract class ModelTest extends GroovyTestCase {
 
 
         for (int i = 1; i < resultLines.size(); i++) {
-            String line = lines[i]
+            String line = resultLines[i]
             String[] info = line.split()
             int iteration = Integer.parseInt(info[0])
             int period = Integer.parseInt(info[1])

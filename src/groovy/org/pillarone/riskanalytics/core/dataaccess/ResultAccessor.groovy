@@ -29,35 +29,46 @@ class ResultAccessor {
         if (result != null) {
             return result.result
         } else {
-            def res = SingleValueResult.executeQuery("SELECT AVG(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
-                    " WHERE s.path.pathName = ? AND " +
-                    "s.collector.collectorName = ? AND " +
-                    "s.field.fieldName = ? AND " +
-                    "s.period = ? AND " +
-                    "s.simulationRun.id = ?", [pathName, collectorName, fieldName, periodIndex, simulationRun.id])
-            return res[0]
+            Sql sql = new Sql(simulationRun.dataSource)
+            def res = sql.firstRow(
+                    "SELECT AVG(iteration.total) AS average FROM ( " +
+                            "SELECT SUM(svr.value) AS total " +
+                            "FROM single_value_result svr, path_mapping pm, field_mapping fm " +
+                            "WHERE svr.simulation_run_id = ? AND svr.path_id = pm.id AND pm.path_name = ? AND svr.field_id = fm.id AND fm.field_name = ? AND period = ? " +
+                            "GROUP BY iteration) AS iteration", [simulationRun.id, pathName, fieldName, periodIndex])
+
+            def average = res.average
+            sql.close()
+            return average
         }
     }
 
 
     static Double getMin(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
-        def res = SingleValueResult.executeQuery("SELECT MIN(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
-                " WHERE s.path.pathName = ? AND " +
-                "s.collector.collectorName = ? AND " +
-                "s.field.fieldName = ? AND " +
-                "s.period = ? AND " +
-                "s.simulationRun.id = ?", [pathName, collectorName, fieldName, periodIndex, simulationRun.id])
-        return res[0]
+        Sql sql = new Sql(simulationRun.dataSource)
+        def res = sql.firstRow(
+                "SELECT MIN(iteration.total) AS minimum FROM ( " +
+                        "SELECT SUM(svr.value) AS total " +
+                        "FROM single_value_result svr, path_mapping pm, field_mapping fm " +
+                        "WHERE svr.simulation_run_id = ? AND svr.path_id = pm.id AND pm.path_name = ? AND svr.field_id = fm.id AND fm.field_name = ? AND period = ? " +
+                        "GROUP BY iteration) AS iteration", [simulationRun.id, pathName, fieldName, periodIndex])
+        def minimum = res.minimum
+        sql.close()
+        return minimum
     }
 
     static Double getMax(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
-        def res = SingleValueResult.executeQuery("SELECT MAX(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
-                " WHERE s.path.pathName = ? AND " +
-                "s.collector.collectorName = ? AND " +
-                "s.field.fieldName = ? AND " +
-                "s.period = ? AND " +
-                "s.simulationRun.id = ?", [pathName, collectorName, fieldName, periodIndex, simulationRun.id])
-        return res[0]
+        Sql sql = new Sql(simulationRun.dataSource)
+        def res = sql.firstRow(
+                "SELECT MAX(iteration.total) AS maximum FROM ( " +
+                        "SELECT SUM(svr.value) AS total " +
+                        "FROM single_value_result svr, path_mapping pm, field_mapping fm " +
+                        "WHERE svr.simulation_run_id = ? AND svr.path_id = pm.id AND pm.path_name = ? AND svr.field_id = fm.id AND fm.field_name = ? AND period = ? " +
+                        "GROUP BY iteration) AS iteration", [simulationRun.id, pathName, fieldName, periodIndex])
+
+        def maximum = res.maximum
+        sql.close()
+        return maximum
     }
 
 
@@ -65,22 +76,7 @@ class ResultAccessor {
         if (simulationRun.iterations == 1) {
             return false
         }
-        List values = getValues(simulationRun, periodIndex, pathName, collectorName, fieldName)
-        return values.max() != values.min()
-        //todo: fix query! does not work properly when called from RTTM
-        /*Statement stmt = simulationRun.dataSource.connection.createStatement()
-       ResultSet res = stmt.executeQuery("SELECT min(value) = max(value) as isStochastic FROM single_value_result s, path_mapping p, field_mapping f, collector_mapping c WHERE " +
-               "s.path_id = p.id " +
-               "AND s.field_id = f.id " +
-               "AND s.collector_id = c.id " +
-               "AND p.path_name = '" + pathName + "'" +
-               "AND f.field_name = '" + fieldName + "'" +
-               "AND c.collector_name = '" + collectorName + "'" +
-               "AND s.id = '"+ simulationRun.id + "'" +
-               "AND s.period = '"+ periodIndex + "'"
-       )
-       res.next()
-       return !res.getBoolean("isStochastic")*/
+        return getMax(simulationRun, periodIndex, pathName, collectorName, fieldName) != getMin(simulationRun, periodIndex, pathName, collectorName, fieldName)
     }
 
     static Double getStdDev(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName, String fieldName) {
@@ -129,49 +125,67 @@ class ResultAccessor {
     }
 
     static List getValuesSorted(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
-        SingleValueResult.executeQuery("SELECT value FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
-                " WHERE s.path.pathName = ? AND " +
-                "s.period = ? AND " +
-                "s.collector.collectorName = ? AND " +
-                "s.field.fieldName = ? AND " +
-                "s.simulationRun.id = ? ORDER BY value", [pathName, periodIndex, collectorName, fieldName, simulationRun.id])
+        Sql sql = new Sql(simulationRun.dataSource)
+        List<GroovyRowResult> res = sql.rows(
+                "SELECT SUM(svr.value) AS total " +
+                        "FROM single_value_result svr, path_mapping pm, field_mapping fm " +
+                        "WHERE svr.simulation_run_id = ? AND svr.path_id = pm.id AND pm.path_name = ? AND svr.field_id = fm.id AND fm.field_name = ? AND period = ? " +
+                        "GROUP BY iteration ORDER BY total", [simulationRun.id, pathName, fieldName, periodIndex])
+
+        List values = res.collect { it.getAt("total") }
+        sql.close()
+        return values
     }
 
     static List getValuesSorted(SimulationRun simulationRun, int period, long pathId, long collectorId, long fieldId) {
-        SingleValueResult.executeQuery("SELECT value FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
-                " WHERE s.path.id = ? AND " +
-                "s.period = ? AND " +
-                "s.collector.id = ? AND " +
-                "s.field.id = ? AND " +
-                "s.simulationRun.id = ? ORDER BY value", [pathId, period, collectorId, fieldId, simulationRun.id])
+        Sql sql = new Sql(simulationRun.dataSource)
+        List<GroovyRowResult> res = sql.rows(
+                "SELECT SUM(value) AS total " +
+                        "FROM single_value_result " +
+                        "WHERE simulation_run_id = ? AND path_id = ? AND field_id = ? AND period = ? " +
+                        "GROUP BY iteration ORDER BY total", [simulationRun.id, pathId, fieldId, period])
+
+        List values = res.collect { it.getAt("total") }
+        sql.close()
+        return values
     }
 
     static List getValues(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
-        SingleValueResult.executeQuery("SELECT value FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
-                " WHERE s.path.pathName = ? AND " +
-                "s.period = ? AND " +
-                "s.collector.collectorName = ? AND " +
-                "s.field.fieldName = ? AND " +
-                "s.simulationRun.id = ? ORDER BY s.iteration", [pathName, periodIndex, collectorName, fieldName, simulationRun.id])
+        Sql sql = new Sql(simulationRun.dataSource)
+        List<GroovyRowResult> res = sql.rows(
+                "SELECT SUM(svr.value) AS total " +
+                        "FROM single_value_result svr, path_mapping pm, field_mapping fm " +
+                        "WHERE svr.simulation_run_id = ? AND svr.path_id = pm.id AND pm.path_name = ? AND svr.field_id = fm.id AND fm.field_name = ? AND period = ? " +
+                        "GROUP BY iteration", [simulationRun.id, pathName, fieldName, periodIndex])
+
+        List values = res.collect { it.getAt("total") }
+        sql.close()
+        return values
     }
 
     static List getValues(SimulationRun simulationRun, int period, long pathId, long collectorId, long fieldId) {
-        SingleValueResult.executeQuery("SELECT value FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
-                " WHERE s.path.id = ? AND " +
-                "s.period = ? AND " +
-                "s.collector.id = ? AND " +
-                "s.field.id = ? AND " +
-                "s.simulationRun.id = ? ORDER BY s.iteration", [pathId, period, collectorId, fieldId, simulationRun.id])
+        Sql sql = new Sql(simulationRun.dataSource)
+        List<GroovyRowResult> res = sql.rows(
+                "SELECT SUM(value) AS total " +
+                        "FROM single_value_result " +
+                        "WHERE simulation_run_id = ? AND path_id = ? AND field_id = ? AND period = ? " +
+                        "GROUP BY iteration", [simulationRun.id, pathId, fieldId, period])
+
+        List values = res.collect { it.getAt("total") }
+        sql.close()
+        return values
     }
 
 
 
     public static List<Object[]> getAvgAndIsStochasticForSimulationRun(SimulationRun simulationRun) {
         Sql sql = new Sql(simulationRun.dataSource)
-        List<GroovyRowResult> rows = sql.rows("SELECT path_id, period,collector_id, field_id, AVG(value) as average, MIN(value) as minimum, MAX(value) as maximum " +
+        List<GroovyRowResult> rows = sql.rows("SELECT iteration.path_id, iteration.period, iteration.collector_id, iteration.field_id, AVG(iteration.total) AS average, MIN(iteration.total) AS minimum, MAX(iteration.total) AS maximum FROM ( " +
+                "SELECT path_id, period,collector_id, field_id, SUM(value) as total " +
                 "FROM single_value_result s " +
-                " WHERE simulation_run_id = " + simulationRun.id +
-                " GROUP BY period, path_id, collector_id, field_id")
+                "WHERE simulation_run_id = ? " +
+                "GROUP BY path_id, period, collector_id, field_id, iteration) AS iteration " +
+                "GROUP BY period, path_id, collector_id, field_id", [simulationRun.id])
         def result = []
         for (GroovyRowResult row in rows) {
             def array = new Object[7]

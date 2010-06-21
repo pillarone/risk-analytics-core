@@ -18,7 +18,7 @@ class GenericBulkInsert extends AbstractResultsBulkInsert {
             result.field = FieldMapping.get(Long.parseLong(values[4]))
             result.collector = CollectorMapping.get(Long.parseLong(values[5]))
             result.value = Double.parseDouble(values[6])
-            result.valueIndex = 0
+            result.valueIndex = Integer.parseInt(values[7])
             result.save()
         }
     }

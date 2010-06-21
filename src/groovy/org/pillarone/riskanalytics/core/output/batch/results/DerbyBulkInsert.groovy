@@ -7,7 +7,6 @@ public class DerbyBulkInsert extends AbstractResultsBulkInsert {
 
     protected void writeResult(List values) {
         values << 0 //derby needs version column explicitly
-        values << 0 //derby needs value index column explicitly
         writer.writeLine(values.join(','))
     }
 

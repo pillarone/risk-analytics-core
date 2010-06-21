@@ -23,6 +23,7 @@ public abstract class AbstractResultsBulkInsert extends AbstractBulkInsert {
             values.add(result.getField().getId());
             values.add(result.getCollector().getId());
             values.add(result.getValue());
+            values.add(result.getValueIndex());
             writeResult(values);
             values.clear();
         }

@@ -12,7 +12,7 @@ class MysqlBulkInsert extends AbstractResultsBulkInsert {
     void save() {
         long time = System.currentTimeMillis()
         Sql sql = new Sql(simulationRun.dataSource)
-        String query = "LOAD DATA LOCAL INFILE '${tempFile.getAbsolutePath()}' INTO TABLE single_value_result FIELDS TERMINATED BY ',' LINES TERMINATED BY ';' (simulation_run_id, period, iteration, path_id, field_id, collector_id, value)"
+        String query = "LOAD DATA LOCAL INFILE '${tempFile.getAbsolutePath()}' INTO TABLE single_value_result FIELDS TERMINATED BY ',' LINES TERMINATED BY ';' (simulation_run_id, period, iteration, path_id, field_id, collector_id, value, value_index)"
         int numberOfResults = sql.executeUpdate(query.replaceAll('\\\\', '/'))
         time = System.currentTimeMillis() - time
         LOG.info("${numberOfResults} results saved in ${time} ms");

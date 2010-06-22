@@ -27,6 +27,7 @@ abstract class ModelTest extends GroovyTestCase {
     private static final Log LOG = LogFactory.getLog(ModelTest)
     String refFileName
     String newFileName
+    private static final EPSILON = 1E-6
 
     String getParameterFileName() {
         (getModelClass().simpleName - "Model") + "Parameters"
@@ -201,7 +202,7 @@ abstract class ModelTest extends GroovyTestCase {
             int key = createKey(iteration, period, path, field)
             def expectedResult = referenceResults.remove(key)
             assertNotNull "No result found for I$iteration P$period $path $field", expectedResult
-            assertEquals("Different value at I$iteration P$period $path $field", expectedResult, value)
+            assertEquals("Different value at I$iteration P$period $path $field", expectedResult, value, EPSILON)
         }
 
         assertTrue("${referenceResults.size()} more results than expected", referenceResults.size() == 0)

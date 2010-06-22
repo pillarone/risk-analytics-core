@@ -38,9 +38,4 @@ public class PeriodStoreUtilities {
             throw new IllegalArgumentException("PeriodStore objects for key ${key} are not numbers.")
         }
     }
-
-    // todo(sku): idea!
-    /*static Packet getAggregate(PeriodStore store, String key) {
-        
-    }*/
 }

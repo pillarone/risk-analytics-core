@@ -9,12 +9,19 @@ import org.pillarone.riskanalytics.core.example.component.TestComponentWithPerio
  */
 class PeriodStoreTests extends GroovyTestCase {
 
-    void testInitial() {
-        Component component = new TestComponentWithPeriodStore()
-        component.periodScope = new PeriodScope()
-        component.periodStore = new PeriodStore(component.periodScope)
+    TestComponentWithPeriodStore component
 
-        component.periodScope.currentPeriod = 0
+    void setUp() {
+        component = new TestComponentWithPeriodStore()
+        component.periodScope = new PeriodScope(currentPeriod : 0)
+        component.periodStore = new PeriodStore(component.periodScope)
+    }
+
+    protected void tearDown() {
+        component = null
+    }    
+
+    void testInitial() {
         component.doCalculation() // 1st period
         assertEquals "correct value 5", 5d, component.outPacket[0].value
         component.outPacket.clear()
@@ -26,12 +33,6 @@ class PeriodStoreTests extends GroovyTestCase {
 
     // fail if user tries to write to history -> IAE
     void testBlockWriteToHistory() {
-        Component component = new TestComponentWithPeriodStore()
-        component.periodScope = new PeriodScope()
-        component.periodStore = new PeriodStore(component.periodScope)
-
-        component.periodScope.currentPeriod = 0
-
         shouldFail(IllegalArgumentException, {
             component.periodStore.put(TestComponentWithPeriodStore.PAID, null, PeriodStore.LAST_PERIOD)
         })
@@ -39,22 +40,12 @@ class PeriodStoreTests extends GroovyTestCase {
 
     // fail if an unknown key is used -> return null
     void testKeyNotAvailable() {
-        Component component = new TestComponentWithPeriodStore()
-        component.periodScope = new PeriodScope()
-        component.periodStore = new PeriodStore(component.periodScope)
-
-        component.periodScope.currentPeriod = 0
         component.doCalculation() // 1st period
         assertNull "reserved key not available", component.periodStore.get("reserved", PeriodStore.CURRENT_PERIOD)
     }
 
     // fail when outside bounds, e.g. currentPeriod == 0 , periodStore[-1]
     void testCheckBounds() {
-        Component component = new TestComponentWithPeriodStore()
-        component.periodScope = new PeriodScope()
-        component.periodStore = new PeriodStore(component.periodScope)
-
-        component.periodScope.currentPeriod = 0
         component.doCalculation() // 1st period
 
         shouldFail(IllegalArgumentException, {
@@ -63,11 +54,6 @@ class PeriodStoreTests extends GroovyTestCase {
     }
 
     void testPut() {
-        Component component = new TestComponentWithPeriodStore()
-        component.periodScope = new PeriodScope()
-        component.periodStore = new PeriodStore(component.periodScope)
-
-        component.periodScope.currentPeriod = 0
         SingleValuePacket packetPeriod0 = new SingleValuePacket(value: 1)
         component.periodStore.put(TestComponentWithPeriodStore.PAID, packetPeriod0, PeriodStore.CURRENT_PERIOD)
         assertEquals "period 0, get with idx", packetPeriod0, component.periodStore.get(TestComponentWithPeriodStore.PAID, PeriodStore.CURRENT_PERIOD)
@@ -75,11 +61,6 @@ class PeriodStoreTests extends GroovyTestCase {
     }
 
     void testClear() {
-        Component component = new TestComponentWithPeriodStore()
-        component.periodScope = new PeriodScope()
-        component.periodStore = new PeriodStore(component.periodScope)
-
-        component.periodScope.currentPeriod = 0
         SingleValuePacket packetPeriod0 = new SingleValuePacket(value: 1)
         component.periodStore.put(TestComponentWithPeriodStore.PAID, packetPeriod0, PeriodStore.CURRENT_PERIOD)
 
@@ -89,11 +70,6 @@ class PeriodStoreTests extends GroovyTestCase {
     }
 
     void testPutAll() {
-        Component component = new TestComponentWithPeriodStore()
-        component.periodScope = new PeriodScope()
-        component.periodStore = new PeriodStore(component.periodScope)
-
-        component.periodScope.currentPeriod = 0
         List<SingleValuePacket> packets = []
         SingleValuePacket packetPeriod0 = new SingleValuePacket(value: 1)
         SingleValuePacket packetPeriod1 = new SingleValuePacket(value: 2)
@@ -104,11 +80,6 @@ class PeriodStoreTests extends GroovyTestCase {
     }
 
     void testGetList() {
-        Component component = new TestComponentWithPeriodStore()
-        component.periodScope = new PeriodScope()
-        component.periodStore = new PeriodStore(component.periodScope)
-
-        component.periodScope.currentPeriod = 0
         List<SingleValuePacket> packets = []
         SingleValuePacket packetPeriod0 = new SingleValuePacket(value: 1)
         SingleValuePacket packetPeriod1 = new SingleValuePacket(value: 2)

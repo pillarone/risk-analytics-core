@@ -4,6 +4,7 @@ import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.output.SimulationRun
+import org.pillarone.riskanalytics.core.output.DeleteSimulationStrategy
 
 class Simulation extends ModellingItem {
 
@@ -91,7 +92,8 @@ class Simulation extends ModellingItem {
      */
     protected Object deleteDaoImpl(simulation) {
         assert simulation instanceof SimulationRun
-        simulation.deleteSimulationService.deleteSimulation(simulation)
+        DeleteSimulationStrategy.instance.deleteSimulation(simulation)
+        return true
     }
 
     public SimulationRun getSimulationRun() {

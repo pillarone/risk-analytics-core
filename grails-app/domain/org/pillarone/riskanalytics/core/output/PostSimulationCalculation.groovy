@@ -12,8 +12,7 @@ class PostSimulationCalculation {
 
     private static List VALUES = [MEAN, STDEV, PERCENTILE, VAR, TVAR,PDF, IS_STOCHASTIC]
 
-    static belongsTo = [run: SimulationRun]
-
+    SimulationRun run
     String keyFigure
     BigDecimal keyFigureParameter
     PathMapping path

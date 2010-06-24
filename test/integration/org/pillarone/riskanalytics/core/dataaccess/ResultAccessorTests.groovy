@@ -65,10 +65,10 @@ class ResultAccessorTests extends GroovyTestCase {
 
     void testAvgIsStochastic() {
         assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 0).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 10).save()
+        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 10).save()
 
         assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 0, iteration: 0, value: 5).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 0, iteration: 1, value: 15).save()
+        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 0, iteration: 0, value: 15).save()
 
         List<Object[]> results = ResultAccessor.getAvgAndIsStochasticForSimulationRun(simulationRun)
         assertEquals 2, results.size()
@@ -84,43 +84,6 @@ class ResultAccessorTests extends GroovyTestCase {
         assertEquals 10, result[6]
 
         result = results[1]
-
-        assertEquals path2.id, result[0]
-        assertEquals 0, result[1]
-        assertEquals collector.id, result[2]
-        assertEquals field.id, result[3]
-        assertEquals 10, result[4]
-        assertEquals 5, result[5]
-        assertEquals 15, result[6]
-
-    }
-
-    void testAvgIsStochastic_SingleValues() {
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: -5).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 1, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 5).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 5).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 1, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 5).save()
-
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 0, iteration: 0, value: 5).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 0, iteration: 1, value: 7).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 1, path: path2, field: field, collector: collector, period: 0, iteration: 1, value: 8).save()
-
-        List<Object[]> results = ResultAccessor.getAvgAndIsStochasticForSimulationRun(simulationRun)
-        assertEquals 2, results.size()
-
-        Object[] result = results[0]
-        assertEquals 7, result.size()
-
-        assertEquals path1.id, result[0]
-        assertEquals 0, result[1]
-        assertEquals collector.id, result[2]
-        assertEquals field.id, result[3]
-        assertEquals 5, result[4]
-        assertEquals 0, result[5]
-        assertEquals 10, result[6]
-
-        result = results[1]
-        assertEquals 7, result.size()
 
         assertEquals path2.id, result[0]
         assertEquals 0, result[1]
@@ -161,25 +124,6 @@ class ResultAccessorTests extends GroovyTestCase {
         assertEquals 20, max
     }
 
-    void testGetMeanMinMax_SingleValues() {
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: -1).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 1, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 1).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 3).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 1, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 7).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 2, value: 10).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 3, value: 10).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 1, path: path1, field: field, collector: collector, period: 0, iteration: 3, value: 10).save()
-
-        double mean = ResultAccessor.getMean(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName)
-        assertEquals 10, mean
-
-        double min = ResultAccessor.getMin(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName)
-        assertEquals 0, min
-
-        double max = ResultAccessor.getMax(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName)
-        assertEquals 20, max
-    }
-
     void testHasDifferentValues() {
         assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 10).save()
         assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 10).save()
@@ -190,21 +134,7 @@ class ResultAccessorTests extends GroovyTestCase {
         assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 3, value: 20).save()
 
         assertTrue ResultAccessor.hasDifferentValues(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName)
-    }
 
-    void testHasDifferentValues_SingleValues() {
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 5).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 1, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 5).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 3).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 1, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 7).save()
-
-        assertFalse ResultAccessor.hasDifferentValues(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName)
-
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 2, value: 10).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 3, value: 10).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 1, path: path1, field: field, collector: collector, period: 0, iteration: 3, value: 10).save()
-
-        assertTrue ResultAccessor.hasDifferentValues(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName)
     }
 
     void testGetValues() {
@@ -228,58 +158,11 @@ class ResultAccessorTests extends GroovyTestCase {
         assertTrue values.contains(20d)
     }
 
-    void testGetValues_SingleValues() {
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 0).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 2).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 1, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 3).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 2, value: 5).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 1, path: path1, field: field, collector: collector, period: 0, iteration: 2, value: 5).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 3, value: 20).save()
-
-        List values = ResultAccessor.getValues(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName)
-        assertEquals 4, values.size()
-        assertTrue values.contains(0d)
-        assertTrue values.contains(5d)
-        assertTrue values.contains(10d)
-        assertTrue values.contains(20d)
-
-        values = ResultAccessor.getValues(simulationRun, 0, path1.id, collector.id, field.id)
-        assertEquals 4, values.size()
-        assertTrue values.contains(0d)
-        assertTrue values.contains(5d)
-        assertTrue values.contains(10d)
-        assertTrue values.contains(20d)
-    }
-
     void testGetValuesSorted() {
         assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 20).save()
         assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 10).save()
         assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 2, value: 5).save()
         assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 3, value: 0).save()
-
-        List values = ResultAccessor.getValuesSorted(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName)
-        assertEquals 4, values.size()
-        assertEquals 0, values[0]
-        assertEquals 5, values[1]
-        assertEquals 10, values[2]
-        assertEquals 20, values[3]
-
-        values = ResultAccessor.getValuesSorted(simulationRun, 0, path1.id, collector.id, field.id)
-        assertEquals 4, values.size()
-        assertEquals 0, values[0]
-        assertEquals 5, values[1]
-        assertEquals 10, values[2]
-        assertEquals 20, values[3]
-    }
-
-    void testGetValuesSorted_SingleValues() {
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 15).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 1, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 5).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 9).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 1, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 1).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 2, value: 5).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 3, value: 5).save()
-        assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 1, path: path1, field: field, collector: collector, period: 0, iteration: 3, value: -5).save()
 
         List values = ResultAccessor.getValuesSorted(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName)
         assertEquals 4, values.size()

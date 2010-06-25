@@ -63,6 +63,9 @@ class SimulationTests extends GroovyTestCase {
         assertEquals start, simulation.start
         assertEquals end, simulation.end
         assertEquals run.id, simulation.dao.id
+
+        assertNotNull simulation.modelClass
+        assertEquals simulation.modelClass, simulation.parameterization.modelClass
     }
 
     void testSave() {

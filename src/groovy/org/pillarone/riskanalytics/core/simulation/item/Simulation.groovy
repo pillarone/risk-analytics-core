@@ -71,6 +71,7 @@ class Simulation extends ModellingItem {
         modelClass = this.class.classLoader.loadClass(run.model)
         Parameterization parameterization = new Parameterization(run.parameterization.name)
         parameterization.versionNumber = new VersionNumber(run.parameterization.itemVersion)
+        parameterization.modelClass = modelClass
         this.parameterization = parameterization
         ResultConfiguration resultConfiguration = new ResultConfiguration(run.resultConfiguration.name)
         resultConfiguration.versionNumber = new VersionNumber(run.resultConfiguration.itemVersion)

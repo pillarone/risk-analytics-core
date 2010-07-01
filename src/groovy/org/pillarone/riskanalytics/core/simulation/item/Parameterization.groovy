@@ -271,7 +271,7 @@ class Parameterization extends ModellingItem {
 
     List getParameters(String path) {
         def params = parameters.findAll {ParameterHolder parameter ->
-            parameter.path == path
+            parameter.path == path && !parameter.removed
         }
         ArrayList list = params.toList().sort {orderByPath ? it.path : it.periodIndex }
         return list

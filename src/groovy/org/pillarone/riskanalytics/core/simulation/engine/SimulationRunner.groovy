@@ -100,11 +100,11 @@ public class SimulationRunner {
         }
 
         LOG.debug "end simulation"
-        simulationState = SimulationState.FINISHED
         long end = System.currentTimeMillis()
         currentScope?.simulation?.end = new Date(end)
         currentScope?.simulation?.save()
         LOG.info "simulation took ${end - start} ms"
+        simulationState = SimulationState.FINISHED
         notifySimulationEnd(currentScope?.simulation, SimulationState.FINISHED)
     }
 

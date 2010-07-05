@@ -14,7 +14,11 @@ class MysqlDeleteStrategy extends DeleteSimulationStrategy {
         SimulationRun.withTransaction {
             Sql sql = new Sql(DataSourceUtils.getConnection(simulationRun.dataSource))
             long time = System.currentTimeMillis()
-            sql.execute("ALTER TABLE single_value_result DROP PARTITION P${simulationRun.id}")
+            try {
+                sql.execute("ALTER TABLE single_value_result DROP PARTITION P${simulationRun.id}")
+            } catch (Exception e) {
+                //the partition was not created yet
+            }
             sql.execute("DELETE FROM post_simulation_calculation where run_id=${simulationRun.id}")
             simulationRun.delete(flush: true)
             LOG.info "Simulation ${simulationRun.name} deleted in ${System.currentTimeMillis() - time}ms"

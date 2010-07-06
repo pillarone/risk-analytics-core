@@ -59,7 +59,7 @@ class Calculator {
 
     void calculate() {
 
-        CollectorMapping collectorMapping = CollectorMapping.findByCollectorName(AggregatedCollectingModeStrategy.IDENTIFIER)
+        CollectorMapping collectorMapping = CollectorMapping.findByCollectorName(SingleValueCollectingModeStrategy.IDENTIFIER)
 
         startTime = System.currentTimeMillis()
         List<Object[]> result = ResultAccessor.getAvgAndIsStochasticForSimulationRun(run)
@@ -72,7 +72,7 @@ class Calculator {
             long field = array[3]
             double avg = array[4]
             //use only aggregated values
-            if(collector != collectorMapping.id) {
+            if(collector == collectorMapping?.id) {
                 continue
             }
 

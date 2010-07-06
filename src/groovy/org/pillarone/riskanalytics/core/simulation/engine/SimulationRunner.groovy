@@ -58,25 +58,38 @@ public class SimulationRunner {
         currentScope?.simulation?.start = new Date(start)
         try {
             for (Action action in preSimulationActions) {
-                action.perform()
+                if (!performAction(action, null)) {
+                    deleteCancelledSimulation()
+                    return
+                }
             }
             long initializationTime = System.currentTimeMillis() - start
             LOG.info "Initialization completed in ${initializationTime}ms"
 
-            simulationState = SimulationState.RUNNING
+            boolean shouldReturn = false
             //Transaction is necessary because PathMappings etc might be inserted when writing bulk insert files
             SimulationRun.withTransaction {TransactionStatus status ->
-                simulationAction.perform()
+                if (!performAction(simulationAction, SimulationState.RUNNING)) {
+                    deleteCancelledSimulation()
+                    shouldReturn = true
+                }
             }
+            if (shouldReturn) return
             LOG.info "${currentScope?.numberOfIterations} iterations completed in ${System.currentTimeMillis() - (start + initializationTime)}ms"
 
             //Transaction because of saving results to db
             SimulationRun.withTransaction {TransactionStatus status ->
                 for (Action action in postSimulationActions) {
-                    if (simulationState == SimulationState.CANCELED) break;
-                    action.perform()
+                    if (!performAction(action, null)) {
+                        shouldReturn = true
+                    }
                 }
             }
+            if (shouldReturn) {
+                deleteCancelledSimulation()
+                return
+            }
+
         } catch (Throwable t) {
             notifySimulationEnd(currentScope?.simulation, SimulationState.ERROR)
             simulationState = SimulationState.ERROR
@@ -91,21 +104,25 @@ public class SimulationRunner {
             currentScope.simulation.delete()
             return
         }
-
-        if (simulationState == SimulationState.CANCELED) {
-            LOG.info "canceled simulation ${currentScope.simulation.name} will be deleted"
-            notifySimulationEnd(currentScope?.simulation, SimulationState.CANCELED)
-            currentScope.simulation.delete()
+        if (simulationAction.isCancelled()) {
+            deleteCancelledSimulation()
             return
         }
-
         LOG.debug "end simulation"
         long end = System.currentTimeMillis()
         currentScope?.simulation?.end = new Date(end)
         currentScope?.simulation?.save()
         LOG.info "simulation took ${end - start} ms"
-        simulationState = SimulationState.FINISHED
-        notifySimulationEnd(currentScope?.simulation, SimulationState.FINISHED)
+        simulationState = simulationAction.isStopped() ? SimulationState.STOPPED : SimulationState.FINISHED
+        notifySimulationEnd(currentScope?.simulation, simulationState)
+    }
+
+    private void deleteCancelledSimulation() {
+        if (simulationAction.isCancelled()) {
+            LOG.info "canceled simulation ${currentScope.simulation.name} will be deleted"
+            notifySimulationEnd(currentScope?.simulation, SimulationState.CANCELED)
+            currentScope.simulation.delete()
+        }
     }
 
     /**
@@ -113,13 +130,30 @@ public class SimulationRunner {
      * the simulation has been stopped.
      */
     public void stop() {
+        LOG.info("Simulation stopped by user")
         simulationAction.stop()
         simulationState = SimulationState.STOPPED
     }
 
-    public void cancel() {
+    public synchronized void cancel() {
+        LOG.info("Simulation cancelled by user")
         simulationAction.cancel()
         simulationState = SimulationState.CANCELED
+    }
+
+    protected boolean performAction(Action action, SimulationState newState) {
+        LOG.info "Trying to perform action ${action.class.simpleName}..."
+        synchronized (this) {
+            if (simulationAction.isCancelled()) {
+                LOG.info "Action aborted because simulation is cancelled"
+                return false
+            }
+            if (newState != null) {
+                simulationState = newState
+            }
+        }
+        action.perform()
+        return true
     }
 
 

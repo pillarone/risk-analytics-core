@@ -36,14 +36,22 @@ public class SimulationAction implements Action {
     /**
      * Stops the simulation at the end of the current point of execution. The stop is forwarded to the iterationAction.
      */
-    protected void stop() {
+    void stop() {
         stopped = true
         iterationAction.stop()
         simulationScope.updateNumberOfIterations(iterationAction.iterationScope.currentIteration)
     }
 
-    protected void cancel() {
+    void cancel() {
         canceled = true
-        iterationAction.cancel()
+        iterationAction.stop()
+    }
+
+    boolean isStopped() {
+        return stopped
+    }
+
+    boolean isCancelled() {
+        return canceled
     }
 }

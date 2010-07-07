@@ -39,6 +39,36 @@ class CoreBootStrap {
                 admin.settings = new UserSettings(language: "en")
                 admin.addToAuthorities(adminGroup)
                 admin.save()
+
+                Person actuary = new Person()
+                actuary.username = "actuary"
+                actuary.userRealName = "actuary"
+                actuary.passwd = authenticateService.encodePassword("actuary")
+                actuary.enabled = true
+                actuary.email = "actuary@pillarone.org"
+                actuary.settings = new UserSettings(language: "en")
+                actuary.addToAuthorities(userGroup)
+                actuary.save()
+
+                Person actuaryDE = new Person()
+                actuaryDE.username = "aktuar"
+                actuaryDE.userRealName = "aktuar"
+                actuaryDE.passwd = authenticateService.encodePassword("aktuar")
+                actuaryDE.enabled = true
+                actuaryDE.email = "actuary@pillarone.org"
+                actuaryDE.settings = new UserSettings(language: "de")
+                actuaryDE.addToAuthorities(userGroup)
+                actuaryDE.save()
+
+                Person actuaryFR = new Person()
+                actuaryFR.username = "actuaire"
+                actuaryFR.userRealName = "actuaire"
+                actuaryFR.passwd = authenticateService.encodePassword("actuaire")
+                actuaryFR.enabled = true
+                actuaryFR.email = "actuary@pillarone.org"
+                actuaryFR.settings = new UserSettings(language: "fr")
+                actuaryFR.addToAuthorities(userGroup)
+                actuaryFR.save()
             }
         }
 

@@ -297,6 +297,15 @@ class ParameterizationTests extends GroovyTestCase {
 
         assertEquals 1, parameterization.validationErrors.size()
         assertFalse parameterization.valid
+
+        StringParameterHolder holder = new StringParameterHolder("path", 0, "INVALID")
+        holder.removed = true
+        parameterization.addParameter(holder)
+        parameterization.validate()
+
+        // do not validate removed params
+        assertEquals 1, parameterization.validationErrors.size()
+        assertFalse parameterization.valid
     }
 
 

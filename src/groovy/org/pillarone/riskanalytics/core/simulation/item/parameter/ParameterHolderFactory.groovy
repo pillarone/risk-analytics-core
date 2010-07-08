@@ -116,7 +116,7 @@ class ParameterHolderFactory {
         List removedParameters = []
         List clonedParameters = []
         parameterization.parameters.each {ParameterHolder parameterHolder ->
-            if (parameterHolder.path.startsWith(oldPath)) {
+            if (parameterHolder.path.startsWith(oldPath + ":")) {
                 ParameterHolder cloned = parameterHolder.clone()
                 cloned.path = cloned.path.replace("${oldPath}", "${newPath}")
                 removedParameters << parameterHolder
@@ -134,7 +134,7 @@ class ParameterHolderFactory {
     public static void duplicateParameters(Parameterization parameterization, String oldPath, String newPath) {
         List clonedParameters = []
         parameterization.parameters.each {ParameterHolder parameterHolder ->
-            if (parameterHolder.path.startsWith(oldPath)) {
+            if (parameterHolder.path.startsWith(oldPath + ":")) {
                 ParameterHolder cloned = parameterHolder.clone()
                 cloned.path = cloned.path.replace("${oldPath}", "${newPath}")
                 clonedParameters << cloned

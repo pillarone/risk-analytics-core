@@ -117,7 +117,7 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable {
     public void setDimension(MultiDimensionalParameterDimension dimension) {
         int newRowCount = dimension.getRows();
         int newColumnCount = dimension.getColumns();
-        if(newColumnCount > 1) {
+        if (newColumnCount > 1) {
             valuesConverted = false;
         }
 
@@ -136,7 +136,7 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable {
 
             int columnCount = getValueColumnCount();
             for (int currentColumn = 0; currentColumn < columnCount; currentColumn++) {
-                if(currentColumn >= values.size()) {
+                if (currentColumn >= values.size()) {
                     addColumn(currentColumn);
                 }
                 List list = values.get(currentColumn);
@@ -183,8 +183,8 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable {
     }
 
     protected Object createDefaultValue(int row, int column, Object object) {
-        if (object == null)
-            object = values.get(column).get(0);
+
+        object = (object == null && values.get(column).size() > 0) ? values.get(column).get(0) : new Double(0);
         if (object instanceof Date) return ((Date) object).clone();
         if (object instanceof String) return object;
         if (object instanceof Integer) return new Integer(0);

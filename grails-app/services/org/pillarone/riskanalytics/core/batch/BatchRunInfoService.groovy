@@ -17,6 +17,7 @@ class BatchRunInfoService {
     List<Simulation> executedSimulations
     List<BatchRunSimulationRun> executedBatchRunSimulationRuns
     List<BatchRunSimulationRun> updatedRuns
+    List runningSimulations = []
 
     Log LOG = LogFactory.getLog(BatchRunInfoService)
 

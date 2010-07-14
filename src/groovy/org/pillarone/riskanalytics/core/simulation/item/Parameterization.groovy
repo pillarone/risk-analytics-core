@@ -221,10 +221,10 @@ class Parameterization extends ModellingItem {
     }
 
     public boolean equals(Object obj) {
-        if (!obj instanceof Parameterization) {
-            return false
-        } else {
+        if (obj instanceof Parameterization) {
             return obj.name.equals(name) && obj.modelClass.equals(modelClass) && obj.versionNumber.equals(versionNumber)
+        } else {
+            return false
         }
     }
 

@@ -249,6 +249,11 @@ class ParameterizationTests extends GroovyTestCase {
 
         assertTrue p1.equals(p2)
         assertTrue p1.hashCode().equals(p2.hashCode())
+
+        //ART-113
+        Simulation simulation = new Simulation('Name')
+        simulation.modelClass = EmptyModel
+        assertFalse p1.equals(simulation)
     }
 
     void testToConfigObject() {

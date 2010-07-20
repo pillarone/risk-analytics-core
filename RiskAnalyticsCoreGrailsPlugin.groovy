@@ -25,7 +25,7 @@ class RiskAnalyticsCoreGrailsPlugin {
             "grails-app/views/error.gsp"
     ]
 
-    def author = "Intuitive Collaboration GmbH"
+    def author = "Intuitive Collaboration AG"
     def authorEmail = "info@pillarone.org"
     def title = "RiskAnalytics core"
     def description = '''\\

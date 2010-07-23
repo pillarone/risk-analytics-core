@@ -20,8 +20,8 @@ class Simulation extends ModellingItem {
      */
     int periodCount
     Integer randomSeed
-    Date start
-    Date end
+    volatile Date start
+    volatile Date end
 
     String comment
 

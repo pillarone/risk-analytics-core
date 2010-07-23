@@ -1,5 +1,5 @@
-<plugin name='risk-analytics-core' version='1.0.0.1' grailsVersion='1.2.0 &gt; *'>
-  <author>Intuitive Collaboration GmbH</author>
+<plugin name='risk-analytics-core' version='1.0.0.2' grailsVersion='1.2.0 &gt; *'>
+  <author>Intuitive Collaboration AG</author>
   <authorEmail>info@pillarone.org</authorEmail>
   <title>RiskAnalytics core</title>
   <description>\

@@ -2,8 +2,14 @@ package org.pillarone.riskanalytics.core
 
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.user.Person
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
+import groovy.sql.Sql
+import groovy.sql.GroovyRowResult
 
 class ParameterizationDAO {
+
+    private static Log LOG = LogFactory.getLog(ParameterizationDAO)
 
     String name
     String modelClassName
@@ -18,7 +24,10 @@ class ParameterizationDAO {
     Person lastUpdater
     boolean valid
 
+    javax.sql.DataSource dataSource
+
     static hasMany = [parameters: Parameter]
+    static transients = ['dataSource']
 
 
     static constraints = {
@@ -51,5 +60,45 @@ class ParameterizationDAO {
         return results.size() > 0 ? results.get(0) : null
     }
 
+    def beforeInsert = {
+        logDetails "beforeInsert", false
+    }
+
+    def beforeUpdate = {
+        logDetails "beforeUpdate", false
+    }
+
+    def afterInsert = {
+        logDetails "afterInsert", true
+    }
+
+    def afterUpdate = {
+        logDetails "afterUpdate", true
+    }
+
+    private void logDetails(String text, boolean printStackTrace) {
+        if (LOG.isTraceEnabled()) {
+            try {
+                LOG.trace "$text: id $id ($name $itemVersion): locking version (object): $version"
+                Sql sql = new Sql(dataSource)
+                List results = sql.rows("select version from parameterizationdao where id = ?", [id])
+                GroovyRowResult res = results[0]
+                LOG.trace "$text: id $id ($name $itemVersion): locking version (db): ${res.getAt(0)}"
+                if (printStackTrace) {
+                    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace().findAll {
+                        !(it.declaringClass.startsWith("sun.reflect")) &&
+                                !(it.declaringClass.startsWith("groovy.lang")) &&
+                                !(it.declaringClass.startsWith("java.lang.reflect")) &&
+                                !(it.declaringClass.startsWith("org.codehaus.groovy"))
+                    }
+                    LOG.trace "Stack: ${stackTrace*.toString().join("\n")}"
+                }
+
+            } catch (Throwable t) {
+                LOG.error "Exception during logging", t
+            }
+
+        }
+    }
 
 }

@@ -58,5 +58,9 @@ abstract class ParameterHolder implements Cloneable{
 
     public void clearCachedValues() { }
 
+    String toString() {
+        return path
+    }
+
 
 }

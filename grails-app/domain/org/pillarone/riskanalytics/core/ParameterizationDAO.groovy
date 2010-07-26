@@ -83,7 +83,8 @@ class ParameterizationDAO {
                 Sql sql = new Sql(dataSource)
                 List results = sql.rows("select version from parameterizationdao where id = ?", [id])
                 GroovyRowResult res = results[0]
-                LOG.trace "$text: id $id ($name $itemVersion): locking version (db): ${res.getAt(0)}"
+                String versionString = res == null ? "null" : res.getAt(0)
+                LOG.trace "$text: id $id ($name $itemVersion): locking version (db): ${versionString}"
                 if (printStackTrace) {
                     StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace().findAll {
                         !(it.declaringClass.startsWith("sun.reflect")) &&

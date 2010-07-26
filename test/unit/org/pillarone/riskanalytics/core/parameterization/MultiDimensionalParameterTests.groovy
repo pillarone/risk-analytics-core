@@ -288,8 +288,11 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertEquals param3.columnTitles, clone3.columnTitles
 
         ComboBoxMatrixMultiDimensionalParameter param4 = new ComboBoxMatrixMultiDimensionalParameter([[0, 1], [1, 2]], ['title', 'title2'], ITestComponentMarker)
+        param4.comboBoxValues.put("x", "y")
         ComboBoxMatrixMultiDimensionalParameter clone4 = param4.clone()
 
+        //clone should not this parameterization dependent map
+        assertTrue clone4.comboBoxValues.isEmpty()
         assertNotSame param4.values, clone4.values
         for (int i = 0; i < param4.values.size(); i++) {
             assertNotSame param4.values[i], clone4.values[i]
@@ -306,8 +309,11 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertEquals param4.markerClass, clone4.markerClass
 
         ComboBoxTableMultiDimensionalParameter param5 = new ComboBoxTableMultiDimensionalParameter([[0, 1], [1, 2]], ['title', 'title2'], ITestComponentMarker)
+        param5.comboBoxValues.put("x", "y")
         ComboBoxTableMultiDimensionalParameter clone5 = param5.clone()
 
+        //clone should not this parameterization dependent map
+        assertTrue clone5.comboBoxValues.isEmpty()
         assertNotSame param5.values, clone5.values
         for (int i = 0; i < param5.values.size(); i++) {
             assertNotSame param5.values[i], clone5.values[i]
@@ -321,8 +327,11 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertEquals param5.markerClass, clone5.markerClass
 
         ConstrainedMultiDimensionalParameter param6 = new ConstrainedMultiDimensionalParameter([[0, 1], [1, 2]], ['title', 'title2'], ConstraintsFactory.getConstraints(SimpleConstraint.IDENTIFIER))
+        param6.comboBoxValues.put("x", new HashMap())
         ConstrainedMultiDimensionalParameter clone6 = param6.clone()
 
+        //clone should not this parameterization dependent map
+        assertTrue clone6.comboBoxValues.isEmpty()
         assertNotSame param6.values, clone6.values
         for (int i = 0; i < param6.values.size(); i++) {
             assertNotSame param6.values[i], clone6.values[i]

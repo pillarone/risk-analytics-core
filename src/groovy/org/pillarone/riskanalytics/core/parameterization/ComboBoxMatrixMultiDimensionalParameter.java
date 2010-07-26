@@ -104,6 +104,7 @@ public class ComboBoxMatrixMultiDimensionalParameter extends MatrixMultiDimensio
     @Override
     public ComboBoxMatrixMultiDimensionalParameter clone() throws CloneNotSupportedException {
         final ComboBoxMatrixMultiDimensionalParameter clone = (ComboBoxMatrixMultiDimensionalParameter) super.clone();
+        clone.comboBoxValues = new HashMap<String, Component>();
         clone.markerClass = markerClass;
         if (simulationModel != null) {
             setSimulationModel(simulationModel);

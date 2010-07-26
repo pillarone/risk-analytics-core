@@ -139,6 +139,7 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
     @Override
     public ConstrainedMultiDimensionalParameter clone() throws CloneNotSupportedException {
         final ConstrainedMultiDimensionalParameter clone = (ConstrainedMultiDimensionalParameter) super.clone();
+        clone.comboBoxValues = new HashMap<Integer, Map<String, Component>>();
         clone.constraints = constraints;
         return clone;
     }

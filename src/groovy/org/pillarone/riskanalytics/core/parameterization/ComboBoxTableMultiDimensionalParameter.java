@@ -104,6 +104,7 @@ public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensiona
     @Override
     public ComboBoxTableMultiDimensionalParameter clone() throws CloneNotSupportedException {
         final ComboBoxTableMultiDimensionalParameter clone = (ComboBoxTableMultiDimensionalParameter) super.clone();
+        clone.comboBoxValues = new HashMap();
         clone.markerClass = markerClass;
         if (simulationModel != null) {
             setSimulationModel(simulationModel);

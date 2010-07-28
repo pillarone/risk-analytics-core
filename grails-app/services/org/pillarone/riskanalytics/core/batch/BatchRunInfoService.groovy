@@ -38,6 +38,11 @@ class BatchRunInfoService {
         addExecutedBatch(batchRunSimulationRun)
     }
 
+    public synchronized void batchSimulationStart(Simulation simulation) {
+        BatchRunSimulationRun batchRunSimulationRun = update(simulation, SimulationState.RUNNING)
+        addExecutedBatch batchRunSimulationRun
+    }
+
     public void addExecutedBatch(BatchRunSimulationRun batchRunSimulationRun) {
         executedBatchRunSimulationRuns.remove(executedBatchRunSimulationRuns.find {it.simulationRun.name == batchRunSimulationRun.simulationRun.name})
         executedBatchRunSimulationRuns << batchRunSimulationRun

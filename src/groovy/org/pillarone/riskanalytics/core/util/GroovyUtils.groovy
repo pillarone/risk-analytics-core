@@ -155,4 +155,12 @@ public class GroovyUtils {
             return item[0] as double[]
         return list as double[]
     }
+
+    static List<String> getEnumValuesFromClass(Class clazz) {
+        List result = []
+        if(clazz.isEnum()) {
+            result = clazz.values()*.toString()
+        }
+        return result
+    }
 }

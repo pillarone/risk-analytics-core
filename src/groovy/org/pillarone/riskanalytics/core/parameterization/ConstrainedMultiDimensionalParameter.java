@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.parameterization;
 import org.pillarone.riskanalytics.core.components.Component;
 import org.pillarone.riskanalytics.core.components.IComponentMarker;
 import org.pillarone.riskanalytics.core.model.Model;
+import org.pillarone.riskanalytics.core.util.GroovyUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -96,6 +97,8 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
                 names.add(normalizeName(((Component) component).getName()));
             }
             return names;
+        } else if (columnClass.isEnum()) {
+            return GroovyUtils.getEnumValuesFromClass(columnClass);
         } else {
             return new Object();
         }

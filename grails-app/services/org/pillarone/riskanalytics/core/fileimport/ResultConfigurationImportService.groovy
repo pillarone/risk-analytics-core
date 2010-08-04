@@ -2,7 +2,6 @@ package org.pillarone.riskanalytics.core.fileimport
 
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.pillarone.riskanalytics.core.fileimport.FileImportService
 import org.pillarone.riskanalytics.core.output.CollectorInformation
 import org.pillarone.riskanalytics.core.output.PathMapping
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
@@ -62,5 +61,8 @@ public class ResultConfigurationImportService extends FileImportService {
         return name
     }
 
+    String getModelClassName() {
+        return configObject.get("model").name
+    }
 
 }

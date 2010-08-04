@@ -50,6 +50,7 @@ public class GroovyUtils {
     static List toList(List list) {
         if (!isListOfList(list))
             return concatList(list)
+        if (list.size() == 1 && list[0].size() == 0) return []
         List<List> resultList = []
         list.each {List actList ->
             def item = actList.size() > 0 ? actList.get(0) : null
@@ -123,13 +124,22 @@ public class GroovyUtils {
 
     static List splitList(List list, int max_tokens) {
         List<List> resultList = []
-        int semi = list.size() / 2
-        def firstRange = 0..semi
-        def secondRange = (semi + 1)..list.size() - 1
-        List firstList = list.getAt(firstRange)
-        List secondList = list.getAt(secondRange)
-        resultList << "'" + addQuoteToListItems(firstList).toString() + "'"
-        resultList << "'" + addQuoteToListItems(secondList).toString() + "'"
+        if (list.size() < max_tokens) {
+            resultList << "'" + addQuoteToListItems(list).toString() + "'"
+            return resultList
+        }
+        int index = max_tokens
+        int startIndex = 0
+
+        while (index < list.size() - 1) {
+            List tempList = list.getAt(startIndex..index)
+            resultList << "'" + addQuoteToListItems(tempList).toString() + "'"
+            startIndex = index + 1
+            index = (index + max_tokens < list.size()) ? index + max_tokens : list.size() - 1
+        }
+        if (index >= startIndex && index <= list.size() - 1)
+            resultList << "'" + addQuoteToListItems(list.getAt(startIndex..index)).toString() + "'"
+
         return resultList
     }
 
@@ -158,7 +168,7 @@ public class GroovyUtils {
 
     static List<String> getEnumValuesFromClass(Class clazz) {
         List result = []
-        if(clazz.isEnum()) {
+        if (clazz.isEnum()) {
             result = clazz.values()*.toString()
         }
         return result

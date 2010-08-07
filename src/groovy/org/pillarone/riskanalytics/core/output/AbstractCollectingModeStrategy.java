@@ -2,6 +2,8 @@ package org.pillarone.riskanalytics.core.output;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pillarone.riskanalytics.core.packets.Packet;
+import org.pillarone.riskanalytics.core.packets.PacketList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,24 +16,40 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
     private Log LOG = LogFactory.getLog(AbstractCollectingModeStrategy.class);
 
     /**
+     * @param packetList    The first packet within the list is used to try to get none standard period information.
+     *                      Period information in following packets is ignored. If no period information is found the
+     *                      current period of the packetCollector is used.
+     * @param valueMap      field, value map
+     * @param valueIndex    Used when aggregating single packets
+     * @return
+     */
+    protected List<SingleValueResultPOJO> createSingleValueResults(PacketList packetList, Map<String, Number> valueMap, int valueIndex) {
+        int period = packetCollector.getSimulationScope().getIterationScope().getPeriodScope().getCurrentPeriod();
+        if (packetList.size() > 0 && ((Packet) packetList.get(0)).period != null) {
+            period = ((Packet) packetList.get(0)).period;
+        }
+        return createSingleValueResults(valueMap, valueIndex, period);
+    }
+
+    /**
      * Create a SingleValueResult object for each packetValue.
      * Information about current simulation is gathered from the scopes.
      * The key of the value map is the field name.
      * If a value is infinite or NaN a log statement is created and the packet ignored.
      */
-    protected List<SingleValueResultPOJO> createSingleValueResults(Map<String, Number> valueMap, int valueIndex) {
+    private List<SingleValueResultPOJO> createSingleValueResults(Map<String, Number> valueMap, int valueIndex, int period) {
         List<SingleValueResultPOJO> results = new ArrayList(valueMap.size());
+        int iteration = packetCollector.getSimulationScope().getIterationScope().getCurrentIteration();
+        PathMapping path = packetCollector.getSimulationScope().getMappingCache().lookupPath(packetCollector.getPath());
         for (Map.Entry<String, Number> entry : valueMap.entrySet()) {
             String name = entry.getKey();
             Double value = entry.getValue().doubleValue();
             SingleValueResultPOJO result = new SingleValueResultPOJO();
-            int period = packetCollector.getSimulationScope().getIterationScope().getPeriodScope().getCurrentPeriod();
-            int iteration = packetCollector.getSimulationScope().getIterationScope().getCurrentIteration();
             if (logInvalidValues(name, value, period, iteration)) continue;
             result.setSimulationRun(packetCollector.getSimulationScope().getSimulation().getSimulationRun());
             result.setIteration(iteration);
             result.setPeriod(period);
-            result.setPath(packetCollector.getSimulationScope().getMappingCache().lookupPath(packetCollector.getPath()));
+            result.setPath(path);
             result.setCollector(packetCollector.getSimulationScope().getMappingCache().lookupCollector(packetCollector.getMode().getIdentifier()));
             result.setField(packetCollector.getSimulationScope().getMappingCache().lookupField(name));
             result.setValueIndex(valueIndex);

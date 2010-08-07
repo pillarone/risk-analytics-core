@@ -19,7 +19,7 @@ public class SingleValueCollectingModeStrategy extends AbstractCollectingModeStr
         List<SingleValueResultPOJO> result = new ArrayList<SingleValueResultPOJO>(results.size());
         int valueIndex = 0;
         for (Object p : results) {
-            result.addAll(createSingleValueResults(((Packet)p).getValuesToSave(), valueIndex));
+            result.addAll(createSingleValueResults(results, ((Packet)p).getValuesToSave(), valueIndex));
             valueIndex++;
         }
         return result;

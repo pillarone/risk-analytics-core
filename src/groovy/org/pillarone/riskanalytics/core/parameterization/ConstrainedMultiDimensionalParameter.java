@@ -129,6 +129,8 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
             result = 0d;
         } else if (columnClass == Integer.class) {
             result = 0;
+        } else if (columnClass.isEnum()) {
+            result = GroovyUtils.getEnumValuesFromClass(columnClass).get(0);
         } else {
             try {
                 result = columnClass.newInstance();

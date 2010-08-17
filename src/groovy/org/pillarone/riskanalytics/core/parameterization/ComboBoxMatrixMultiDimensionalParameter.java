@@ -41,9 +41,6 @@ public class ComboBoxMatrixMultiDimensionalParameter extends MatrixMultiDimensio
         }
     }
 
-    public boolean isCellEditable(int row, int column) {
-        return !(row == 0 || column == 0);
-    }
 
     protected void appendAdditionalConstructorArguments(StringBuffer buffer) {
         buffer.append(",");

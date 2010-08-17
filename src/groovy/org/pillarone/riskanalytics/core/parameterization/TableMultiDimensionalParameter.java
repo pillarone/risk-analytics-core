@@ -111,9 +111,6 @@ public class TableMultiDimensionalParameter extends AbstractMultiDimensionalPara
         }
     }
 
-    public boolean isCellEditable(int row, int column) {
-        return column != 0;
-    }
 
     protected void appendAdditionalConstructorArguments(StringBuffer buffer) {
         buffer.append(",");

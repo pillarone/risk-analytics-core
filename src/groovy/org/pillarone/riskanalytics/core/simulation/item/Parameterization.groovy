@@ -1,23 +1,23 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
+import java.text.SimpleDateFormat
 import org.apache.commons.lang.builder.HashCodeBuilder
 import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.parameter.Parameter
+import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
 import org.pillarone.riskanalytics.core.parameterization.ParameterWriter
+import org.pillarone.riskanalytics.core.parameterization.validation.IParameterizationValidator
+import org.pillarone.riskanalytics.core.parameterization.validation.ParameterValidationError
+import org.pillarone.riskanalytics.core.parameterization.validation.ValidatorRegistry
+import org.pillarone.riskanalytics.core.simulation.ILimitedPeriodCounter
+import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.util.PropertiesUtils
 import org.springframework.transaction.TransactionStatus
-import org.pillarone.riskanalytics.core.model.Model
-import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
-import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
-import java.text.SimpleDateFormat
-import org.pillarone.riskanalytics.core.simulation.ILimitedPeriodCounter
-import org.pillarone.riskanalytics.core.parameterization.validation.IParameterizationValidator
-import org.pillarone.riskanalytics.core.parameterization.validation.ValidatorRegistry
-import org.pillarone.riskanalytics.core.parameterization.validation.ParameterValidationError
 
 class Parameterization extends ModellingItem {
 
@@ -232,13 +232,13 @@ class Parameterization extends ModellingItem {
         if (!isLoaded()) {
             load()
         }
-        def result
+        SimulationRun result = null
         try {
             result = SimulationRun.findByParameterizationAndToBeDeleted(dao, false)
         } catch (Exception e) {
             LOG.error("Exception in method isUsedInSimulation : $e.message", e)
         }
-        result != null
+        return result != null && result.endTime != null
     }
 
     public List<SimulationRun> getSimulations() {

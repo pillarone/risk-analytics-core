@@ -3,11 +3,14 @@ package org.pillarone.riskanalytics.core.util;
 import umontreal.iro.lecuyer.rng.F2NL607;
 import umontreal.iro.lecuyer.rng.RandomStreamBase;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MathUtils {
     public static RandomStreamBase RANDOM_NUMBER_GENERATOR_INSTANCE = new F2NL607();
+    //public static RandomStreamBase RANDOM_NUMBER_GENERATOR_INSTANCE;
     public static int DEFAULT_RANDOM_SEED = 2;
 
     public static double calculatePercentile(double[] values, double percentile) {
@@ -19,9 +22,11 @@ public class MathUtils {
         if (seed == null) {
             return;
         }
+        DEFAULT_RANDOM_SEED=seed;
         F2NL607 generator = new F2NL607();
         generateSeed(generator, seed);
         RANDOM_NUMBER_GENERATOR_INSTANCE = generator;
+        
     }
 
     public static void initDummyRandomStreamBase() {
@@ -174,4 +179,5 @@ public class MathUtils {
     public static double minOfSortedValues(double[] sortedValues) {
         return sortedValues[0];
     }
+
 }

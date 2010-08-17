@@ -1,11 +1,17 @@
 package org.pillarone.riskanalytics.core.dataaccess
 
-import java.sql.ResultSet
-import java.sql.Statement
 import org.pillarone.riskanalytics.core.util.MathUtils
 import org.pillarone.riskanalytics.core.output.*
+import groovy.sql.Sql
+import groovy.sql.GroovyRowResult
+import org.pillarone.riskanalytics.core.simulation.engine.grid.FileOutputAppender
+import org.pillarone.riskanalytics.core.FileConstants
 
 class ResultAccessor {
+
+    private static HashMap<String, Integer> pathCache = new HashMap<String, Integer>();
+    private static HashMap<String, Integer> fieldCache = new HashMap<String, Integer>();
+
 
     static List getRawData(SimulationRun simulationRun) {
 
@@ -13,14 +19,17 @@ class ResultAccessor {
     }
 
     static List getPaths(SimulationRun simulationRun) {
-        return SingleValueResult.executeQuery("SELECT DISTINCT p.pathName " +
+        return getPathsNew(simulationRun);
+        /*return SingleValueResult.executeQuery("SELECT DISTINCT p.pathName " +
                 "FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s, org.pillarone.riskanalytics.core.output.PathMapping as p " +
-                "WHERE s.path.id = p.id AND s.simulationRun.id = " + simulationRun.id)
+                "WHERE s.path.id = p.id AND s.simulationRun.id = " + simulationRun.id)*/
     }
 
 
     static Double getMean(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
-        if (simulationRun.iterations == 1) {
+
+        return getMeanNew(simulationRun, periodIndex, pathName, collectorName, fieldName);
+        /*if (simulationRun.iterations == 1) {
             return DeterminsiticResultAccessor.getSingleValueFromView(simulationRun, fieldName, collectorName, pathName, periodIndex)
         }
 
@@ -36,28 +45,30 @@ class ResultAccessor {
                     "s.period = ? AND " +
                     "s.simulationRun.id = ?", [pathName, collectorName, fieldName, periodIndex, simulationRun.id])
             return res[0]
-        }
+        }*/
     }
 
 
     static Double getMin(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
-        def res = SingleValueResult.executeQuery("SELECT MIN(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
+        return getMinNew(simulationRun, periodIndex, pathName, collectorName, fieldName);
+        /*def res = SingleValueResult.executeQuery("SELECT MIN(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
                 " WHERE s.path.pathName = ? AND " +
                 "s.collector.collectorName = ? AND " +
                 "s.field.fieldName = ? AND " +
                 "s.period = ? AND " +
                 "s.simulationRun.id = ?", [pathName, collectorName, fieldName, periodIndex, simulationRun.id])
-        return res[0]
+        return res[0]*/
     }
 
     static Double getMax(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
-        def res = SingleValueResult.executeQuery("SELECT MAX(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
+        return getMaxNew(simulationRun, periodIndex, pathName, collectorName, fieldName);
+        /*def res = SingleValueResult.executeQuery("SELECT MAX(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
                 " WHERE s.path.pathName = ? AND " +
                 "s.collector.collectorName = ? AND " +
                 "s.field.fieldName = ? AND " +
                 "s.period = ? AND " +
                 "s.simulationRun.id = ?", [pathName, collectorName, fieldName, periodIndex, simulationRun.id])
-        return res[0]
+        return res[0]*/
     }
 
 
@@ -129,59 +140,73 @@ class ResultAccessor {
     }
 
     static List getValuesSorted(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
-        SingleValueResult.executeQuery("SELECT value FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
+        /*SingleValueResult.executeQuery("SELECT value FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
                 " WHERE s.path.pathName = ? AND " +
                 "s.period = ? AND " +
                 "s.collector.collectorName = ? AND " +
                 "s.field.fieldName = ? AND " +
-                "s.simulationRun.id = ? ORDER BY value", [pathName, periodIndex, collectorName, fieldName, simulationRun.id])
+                "s.simulationRun.id = ? ORDER BY value", [pathName, periodIndex, collectorName, fieldName, simulationRun.id])*/
+        return getValuesSortedNew(simulationRun, periodIndex, pathName, collectorName, fieldName);
     }
 
     static List getValuesSorted(SimulationRun simulationRun, int period, long pathId, long collectorId, long fieldId) {
-        SingleValueResult.executeQuery("SELECT value FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
+        return getValuesSortedNew(simulationRun, period, pathId, collectorId, fieldId);
+        /*SingleValueResult.executeQuery("SELECT value FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
                 " WHERE s.path.id = ? AND " +
                 "s.period = ? AND " +
                 "s.collector.id = ? AND " +
                 "s.field.id = ? AND " +
-                "s.simulationRun.id = ? ORDER BY value", [pathId, period, collectorId, fieldId, simulationRun.id])
+                "s.simulationRun.id = ? ORDER BY value", [pathId, period, collectorId, fieldId, simulationRun.id])*/
     }
 
     static List getValues(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
-        SingleValueResult.executeQuery("SELECT value FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
+        return getValuesNew(simulationRun, periodIndex, pathName, collectorName, fieldName);
+        /*SingleValueResult.executeQuery("SELECT value FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
                 " WHERE s.path.pathName = ? AND " +
                 "s.period = ? AND " +
                 "s.collector.collectorName = ? AND " +
                 "s.field.fieldName = ? AND " +
-                "s.simulationRun.id = ? ORDER BY s.iteration", [pathName, periodIndex, collectorName, fieldName, simulationRun.id])
+                "s.simulationRun.id = ? ORDER BY s.iteration", [pathName, periodIndex, collectorName, fieldName, simulationRun.id])*/
     }
 
     static List getValues(SimulationRun simulationRun, int period, long pathId, long collectorId, long fieldId) {
-        SingleValueResult.executeQuery("SELECT value FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
+        return getValuesNew(simulationRun, period, pathId, collectorId, fieldId);
+        /*SingleValueResult.executeQuery("SELECT value FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
                 " WHERE s.path.id = ? AND " +
                 "s.period = ? AND " +
                 "s.collector.id = ? AND " +
                 "s.field.id = ? AND " +
-                "s.simulationRun.id = ? ORDER BY s.iteration", [pathId, period, collectorId, fieldId, simulationRun.id])
+                "s.simulationRun.id = ? ORDER BY s.iteration", [pathId, period, collectorId, fieldId, simulationRun.id])*/
     }
 
 
 
-    public static ResultSet getAvgAndIsStochasticForSimulationRun(SimulationRun simulationRun) {
-        Statement stmt = simulationRun.dataSource.connection.createStatement()
-        ResultSet res = stmt.executeQuery("SELECT path_id, period,collector_id, field_id, AVG(value) as average, MIN(value) as minimum, MAX(value) as maximum " +
+    public static List<Object[]> getAvgAndIsStochasticForSimulationRun(SimulationRun simulationRun) {
+        /*Sql sql = new Sql(simulationRun.dataSource)
+        List<GroovyRowResult> rows = sql.rows("SELECT path_id, period,collector_id, field_id, AVG(value) as average, MIN(value) as minimum, MAX(value) as maximum " +
                 "FROM single_value_result s " +
                 " WHERE simulation_run_id = " + simulationRun.id +
                 " GROUP BY period, path_id, collector_id, field_id")
-        return res
+        def result = []
+        for (GroovyRowResult row in rows) {
+            def array = new Object[7]
+            for (int i = 0; i < 7; i++) {
+                array[i] = row.getAt(i)
+            }
+            result << array
+        }
+        sql.close()
+        return result*/
+        return getAvgAndIsStochastic(simulationRun);
     }
 
 
 
     public static int getAvgAndIsStochasticForSimulationRunCount(SimulationRun simulationRun) {
-        ResultSet result = getAvgAndIsStochasticForSimulationRun(simulationRun)
+        List result = getAvgAndIsStochasticForSimulationRun(simulationRun)
         int count = 0
-        while (result.next()) {
-            int isStochastic = result.getDouble("minimum") == result.getDouble("maximum") ? 1 : 0
+        for (array in result) {
+            int isStochastic = array[5] == array[6] ? 1 : 0
             if (isStochastic == 0)
                 count++
         }
@@ -211,5 +236,213 @@ class ResultAccessor {
             return null
         }
         return res[0][1]
+    }
+
+    private static String getSimRunPath(SimulationRun simulationRun) {
+        return "${FileConstants.EXTERNAL_DATABASE_DIRECTORY}" + File.separator + "simrun" + simulationRun.id;
+    }
+
+    public static List<Object[]> getAvgAndIsStochastic(SimulationRun simulationRun) {
+        File simRun = new File(getSimRunPath(simulationRun));
+        def result = []
+        for (File f: simRun.listFiles()) {
+            def array = new Object[7]
+            IterationFileAccessor ifa = new IterationFileAccessor(f);
+            double min = Double.MAX_VALUE, max = Double.MIN_VALUE, avg = 0;
+            double count = 0;
+            while (ifa.fetchNext()) {
+                min = Math.min(ifa.getValue(), min);
+                max = Math.max(ifa.getValue(), max);
+                avg += ifa.getValue();
+                count++;
+            }
+
+            avg = avg / count;
+            String[] path_period_field = f.getName().split("_");
+            for (int i = 0; i < 3; i++) {
+                array[i] = Long.parseLong(path_period_field[i]);
+            }
+            array[3] = Long.parseLong(path_period_field[2]);
+            array[4] = avg;
+            array[5] = min;
+            array[6] = max;
+            result << array;
+        }
+
+        return result;
+    }
+
+
+    private static List getPathsNew(SimulationRun simulationRun) {
+        File simRun = new File(getSimRunPath(simulationRun));
+        String pathIds = "(";
+        for (File f: simRun.listFiles()) {
+            pathIds += f.getName().split("_")[0] + ",";
+        }
+        pathIds = pathIds.substring(0, pathIds.length() - 1) + ")";
+
+        return SingleValueResult.executeQuery("SELECT DISTINCT p.pathName " +
+                "FROM org.pillarone.riskanalytics.core.output.PathMapping as p " +
+                "WHERE p.id IN " + pathIds)
+    }
+
+    private static int getPathId(String pathName, long simId) {
+        Integer pathId = null;
+        if ((pathId = pathCache.get(pathName + simId)) == null) {
+            def res = SingleValueResult.executeQuery("SELECT DISTINCT p.id " +
+                    "FROM org.pillarone.riskanalytics.core.output.PathMapping as p " +
+                    "WHERE p.pathName = ?", [pathName]);
+
+            pathId = new Integer((int)res[0]);
+            pathCache.put(pathName + simId, pathId)
+        }
+        return pathId;
+    }
+//
+    private static int getFieldId(String fieldName, long simId) {
+        Integer fieldId = null;
+        if ((fieldId = pathCache.get(fieldName + simId)) == null) {
+            def res = SingleValueResult.executeQuery("SELECT DISTINCT f.id " +
+                    "FROM org.pillarone.riskanalytics.core.output.FieldMapping as f " +
+                    "WHERE f.fieldName = ?", [fieldName]);
+            fieldId = new Integer((int)res[0]);
+            pathCache.put(fieldName + simId, fieldId)
+        }
+        return fieldId;
+    }
+
+    private static Double getMeanNew(SimulationRun simulationRun, int periodIndex = 0, String pathName,
+                                     String collectorName, String fieldName) {
+        long tstamp = System.currentTimeMillis();
+        int pathId = getPathId(pathName, simulationRun.id);
+        int fieldId = getFieldId(fieldName, simulationRun.id);
+
+        def result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, pathName, collectorName, fieldName, PostSimulationCalculation.MEAN)
+
+        if (result != null) {
+            return result.result
+        } else {
+
+            File iterationFile = new File(getSimRunPath(simulationRun) + File.separator + pathId + "_" + periodIndex + "_" + fieldId);
+            double avg = 0;
+            double count = 0;
+
+            IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
+            while (ifa.fetchNext()) {
+                avg += ifa.getValue();
+                count++;
+            }
+
+            tstamp = System.currentTimeMillis() - tstamp;
+            return avg / count;
+        }
+    }
+
+    static Double getMinNew(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
+        int pathId = getPathId(pathName, simulationRun.id);
+        int fieldId = getFieldId(fieldName, simulationRun.id);
+        File iterationFile = new File(getSimRunPath(simulationRun) + File.separator + pathId + "_" + periodIndex + "_" + fieldId);
+        IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
+        double min = Double.MAX_VALUE;
+        while (ifa.fetchNext()) {
+            min = Math.min(min, ifa.getValue());
+        }
+        return min;
+    }
+
+    static Double getMaxNew(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
+        int pathId = getPathId(pathName, simulationRun.id);
+        int fieldId = getFieldId(fieldName, simulationRun.id);
+        File iterationFile = new File(getSimRunPath(simulationRun) + File.separator + pathId + "_" + periodIndex + "_" + fieldId);
+        IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
+        double max = 0;
+        while (ifa.fetchNext()) {
+            max = Math.max(max, ifa.getValue());
+        }
+        return max;
+    }
+
+    public static List getValuesNew(SimulationRun simulationRun, int period, long pathId, long collectorId, long fieldId) {
+
+        File iterationFile = new File(getSimRunPath(simulationRun) + File.separator + pathId + "_" + period + "_" + fieldId);
+        HashMap<Integer, Double> tmpValues = new HashMap<Integer, Double>(10000);
+        IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
+        while (ifa.fetchNext()) {
+            tmpValues.put(ifa.getId(), ifa.getValue());
+        }
+        List<Double> values = new ArrayList<Double>(tmpValues.size());
+        for (int i = 0; i <= tmpValues.size(); i++) {
+            Double d=null
+            if ((d=tmpValues.get(i))!=null){
+                values.add(d);
+            }
+        }
+
+        return values;
+    }
+//
+
+    public static List getValuesNew(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
+        return getValuesNew(simulationRun, periodIndex, getPathId(pathName, simulationRun.id), 0, getFieldId(fieldName, simulationRun.id));
+    }
+
+    public static List getValuesSortedNew(SimulationRun simulationRun, int period, long pathId, long collectorId, long fieldId) {
+        long tstamp = System.currentTimeMillis();
+        File iterationFile = new File(getSimRunPath(simulationRun) + File.separator + pathId + "_" + period + "_" + fieldId);
+        IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
+        List<Double> values = new ArrayList<Double>();
+        while (ifa.fetchNext()) {
+            values.add(ifa.getValue());
+        }
+        Collections.sort(values);
+        tstamp = System.currentTimeMillis() - tstamp;
+        return values;
+    }
+
+    public static List getValuesSortedNew(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
+        return getValuesSortedNew(simulationRun, periodIndex, getPathId(pathName, simulationRun.id), 0, getFieldId(fieldName, simulationRun.id));
+    }
+
+
+}
+
+
+class IterationFileAccessor {
+    DataInputStream dis;
+    int id;
+    double value;
+
+    public IterationFileAccessor(File f) {
+
+        FileInputStream fis = new FileInputStream(f);
+        //BufferedInputStream bis=new BufferedInputStream(fis);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+        byte[] b = new byte[2048];
+        int len;
+        while ((len = fis.read(b)) != -1) {
+            bos.write(b, 0, len);
+        }
+        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+
+        dis = new DataInputStream(bis);
+
+    }
+
+    public boolean fetchNext() {
+        if (dis.available() > 4) {
+            id = dis.readInt();
+            value = dis.readDouble();
+            return true;
+        }
+        return false;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public double getValue() {
+        return value;
     }
 }

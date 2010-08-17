@@ -21,7 +21,7 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
             String name = entry.getKey();
             Double value = entry.getValue().doubleValue();
             SingleValueResultPOJO result = new SingleValueResultPOJO();
-            result.setSimulationRun(packetCollector.getSimulationScope().getSimulation().getSimulationRun());
+            //result.setSimulationRun(packetCollector.getSimulationScope().getSimulation().getSimulationRun());
             result.setIteration(packetCollector.getSimulationScope().getIterationScope().getCurrentIteration());
             result.setPeriod(packetCollector.getSimulationScope().getIterationScope().getPeriodScope().getCurrentPeriod());
             result.setPath(packetCollector.getSimulationScope().getMappingCache().lookupPath(packetCollector.getPath()));

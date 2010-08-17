@@ -8,6 +8,7 @@ import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.simulation.engine.actions.*
+import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationBlock
 
 /**
  * This is the main entity to run a simulation. To do this, create a runner object (SimulationRunner.createRunner()).
@@ -219,5 +220,9 @@ public class SimulationRunner {
 
     protected void notifySimulationEnd(Simulation simulation, SimulationState simulationState) {
         batchRunInfoService?.batchSimulationRunEnd(simulation, simulationState)
+    }
+
+    public void setSimBlocks (List<SimulationBlock> simBlocks){
+        simulationAction.simBlocks=simBlocks;
     }
 }

@@ -5,6 +5,8 @@ import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
+import org.apache.commons.logging.LogFactory
+import org.apache.commons.logging.Log
 
 /**
  * The SimulationConfiguration is a descriptor for a runnable simulation. All runtime aspects e.g. numberOfIterations,
@@ -18,6 +20,8 @@ public class SimulationConfiguration implements Serializable {
     Simulation simulation
     ICollectorOutputStrategy outputStrategy
     MappingCache mappingCache
+
+    private static Log LOG = LogFactory.getLog(SimulationConfiguration)
 
     /**
      * This creates a new Simulation instance based on the existing one, which only contains the necessary info for the
@@ -45,5 +49,6 @@ public class SimulationConfiguration implements Serializable {
 
         this.simulation = preparedSimulation
     }
+
 
 }

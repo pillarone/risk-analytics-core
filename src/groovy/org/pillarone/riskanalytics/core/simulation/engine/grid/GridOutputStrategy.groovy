@@ -14,8 +14,9 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
     GridNode node
 //    ArrayList<Object[]> resultBuffer = new ArrayList<Object[]>(10000)
     StringBuilder buffer = new StringBuilder()
+    
     int resCount = 0
-    private long simulationRunId;
+    protected long simulationRunId;
 
     public GridOutputStrategy(GridNode masterNode, long simulationRunId) {
         grid = getGrid()
@@ -51,7 +52,7 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
         return this
     }
 
-    private void sendResults() {
+    protected void sendResults() {
         getGrid().sendMessage(node, buffer.toString())
         buffer.delete(0, buffer.length())
         resCount = 0

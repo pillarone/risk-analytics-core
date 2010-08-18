@@ -190,6 +190,7 @@ public class SimulationRunner {
         currentScope.model = simulation.modelClass.newInstance()
         currentScope.outputStrategy = configuration.outputStrategy
         currentScope.iterationScope.numberOfPeriods = simulation.periodCount
+        currentScope.simulationBlocks = configuration.simulationBlocks
 
         simulationAction.iterationAction.periodAction.model = currentScope.model
 
@@ -260,8 +261,5 @@ public class SimulationRunner {
     protected void notifySimulationEnd(Simulation simulation, SimulationState simulationState) {
         batchRunInfoService?.batchSimulationRunEnd(simulation, simulationState)
     }
-
-    public void setSimBlocks (List<SimulationBlock> simBlocks){
-        simulationAction.simBlocks=simBlocks;
-    }
+   
 }

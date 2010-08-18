@@ -7,6 +7,7 @@ import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.apache.commons.logging.LogFactory
 import org.apache.commons.logging.Log
+import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationBlock
 
 /**
  * The SimulationConfiguration is a descriptor for a runnable simulation. All runtime aspects e.g. numberOfIterations,
@@ -15,11 +16,12 @@ import org.apache.commons.logging.Log
  *
  * Use the SimulationConfiguration to configure a SimulationRunner instance.
  */
-public class SimulationConfiguration implements Serializable {
+public class SimulationConfiguration implements Serializable, Cloneable {
 
     Simulation simulation
     ICollectorOutputStrategy outputStrategy
     MappingCache mappingCache
+    List<SimulationBlock> simulationBlocks = []
 
     private static Log LOG = LogFactory.getLog(SimulationConfiguration)
 
@@ -50,5 +52,19 @@ public class SimulationConfiguration implements Serializable {
         this.simulation = preparedSimulation
     }
 
+    SimulationConfiguration clone() {
+        SimulationConfiguration configuration = (SimulationConfiguration) super.clone()
+        configuration.simulationBlocks = []
+        return configuration
+    }
+
+    void addSimulationBlock(SimulationBlock simulationBlock) {
+        simulationBlocks << simulationBlock
+        calculateTotalIterations()
+    }
+
+    private void calculateTotalIterations() {
+        simulation.numberOfIterations = simulationBlocks*.blockSize.sum()
+    }
 
 }

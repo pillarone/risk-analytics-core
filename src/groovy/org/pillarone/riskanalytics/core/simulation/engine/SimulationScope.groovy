@@ -16,6 +16,7 @@ import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
+import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationBlock
 
 /**
  * The SimulationScope provides information, that is valid throughout the whole simulation.
@@ -42,6 +43,8 @@ public class SimulationScope {
     ICollectorOutputStrategy outputStrategy
 
     MappingCache mappingCache
+
+    List<SimulationBlock> simulationBlocks
 
     private volatile SimulationState simulationState = SimulationState.NOT_RUNNING
 

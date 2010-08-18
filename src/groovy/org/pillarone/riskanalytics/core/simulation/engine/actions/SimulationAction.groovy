@@ -21,7 +21,6 @@ public class SimulationAction implements Action {
     SimulationScope simulationScope
     private volatile boolean stopped = false
     private volatile boolean canceled = false
-    List<SimulationBlock> simBlocks;
 
     /**
      * Loops over the number of iteration and calls iterationAction.perform().
@@ -33,23 +32,25 @@ public class SimulationAction implements Action {
             iterationAction.perform()
             simulationScope.iterationsDone = simulationScope.iterationsDone + 1 // do not use simulationScope.iterationsDone++ because of a issue in StubFor
         }*/
-        
-        for (SimulationBlock simBlock:simBlocks){
-            MathUtils.RANDOM_NUMBER_GENERATOR_INSTANCE.resetStartStream();
-            for (int i=0;i<simBlock.streamOffset;i++){
-                MathUtils.RANDOM_NUMBER_GENERATOR_INSTANCE.resetNextSubstream();
-            }
-            iterationAction.iterationScope.currentIteration=simBlock.iterationOffset;
 
-            
-            for (int iteration=0;iteration<simBlock.blockSize;iteration++){
+        for (SimulationBlock simulationBlock: simulationScope.simulationBlocks) {
+            initializeSimulationBlock(simulationBlock)
+            for (int iteration = 0; iteration < numberOfIterations && !stopped && !canceled; iteration++) {
                 iterationAction.perform()
                 simulationScope.iterationsDone = simulationScope.iterationsDone + 1 // do not use simulationScope.iterationsDone++ because of a issue in StubFor
             }
-
         }
 
         LOG.debug "end perform"
+    }
+
+    private void initializeSimulationBlock(SimulationBlock simulationBlock) {
+        MathUtils.RANDOM_NUMBER_GENERATOR_INSTANCE.resetStartStream()
+        for (int i = 0; i < simulationBlock.streamOffset; i++) {
+            MathUtils.RANDOM_NUMBER_GENERATOR_INSTANCE.resetNextSubstream()
+        }
+        iterationAction.iterationScope.currentIteration = simulationBlock.iterationOffset
+        simulationScope.numberOfIterations = simulationBlock.blockSize
     }
 
     /**

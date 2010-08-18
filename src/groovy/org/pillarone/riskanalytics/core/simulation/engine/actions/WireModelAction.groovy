@@ -2,7 +2,6 @@ package org.pillarone.riskanalytics.core.simulation.engine.actions
 
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.output.CollectorFactory
 import org.pillarone.riskanalytics.core.output.PacketCollector
@@ -27,7 +26,6 @@ public class WireModelAction implements Action {
 
             model.wire()
             LOG.debug "Model wired"
-
 
             CollectorFactory collectorFactory = simulationScope.collectorFactory
             collectorFactory.structureInformation = simulationScope.structureInformation

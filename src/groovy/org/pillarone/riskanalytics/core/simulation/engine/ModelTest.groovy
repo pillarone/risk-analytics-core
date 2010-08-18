@@ -16,6 +16,7 @@ import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
+import org.apache.commons.lang.builder.HashCodeBuilder
 import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
 
 /**
@@ -27,6 +28,7 @@ abstract class ModelTest extends GroovyTestCase {
     private static final Log LOG = LogFactory.getLog(ModelTest)
     String refFileName
     String newFileName
+    private static final EPSILON = 1E-6
 
     String getParameterFileName() {
         (getModelClass().simpleName - "Model") + "Parameters"
@@ -157,51 +159,61 @@ abstract class ModelTest extends GroovyTestCase {
         FileInputStream referenceFis = new FileInputStream(refFile)
 
         FileInputStream resultFis = new FileInputStream(new File(newFileName))
-        if (!compare(resultFis, referenceFis)) {
-            List resultBytes = new File(newFileName).readBytes().toList()
-            List refBytes = new File(refFileName).readBytes().toList()
-            if (resultBytes != refBytes) {
-                fail("comparing results failed Reference file is ${refFileName} (size: ${refBytes.size()})  and  result file is ${newFileName} (size: ${resultBytes.size()})  ")
-            }
-        }
+        compare(resultFis, referenceFis)
+
     }
 
     /**
      * compares two inputStreams and return true if the inputStreams have the same content.
      *
      */
-    public static boolean compare(InputStream in1, InputStream in2) throws IOException {
+    public void compare(InputStream result, InputStream reference) throws IOException {
         int in1byte, in2byte;
 
         final int byteBufferSize = 10448;
 
-        in1 = new BufferedInputStream(in1, byteBufferSize);
-        in2 = new BufferedInputStream(in2, byteBufferSize);
+        reference = new BufferedInputStream(reference, byteBufferSize);
+        result = new BufferedInputStream(result, byteBufferSize);
 
-        in1byte = 0;
-        while (in1byte != -1) {
-            // read one byte from file1
-            in1byte = in1.read();
+        Map referenceResults = [:]
 
-            // check if byte is whitespace or blank
-            if ((!(Character.isWhitespace((char) in1byte))) && (in1byte != ' ') && (in1byte != '\n')
-                    && (in1byte != '\r')) {
-                // read one byte form file2
-                in2byte = in2.read();
-
-                // read bytes until byte is no whitespace or blank
-                while ((Character.isWhitespace((char) in2byte)) || (in2byte == ' ') || (in2byte == '\n')
-                        || (in2byte == '\r')) {
-                    // if byte is whitespace or blank read next byte
-                    in2byte = in2.read();
-                }
-
-                // check if byte from file1 and file2 are the same
-                if (in1byte != in2byte) {
-                    return false; // file content of the two files are not the same
-                }
-            }
+        List lines = reference.readLines()
+        for (int i = 1; i < lines.size(); i++) {
+            String line = lines[i]
+            String[] info = line.split()
+            int iteration = Integer.parseInt(info[0])
+            int period = Integer.parseInt(info[1])
+            String path = info[2]
+            String field = info[3]
+            double value = Double.parseDouble(info[4])
+            referenceResults.put(createKey(iteration, period, path, field), value)
         }
-        return true;
+
+        List resultLines = result.readLines()
+        assertEquals "Different result count: Reference: ${lines.size()}, Actual: ${resultLines.size()}", lines.size(), resultLines.size()
+
+
+        for (int i = 1; i < resultLines.size(); i++) {
+            String line = resultLines[i]
+            String[] info = line.split()
+            int iteration = Integer.parseInt(info[0])
+            int period = Integer.parseInt(info[1])
+            String path = info[2]
+            String field = info[3]
+            double value = Double.parseDouble(info[4])
+            int key = createKey(iteration, period, path, field)
+            def expectedResult = referenceResults.remove(key)
+            assertNotNull "No result found for I$iteration P$period $path $field", expectedResult
+            assertEquals("Different value at I$iteration P$period $path $field", expectedResult, value, EPSILON)
+        }
+
+        assertTrue("${referenceResults.size()} more results than expected", referenceResults.size() == 0)
+
+    }
+
+    private int createKey(int iteration, int period, String path, String field) {
+        HashCodeBuilder builder = new HashCodeBuilder()
+        builder.append(iteration).append(period).append(path).append(field)
+        return builder.toHashCode()
     }
 }

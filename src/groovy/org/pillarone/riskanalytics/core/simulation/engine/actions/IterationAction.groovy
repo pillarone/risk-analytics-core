@@ -16,7 +16,6 @@ public class IterationAction implements Action {
     IterationScope iterationScope
     PeriodAction periodAction
     private boolean stopped = false
-    private boolean canceled = false
 
     /**
      * Prepares the iterationScope for the next iteration and loops over the defined numberOfPeriods.
@@ -26,7 +25,7 @@ public class IterationAction implements Action {
         LOG.debug "start perform"
         iterationScope.prepareNextIteration()
         int numberOfPeriods = iterationScope.numberOfPeriods
-        for (int period = 1; period <= numberOfPeriods && !stopped && !canceled; period++) {
+        for (int period = 1; period <= numberOfPeriods && !stopped; period++) {
             periodAction.perform()
         }
         periodAction.parameterValidationNeeded = false
@@ -38,11 +37,6 @@ public class IterationAction implements Action {
      */
     protected void stop() {
         stopped = true
-    }
-
-
-    protected void cancel() {
-        canceled = true
     }
 
 }

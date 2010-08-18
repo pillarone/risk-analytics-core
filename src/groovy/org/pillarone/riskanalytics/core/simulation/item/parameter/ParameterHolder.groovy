@@ -56,5 +56,11 @@ abstract class ParameterHolder implements Cloneable, Serializable {
         return holder;
     }
 
+    public void clearCachedValues() { }
+
+    String toString() {
+        return path
+    }
+
 
 }

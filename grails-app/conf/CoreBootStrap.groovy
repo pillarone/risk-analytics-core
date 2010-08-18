@@ -10,6 +10,8 @@ import org.grails.plugins.springsecurity.service.AuthenticateService
 import org.pillarone.riskanalytics.core.user.UserManagement
 import org.pillarone.riskanalytics.core.output.CollectorMapping
 import org.pillarone.riskanalytics.core.output.batch.AbstractBulkInsert
+import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
+import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
 
 class CoreBootStrap {
 
@@ -22,7 +24,8 @@ class CoreBootStrap {
         //All mappings must be persistent before a simulation is started
         CollectorMapping.withTransaction { status ->
             if (CollectorMapping.count() == 0) {
-                new CollectorMapping(collectorName: AbstractBulkInsert.DEFAULT_COLLECTOR_NAME).save()
+                new CollectorMapping(collectorName: SingleValueCollectingModeStrategy.IDENTIFIER).save()
+                new CollectorMapping(collectorName: AggregatedCollectingModeStrategy.IDENTIFIER).save()
             }
         }
 
@@ -48,6 +51,36 @@ class CoreBootStrap {
                 admin.settings = new UserSettings(language: "en")
                 admin.addToAuthorities(adminGroup)
                 admin.save()
+
+                Person actuary = new Person()
+                actuary.username = "actuary"
+                actuary.userRealName = "actuary"
+                actuary.passwd = authenticateService.encodePassword("actuary")
+                actuary.enabled = true
+                actuary.email = "actuary@pillarone.org"
+                actuary.settings = new UserSettings(language: "en")
+                actuary.addToAuthorities(userGroup)
+                actuary.save()
+
+                Person actuaryDE = new Person()
+                actuaryDE.username = "aktuar"
+                actuaryDE.userRealName = "aktuar"
+                actuaryDE.passwd = authenticateService.encodePassword("aktuar")
+                actuaryDE.enabled = true
+                actuaryDE.email = "actuary@pillarone.org"
+                actuaryDE.settings = new UserSettings(language: "de")
+                actuaryDE.addToAuthorities(userGroup)
+                actuaryDE.save()
+
+                Person actuaryFR = new Person()
+                actuaryFR.username = "actuaire"
+                actuaryFR.userRealName = "actuaire"
+                actuaryFR.passwd = authenticateService.encodePassword("actuaire")
+                actuaryFR.enabled = true
+                actuaryFR.email = "actuary@pillarone.org"
+                actuaryFR.settings = new UserSettings(language: "fr")
+                actuaryFR.addToAuthorities(userGroup)
+                actuaryFR.save()
             }
         }
 

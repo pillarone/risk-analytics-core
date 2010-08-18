@@ -4,6 +4,7 @@ import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.output.SimulationRun
+import org.pillarone.riskanalytics.core.output.DeleteSimulationStrategy
 
 class Simulation extends ModellingItem {
 
@@ -19,8 +20,8 @@ class Simulation extends ModellingItem {
      */
     int periodCount
     Integer randomSeed
-    Date start
-    Date end
+    volatile Date start
+    volatile Date end
 
     String comment
 
@@ -70,6 +71,7 @@ class Simulation extends ModellingItem {
         modelClass = this.class.classLoader.loadClass(run.model)
         Parameterization parameterization = new Parameterization(run.parameterization.name)
         parameterization.versionNumber = new VersionNumber(run.parameterization.itemVersion)
+        parameterization.modelClass = modelClass
         this.parameterization = parameterization
         ResultConfiguration resultConfiguration = new ResultConfiguration(run.resultConfiguration.name)
         resultConfiguration.versionNumber = new VersionNumber(run.resultConfiguration.itemVersion)
@@ -91,7 +93,8 @@ class Simulation extends ModellingItem {
      */
     protected Object deleteDaoImpl(simulation) {
         assert simulation instanceof SimulationRun
-        simulation.deleteSimulationService.deleteSimulation(simulation)
+        DeleteSimulationStrategy.instance.deleteSimulation(simulation)
+        return true
     }
 
     public SimulationRun getSimulationRun() {

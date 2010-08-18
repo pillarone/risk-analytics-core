@@ -1,23 +1,23 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
+import java.text.SimpleDateFormat
 import org.apache.commons.lang.builder.HashCodeBuilder
 import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.parameter.Parameter
+import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
 import org.pillarone.riskanalytics.core.parameterization.ParameterWriter
+import org.pillarone.riskanalytics.core.parameterization.validation.IParameterizationValidator
+import org.pillarone.riskanalytics.core.parameterization.validation.ParameterValidationError
+import org.pillarone.riskanalytics.core.parameterization.validation.ValidatorRegistry
+import org.pillarone.riskanalytics.core.simulation.ILimitedPeriodCounter
+import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.util.PropertiesUtils
 import org.springframework.transaction.TransactionStatus
-import org.pillarone.riskanalytics.core.model.Model
-import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
-import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
-import java.text.SimpleDateFormat
-import org.pillarone.riskanalytics.core.simulation.ILimitedPeriodCounter
-import org.pillarone.riskanalytics.core.parameterization.validation.IParameterizationValidator
-import org.pillarone.riskanalytics.core.parameterization.validation.ValidatorRegistry
-import org.pillarone.riskanalytics.core.parameterization.validation.ParameterValidationError
 
 class Parameterization extends ModellingItem {
 
@@ -66,8 +66,9 @@ class Parameterization extends ModellingItem {
         valid = false
         List<ParameterValidationError> errors = []
         for (IParameterizationValidator validator in ValidatorRegistry.getValidators()) {
-            errors.addAll(validator.validate(parameterHolders))
+            errors.addAll(validator.validate(parameterHolders.findAll { !it.removed }))
         }
+        parameterHolders*.clearCachedValues()
 
         valid = errors.empty
         validationErrors = errors
@@ -132,7 +133,7 @@ class Parameterization extends ModellingItem {
         dao.name = name
         dao.periodCount = periodCount
         List periodDates = obtainPeriodLabelsFromParameters()
-        if(periodDates != null) {
+        if (periodDates != null) {
             periodLabels = periodDates
         }
         dao.periodLabels = periodLabels != null && !periodLabels.empty ? periodLabels.join(";") : null
@@ -220,10 +221,10 @@ class Parameterization extends ModellingItem {
     }
 
     public boolean equals(Object obj) {
-        if (!obj instanceof Parameterization) {
-            return false
-        } else {
+        if (obj instanceof Parameterization) {
             return obj.name.equals(name) && obj.modelClass.equals(modelClass) && obj.versionNumber.equals(versionNumber)
+        } else {
+            return false
         }
     }
 
@@ -231,13 +232,13 @@ class Parameterization extends ModellingItem {
         if (!isLoaded()) {
             load()
         }
-        def result
+        SimulationRun result = null
         try {
             result = SimulationRun.findByParameterizationAndToBeDeleted(dao, false)
         } catch (Exception e) {
             LOG.error("Exception in method isUsedInSimulation : $e.message", e)
         }
-        result != null
+        return result != null && result.endTime != null
     }
 
     public List<SimulationRun> getSimulations() {
@@ -270,7 +271,7 @@ class Parameterization extends ModellingItem {
 
     List getParameters(String path) {
         def params = parameters.findAll {ParameterHolder parameter ->
-            parameter.path == path
+            parameter.path == path && !parameter.removed
         }
         ArrayList list = params.toList().sort {orderByPath ? it.path : it.periodIndex }
         return list

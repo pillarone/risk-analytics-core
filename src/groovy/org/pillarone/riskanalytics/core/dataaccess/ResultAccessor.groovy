@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.dataaccess
 
+import java.sql.ResultSet
+import java.sql.Statement
 import org.pillarone.riskanalytics.core.util.MathUtils
 import org.pillarone.riskanalytics.core.output.*
 import groovy.sql.Sql

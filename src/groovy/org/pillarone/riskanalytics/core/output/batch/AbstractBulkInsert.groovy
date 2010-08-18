@@ -2,16 +2,11 @@ package org.pillarone.riskanalytics.core.output.batch
 
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pillarone.riskanalytics.core.FileConstants
-import org.pillarone.riskanalytics.core.output.CollectorMapping
-import org.pillarone.riskanalytics.core.output.FieldMapping
-import org.pillarone.riskanalytics.core.output.PathMapping
 import org.pillarone.riskanalytics.core.output.SimulationRun
-import org.pillarone.riskanalytics.core.output.SingleValueResult
 
 abstract class AbstractBulkInsert {
-    public static final String DEFAULT_COLLECTOR_NAME = "aggregated"
+    
     protected static final Log LOG = LogFactory.getLog(AbstractBulkInsert)
 
     File tempFile

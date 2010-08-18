@@ -45,7 +45,7 @@ public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensiona
     }
 
     public Object getPossibleValues(int row, int column) {
-        if (row == 0 || column == 0) {
+        if (row == 0) {
             return getValueAt(row, column);
         } else {
             List names = new LinkedList();
@@ -80,14 +80,6 @@ public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensiona
         return result;
     }
 
-    // todo: this function is added due to PMO-492. It should become obsolete once the issue will be resolved properly
-    public List getValuesAsObjects(Model simulationModel) {
-        if (comboBoxValues.size() == 0) {
-            setSimulationModel(simulationModel);
-        }
-        return getValuesAsObjects();
-    }
-
     public Class getMarkerClass() {
         return markerClass;
     }
@@ -112,6 +104,7 @@ public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensiona
     @Override
     public ComboBoxTableMultiDimensionalParameter clone() throws CloneNotSupportedException {
         final ComboBoxTableMultiDimensionalParameter clone = (ComboBoxTableMultiDimensionalParameter) super.clone();
+        clone.comboBoxValues = new HashMap();
         clone.markerClass = markerClass;
         clone.comboBoxValues.clear();
         return clone;

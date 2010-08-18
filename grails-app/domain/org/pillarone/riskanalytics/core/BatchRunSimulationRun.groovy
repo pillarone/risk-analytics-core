@@ -10,11 +10,11 @@ class BatchRunSimulationRun {
     SimulationRun simulationRun
     Integer priority
     OutputStrategy strategy
-    SimulationState simulationState
+    volatile SimulationState simulationState
 
     static mapping = {
-        batchRun lazy: false, fetchMode: FetchMode.JOIN
-        simulationRun lazy: false, fetchMode: FetchMode.JOIN
+        batchRun lazy: false, fetchMode: FetchMode.JOIN, cache: 'read-only'
+        simulationRun lazy: false, fetchMode: FetchMode.JOIN, cache: 'read-only'
     }
 
     static constraints = {

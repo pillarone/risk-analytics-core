@@ -163,6 +163,20 @@ class ParameterizationTests extends GroovyTestCase {
         assertEquals "newValue", parameterization.parameters[0].businessObject
     }
 
+    void testPMO_1007() {
+        Parameterization parameterization = new Parameterization("testSimpleParameterUpdate")
+        parameterization.periodCount = 1
+        parameterization.modelClass = EmptyModel
+
+
+        StringParameterHolder newHolder = new StringParameterHolder(new StringParameter(path: "path", periodIndex: 0, parameterValue: "value"))
+        parameterization.addParameter(newHolder)
+
+        assertTrue parameterization.getParameters("path").size() > 0
+        newHolder.removed = true
+        assertFalse parameterization.getParameters("path").size() > 0
+    }
+
     void testSaveOfParameter() {
         Parameterization parameterization = new Parameterization("newParams")
         parameterization.modelClass = EmptyModel
@@ -235,6 +249,11 @@ class ParameterizationTests extends GroovyTestCase {
 
         assertTrue p1.equals(p2)
         assertTrue p1.hashCode().equals(p2.hashCode())
+
+        //ART-113
+        Simulation simulation = new Simulation('Name')
+        simulation.modelClass = EmptyModel
+        assertFalse p1.equals(simulation)
     }
 
     void testToConfigObject() {
@@ -280,7 +299,16 @@ class ParameterizationTests extends GroovyTestCase {
 
         parameterization.addParameter(new StringParameterHolder("path", 0, "INVALID"))
         parameterization.validate()
-        
+
+        assertEquals 1, parameterization.validationErrors.size()
+        assertFalse parameterization.valid
+
+        StringParameterHolder holder = new StringParameterHolder("path", 0, "INVALID")
+        holder.removed = true
+        parameterization.addParameter(holder)
+        parameterization.validate()
+
+        // do not validate removed params
         assertEquals 1, parameterization.validationErrors.size()
         assertFalse parameterization.valid
     }

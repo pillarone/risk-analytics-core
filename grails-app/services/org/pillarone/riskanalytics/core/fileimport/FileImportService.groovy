@@ -1,12 +1,13 @@
 package org.pillarone.riskanalytics.core.fileimport
 
+import java.util.jar.JarInputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.pillarone.riskanalytics.core.util.ConfigObjectUtils
 import org.pillarone.riskanalytics.core.ParameterizationDAO
-import java.util.zip.ZipEntry
-import java.util.jar.JarInputStream
-import java.util.zip.ZipInputStream
+import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
+import org.pillarone.riskanalytics.core.util.ConfigObjectUtils
 
 abstract class FileImportService {
 
@@ -111,7 +112,7 @@ abstract class FileImportService {
     }
 
     protected boolean lookUpItem(def daoClass, String itemName) {
-        if (daoClass == ParameterizationDAO) {
+        if (daoClass == ParameterizationDAO || daoClass == ResultConfigurationDAO) {
             return getDaoClass().findByNameAndModelClassName(itemName, getModelClassName()) != null
         } else {
             return lookUpItem(itemName)

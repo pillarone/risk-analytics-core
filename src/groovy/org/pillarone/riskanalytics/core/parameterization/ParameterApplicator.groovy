@@ -83,6 +83,12 @@ public class ParameterApplicator {
         parameterValue.simulationModel = model
     }
 
+    protected void prepareParameter(Model model, IParameterObject parameterValue) {
+        for (def value in parameterValue.getParameters().values()) {
+            prepareParameter(model, value)
+        }
+    }
+
     protected void prepareParameter(Model model, ConstrainedString parameterValue) {
         List<Component> allMarkedComponents = model.getMarkedComponents(parameterValue.markerClass)
         parameterValue.selectedComponent = allMarkedComponents.find {Component c -> c.name == parameterValue.stringValue }

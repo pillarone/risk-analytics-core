@@ -44,7 +44,7 @@ public class MathUtils {
         ArrayList<Integer> seedsList = new ArrayList<Integer>();
         for (int i = 0; i < 19; i++) {
             seedsList.add((int) source);
-            source = (source - seedsList.get(seedsList.size() - 1)) * (10 + Math.E);
+            source = (source - seedsList.get(seedsList.size() - 1)) * (100 + Math.E);
         }
         int[] seeds = new int[seedsList.size()];
 
@@ -56,7 +56,7 @@ public class MathUtils {
         seedsList = new ArrayList<Integer>();
         for (int i = 0; i < 3; i++) {
             seedsList.add((int) source);
-            source = (source - seedsList.get(seedsList.size() - 1)) * (10 + Math.E);
+            source = (source - seedsList.get(seedsList.size() - 1)) * (100 + Math.E);
         }
 
         seeds = new int[seedsList.size()];
@@ -67,6 +67,27 @@ public class MathUtils {
 
         generator.setNonLinearSeed(seeds);
     }
+
+    /**
+     * Clones the provided stream and selects defined subStream. If subStream is not positive, the stream
+     * itselfs is returned.
+     * @param stream
+     * @param subStream
+     * @return
+     */
+    public static RandomStreamBase getRandomStream(RandomStreamBase stream, int subStream) {
+        if (subStream > 0) {
+            RandomStreamBase streamStartingAtSubstream = stream.clone();
+            streamStartingAtSubstream.resetStartStream();
+            for (int i = 0; i < subStream; i++) {
+                streamStartingAtSubstream.resetNextSubstream();
+            }
+            return streamStartingAtSubstream;
+        } else {
+            return stream;
+        }
+    }
+
 
     /**
      * If an array is not yet sorted use Arrays.sort(values) before applying this function;

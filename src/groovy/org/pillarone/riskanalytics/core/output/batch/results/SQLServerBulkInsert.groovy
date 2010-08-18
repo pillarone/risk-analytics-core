@@ -18,7 +18,6 @@ class SQLServerBulkInsert extends AbstractResultsBulkInsert {
     protected void writeResult(List values) {
         values.add(0, 0) //dummy id
         values.add(0, 0) //version
-        values << 0 //value index
         writer.writeLine(values.join(","))
     }
 

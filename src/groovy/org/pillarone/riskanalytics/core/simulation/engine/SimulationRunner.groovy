@@ -56,22 +56,38 @@ public class SimulationRunner {
         simulationState = SimulationState.INITIALIZING
         LOG.debug "start simulation"
         start = System.currentTimeMillis()
-        currentScope?.simulation?.start = new Date(start)
+        Date startDate = new Date(start)
+        currentScope?.simulation?.start = startDate
+        LOG.trace "Written start date ${startDate.time} to ${System.identityHashCode(currentScope?.simulation)}"
+        LOG.trace "New value read from simulation: ${currentScope?.simulation?.start?.time}"
         try {
             for (Action action in preSimulationActions) {
-                action.perform()
+                if (!performAction(action, null)) {
+                    deleteCancelledSimulation()
+                    return
+                }
             }
             long initializationTime = System.currentTimeMillis() - start
             LOG.info "Initialization completed in ${initializationTime}ms"
 
-            simulationState = SimulationState.RUNNING
-            simulationAction.perform()
+            boolean shouldReturn = false
+            if (!performAction(simulationAction, SimulationState.RUNNING)) {
+                deleteCancelledSimulation()
+                shouldReturn = true
+            }
+            if (shouldReturn) return
             LOG.info "${currentScope?.numberOfIterations} iterations completed in ${System.currentTimeMillis() - (start + initializationTime)}ms"
 
             for (Action action in postSimulationActions) {
-                if (simulationState == SimulationState.CANCELED) break;
-                action.perform()
+                if (!performAction(action, null)) {
+                    shouldReturn = true
+                }
             }
+            if (shouldReturn) {
+                deleteCancelledSimulation()
+                return
+            }
+
         } catch (Throwable t) {
             notifySimulationEnd(currentScope?.simulation, SimulationState.ERROR)
             simulationState = SimulationState.ERROR
@@ -86,21 +102,28 @@ public class SimulationRunner {
 //            currentScope.simulation.delete()
             return
         }
+        if (simulationAction.isCancelled()) {
+            deleteCancelledSimulation()
+            return
+        }
+        LOG.debug "end simulation"
+        long end = System.currentTimeMillis()
+        currentScope?.simulation?.end = new Date(end)
+        LOG.trace "Written end date ${end} to ${System.identityHashCode(currentScope?.simulation)}"
+        LOG.trace "New value read from simulation: ${currentScope?.simulation?.end?.time}"
+//        currentScope?.simulation?.save()
 
-        if (simulationState == SimulationState.CANCELED) {
+        LOG.info "simulation took ${end - start} ms"
+        simulationState = simulationAction.isStopped() ? SimulationState.STOPPED : SimulationState.FINISHED
+        notifySimulationEnd(currentScope?.simulation, simulationState)
+    }
+
+    private void deleteCancelledSimulation() {
+        if (simulationAction.isCancelled()) {
             LOG.info "canceled simulation ${currentScope.simulation.name} will be deleted"
             notifySimulationEnd(currentScope?.simulation, SimulationState.CANCELED)
 //            currentScope.simulation.delete()
-            return
         }
-
-        LOG.debug "end simulation"
-        simulationState = SimulationState.FINISHED
-        long end = System.currentTimeMillis()
-        currentScope?.simulation?.end = new Date(end)
-//        currentScope?.simulation?.save()
-        LOG.info "simulation took ${end - start} ms"
-        notifySimulationEnd(currentScope?.simulation, SimulationState.FINISHED)
     }
 
     /**
@@ -108,15 +131,31 @@ public class SimulationRunner {
      * the simulation has been stopped.
      */
     public void stop() {
+        LOG.info("Simulation stopped by user")
         simulationAction.stop()
         simulationState = SimulationState.STOPPED
     }
 
-    public void cancel() {
+    public synchronized void cancel() {
+        LOG.info("Simulation cancelled by user")
         simulationAction.cancel()
         simulationState = SimulationState.CANCELED
     }
 
+    protected boolean performAction(Action action, SimulationState newState) {
+        LOG.info "Trying to perform action ${action.class.simpleName}..."
+        synchronized (this) {
+            if (simulationAction.isCancelled()) {
+                LOG.info "Action aborted because simulation is cancelled"
+                return false
+            }
+            if (newState != null) {
+                simulationState = newState
+            }
+        }
+        action.perform()
+        return true
+    }
 
     Date getEstimatedSimulationEnd() {
         int progress = currentScope.getProgress()

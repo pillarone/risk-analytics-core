@@ -118,20 +118,16 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable, Se
     public void setDimension(MultiDimensionalParameterDimension dimension) {
         int newRowCount = dimension.getRows();
         int newColumnCount = dimension.getColumns();
+        if (newColumnCount > 1) {
+            valuesConverted = false;
+        }
 
         int currentRowCount = getValueRowCount();
         int currentColumnCount = getValueColumnCount();
 
         if (newColumnCount > currentColumnCount) {
             for (int i = 0; i < (newColumnCount - currentColumnCount); i++) {
-                List lastList = values.get(values.size() - 1);
-                ArrayList newList = new ArrayList();
-                int rowIndex = 0;
-                for (Object object : lastList) {
-                    newList.add(createDefaultValue(rowIndex, currentColumnCount, object));
-                    rowIndex++;
-                }
-                values.add(newList);
+                addColumn(currentColumnCount);
             }
             valuesConverted = false;
             columnsAdded(newColumnCount - currentColumnCount);
@@ -139,16 +135,17 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable, Se
 
         if (newRowCount > currentRowCount) {
 
-            Iterator<List> iterator = values.iterator();
-            int currentColumn = 0;
-            while (iterator.hasNext()) {
-                List list = iterator.next();
+            int columnCount = getValueColumnCount();
+            for (int currentColumn = 0; currentColumn < columnCount; currentColumn++) {
+                if (currentColumn >= values.size()) {
+                    addColumn(currentColumn);
+                }
+                List list = values.get(currentColumn);
                 if (list.size() == currentRowCount) {
                     for (int i = 0; i < (newRowCount - currentRowCount); i++) {
                         list.add(createDefaultValue(currentRowCount + i, currentColumn, null));
                     }
                 }
-                currentColumn++;
             }
             rowsAdded(newRowCount - currentRowCount);
         }
@@ -175,9 +172,20 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable, Se
         setDiagonalValue();
     }
 
+    private void addColumn(int currentColumnCount) {
+        List lastList = values.get(values.size() - 1);
+        ArrayList newList = new ArrayList();
+        int rowIndex = 0;
+        for (Object object : lastList) {
+            newList.add(createDefaultValue(rowIndex, currentColumnCount, object));
+            rowIndex++;
+        }
+        values.add(newList);
+    }
+
     protected Object createDefaultValue(int row, int column, Object object) {
-        if (object == null)
-            object = values.get(column).get(0);
+
+        object = (object == null && values.get(column).size() > 0) ? values.get(column).get(0) : new Double(0);
         if (object instanceof Date) return ((Date) object).clone();
         if (object instanceof String) return object;
         if (object instanceof Integer) return new Integer(0);
@@ -188,7 +196,9 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable, Se
         return false;
     }
 
-    public abstract boolean isCellEditable(int row, int column);
+    public boolean isCellEditable(int row, int column) {
+        return row > 0 && column > 0;
+    }
 
     public String toString() {
         StringBuffer buffer = new StringBuffer("new ");

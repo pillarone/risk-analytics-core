@@ -33,7 +33,7 @@ public class SimulationScope {
     int iterationsDone
 
     Model model
-    Simulation simulation
+    volatile Simulation simulation
     StructureInformation structureInformation
     Parameterization parameters
     ResultConfiguration resultConfiguration

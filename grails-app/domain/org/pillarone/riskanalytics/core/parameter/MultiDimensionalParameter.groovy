@@ -171,7 +171,7 @@ class MultiDimensionalParameter extends Parameter {
 
     private List getCellValues() {
         List result = []
-        Sql sql = new Sql(dataSource)
+        Sql sql = new Sql(DataSourceUtils.getConnection(dataSource))
         int i = 0
         List column = sql.rows("SELECT value FROM multi_dimensional_parameter_value v where v.multi_dimensional_parameter_id = ? and v.col = ? order by v.row", [this.id, i])
         while (column.size() > 0) {

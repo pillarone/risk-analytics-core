@@ -76,4 +76,12 @@
 })();
 // -->
 </script>
+<div align="center">
+<h3>Credentials</h3>
+in order to start the application in
+<ul><li>English use 'actuary':'actuary'</li>
+<li>German use 'aktuar':'aktuar'</li>
+<li>French use 'actuaire':'actuaire'</li>
+</ul>
+</div>
 </body>

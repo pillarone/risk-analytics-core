@@ -37,7 +37,6 @@ public class PacketCollector extends Component {
     private Map fieldMappings = [:]
 
     String path
-    String collectorName = AbstractBulkInsert.DEFAULT_COLLECTOR_NAME
 
     public PacketCollector() { }
 

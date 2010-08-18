@@ -121,6 +121,13 @@ class ParameterObjectParameterHolder extends ParameterHolder {
         return holder
     }
 
+    public void clearCachedValues() {
+        businessObject = null
+        for (ParameterHolder p in classifierParameters.values()) {
+            p.clearCachedValues()
+        }
+    }
+    
     private void writeObject(java.io.ObjectOutputStream out) throws IOException {
         String classifierClass = classifier.getClass().getName()
         String classifierType = classifier.displayName
@@ -139,6 +146,5 @@ class ParameterObjectParameterHolder extends ParameterHolder {
 
         classifierParameters = inStream.readObject()
     }
-
 
 }

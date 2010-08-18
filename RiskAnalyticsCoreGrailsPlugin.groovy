@@ -10,7 +10,7 @@ import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "0.6.3.7"
+    def version = "1.0.2.1"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.2.0 > *"
     // the other plugins this plugin depends on
@@ -25,7 +25,7 @@ class RiskAnalyticsCoreGrailsPlugin {
             "grails-app/views/error.gsp"
     ]
 
-    def author = "Intuitive Collaboration GmbH"
+    def author = "Intuitive Collaboration AG"
     def authorEmail = "info@pillarone.org"
     def title = "RiskAnalytics core"
     def description = '''\\

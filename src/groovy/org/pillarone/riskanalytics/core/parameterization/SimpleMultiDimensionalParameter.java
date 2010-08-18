@@ -33,9 +33,6 @@ public class SimpleMultiDimensionalParameter extends AbstractMultiDimensionalPar
 
     }
 
-    public boolean isCellEditable(int row, int column) {
-        return true;
-    }
 
     protected void appendAdditionalConstructorArguments(StringBuffer buffer) {
 

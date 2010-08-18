@@ -96,6 +96,20 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
 
     }
 
+    void testIncreaseDimensionEmpty() {
+        AbstractMultiDimensionalParameter param = new ConstrainedMultiDimensionalParameter([], ['title1', 'title2'], ConstraintsFactory.getConstraints(SimpleConstraint.IDENTIFIER))
+
+        assertEquals 0, param.valueRowCount
+        assertEquals 2, param.columnCount
+
+        param.dimension = new MultiDimensionalParameterDimension(2, 1)
+        assertEquals 1, param.valueRowCount
+        assertEquals 2, param.columnCount
+        assertEquals 2, param.values.size()
+        assertTrue param.values.every { it.size() == 1}
+
+    }
+
     void testDecreaseDimension() {
         AbstractMultiDimensionalParameter param = new SimpleMultiDimensionalParameter([[1, 2, 3], [4, 5, 6]])
 
@@ -161,16 +175,48 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
 
 
     void testToString() {
-        AbstractMultiDimensionalParameter param = new SimpleMultiDimensionalParameter([1, 2, 3])
+        AbstractMultiDimensionalParameter param = new SimpleMultiDimensionalParameter([])
         param.max_tokens = 2
-        String output = "new org.pillarone.riskanalytics.core.parameterization.SimpleMultiDimensionalParameter(org.pillarone.riskanalytics.core.util.GroovyUtils.toList(['[1, 2]', '[3]']))"
+        String output = "new org.pillarone.riskanalytics.core.parameterization.SimpleMultiDimensionalParameter(org.pillarone.riskanalytics.core.util.GroovyUtils.toList([[]]))"
 
         String parmStringValue = param.toString()
         assertTrue output.equals(parmStringValue)
-        assertEquals GroovyUtils.toList(["[1, 2]", "[3]"]), [1, 2, 3]
+        assertEquals GroovyUtils.toList([[]]), []
+
+        param = new SimpleMultiDimensionalParameter([1])
+        param.max_tokens = 2
+        output = "new org.pillarone.riskanalytics.core.parameterization.SimpleMultiDimensionalParameter(org.pillarone.riskanalytics.core.util.GroovyUtils.toList(['[1]']))"
+
+        parmStringValue = param.toString()
+        assertTrue output.equals(parmStringValue)
+        assertEquals GroovyUtils.toList(['[1]']), [1]
+
+        param = new SimpleMultiDimensionalParameter([1, 2, 3, 4, 5])
+        param.max_tokens = 2
+        output = "new org.pillarone.riskanalytics.core.parameterization.SimpleMultiDimensionalParameter(org.pillarone.riskanalytics.core.util.GroovyUtils.toList(['[1, 2, 3]', '[4, 5]']))"
+
+        parmStringValue = param.toString()
+        assertTrue output.equals(parmStringValue)
+        assertEquals GroovyUtils.toList(['[1, 2, 3]', '[4, 5]']), [1, 2, 3, 4, 5]
+
+        param = new SimpleMultiDimensionalParameter([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
+        param.max_tokens = 1
+        output = "new org.pillarone.riskanalytics.core.parameterization.SimpleMultiDimensionalParameter(org.pillarone.riskanalytics.core.util.GroovyUtils.toList(['[1, 2]', '[3]', '[4]', '[5]', '[6]', '[7]', '[8]', '[9]', '[10]', '[11]']))"
+
+        parmStringValue = param.toString()
+        assertTrue output.equals(parmStringValue)
+        assertEquals GroovyUtils.toList(['[1, 2]', '[3]', '[4]', '[5]', '[6]', '[7]', '[8]', '[9]', '[10]', '[11]']), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+
+        param = new SimpleMultiDimensionalParameter([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
+        param.max_tokens = 2
+        output = "new org.pillarone.riskanalytics.core.parameterization.SimpleMultiDimensionalParameter(org.pillarone.riskanalytics.core.util.GroovyUtils.toList(['[1, 2, 3]', '[4, 5]', '[6, 7]', '[8, 9]', '[10, 11]']))"
+
+        parmStringValue = param.toString()
+        assertTrue output.equals(parmStringValue)
+        assertEquals GroovyUtils.toList(['[1, 2, 3]', '[4, 5]', '[6, 7]', '[8, 9]', '[10, 11]']), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 
         param = new SimpleMultiDimensionalParameter([[1, 2, 3], ["a", "b", "c"]])
-        param.max_tokens = 2
+        param.max_tokens = 1
         output = "new org.pillarone.riskanalytics.core.parameterization.SimpleMultiDimensionalParameter(org.pillarone.riskanalytics.core.util.GroovyUtils.toList([['[1, 2]', '[3]'], ['[\"a\", \"b\"]', '[\"c\"]']]))"
 
         assertTrue output.equals(param.toString())
@@ -180,11 +226,11 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         param.max_tokens = "[1, 2, 3]".length() + 1
         output = 'new org.pillarone.riskanalytics.core.parameterization.TableMultiDimensionalParameter(org.pillarone.riskanalytics.core.util.GroovyUtils.toList([[1, 2, 3], [4, 5, 6], [7, 8, 9]]),["title1","title2","title3"])'
 
+
         assertTrue output.equals(param.toString())
         assertEquals GroovyUtils.toList([[1, 2, 3], [4, 5, 6], [7, 8, 9]]), [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-
         param = new MatrixMultiDimensionalParameter([[1, 2, 3], [4, 5, 6]], ["row1", "row2"], ["col1", "col2"])
-        param.max_tokens = 2
+        param.max_tokens = 1
         output = "new org.pillarone.riskanalytics.core.parameterization.MatrixMultiDimensionalParameter(org.pillarone.riskanalytics.core.util.GroovyUtils.toList([['[1, 2]', '[3]'], ['[4, 5]', '[6]']]),[\"row1\",\"row2\"],[\"col1\",\"col2\"])"
         assertTrue output.equals(param.toString())
         assertEquals GroovyUtils.toList([["[1, 2]", "[3]"], ["[4, 5]", "[6]"]]), [[1, 2, 3], [4, 5, 6]]
@@ -207,14 +253,14 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         mdp.validateValues()
 
         assertFalse "invalid name" == mdp.getValueAt(0, 1)
-        assertEquals "hierarchy output component", mdp.getValueAt(0, 3)
+        assertEquals "hierarchy output component", mdp.getValueAt(0, 2)
 
         mdp = new ComboBoxTableMultiDimensionalParameter([['invalid name', 'hierarchy output component']], ['title'], ITestComponentMarker)
         mdp.setSimulationModel(model)
         mdp.validateValues()
 
         assertFalse "invalid name" == mdp.getValueAt(1, 0)
-        assertEquals "hierarchy output component", mdp.getValueAt(2, 1)
+        assertEquals "hierarchy output component", mdp.getValueAt(2, 0)
     }
 
     void testGetColumnIndex() {
@@ -224,6 +270,13 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
 
         index = mdp.getColumnIndex("title2")
         assertEquals "title2", mdp.getValueAt(0, index)
+    }
+
+    void testGetColumn() {
+        TableMultiDimensionalParameter mdp = new TableMultiDimensionalParameter([[1, 3], [2, 4]], ['title1', 'title2'])
+        assertEquals mdp.getValueAt(1, 0), mdp.getColumn(0)[0]
+        assertEquals mdp.getValueAt(2, 0), mdp.getColumn(0)[1]
+
     }
 
     void testClone() {
@@ -267,8 +320,11 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertEquals param3.columnTitles, clone3.columnTitles
 
         ComboBoxMatrixMultiDimensionalParameter param4 = new ComboBoxMatrixMultiDimensionalParameter([[0, 1], [1, 2]], ['title', 'title2'], ITestComponentMarker)
+        param4.comboBoxValues.put("x", "y")
         ComboBoxMatrixMultiDimensionalParameter clone4 = param4.clone()
 
+        //clone should not this parameterization dependent map
+        assertTrue clone4.comboBoxValues.isEmpty()
         assertNotSame param4.values, clone4.values
         for (int i = 0; i < param4.values.size(); i++) {
             assertNotSame param4.values[i], clone4.values[i]
@@ -285,8 +341,11 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertEquals param4.markerClass, clone4.markerClass
 
         ComboBoxTableMultiDimensionalParameter param5 = new ComboBoxTableMultiDimensionalParameter([[0, 1], [1, 2]], ['title', 'title2'], ITestComponentMarker)
+        param5.comboBoxValues.put("x", "y")
         ComboBoxTableMultiDimensionalParameter clone5 = param5.clone()
 
+        //clone should not this parameterization dependent map
+        assertTrue clone5.comboBoxValues.isEmpty()
         assertNotSame param5.values, clone5.values
         for (int i = 0; i < param5.values.size(); i++) {
             assertNotSame param5.values[i], clone5.values[i]
@@ -300,8 +359,11 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertEquals param5.markerClass, clone5.markerClass
 
         ConstrainedMultiDimensionalParameter param6 = new ConstrainedMultiDimensionalParameter([[0, 1], [1, 2]], ['title', 'title2'], ConstraintsFactory.getConstraints(SimpleConstraint.IDENTIFIER))
+        param6.comboBoxValues.put("x", new HashMap())
         ConstrainedMultiDimensionalParameter clone6 = param6.clone()
 
+        //clone should not this parameterization dependent map
+        assertTrue clone6.comboBoxValues.isEmpty()
         assertNotSame param6.values, clone6.values
         for (int i = 0; i < param6.values.size(); i++) {
             assertNotSame param6.values[i], clone6.values[i]

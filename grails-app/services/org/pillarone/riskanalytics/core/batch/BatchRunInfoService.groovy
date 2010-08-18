@@ -17,6 +17,7 @@ class BatchRunInfoService {
     List<Simulation> executedSimulations
     List<BatchRunSimulationRun> executedBatchRunSimulationRuns
     List<BatchRunSimulationRun> updatedRuns
+    List runningSimulations = []
 
     Log LOG = LogFactory.getLog(BatchRunInfoService)
 
@@ -35,6 +36,11 @@ class BatchRunInfoService {
         activeSimulationRuns.remove(activeSimulationRuns.find { it.name == simulation.name})
         BatchRunSimulationRun batchRunSimulationRun = update(simulation, simulationState)
         addExecutedBatch(batchRunSimulationRun)
+    }
+
+    public synchronized void batchSimulationStart(Simulation simulation) {
+        BatchRunSimulationRun batchRunSimulationRun = update(simulation, SimulationState.RUNNING)
+        addExecutedBatch batchRunSimulationRun
     }
 
     public void addExecutedBatch(BatchRunSimulationRun batchRunSimulationRun) {

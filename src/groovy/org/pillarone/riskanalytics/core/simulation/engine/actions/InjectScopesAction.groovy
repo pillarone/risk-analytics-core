@@ -10,6 +10,7 @@ import org.pillarone.riskanalytics.core.simulation.engine.PeriodScope
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 import org.pillarone.riskanalytics.core.wiring.ITransmitter
 import org.pillarone.riskanalytics.core.wiring.WiringUtils
+import org.pillarone.riskanalytics.core.components.IterationStore
 
 public class InjectScopesAction implements Action {
 
@@ -35,17 +36,26 @@ public class InjectScopesAction implements Action {
                 }
             }
 
-            createPeriodStoreForComponentIfNeeded(component)
+            createStoreForComponentIfNeeded(component)
 
         }
 
         LOG.debug "Published scopes to components"
     }
 
-    private void createPeriodStoreForComponentIfNeeded(Component component) {
+    /**
+     * Injects a PeriodStore or IterationStore if a component contains
+     * a corresponding property. The store is added to the IterationScope.
+     * A component may have both kinds of stores.
+     * @param component
+     */
+    private void createStoreForComponentIfNeeded(Component component) {
         if (component.properties.keySet().contains('periodStore')) {
             component.periodStore = new PeriodStore(periodScope)
             iterationScope.periodStores << component.periodStore
+        }
+        if (component.properties.keySet().contains('iterationStore')) {
+            component.iterationStore = new IterationStore(iterationScope)
         }
     }
 

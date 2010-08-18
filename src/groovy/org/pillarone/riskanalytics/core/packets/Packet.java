@@ -12,6 +12,12 @@ public class Packet implements Cloneable, Comparable {
     public Component sender;
     public String senderChannelName;
 
+    /**
+     *  Setting the period property allows to persist a packet in a different period than the period it is created.
+     *  Business components have to set the property. It is evaluated in AbstractCollectingModeStrategy.
+     */
+    public Integer period;
+
     public Packet() {
     }
 

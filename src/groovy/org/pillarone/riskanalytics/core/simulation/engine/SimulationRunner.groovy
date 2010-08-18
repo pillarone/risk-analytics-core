@@ -53,6 +53,7 @@ public class SimulationRunner {
      */
     public void start() {
         simulationState = SimulationState.INITIALIZING
+        notifySimulationStateChanged(currentScope?.simulation, simulationState)
         LOG.debug "start simulation"
         start = System.currentTimeMillis()
         Date startDate = new Date(start)
@@ -68,6 +69,7 @@ public class SimulationRunner {
             }
             long initializationTime = System.currentTimeMillis() - start
             LOG.info "Initialization completed in ${initializationTime}ms"
+            notifySimulationStateChanged(currentScope?.simulation, SimulationState.RUNNING)
 
             boolean shouldReturn = false
             //Transaction is necessary because PathMappings etc might be inserted when writing bulk insert files
@@ -79,7 +81,7 @@ public class SimulationRunner {
             }
             if (shouldReturn) return
             LOG.info "${currentScope?.numberOfIterations} iterations completed in ${System.currentTimeMillis() - (start + initializationTime)}ms"
-
+            notifySimulationStateChanged(currentScope?.simulation, SimulationState.POST_SIMULATION_CALCULATIONS)
             //Transaction because of saving results to db
             SimulationRun.withTransaction {TransactionStatus status ->
                 for (Action action in postSimulationActions) {
@@ -94,7 +96,7 @@ public class SimulationRunner {
             }
 
         } catch (Throwable t) {
-            notifySimulationEnd(currentScope?.simulation, SimulationState.ERROR)
+            notifySimulationStateChanged(currentScope?.simulation, SimulationState.ERROR)
             simulationState = SimulationState.ERROR
             error = new SimulationError(
                     simulationRunID: currentScope.simulation?.id,
@@ -120,13 +122,13 @@ public class SimulationRunner {
 
         LOG.info "simulation took ${end - start} ms"
         simulationState = simulationAction.isStopped() ? SimulationState.STOPPED : SimulationState.FINISHED
-        notifySimulationEnd(currentScope?.simulation, simulationState)
+        notifySimulationStateChanged(currentScope?.simulation, simulationState)
+
     }
 
     private void deleteCancelledSimulation() {
         if (simulationAction.isCancelled()) {
             LOG.info "canceled simulation ${currentScope.simulation.name} will be deleted"
-            notifySimulationEnd(currentScope?.simulation, SimulationState.CANCELED)
             currentScope.simulation.delete()
         }
     }
@@ -263,7 +265,8 @@ public class SimulationRunner {
         currentScope.simulationState = newState
     }
 
-    protected void notifySimulationEnd(Simulation simulation, SimulationState simulationState) {
-        batchRunInfoService?.batchSimulationRunEnd(simulation, simulationState)
+    protected void notifySimulationStateChanged(Simulation simulation, SimulationState simulationState) {
+        batchRunInfoService?.batchSimulationStateChanged(simulation, simulationState)
     }
+
 }

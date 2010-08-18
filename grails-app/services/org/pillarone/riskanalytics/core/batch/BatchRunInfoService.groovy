@@ -38,6 +38,15 @@ class BatchRunInfoService {
         addExecutedBatch(batchRunSimulationRun)
     }
 
+    public synchronized void batchSimulationStateChanged(Simulation simulation, SimulationState simulationState) {
+        if (simulationState == SimulationState.FINISHED || simulationState == SimulationState.ERROR) {
+            batchSimulationRunEnd(simulation, simulationState)
+        } else {
+            BatchRunSimulationRun batchRunSimulationRun = update(simulation, simulationState)
+            addExecutedBatch(batchRunSimulationRun)
+        }
+    }
+
     public synchronized void batchSimulationStart(Simulation simulation) {
         BatchRunSimulationRun batchRunSimulationRun = update(simulation, SimulationState.RUNNING)
         addExecutedBatch batchRunSimulationRun

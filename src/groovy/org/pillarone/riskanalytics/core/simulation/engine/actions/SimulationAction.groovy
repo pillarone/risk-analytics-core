@@ -27,15 +27,10 @@ public class SimulationAction implements Action {
      */
     public void perform() {
         LOG.debug "start perform"
-        int numberOfIterations = simulationScope.numberOfIterations
-        /*for (int iteration = 0; iteration < numberOfIterations && !stopped && !canceled; iteration++) {
-            iterationAction.perform()
-            simulationScope.iterationsDone = simulationScope.iterationsDone + 1 // do not use simulationScope.iterationsDone++ because of a issue in StubFor
-        }*/
 
         for (SimulationBlock simulationBlock: simulationScope.simulationBlocks) {
             initializeSimulationBlock(simulationBlock)
-            for (int iteration = 0; iteration < numberOfIterations && !stopped && !canceled; iteration++) {
+            for (int iteration = 0; iteration < simulationScope.numberOfIterations && !stopped && !canceled; iteration++) {
                 iterationAction.perform()
                 simulationScope.iterationsDone = simulationScope.iterationsDone + 1 // do not use simulationScope.iterationsDone++ because of a issue in StubFor
             }

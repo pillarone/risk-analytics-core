@@ -26,7 +26,7 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
 
     private int messageCount = 0;
     private GridMysqlBulkInsert gridMysqlBulkInsert = new GridMysqlBulkInsert();
-//    private FileOutputAppender foa = new FileOutputAppender();
+    //    private FileOutputAppender foa = new FileOutputAppender();
     private long simRunId;
 
     protected Collection<? extends GridJob> split(int gridSize, SimulationConfiguration simulationConfiguration) {
@@ -44,7 +44,7 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
             SimulationConfiguration newConfiguration = simulationConfiguration.clone();
             for (int j = 0; j < maximumBlocksPerNode; j++) {
                 if (nextBlockIndex < simulationBlocks.size()) {
-                    newConfiguration.getSimulationBlocks().add(simulationBlocks.get(nextBlockIndex));
+                    newConfiguration.addSimulationBlock(simulationBlocks.get(nextBlockIndex));
                     nextBlockIndex++;
                 }
             }
@@ -64,7 +64,7 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
         for (GridJobResult res : gridJobResults) {
             l.add(res.getData());
         }
-        LOG.info("Received ${messageCount} messages");
+        LOG.info("Received " + messageCount + " messages");
         //gridMysqlBulkInsert.saveToDB()
         //mdbIndex();
 
@@ -95,7 +95,7 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
         for (GridNode node : nodes) {
             processorCount += node.getMetrics().getAvailableProcessors();
         }
-        LOG.info("Found ${processorCount} CPUs on ${nodes.size()} nodes");
+        LOG.info("Found " + processorCount + " CPUs on " + nodes.size() + " nodes");
         return processorCount;
     }
 }

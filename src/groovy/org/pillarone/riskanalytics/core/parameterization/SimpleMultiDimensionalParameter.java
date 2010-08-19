@@ -17,6 +17,10 @@ public class SimpleMultiDimensionalParameter extends AbstractMultiDimensionalPar
         return 0;
     }
 
+    public boolean isCellEditable(int row, int column) {
+        return true;
+    }
+
     protected void rowsAdded(int i) {
 
     }

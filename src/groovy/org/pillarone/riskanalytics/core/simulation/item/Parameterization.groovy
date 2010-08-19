@@ -234,13 +234,13 @@ class Parameterization extends ModellingItem {
         if (!isLoaded()) {
             load()
         }
-        SimulationRun result = null
+        List<SimulationRun> result = null
         try {
-            result = SimulationRun.findByParameterizationAndToBeDeleted(dao, false)
+            result = SimulationRun.findAllByParameterizationAndToBeDeleted(dao, false)
         } catch (Exception e) {
             LOG.error("Exception in method isUsedInSimulation : $e.message", e)
         }
-        return result != null && result.endTime != null
+        return result.size() > 0 && result.any { it.endTime != null }
     }
 
     public List<SimulationRun> getSimulations() {

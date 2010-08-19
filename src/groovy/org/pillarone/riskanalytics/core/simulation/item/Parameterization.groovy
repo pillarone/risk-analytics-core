@@ -202,10 +202,12 @@ class Parameterization extends ModellingItem {
 
 
     public getDao() {
-        if (parameterizationDAO == null) {
+        if (parameterizationDAO?.id == null) {
             parameterizationDAO = createDao()
+            return parameterizationDAO
+        } else {
+            return getDaoClass().get(parameterizationDAO.id)
         }
-        return parameterizationDAO
     }
 
     public void setDao(def newDao) {

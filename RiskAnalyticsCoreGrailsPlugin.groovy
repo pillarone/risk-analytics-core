@@ -7,6 +7,9 @@ import org.pillarone.riskanalytics.core.parameterization.ConstraintsFactory
 import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
 import org.pillarone.riskanalytics.core.output.CollectingModeFactory
 import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
+import org.gridgain.grid.GridSpringBean
+import org.gridgain.grid.GridConfigurationAdapter
+import org.pillarone.riskanalytics.core.simulation.engine.grid.ContextClassLoaderAwareGridJBossMarshaller
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
@@ -39,7 +42,23 @@ Persistence & Simulation engine.
     }
 
     def doWithSpring = {
-        // TODO Implement runtime spring config (optional)
+        //override gridgain beans because we need a custom config
+        "grid.cfg"(GridConfigurationAdapter) {
+            gridName = "pillarone"
+            marshaller = ref('marshaller')
+
+            if (!Boolean.getBoolean("GRIDGAIN_HOME")) {
+                def gridgainHomeDefault = new File("./").absolutePath + File.separator + 'grails-app' + File.separator + 'conf' + File.separator + 'gridgain'
+                if (log.isInfoEnabled()) log.info("GRIDGAIN_HOME is not defined. A default path is provided as: $gridgainHomeDefault")
+                gridGainHome = gridgainHomeDefault
+            }
+
+        }
+        grid(GridSpringBean) {
+            configuration = ref('grid.cfg')
+        }
+
+        marshaller(ContextClassLoaderAwareGridJBossMarshaller) { }
     }
 
     def doWithDynamicMethods = {ctx ->

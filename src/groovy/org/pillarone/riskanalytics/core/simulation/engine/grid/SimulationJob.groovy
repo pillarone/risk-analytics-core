@@ -7,7 +7,8 @@ import org.gridgain.grid.GridNode
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import java.text.SimpleDateFormat
-import org.pillarone.riskanalytics.core.util.MathUtils
+
+import org.pillarone.riskanalytics.core.simulation.engine.grid.output.GridOutputStrategy
 
 class SimulationJob extends GridJobAdapter<Boolean> {
 
@@ -19,8 +20,7 @@ class SimulationJob extends GridJobAdapter<Boolean> {
     public SimulationJob(SimulationConfiguration simulationConfiguration, GridNode gridNode) {
         this.master = gridNode
         this.simulationConfiguration = simulationConfiguration
-        //this.simulationConfiguration.outputStrategy = new GridOutputStrategy(gridNode, simulationConfiguration.simulation.id);
-        this.simulationConfiguration.outputStrategy = new FileOutputStrategy(gridNode);
+        this.simulationConfiguration.outputStrategy = new GridOutputStrategy(gridNode);
     }
 
     Serializable execute() {

@@ -8,9 +8,10 @@ import org.gridgain.grid.GridJobResult;
 import org.gridgain.grid.GridMessageListener;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
-import org.pillarone.riskanalytics.core.output.batch.results.GridMysqlBulkInsert;
 import org.gridgain.grid.Grid;
 import org.gridgain.grid.GridNode;
+import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultWriter;
+import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultTransferObject;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -25,9 +26,7 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
     public static final int SIMULATION_BLOCK_SIZE = 1000;
 
     private int messageCount = 0;
-    private GridMysqlBulkInsert gridMysqlBulkInsert = new GridMysqlBulkInsert();
-    //    private FileOutputAppender foa = new FileOutputAppender();
-    private long simRunId;
+    private ResultWriter resultWriter;
 
     protected Collection<? extends GridJob> split(int gridSize, SimulationConfiguration simulationConfiguration) {
 
@@ -51,11 +50,9 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
             jobs.add(new SimulationJob(newConfiguration, grid.getLocalNode()));
         }
 
-//        gridMysqlBulkInsert.setSimulationRunId((Long) simulationConfiguration.getSimulation().id);
-        simRunId = (Long) simulationConfiguration.getSimulation().id;
-//        foa.init(simRunId);
+        resultWriter = new ResultWriter((Long) simulationConfiguration.getSimulation().id);
         grid.addMessageListener(this);
-//
+
         return jobs;
     }
 
@@ -65,16 +62,13 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
             l.add(res.getData());
         }
         LOG.info("Received " + messageCount + " messages");
-        //gridMysqlBulkInsert.saveToDB()
-        //mdbIndex();
 
         return l;
     }
 
     public void onMessage(UUID uuid, Serializable serializable) {
         messageCount++;
-//        foa.writeResult((HashMap<String, byte[]>) serializable);
-        //gridMysqlBulkInsert.writeResult serializable;
+        resultWriter.writeResult((ResultTransferObject) serializable);
     }
 
     private List<SimulationBlock> generateBlocks(int blockSize, int iterations) {
@@ -91,9 +85,13 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
 
     private int getTotalProcessorCount(Grid grid) {
         Collection<GridNode> nodes = grid.getAllNodes();
+        List<String> usedHosts = new ArrayList<String>();
         int processorCount = 0;
         for (GridNode node : nodes) {
-            processorCount += node.getMetrics().getAvailableProcessors();
+            if (!usedHosts.contains(node.getPhysicalAddress())) {
+                processorCount += node.getMetrics().getAvailableProcessors();
+                usedHosts.add(node.getPhysicalAddress());
+            }
         }
         LOG.info("Found " + processorCount + " CPUs on " + nodes.size() + " nodes");
         return processorCount;

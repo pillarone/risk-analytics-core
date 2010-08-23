@@ -1,8 +1,7 @@
 package org.pillarone.riskanalytics.core.output
 
-import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.hibernate.FetchMode
-import org.pillarone.riskanalytics.core.simulation.engine.grid.FileOutputAppender
+import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultWriter
 
 class SingleValueResult {
 
@@ -30,7 +29,7 @@ class SingleValueResult {
     }
 
     String toString() {
-        "${path.pathName}, ${field.fieldName}, $value" 
+        "${path.pathName}, ${field.fieldName}, $value"
     }
 
     def beforeInsert = {
@@ -39,7 +38,7 @@ class SingleValueResult {
 
 
     private void writeFile(){
-        FileOutputAppender foa=new FileOutputAppender();
+        ResultWriter foa=new ResultWriter();
         foa.init (simulationRun.id);
         HashMap<String,byte[]> transfer=new HashMap<String,byte[]>();
         ByteArrayOutputStream bos=new ByteArrayOutputStream();
@@ -51,7 +50,7 @@ class SingleValueResult {
     }
 
     public void writePerfFile(){
-        FileOutputAppender foa=new FileOutputAppender();
+        ResultWriter foa=new ResultWriter();
         HashMap<String,byte[]> transfer=new HashMap<String,byte[]>();
         ByteArrayOutputStream bos=new ByteArrayOutputStream();
         DataOutputStream dos=new DataOutputStream(bos);
@@ -63,5 +62,5 @@ class SingleValueResult {
         foa.init (simulationRun.id);
         foa.writeResult (transfer);
     }
-  //  
+  //
 }

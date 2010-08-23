@@ -7,7 +7,7 @@ import org.gridgain.grid.GridFactory;
 public class GridHelper {
 
     public static Grid getGrid() {
-        if (ApplicationHolder.getApplication()==null)
+        if (ApplicationHolder.getApplication() == null)
             return GridFactory.getGrid();
         else
             return (Grid) ApplicationHolder.getApplication().getMainContext().getBean("grid");

@@ -4,7 +4,7 @@ import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationBlock
-import org.pillarone.riskanalytics.core.simulation.engine.grid.FileOutputStrategy
+
 import org.pillarone.riskanalytics.core.util.MathUtils
 
 /**

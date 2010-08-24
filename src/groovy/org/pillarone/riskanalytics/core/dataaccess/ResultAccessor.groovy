@@ -3,7 +3,7 @@ package org.pillarone.riskanalytics.core.dataaccess
 import org.pillarone.riskanalytics.core.util.MathUtils
 import org.pillarone.riskanalytics.core.output.*
 
-import org.pillarone.riskanalytics.core.FileConstants
+import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper
 
 class ResultAccessor {
 
@@ -237,7 +237,7 @@ class ResultAccessor {
     }
 
     private static String getSimRunPath(SimulationRun simulationRun) {
-        return "${FileConstants.EXTERNAL_DATABASE_DIRECTORY}" + File.separator + "simrun" + simulationRun.id;
+        return GridHelper.getResultLocation(simulationRun.id)
     }
 
     public static List<Object[]> getAvgAndIsStochastic(SimulationRun simulationRun) {
@@ -246,7 +246,7 @@ class ResultAccessor {
         for (File f: simRun.listFiles()) {
             def array = new Object[7]
             IterationFileAccessor ifa = new IterationFileAccessor(f);
-            double min = Double.MAX_VALUE, max = Double.MIN_VALUE, avg = 0;
+            double min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY, avg = 0;
             double count = 0;
             while (ifa.fetchNext()) {
                 min = Math.min(ifa.getValue(), min);

@@ -60,4 +60,9 @@ public class ResultDescriptor implements Serializable {
     public String getFileName() {
         return new StringBuilder().append(pathId).append(SEPARATOR).append(period).append(SEPARATOR).append(fieldId).toString();
     }
+
+    @Override
+    public String toString() {
+        return "Period: " + period + ", path: " + pathId + ", field: " + fieldId;
+    }
 }

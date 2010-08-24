@@ -4,6 +4,7 @@ package org.pillarone.riskanalytics.core.simulation.engine.grid.output
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.FileConstants
+import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper
 
 class ResultWriter {
 
@@ -12,8 +13,12 @@ class ResultWriter {
 
     public ResultWriter(long simulationRunId) {
 
-        simulationRunPath = "${FileConstants.EXTERNAL_DATABASE_DIRECTORY}${File.separator}simulations${File.separator}${simulationRunId}"
-        new File(simulationRunPath).mkdirs();
+        simulationRunPath = GridHelper.getResultLocation(simulationRunId)
+        File file = new File(simulationRunPath)
+        if (file.exists()) {
+            file.deleteDir()
+        }
+        file.mkdirs();
     }
 
 

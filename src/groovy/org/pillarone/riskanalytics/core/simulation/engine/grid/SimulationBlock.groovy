@@ -9,4 +9,10 @@ class SimulationBlock implements Serializable {
         this.blockSize = blockSize;
         this.streamOffset = streamOffset;
     }
+
+    String toString() {
+        return "First iteration: $iterationOffset, last iteration: ${iterationOffset + blockSize - 1}"
+    }
+
+
 }

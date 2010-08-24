@@ -421,6 +421,7 @@ class IterationFileAccessor {
         while ((len = fis.read(b)) != -1) {
             bos.write(b, 0, len);
         }
+        fis.close()
         ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
 
         dis = new DataInputStream(bis);

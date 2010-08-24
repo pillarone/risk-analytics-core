@@ -6,11 +6,14 @@ import org.gridgain.grid.GridNode
 import org.gridgain.grid.Grid
 
 import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 
 
 class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
 
     private static final int PACKET_LIMIT = 100000
+    private static Log LOG = LogFactory.getLog(GridOutputStrategy)
 
     private HashMap<ResultDescriptor, ByteArrayOutputStream> streamCache = new HashMap<ResultDescriptor, ByteArrayOutputStream>();
 
@@ -18,6 +21,8 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
     private GridNode node
 
     private int resultCount = 0
+
+    int totalMessages = 0
 
     public GridOutputStrategy(GridNode masterNode) {
         node = masterNode
@@ -35,6 +40,7 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
     }
 
     ICollectorOutputStrategy leftShift(List results) {
+        LOG.debug("Received ${results.size()} results...")
         for (SingleValueResultPOJO result in results) {
             ResultDescriptor descriptor = new ResultDescriptor(result.field.id, result.path.id, result.period)
             ByteArrayOutputStream buffer = streamCache.get(descriptor);
@@ -60,9 +66,10 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
             ResultDescriptor resultDescriptor = entry.key
             ByteArrayOutputStream stream = entry.value
             getGrid().sendMessage(node, new ResultTransferObject(resultDescriptor, stream.toByteArray()));
+            totalMessages++
             stream.reset();
         }
-
+        LOG.debug("Sent results back for ${streamCache.size()} streams. Total count: ${totalMessages}")
         resultCount = 0
     }
 }

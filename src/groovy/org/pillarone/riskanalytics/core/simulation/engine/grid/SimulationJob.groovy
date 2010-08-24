@@ -9,8 +9,9 @@ import org.apache.commons.logging.LogFactory
 import java.text.SimpleDateFormat
 
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.GridOutputStrategy
+import org.pillarone.riskanalytics.core.simulation.engine.grid.output.JobResult
 
-class SimulationJob extends GridJobAdapter<Boolean> {
+class SimulationJob extends GridJobAdapter<JobResult> {
 
     private SimulationConfiguration simulationConfiguration
     private GridNode master
@@ -23,14 +24,18 @@ class SimulationJob extends GridJobAdapter<Boolean> {
         this.simulationConfiguration.outputStrategy = new GridOutputStrategy(gridNode);
     }
 
-    Serializable execute() {
-        String start = new SimpleDateFormat("HH:mm:ss").format(new Date())
+    JobResult execute() {
+        Date start = new Date()
         ExpandoMetaClass.enableGlobally()
         SimulationRunner runner = SimulationRunner.createRunner()
         runner.setSimulationConfiguration(simulationConfiguration)
         runner.start()
 
-        return start + " until " + new SimpleDateFormat("HH:mm:ss").format(new Date())
+        GridOutputStrategy outputStrategy = this.simulationConfiguration.outputStrategy
+        return new JobResult(
+                totalMessagesSent: outputStrategy.totalMessages, start: start, end: new Date(),
+                nodeName: GridHelper.getGrid().getLocalNode().getId().toString(), simulationException: runner.error?.error
+        )
     }
 
 }

@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.simulation.engine.grid;
 
 import org.gridgain.grid.GridTaskSplitAdapter;
+import org.pillarone.riskanalytics.core.output.Calculator;
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration;
 import org.gridgain.grid.GridJob;
 import org.gridgain.grid.GridJobResult;
@@ -10,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 import org.gridgain.grid.Grid;
 import org.gridgain.grid.GridNode;
+import org.pillarone.riskanalytics.core.simulation.engine.grid.output.JobResult;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultWriter;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultTransferObject;
 
@@ -28,6 +30,8 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
     private int messageCount = 0;
     private ResultWriter resultWriter;
 
+    private SimulationConfiguration simulationConfiguration;
+
     protected Collection<? extends GridJob> split(int gridSize, SimulationConfiguration simulationConfiguration) {
 
         Grid grid = GridHelper.getGrid();
@@ -35,6 +39,7 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
 
         List<SimulationBlock> simulationBlocks = generateBlocks(SIMULATION_BLOCK_SIZE, simulationConfiguration.getSimulation().getNumberOfIterations());
 
+        LOG.info("Number of generated blocks: " + simulationBlocks.size());
         int maximumBlocksPerNode = new BigDecimal(simulationBlocks.size()).divide(new BigDecimal(cpuCount), RoundingMode.UP).intValue();
         List<SimulationJob> jobs = new ArrayList<SimulationJob>();
 
@@ -47,21 +52,36 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
                     nextBlockIndex++;
                 }
             }
-            jobs.add(new SimulationJob(newConfiguration, grid.getLocalNode()));
+            if (newConfiguration.getSimulationBlocks().size() > 0) {
+                jobs.add(new SimulationJob(newConfiguration, grid.getLocalNode()));
+                LOG.info("Created a new job with block count " + newConfiguration.getSimulationBlocks().size());
+            }
         }
 
         resultWriter = new ResultWriter((Long) simulationConfiguration.getSimulation().id);
         grid.addMessageListener(this);
 
+        this.simulationConfiguration = simulationConfiguration;
         return jobs;
     }
 
     public Object reduce(List<GridJobResult> gridJobResults) {
         List l = new ArrayList();
+
+        int totalMessageCount = 0;
         for (GridJobResult res : gridJobResults) {
-            l.add(res.getData());
+            JobResult jobResult = res.getData();
+            totalMessageCount += jobResult.getTotalMessagesSent();
+
+            LOG.info("Job " + jobResult.getNodeName() + " executed in " + (jobResult.getEnd().getTime() - jobResult.getStart().getTime()) + " ms");
+            if (jobResult.getSimulationException() != null) {
+                LOG.error("Error in job " + jobResult.getNodeName(), jobResult.getSimulationException());
+            }
         }
-        LOG.info("Received " + messageCount + " messages");
+        LOG.info("Received " + messageCount + " messages. Sent " + totalMessageCount + " messages.");
+
+        Calculator calculator = new Calculator(simulationConfiguration.getSimulation().getSimulationRun());
+        calculator.calculate();
 
         return l;
     }

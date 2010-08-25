@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.simulation.engine.grid;
 
 import org.gridgain.grid.GridTaskSplitAdapter;
 import org.pillarone.riskanalytics.core.output.Calculator;
+import org.pillarone.riskanalytics.core.simulation.SimulationState;
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration;
 import org.gridgain.grid.GridJob;
 import org.gridgain.grid.GridJobResult;
@@ -14,6 +15,7 @@ import org.gridgain.grid.GridNode;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.JobResult;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultWriter;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultTransferObject;
+import org.pillarone.riskanalytics.core.simulation.item.Simulation;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -31,8 +33,11 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
     private ResultWriter resultWriter;
 
     private SimulationConfiguration simulationConfiguration;
+    private SimulationState currentState = SimulationState.NOT_RUNNING;
 
     protected Collection<? extends GridJob> split(int gridSize, SimulationConfiguration simulationConfiguration) {
+        currentState = SimulationState.INITIALIZING;
+        simulationConfiguration.getSimulation().setStart(new Date());
 
         Grid grid = GridHelper.getGrid();
         int cpuCount = getTotalProcessorCount(grid);
@@ -62,13 +67,13 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
         grid.addMessageListener(this);
 
         this.simulationConfiguration = simulationConfiguration;
+        currentState = SimulationState.RUNNING;
         return jobs;
     }
 
     public Object reduce(List<GridJobResult> gridJobResults) {
-        List l = new ArrayList();
-
         int totalMessageCount = 0;
+        boolean error = false;
         for (GridJobResult res : gridJobResults) {
             JobResult jobResult = res.getData();
             totalMessageCount += jobResult.getTotalMessagesSent();
@@ -76,19 +81,38 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
             LOG.info("Job " + jobResult.getNodeName() + " executed in " + (jobResult.getEnd().getTime() - jobResult.getStart().getTime()) + " ms");
             if (jobResult.getSimulationException() != null) {
                 LOG.error("Error in job " + jobResult.getNodeName(), jobResult.getSimulationException());
+                error = true;
             }
         }
+        Simulation simulation = simulationConfiguration.getSimulation();
+        if (error) {
+            simulation.delete();
+            currentState = SimulationState.ERROR;
+            return false;
+        }
         LOG.info("Received " + messageCount + " messages. Sent " + totalMessageCount + " messages.");
-
-        Calculator calculator = new Calculator(simulationConfiguration.getSimulation().getSimulationRun());
+        currentState = SimulationState.POST_SIMULATION_CALCULATIONS;
+        Calculator calculator = new Calculator(simulation.getSimulationRun());
         calculator.calculate();
 
-        return l;
+        simulation.setEnd(new Date());
+        simulation.save();
+        currentState = SimulationState.FINISHED;
+        return true;
     }
 
     public void onMessage(UUID uuid, Serializable serializable) {
         messageCount++;
         resultWriter.writeResult((ResultTransferObject) serializable);
+    }
+
+    public SimulationState getSimulationState() {
+        LOG.info("State of " + System.identityHashCode(this) + ": " + currentState);
+        return currentState;
+    }
+
+    public Simulation getSimulation() {
+        return simulationConfiguration.getSimulation();
     }
 
     private List<SimulationBlock> generateBlocks(int blockSize, int iterations) {

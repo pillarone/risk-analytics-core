@@ -47,18 +47,14 @@ public class RunSimulationService {
      * @param configuration the simulation details
      * @return the result of the grid gain task
      */
-    public def runSimulationOnGrid(SimulationConfiguration configuration) {
+    public SimulationTask runSimulationOnGrid(SimulationConfiguration configuration) {
         configuration.mappingCache = createMappingCache(configuration)
         configuration.prepareSimulationForGrid()
 
-        long time = System.currentTimeMillis()
+        SimulationTask task = new SimulationTask()
+        grid.execute(task, configuration)
 
-        GridTaskFuture future = grid.execute(new SimulationTask(), configuration)
-        Object result = future.get()
-
-        LOG.info "Grid task executed in ${System.currentTimeMillis() - time}ms"
-
-        return result
+        return task
     }
 
     /**

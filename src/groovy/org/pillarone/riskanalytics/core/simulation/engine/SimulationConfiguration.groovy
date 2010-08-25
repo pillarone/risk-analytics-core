@@ -48,6 +48,7 @@ public class SimulationConfiguration implements Serializable, Cloneable {
         preparedSimulation.template.collectors = simulation.template.collectors
 
         preparedSimulation.structure = ModelStructure.getStructureForModel(simulation.modelClass)
+        preparedSimulation.modelVersionNumber = simulation.modelVersionNumber
 
         this.simulation = preparedSimulation
     }

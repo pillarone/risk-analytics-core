@@ -63,7 +63,7 @@ public class SimulationScope {
         if (model instanceof DeterministicModel) {
             return iterationScope.periodScope.currentPeriod / iterationScope.numberOfPeriods * 100.0
         } else {
-            return iterationsDone / numberOfIterations * 100.0
+            return iterationsDone / (simulationBlocks*.blockSize.sum()) * 100.0
         }
     }
 

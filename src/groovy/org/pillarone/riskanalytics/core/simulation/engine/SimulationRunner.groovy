@@ -76,7 +76,7 @@ public class SimulationRunner {
                 shouldReturn = true
             }
             if (shouldReturn) return
-            LOG.info "${currentScope?.numberOfIterations} iterations completed in ${System.currentTimeMillis() - (start + initializationTime)}ms"
+            LOG.info "${currentScope?.simulationBlocks?.blockSize.sum()} iterations completed in ${System.currentTimeMillis() - (start + initializationTime)}ms"
 
             for (Action action in postSimulationActions) {
                 if (!performAction(action, null)) {
@@ -261,5 +261,5 @@ public class SimulationRunner {
     protected void notifySimulationEnd(Simulation simulation, SimulationState simulationState) {
         batchRunInfoService?.batchSimulationRunEnd(simulation, simulationState)
     }
-   
+
 }

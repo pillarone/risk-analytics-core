@@ -15,19 +15,19 @@ class SimulationJob extends GridJobAdapter<JobResult> {
 
     private SimulationConfiguration simulationConfiguration
     private GridNode master
+    private SimulationRunner runner = SimulationRunner.createRunner()
 
     private static Log LOG = LogFactory.getLog(SimulationJob)
 
     public SimulationJob(SimulationConfiguration simulationConfiguration, GridNode gridNode) {
         this.master = gridNode
         this.simulationConfiguration = simulationConfiguration
-        this.simulationConfiguration.outputStrategy = new GridOutputStrategy(gridNode);
+        this.simulationConfiguration.outputStrategy = new GridOutputStrategy(gridNode, runner);
     }
 
     JobResult execute() {
         Date start = new Date()
         ExpandoMetaClass.enableGlobally()
-        SimulationRunner runner = SimulationRunner.createRunner()
         runner.setSimulationConfiguration(simulationConfiguration)
         runner.start()
 

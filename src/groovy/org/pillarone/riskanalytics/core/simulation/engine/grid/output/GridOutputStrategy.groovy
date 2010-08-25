@@ -1,14 +1,13 @@
 package org.pillarone.riskanalytics.core.simulation.engine.grid.output
 
-import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
-import org.pillarone.riskanalytics.core.output.SingleValueResultPOJO
-import org.gridgain.grid.GridNode
-import org.gridgain.grid.Grid
-
-import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-
+import org.gridgain.grid.Grid
+import org.gridgain.grid.GridNode
+import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
+import org.pillarone.riskanalytics.core.output.SingleValueResultPOJO
+import org.pillarone.riskanalytics.core.simulation.engine.SimulationRunner
+import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper
 
 class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
 
@@ -19,13 +18,15 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
 
     private Grid grid
     private GridNode node
+    private SimulationRunner runner
 
     private int resultCount = 0
 
     int totalMessages = 0
 
-    public GridOutputStrategy(GridNode masterNode) {
+    public GridOutputStrategy(GridNode masterNode, SimulationRunner runner) {
         node = masterNode
+        this.runner = runner
     }
 
     private Grid getGrid() {
@@ -65,7 +66,7 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
         for (Map.Entry<ResultDescriptor, ByteArrayOutputStream> entry: streamCache.entrySet()) {
             ResultDescriptor resultDescriptor = entry.key
             ByteArrayOutputStream stream = entry.value
-            getGrid().sendMessage(node, new ResultTransferObject(resultDescriptor, stream.toByteArray()));
+            getGrid().sendMessage(node, new ResultTransferObject(resultDescriptor, stream.toByteArray(), runner.getProgress()));
             totalMessages++
             stream.reset();
         }

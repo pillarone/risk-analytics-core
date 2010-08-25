@@ -34,9 +34,15 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
 
     private SimulationConfiguration simulationConfiguration;
     private SimulationState currentState = SimulationState.NOT_RUNNING;
+    private List<Throwable> simulationErrors = new LinkedList<Throwable>();
+    private Map<UUID, Integer> progress = new HashMap<UUID, Integer>();
+    private Calculator calculator;
+
+    private long time;
 
     protected Collection<? extends GridJob> split(int gridSize, SimulationConfiguration simulationConfiguration) {
         currentState = SimulationState.INITIALIZING;
+        time = System.currentTimeMillis();
         simulationConfiguration.getSimulation().setStart(new Date());
 
         Grid grid = GridHelper.getGrid();
@@ -79,8 +85,10 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
             totalMessageCount += jobResult.getTotalMessagesSent();
 
             LOG.info("Job " + jobResult.getNodeName() + " executed in " + (jobResult.getEnd().getTime() - jobResult.getStart().getTime()) + " ms");
-            if (jobResult.getSimulationException() != null) {
-                LOG.error("Error in job " + jobResult.getNodeName(), jobResult.getSimulationException());
+            Throwable simulationException = jobResult.getSimulationException();
+            if (simulationException != null) {
+                LOG.error("Error in job " + jobResult.getNodeName(), simulationException);
+                simulationErrors.add(simulationException);
                 error = true;
             }
         }
@@ -91,28 +99,49 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
             return false;
         }
         LOG.info("Received " + messageCount + " messages. Sent " + totalMessageCount + " messages.");
+        calculator = new Calculator(simulation.getSimulationRun());
         currentState = SimulationState.POST_SIMULATION_CALCULATIONS;
-        Calculator calculator = new Calculator(simulation.getSimulationRun());
         calculator.calculate();
 
         simulation.setEnd(new Date());
         simulation.save();
         currentState = SimulationState.FINISHED;
+        LOG.info("Task completed in " + (System.currentTimeMillis() - time) + "ms");
         return true;
     }
 
     public void onMessage(UUID uuid, Serializable serializable) {
         messageCount++;
-        resultWriter.writeResult((ResultTransferObject) serializable);
+        ResultTransferObject result = (ResultTransferObject) serializable;
+        resultWriter.writeResult(result);
+        progress.put(uuid, result.getProgress());
     }
 
     public SimulationState getSimulationState() {
-        LOG.info("State of " + System.identityHashCode(this) + ": " + currentState);
         return currentState;
     }
 
     public Simulation getSimulation() {
         return simulationConfiguration.getSimulation();
+    }
+
+    public List<Throwable> getSimulationErrors() {
+        return simulationErrors;
+    }
+
+    public int getProgress() {
+        if (!(currentState == SimulationState.POST_SIMULATION_CALCULATIONS)) {
+            if(progress.isEmpty()) {
+                return 0;
+            }
+            int sum = 0;
+            for (Integer value : progress.values()) {
+                sum += value;
+            }
+            return sum / progress.size();
+        } else {
+            return calculator.getProgress();
+        }
     }
 
     private List<SimulationBlock> generateBlocks(int blockSize, int iterations) {

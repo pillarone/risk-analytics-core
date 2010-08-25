@@ -21,7 +21,9 @@ class GenericBulkInsert extends AbstractCalculationsBulkInsert {
                 result.keyFigure = values[5]
                 result.keyFigureParameter = values[6] != "null" ? Double.parseDouble(values[6]) : null
                 result.result = Double.parseDouble(values[7])
-                result.save()
+                if(!result.save()) {
+                    println result.errors
+                }
             }
         }
     }

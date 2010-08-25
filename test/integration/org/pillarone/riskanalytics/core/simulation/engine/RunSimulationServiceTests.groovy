@@ -16,10 +16,12 @@ import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
+import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationTask
+import org.pillarone.riskanalytics.core.simulation.SimulationState
 
 class RunSimulationServiceTests extends GrailsUnitTestCase {
 
-    def runSimulationService
+    RunSimulationService runSimulationService
 
     private static Log log = LogFactory.getLog(SimulationRunner)
 
@@ -58,13 +60,12 @@ class RunSimulationServiceTests extends GrailsUnitTestCase {
         simulationConfiguration.simulation = run
         simulationConfiguration.outputStrategy = new NoOutput()
 
-        SimulationRunner runner = runSimulationService.runSimulation(SimulationRunner.createRunner(), simulationConfiguration)
+        SimulationTask runner = runSimulationService.runSimulationOnGrid(simulationConfiguration)
         assertNotNull runner
 
-        while (runner.currentScope.iterationScope.currentIteration < 999) {
-            log.info "current iteration ${runner.currentScope.iterationScope.currentIteration}"
+        while (runner.simulationState != SimulationState.FINISHED) {
             Thread.sleep(2000)
-            assertNull "simulation crahed", runner.error
+            assertTrue "simulation crahed", runner.simulationErrors.empty
         }
     }
 }

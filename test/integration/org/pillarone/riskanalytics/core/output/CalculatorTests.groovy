@@ -4,10 +4,14 @@ import models.core.CoreModel
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.fileimport.ParameterizationImportService
 import org.pillarone.riskanalytics.core.fileimport.ResultConfigurationImportService
+import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultDescriptor
+import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultTransferObject
+import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultWriter
 
 class CalculatorTests extends GroovyTestCase {
 
     SimulationRun run
+    ResultWriter resultWriter
 
     void setUp() {
         new ParameterizationImportService().compareFilesAndWriteToDB(['CoreParameters'])
@@ -21,6 +25,7 @@ class CalculatorTests extends GroovyTestCase {
         run.periodCount = 2
         run.modelVersionNumber = '1'
         assertNotNull run.save()
+        resultWriter = new ResultWriter(run.id)
 
         PathMapping path1 = new PathMapping(pathName: "path1").save()
         PathMapping path2 = new PathMapping(pathName: "path2").save()
@@ -29,16 +34,16 @@ class CalculatorTests extends GroovyTestCase {
         CollectorMapping collector = new CollectorMapping(collectorName: AggregatedCollectingModeStrategy.IDENTIFIER).save()
         FieldMapping field = new FieldMapping(fieldName: "field").save()
 
-        assertNotNull new SingleValueResult(simulationRun: run, iteration: 0, period: 0, value: 1, path: path1, collector: collector, field: field).save()
-        assertNotNull new SingleValueResult(simulationRun: run, iteration: 0, period: 0, value: 2, path: path2, collector: collector, field: field).save()
-        assertNotNull new SingleValueResult(simulationRun: run, iteration: 0, period: 0, value: 3, path: path3, collector: collector, field: field).save()
+        writeResult new SingleValueResult(simulationRun: run, iteration: 0, period: 0, value: 1, path: path1, collector: collector, field: field)
+        writeResult new SingleValueResult(simulationRun: run, iteration: 0, period: 0, value: 2, path: path2, collector: collector, field: field)
+        writeResult new SingleValueResult(simulationRun: run, iteration: 0, period: 0, value: 3, path: path3, collector: collector, field: field)
 
-        assertNotNull new SingleValueResult(simulationRun: run, iteration: 0, period: 1, value: 4, path: path1, collector: collector, field: field).save()
-        assertNotNull new SingleValueResult(simulationRun: run, iteration: 0, period: 1, value: 5, path: path2, collector: collector, field: field).save()
-        assertNotNull new SingleValueResult(simulationRun: run, iteration: 0, period: 1, value: 6, path: path3, collector: collector, field: field).save()
+        writeResult new SingleValueResult(simulationRun: run, iteration: 0, period: 1, value: 4, path: path1, collector: collector, field: field)
+        writeResult new SingleValueResult(simulationRun: run, iteration: 0, period: 1, value: 5, path: path2, collector: collector, field: field)
+        writeResult new SingleValueResult(simulationRun: run, iteration: 0, period: 1, value: 6, path: path3, collector: collector, field: field)
 
         //period 0 should be ignored, because path does not contain a result for all iterations
-        assertNotNull new SingleValueResult(simulationRun: run, iteration: 0, period: 1, value: 7, path: path4, collector: collector, field: field,).save()
+        writeResult new SingleValueResult(simulationRun: run, iteration: 0, period: 1, value: 7, path: path4, collector: collector, field: field,)
 
     }
 
@@ -54,6 +59,15 @@ class CalculatorTests extends GroovyTestCase {
         assertEquals 7, PostSimulationCalculation.countByRunAndKeyFigure(run, PostSimulationCalculation.MEAN)
         assertEquals 7, PostSimulationCalculation.countByRunAndKeyFigure(run, PostSimulationCalculation.IS_STOCHASTIC)
 
+    }
+
+    private void writeResult(SingleValueResult result) {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(bos);
+        dos.writeInt(result.iteration);
+        dos.writeDouble(result.value);
+
+        resultWriter.writeResult(new ResultTransferObject(new ResultDescriptor(result.field.id, result.path.id, result.period), bos.toByteArray(), 0));
     }
 
 }

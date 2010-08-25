@@ -257,9 +257,10 @@ class ResultAccessor {
 
             avg = avg / count;
             String[] path_period_field = f.getName().split("_");
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 2; i++) {
                 array[i] = Long.parseLong(path_period_field[i]);
             }
+            array[2] = CollectorMapping.findByCollectorName(AggregatedCollectingModeStrategy.IDENTIFIER).id //TODO: replace with correct collector id
             array[3] = Long.parseLong(path_period_field[2]);
             array[4] = avg;
             array[5] = min;
@@ -273,6 +274,10 @@ class ResultAccessor {
 
     private static List getPathsNew(SimulationRun simulationRun) {
         File simRun = new File(getSimRunPath(simulationRun));
+        if(simRun.listFiles().length == 0) {
+            return []
+        }
+
         String pathIds = "(";
         for (File f: simRun.listFiles()) {
             pathIds += f.getName().split("_")[0] + ",";

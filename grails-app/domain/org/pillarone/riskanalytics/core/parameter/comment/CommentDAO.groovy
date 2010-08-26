@@ -15,6 +15,12 @@ class CommentDAO {
 
     static belongsTo = ParameterizationDAO
 
+    static hasMany = [tags: CommentTag]
+
+    static constraints = {
+        user(nullable: true)
+    }
+
     String toString() {
         "$path P$periodIndex: $comment"
     }

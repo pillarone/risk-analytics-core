@@ -18,6 +18,8 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolde
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.util.PropertiesUtils
 import org.springframework.transaction.TransactionStatus
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
+import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 
 class Parameterization extends ModellingItem {
 
@@ -32,6 +34,7 @@ class Parameterization extends ModellingItem {
      */
     Integer periodCount
     List<ParameterHolder> parameterHolders
+    List<Comment> comments
     List periodLabels
 
     boolean orderByPath = false
@@ -52,6 +55,7 @@ class Parameterization extends ModellingItem {
         setName(name)
         versionNumber = new VersionNumber('1')
         parameterHolders = []
+        comments = []
     }
 
     protected Object createDao() {
@@ -144,6 +148,7 @@ class Parameterization extends ModellingItem {
         dao.creator = creator
         dao.lastUpdater = lastUpdater
         saveParameters(dao)
+        saveComments(dao)
     }
 
     protected void saveParameters(ParameterizationDAO dao) {
@@ -168,6 +173,28 @@ class Parameterization extends ModellingItem {
         }
     }
 
+    protected void saveComments(ParameterizationDAO dao) {
+        Iterator<Comment> iterator = comments.iterator()
+        while (iterator.hasNext()) {
+            Comment comment = iterator.next()
+            if (comment.added) {
+                CommentDAO commentDAO = new CommentDAO(parameterization: dao)
+                comment.applyToDomainObject(commentDAO)
+                dao.addToComments(commentDAO)
+                comment.added = false
+            } else if (comment.updated) {
+                CommentDAO commentDAO = dao.comments.find { it.path == comment.path && it.periodIndex == comment.period }
+                comment.applyToDomainObject(commentDAO)
+                comment.updated = false
+            } else if (comment.deleted) {
+                CommentDAO commentDAO = dao.comments.find { it.path == comment.path && it.periodIndex == comment.period }
+                dao.removeFromComments(commentDAO)
+                commentDAO.delete()
+                iterator.remove()
+            }
+        }
+    }
+
     protected void mapFromDao(Object dao, boolean completeLoad) {
         dao = dao as ParameterizationDAO
         long time = System.currentTimeMillis()
@@ -184,6 +211,7 @@ class Parameterization extends ModellingItem {
         lastUpdater = dao.lastUpdater
         if (completeLoad) {
             loadParameters(dao)
+            loadComments(dao)
         }
         LOG.info("Parameterization $name loaded in ${System.currentTimeMillis() - time}ms")
     }
@@ -193,6 +221,14 @@ class Parameterization extends ModellingItem {
 
         for (Parameter p in dao.parameters) {
             parameterHolders << ParameterHolderFactory.getHolder(p)
+        }
+    }
+
+    private void loadComments(ParameterizationDAO dao) {
+        comments = []
+
+        for (CommentDAO c in dao.comments) {
+            comments << new Comment(c)
         }
     }
 
@@ -271,6 +307,20 @@ class Parameterization extends ModellingItem {
         parameter.modified = false
     }
 
+    void addComment(Comment comment) {
+        comments << comment
+        comment.added = true
+    }
+
+    void removeComment(Comment comment) {
+        if (comment.added) {
+            comments.remove(comment)
+            return
+        }
+        comment.deleted = true
+        comment.updated = false
+    }
+
     List getParameters(String path) {
         def params = parameters.findAll {ParameterHolder parameter ->
             parameter.path == path && !parameter.removed
@@ -321,4 +371,5 @@ class Parameterization extends ModellingItem {
     IConfigObjectWriter getWriter() {
         return new ParameterWriter()
     }
+
 }

@@ -196,9 +196,7 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable, Se
         return false;
     }
 
-    public boolean isCellEditable(int row, int column) {
-        return row > 0 && column > 0;
-    }
+    public abstract boolean isCellEditable(int row, int column);
 
     public String toString() {
         StringBuffer buffer = new StringBuffer("new ");

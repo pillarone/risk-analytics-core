@@ -24,9 +24,18 @@ public class ComboBoxMatrixMultiDimensionalParameter extends MatrixMultiDimensio
             super.setValueAt(value, rowIndex, columnIndex);
             super.setValueAt(value, columnIndex, rowIndex);
         } else if (!(rowIndex == 0 && columnIndex == 0)) {
-            columnTitles.set(rowIndex - 1, value);
-            rowTitles.set(rowIndex - 1, value);
+            if (columnIndex == 0) {
+                columnTitles.set(rowIndex - 1, value);
+                rowTitles.set(rowIndex - 1, value);
+            } else {
+                columnTitles.set(columnIndex - 1, value);
+                rowTitles.set(columnIndex - 1, value);
+            }
         }
+    }
+
+    public boolean isCellEditable(int row, int column) {
+        return !(row == 0 && column == 0);
     }
 
     protected void columnsAdded(int i) {

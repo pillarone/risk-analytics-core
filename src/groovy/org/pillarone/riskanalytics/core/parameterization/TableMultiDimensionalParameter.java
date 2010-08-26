@@ -35,6 +35,10 @@ public class TableMultiDimensionalParameter extends AbstractMultiDimensionalPara
         return 1;
     }
 
+    public boolean isCellEditable(int row, int column) {
+        return row != 0;
+    }
+
     public Object getValueAt(int row, int column) {
         if (row == 0) {
             return titles.get(column).toString();

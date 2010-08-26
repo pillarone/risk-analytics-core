@@ -8,7 +8,6 @@ import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.simulation.engine.actions.*
-import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationBlock
 
 /**
  * This is the main entity to run a simulation. To do this, create a runner object (SimulationRunner.createRunner()).
@@ -89,7 +88,7 @@ public class SimulationRunner {
             }
 
         } catch (Throwable t) {
-            notifySimulationEnd(currentScope?.simulation, SimulationState.ERROR)
+            notifySimulationStateChanged(currentScope?.simulation, SimulationState.ERROR)
             simulationState = SimulationState.ERROR
             error = new SimulationError(
                     simulationRunID: currentScope.simulation?.id,
@@ -115,13 +114,13 @@ public class SimulationRunner {
 
         LOG.info "simulation took ${end - start} ms"
         simulationState = simulationAction.isStopped() ? SimulationState.STOPPED : SimulationState.FINISHED
-        notifySimulationEnd(currentScope?.simulation, simulationState)
+        notifySimulationStateChanged(currentScope?.simulation, simulationState)
+
     }
 
     private void deleteCancelledSimulation() {
         if (simulationAction.isCancelled()) {
             LOG.info "canceled simulation ${currentScope.simulation.name} will be deleted"
-            notifySimulationEnd(currentScope?.simulation, SimulationState.CANCELED)
 //            currentScope.simulation.delete()
         }
     }
@@ -156,6 +155,7 @@ public class SimulationRunner {
         action.perform()
         return true
     }
+
 
     Date getEstimatedSimulationEnd() {
         int progress = currentScope.getProgress()
@@ -258,8 +258,8 @@ public class SimulationRunner {
         currentScope.simulationState = newState
     }
 
-    protected void notifySimulationEnd(Simulation simulation, SimulationState simulationState) {
-        batchRunInfoService?.batchSimulationRunEnd(simulation, simulationState)
+    protected void notifySimulationStateChanged(Simulation simulation, SimulationState simulationState) {
+        batchRunInfoService?.batchSimulationStateChanged(simulation, simulationState)
     }
 
 }

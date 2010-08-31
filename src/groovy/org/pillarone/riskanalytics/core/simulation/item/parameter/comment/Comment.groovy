@@ -1,17 +1,17 @@
 package org.pillarone.riskanalytics.core.simulation.item.parameter.comment
 
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
+import org.pillarone.riskanalytics.core.parameter.comment.CommentTag
 import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.user.UserManagement
-import org.pillarone.riskanalytics.core.parameter.comment.CommentTag
 
 class Comment {
 
-    private String path
-    private int period
-    private Date lastChange
-    private Person user
+    String path
+    int period
+    Date lastChange
+    Person user
     private String comment
     private Set<Tag> tags = new HashSet()
 
@@ -39,6 +39,20 @@ class Comment {
 
     public List<Tag> getTags() {
         return tags.toList()
+    }
+
+    public void setTags(Set selectedTags) {
+        selectedTags.each {Tag tag ->
+            if (!tags.contains(tag))
+                addTag(tag)
+        }
+        List tagsToRemove = []
+        tags.each {Tag tag ->
+            if (!selectedTags.contains(tag))
+                tagsToRemove << tag
+        }
+        if (tagsToRemove.size() > 0)
+            tags.removeAll(tagsToRemove)
     }
 
     public String getText() {

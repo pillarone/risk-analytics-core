@@ -44,6 +44,7 @@ public class SimulationAction implements Action {
         for (int i = 0; i < simulationBlock.streamOffset; i++) {
             MathUtils.RANDOM_NUMBER_GENERATOR_INSTANCE.resetNextSubstream()
         }
+        LOG.info "Initialize block: ${simulationBlock}. Reset to substream #${simulationBlock.streamOffset}"
         iterationAction.iterationScope.currentIteration = simulationBlock.iterationOffset
         simulationScope.numberOfIterations = simulationBlock.blockSize
     }

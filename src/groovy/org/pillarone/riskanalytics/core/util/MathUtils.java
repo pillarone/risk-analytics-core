@@ -9,8 +9,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MathUtils {
-    public static RandomStreamBase RANDOM_NUMBER_GENERATOR_INSTANCE = new F2NL607();
-    //public static RandomStreamBase RANDOM_NUMBER_GENERATOR_INSTANCE;
+
+    private static ThreadLocal<F2NL607> RANDOM_NUMBER_GENERATOR_INSTANCE = new ThreadLocal<F2NL607>() {
+
+        @Override
+        protected F2NL607 initialValue() {
+            return new F2NL607();
+        }
+
+    };
     public static int DEFAULT_RANDOM_SEED = 2;
 
     public static double calculatePercentile(double[] values, double percentile) {
@@ -18,25 +25,21 @@ public class MathUtils {
         return calculatePercentileOfSortedValues(values, percentile);
     }
 
+    public static void setRandomStreamBase(F2NL607 base) {
+        RANDOM_NUMBER_GENERATOR_INSTANCE.set(base);
+    }
+
+    public static F2NL607 getRandomStreamBase() {
+        return RANDOM_NUMBER_GENERATOR_INSTANCE.get();
+    }
+
     public static void initRandomStreamBase(Integer seed) {
         if (seed == null) {
             return;
         }
-        DEFAULT_RANDOM_SEED=seed;
         F2NL607 generator = new F2NL607();
         generateSeed(generator, seed);
-        RANDOM_NUMBER_GENERATOR_INSTANCE = generator;
-        
-    }
-
-    public static void initDummyRandomStreamBase() {
-        DummyRandomStreamBase oldStreamBase = (DummyRandomStreamBase) RANDOM_NUMBER_GENERATOR_INSTANCE;
-        if (oldStreamBase != null) {
-            oldStreamBase.invalidate();
-        }
-
-        RANDOM_NUMBER_GENERATOR_INSTANCE = new DummyRandomStreamBase();
-
+        setRandomStreamBase(generator);
     }
 
     private static void generateSeed(F2NL607 generator, int seed) {

@@ -6,7 +6,7 @@ import org.pillarone.riskanalytics.core.wiring.ITransmitter
 /**
  * @author stefan.kunz (at) intuitive-collaboration (dot) com
  */
-abstract public class MultiPhaseDynamicComposedComponent extends DynamicComposedComponent {
+abstract public class MultiPhaseDynamicComposedComponent extends DynamicComposedComponent implements IChannelAllocation {
 
     private Map<ITransmitter, String> phaseTransmitterInput = new HashMap<ITransmitter, String>();
     private Map<ITransmitter, String> phaseTransmitterOutput = new HashMap<ITransmitter, String>();
@@ -17,8 +17,6 @@ abstract public class MultiPhaseDynamicComposedComponent extends DynamicComposed
 
     public static final String PHASE_START = "start";
     public static final String PHASE_DO_CALCULATION = "calculation";
-
-    abstract public void allocateChannelsToPhases()
 
     public void notifyTransmitted(ITransmitter transmitter) {
         String phaseOfTransmitter = "";
@@ -117,10 +115,6 @@ abstract public class MultiPhaseDynamicComposedComponent extends DynamicComposed
             }
         }
     }
-
-/*    protected void setTransmitterPhase(ITransmitter transmitter, String phase) {
-        phaseTransmitterOutput.put(transmitter, phase);
-    }*/
 
     /** publish on results of transmitters belonging to the DO_CALCULATION_PHASE      */
     protected void publishResults() {

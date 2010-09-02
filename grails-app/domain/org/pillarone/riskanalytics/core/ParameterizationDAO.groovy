@@ -6,6 +6,7 @@ import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import groovy.sql.Sql
 import groovy.sql.GroovyRowResult
+import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 
 class ParameterizationDAO {
 
@@ -26,7 +27,7 @@ class ParameterizationDAO {
 
     javax.sql.DataSource dataSource
 
-    static hasMany = [parameters: Parameter]
+    static hasMany = [parameters: Parameter, comments: CommentDAO]
     static transients = ['dataSource']
 
 

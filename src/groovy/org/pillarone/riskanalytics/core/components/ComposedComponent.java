@@ -91,10 +91,8 @@ abstract public class ComposedComponent extends Component {
     }
 
     private void allocateChannelsToPhases(ComposedComponent component) {
-        if (component instanceof MultiPhaseDynamicComposedComponent) {
-            ((MultiPhaseDynamicComposedComponent) component).allocateChannelsToPhases();
-        } else if (component instanceof MultipleCalculationPhaseComposedComponent) {
-            ((MultipleCalculationPhaseComposedComponent) component).allocateChannelsToPhases();
+        if (component instanceof IChannelAllocation) {
+            ((IChannelAllocation) component).allocateChannelsToPhases();
         }
         List<Component> componentList = component.allSubComponents();
         for (Component subComponent : componentList) {

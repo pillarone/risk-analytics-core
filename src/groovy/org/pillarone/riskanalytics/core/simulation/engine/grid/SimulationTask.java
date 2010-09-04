@@ -39,6 +39,7 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
     private Calculator calculator;
 
     private long time;
+    private int totalJobs = 0;
 
     protected Collection<? extends GridJob> split(int gridSize, SimulationConfiguration simulationConfiguration) {
         currentState = SimulationState.INITIALIZING;
@@ -74,6 +75,7 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
 
         this.simulationConfiguration = simulationConfiguration;
         currentState = SimulationState.RUNNING;
+        totalJobs = jobs.size();
         return jobs;
     }
 
@@ -114,7 +116,7 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
         messageCount++;
         ResultTransferObject result = (ResultTransferObject) serializable;
         resultWriter.writeResult(result);
-        progress.put(uuid, result.getProgress());
+        progress.put(result.getJobIdentifier(), result.getProgress());
     }
 
     public SimulationState getSimulationState() {
@@ -131,14 +133,14 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
 
     public int getProgress() {
         if (!(currentState == SimulationState.POST_SIMULATION_CALCULATIONS)) {
-            if(progress.isEmpty()) {
+            if (progress.isEmpty()) {
                 return 0;
             }
             int sum = 0;
             for (Integer value : progress.values()) {
                 sum += value;
             }
-            return sum / progress.size();
+            return sum / totalJobs;
         } else {
             return calculator.getProgress();
         }

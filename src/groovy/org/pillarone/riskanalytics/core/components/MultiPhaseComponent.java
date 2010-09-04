@@ -13,8 +13,7 @@ import java.util.Map;
  * In and out channels are reset once all phases have been finished.<br/>
  * Restrictions:<ul>
  * <li>If the component is not used as a start component, there has to be at least one in channel for each
- * phase.</li>
- * <li>All channels have to be connected (no test cases available for unconnected channels)</li></ul>
+ * phase.</li></ul>
  *
  * @author stefan.kunz (at) intuitive-collaboration (dot) com
  */
@@ -85,10 +84,12 @@ abstract public class MultiPhaseComponent extends Component implements IChannelA
      * @param phase used as corresponding value and stored within phasePerTransmitterOutput
      */
     public void setTransmitterPhaseOutput(PacketList packetList, String phase) {
-        for (ITransmitter transmitter : getAllOutputTransmitter()) {
-            if (transmitter.getSource() == (packetList)) {
-                phasePerTransmitterOutput.put(transmitter, phase);
-                increaseNumberOfTransmitter(numberOfTransmitterPerPhaseOutput, phase);
+        if (isSenderWired(packetList)) {
+            for (ITransmitter transmitter : getAllOutputTransmitter()) {
+                if (transmitter.getSource() == (packetList)) {
+                    phasePerTransmitterOutput.put(transmitter, phase);
+                    increaseNumberOfTransmitter(numberOfTransmitterPerPhaseOutput, phase);
+                }
             }
         }
     }
@@ -98,10 +99,12 @@ abstract public class MultiPhaseComponent extends Component implements IChannelA
      * @param phase used as corresponding value and stored within phasePerTransmitterInput
      */
     public void setTransmitterPhaseInput(PacketList packetList, String phase) {
-        for (ITransmitter transmitter : getAllInputTransmitter()) {
-            if (transmitter.getTarget() == (packetList)) {
-                phasePerTransmitterInput.put(transmitter, phase);
-                increaseNumberOfTransmitter(numberOfTransmitterPerPhaseInput, phase);
+        if (isReceiverWired(packetList)) {
+            for (ITransmitter transmitter : getAllInputTransmitter()) {
+                if (transmitter.getTarget() == (packetList)) {
+                    phasePerTransmitterInput.put(transmitter, phase);
+                    increaseNumberOfTransmitter(numberOfTransmitterPerPhaseInput, phase);
+                }
             }
         }
     }

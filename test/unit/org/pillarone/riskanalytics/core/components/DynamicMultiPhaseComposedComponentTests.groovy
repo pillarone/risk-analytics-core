@@ -55,20 +55,17 @@ class DynamicMultiPhaseComposedComponentTests extends GroovyTestCase {
         assertEquals 'dynamicComponent.outOrangePhase1.size', 3, dynamicComponentOrangePhase1.size()
         assertEquals 'dynamicComponent.outOrangePhase2.size', 0, dynamicComponentOrangePhase2.size()
 
-        // todo(sku): try to fix during review, in the MCMT it all works fine, the error in the test case occurs
-        //            at setTransmitterPhaseOutput as in the test case getSource instead of getTarget is required
-//        assertEquals 'targetComponent.outApplePhase1.size', 4, targetComponentApplePhase1.size()
-//        assertEquals 'targetComponent.outOrangePhase1.size', 6, targetComponentOrangePhase1.size()
-//        assertEquals 'targetComponent.outOrangePhase2.size', 0, targetComponentOrangePhase2.size()
+        assertEquals 'targetComponent.outApplePhase1.size', 4, targetComponentApplePhase1.size()
+        assertEquals 'targetComponent.outOrangePhase1.size', 6, targetComponentOrangePhase1.size()
+        assertEquals 'targetComponent.outOrangePhase2.size', 0, targetComponentOrangePhase2.size()
 
         sourceComponent.calculateAndPublish("Phase 2")
         assertEquals 'dynamicComponent.outApplePhase1.size', 2,  dynamicComponentApplePhase1.size()
         assertEquals 'dynamicComponent.outOrangePhase1.size', 3, dynamicComponentOrangePhase1.size()
         assertEquals 'dynamicComponent.outOrangePhase2.size', 1, dynamicComponentOrangePhase2.size()
 
-//        assertEquals 'targetComponent.outApplePhase1.size', 4, targetComponentApplePhase1.size()
-//        assertEquals 'targetComponent.outOrangePhase1.size', 6, targetComponentOrangePhase1.size()
-//        assertEquals 'targetComponent.outOrangePhase2.size', 2, targetComponentOrangePhase2.size()
-
+        assertEquals 'targetComponent.outApplePhase1.size', 4, targetComponentApplePhase1.size()
+        assertEquals 'targetComponent.outOrangePhase1.size', 6, targetComponentOrangePhase1.size()
+        assertEquals 'targetComponent.outOrangePhase2.size', 2, targetComponentOrangePhase2.size()
     }
 }

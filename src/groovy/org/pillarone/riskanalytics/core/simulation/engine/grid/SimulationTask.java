@@ -156,7 +156,7 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
         return simBlocks;
     }
 
-    private int getTotalProcessorCount(Grid grid) {
+    protected int getTotalProcessorCount(Grid grid) {
         Collection<GridNode> nodes = grid.getAllNodes();
         List<String> usedHosts = new ArrayList<String>();
         int processorCount = 0;

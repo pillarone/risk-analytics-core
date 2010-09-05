@@ -1,10 +1,15 @@
 package org.pillarone.riskanalytics.core.wiring;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.pillarone.riskanalytics.core.components.Component;
 import org.pillarone.riskanalytics.core.packets.Packet;
 import org.pillarone.riskanalytics.core.packets.PacketList;
 
 public class Transmitter implements ITransmitter {
+
+    private static Log LOG = LogFactory.getLog(Transmitter.class);
+
     protected Component sender;
     protected Component receiver;
     protected PacketList target;
@@ -34,6 +39,22 @@ public class Transmitter implements ITransmitter {
         }
         target.addAll(source);
         setTransmitted(true);
+        if (LOG.isDebugEnabled()) {
+            StringBuffer buffer = new StringBuffer();
+            buffer.append(senderChannelName);
+            buffer.append(" [");
+            buffer.append(source.size());
+            buffer.append("] ");
+            buffer.append(sender.getName());
+            buffer.append(" -> ");
+            buffer.append(receiver.getName());
+            buffer.append(" (");
+            buffer.append(sender.getClass());
+            buffer.append(" -> ");
+            buffer.append(receiver.getClass());
+            buffer.append(")");
+            LOG.debug(buffer.toString());
+        }
         notifyReceiver();
     }
 

@@ -14,6 +14,7 @@ import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.model.ModelHelper
 import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
 import org.gridgain.grid.GridMessageListener
+import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationHandler
 
 public class RunSimulationService {
 
@@ -47,14 +48,15 @@ public class RunSimulationService {
      * @param configuration the simulation details
      * @return the result of the grid gain task
      */
-    public SimulationTask runSimulationOnGrid(SimulationConfiguration configuration) {
+    public SimulationHandler runSimulationOnGrid(SimulationConfiguration configuration) {
         configuration.mappingCache = createMappingCache(configuration)
         configuration.prepareSimulationForGrid()
 
         SimulationTask task = new SimulationTask()
-        grid.execute(task, configuration)
+        SimulationHandler handler = new SimulationHandler(simulationTask: task)
+        handler.gridTaskFuture = grid.execute(task, configuration)
 
-        return task
+        return handler
     }
 
     /**

@@ -39,4 +39,10 @@ class SimulationJob extends GridJobAdapter<JobResult> {
         )
     }
 
+    void cancel() {
+        runner.cancel()
+        super.cancel()
+    }
+
+
 }

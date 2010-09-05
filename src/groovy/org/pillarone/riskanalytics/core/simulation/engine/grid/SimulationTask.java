@@ -41,6 +41,8 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
     private long time;
     private int totalJobs = 0;
 
+    private boolean stopped, cancelled;
+
     protected Collection<? extends GridJob> split(int gridSize, SimulationConfiguration simulationConfiguration) {
         currentState = SimulationState.INITIALIZING;
         time = System.currentTimeMillis();
@@ -95,9 +97,10 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
             }
         }
         Simulation simulation = simulationConfiguration.getSimulation();
-        if (error) {
+        if (error || cancelled) {
             simulation.delete();
-            currentState = SimulationState.ERROR;
+            currentState = error ? SimulationState.ERROR : SimulationState.CANCELED;
+            GridHelper.getGrid().removeMessageListener(this);
             return false;
         }
         LOG.info("Received " + messageCount + " messages. Sent " + totalMessageCount + " messages.");
@@ -107,8 +110,9 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
 
         simulation.setEnd(new Date());
         simulation.save();
-        currentState = SimulationState.FINISHED;
+        currentState = stopped ? SimulationState.STOPPED : SimulationState.FINISHED;
         LOG.info("Task completed in " + (System.currentTimeMillis() - time) + "ms");
+        GridHelper.getGrid().removeMessageListener(this);
         return true;
     }
 
@@ -129,6 +133,14 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
 
     public List<Throwable> getSimulationErrors() {
         return simulationErrors;
+    }
+
+    public void cancel() {
+        cancelled = true;
+    }
+
+    public void stop() {
+        stopped = true;
     }
 
     public int getProgress() {

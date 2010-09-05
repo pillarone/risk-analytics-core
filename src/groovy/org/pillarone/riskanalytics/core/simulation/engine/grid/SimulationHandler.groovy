@@ -31,4 +31,8 @@ class SimulationHandler {
     Simulation getSimulation() {
         return simulationTask.simulation
     }
+
+    List<Throwable> getSimulationErrors() {
+        return simulationTask.getSimulationErrors()
+    }
 }

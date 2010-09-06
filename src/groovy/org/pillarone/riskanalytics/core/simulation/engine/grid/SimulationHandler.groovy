@@ -35,4 +35,8 @@ class SimulationHandler {
     List<Throwable> getSimulationErrors() {
         return simulationTask.getSimulationErrors()
     }
+
+    Date getEstimatedSimulationEnd() {
+        return simulationTask.getEstimatedSimulationEnd()
+    }
 }

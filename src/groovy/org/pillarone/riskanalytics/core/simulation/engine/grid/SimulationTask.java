@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration, Object> implements GridMessageListener {
@@ -29,9 +30,9 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
     private static Log LOG = LogFactory.getLog(SimulationTask.class);
 
     public static final int SIMULATION_BLOCK_SIZE = 1000;
-    public static final int MESSAGE_TIMEOUT=60;
+    public static final int MESSAGE_TIMEOUT = 60000;
 
-    private int messageCount = 0;
+    private AtomicInteger messageCount = new AtomicInteger(0);
     private ResultWriter resultWriter;
 
     private SimulationConfiguration simulationConfiguration;
@@ -40,7 +41,7 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
     private Map<UUID, Integer> progress = new HashMap<UUID, Integer>();
     private Calculator calculator;
 
-    private long time,start;
+    private long time;
     private int totalJobs = 0;
 
     private boolean stopped, cancelled;
@@ -80,10 +81,10 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
         this.simulationConfiguration = simulationConfiguration;
         currentState = SimulationState.RUNNING;
         totalJobs = jobs.size();
-        start=System.currentTimeMillis();
         return jobs;
     }
 
+    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
     public Object reduce(List<GridJobResult> gridJobResults) {
         int totalMessageCount = 0;
         boolean error = false;
@@ -101,31 +102,29 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
         }
         Simulation simulation = simulationConfiguration.getSimulation();
 
-        int currentMessageCount=messageCount;
-        long timeout=System.currentTimeMillis()+MESSAGE_TIMEOUT*1000;
-        while (messageCount<totalMessageCount){
-            if (messageCount>currentMessageCount){
-                timeout=System.currentTimeMillis()+MESSAGE_TIMEOUT*1000;
-                currentMessageCount=messageCount;
+        synchronized (this) {
+            while (messageCount.get() < totalMessageCount) {
+                long timeout = System.currentTimeMillis();
+                LOG.info("Not all messages received yet - waiting");
+                try {
+                    wait(MESSAGE_TIMEOUT);
+                } catch (InterruptedException e) {
+                    error = true;
+                    simulationErrors.add(e);
+                    break;
+                }
+                if (System.currentTimeMillis() - timeout > MESSAGE_TIMEOUT) {
+                    error = true;
+                    simulationErrors.add(new TimeoutException("Not all messages received - timeout reached"));
+                    break;
+                }
             }
-            if (System.currentTimeMillis()>timeout){
-                LOG.error ("Not all messages received ... timeout reached");
-                error=true;
-                simulationErrors.add(new TimeoutException("Not all messages received before timeout ("+messageCount+
-                " of total "+totalMessageCount+")"));
-                break;
-            }
-            try{
-                Thread.sleep(1);
-            }catch(Exception e){};
         }
-
         Grid grid = GridHelper.getGrid();
         grid.removeMessageListener(this);
         if (error || cancelled) {
             simulation.delete();
             currentState = error ? SimulationState.ERROR : SimulationState.CANCELED;
-            GridHelper.getGrid().removeMessageListener(this);
             return false;
         }
         LOG.info("Received " + messageCount + " messages. Sent " + totalMessageCount + " messages.");
@@ -137,15 +136,15 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
         simulation.save();
         currentState = stopped ? SimulationState.STOPPED : SimulationState.FINISHED;
         LOG.info("Task completed in " + (System.currentTimeMillis() - time) + "ms");
-        GridHelper.getGrid().removeMessageListener(this);
         return true;
     }
 
     public synchronized void onMessage(UUID uuid, Serializable serializable) {
-        messageCount++;
+        messageCount.incrementAndGet();
         ResultTransferObject result = (ResultTransferObject) serializable;
         resultWriter.writeResult(result);
         progress.put(result.getJobIdentifier(), result.getProgress());
+        notify();
     }
 
     public SimulationState getSimulationState() {
@@ -187,7 +186,7 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
         int progress = getProgress();
         if (progress > 0 && currentState == SimulationState.RUNNING) {
             long now = System.currentTimeMillis();
-            long onePercentTime = (now - start) / progress;
+            long onePercentTime = (now - time) / progress;
             long estimatedEnd = now + (onePercentTime * (100 - progress));
             return new Date(estimatedEnd);
         } else if (currentState == SimulationState.POST_SIMULATION_CALCULATIONS) {

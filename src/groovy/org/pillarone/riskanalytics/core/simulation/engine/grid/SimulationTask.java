@@ -80,6 +80,7 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
         this.simulationConfiguration = simulationConfiguration;
         currentState = SimulationState.RUNNING;
         totalJobs = jobs.size();
+        start=System.currentTimeMillis();
         return jobs;
     }
 

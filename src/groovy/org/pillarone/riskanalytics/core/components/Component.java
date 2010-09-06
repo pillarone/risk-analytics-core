@@ -4,9 +4,8 @@ import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 import org.pillarone.riskanalytics.core.packets.PacketList;
 import org.pillarone.riskanalytics.core.wiring.ITransmitter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Field;
+import java.util.*;
 
 /**
  * todo: description of general concept
@@ -119,6 +118,7 @@ abstract public class Component implements Cloneable {
         lazyFill(outChannels, "out");
         return outChannels;
     }
+
     private void lazyFill(List<PacketList> channels, String prefix) {
         if (!channels.isEmpty()) return;
         Map properties = allCachedComponentProperties();
@@ -168,14 +168,31 @@ abstract public class Component implements Cloneable {
 
 
     protected Map allComponentProperties() {
-        return DefaultGroovyMethods.getProperties(this);
+        Class currentClass = this.getClass();
+        Map<String, Object> fields = new HashMap<String, Object>();
+
+        while (currentClass != Component.class) {
+            Field[] declaredFields = currentClass.getDeclaredFields();
+            for (Field field : declaredFields) {
+                String fieldName = field.getName();
+                if (fieldName.startsWith("in") || fieldName.startsWith("out") || fieldName.startsWith("parm") || fieldName.startsWith("sub")) {
+                    fields.put(fieldName, DefaultGroovyMethods.getAt(this, fieldName));
+                }
+            }
+
+            currentClass = currentClass.getSuperclass();
+        }
+        return fields;
     }
 
     protected Map propertyCache = null;
-    /** Handle with care! Properties are only retrieved once and never change their value!
-     * Only useful for props that never change like channels and fixed subcomponents.*/
+
+    /**
+     * Handle with care! Properties are only retrieved once and never change their value!
+     * Only useful for props that never change like channels and fixed subcomponents.
+     */
     protected Map allCachedComponentProperties() {
-        if (propertyCache == null) propertyCache =  allComponentProperties();
+        if (propertyCache == null) propertyCache = allComponentProperties();
         return propertyCache;
     }
 
@@ -286,8 +303,8 @@ abstract public class Component implements Cloneable {
             if (propertyKey.startsWith("sub")) {
 
                 Component component = (Component) properties.get(prop);
-                if(component instanceof DynamicComposedComponent) {
-                    component = ((DynamicComposedComponent)component).createDefaultSubComponent();
+                if (component instanceof DynamicComposedComponent) {
+                    component = ((DynamicComposedComponent) component).createDefaultSubComponent();
                 }
                 boolean result = component.hasParameters();
                 if (result) {

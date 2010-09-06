@@ -40,10 +40,11 @@ public class SimulationAction implements Action {
     }
 
     private void initializeSimulationBlock(SimulationBlock simulationBlock) {
-        MathUtils.RANDOM_NUMBER_GENERATOR_INSTANCE.resetStartStream()
+        MathUtils.getRandomStreamBase().resetStartStream()
         for (int i = 0; i < simulationBlock.streamOffset; i++) {
-            MathUtils.RANDOM_NUMBER_GENERATOR_INSTANCE.resetNextSubstream()
+            MathUtils.getRandomStreamBase().resetNextSubstream()
         }
+        LOG.info "Initialize block: ${simulationBlock}. Reset to substream #${simulationBlock.streamOffset}"
         iterationAction.iterationScope.currentIteration = simulationBlock.iterationOffset
         simulationScope.numberOfIterations = simulationBlock.blockSize
     }

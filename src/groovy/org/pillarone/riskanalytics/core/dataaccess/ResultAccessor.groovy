@@ -418,15 +418,25 @@ class IterationFileAccessor {
     public IterationFileAccessor(File f) {
 
         FileInputStream fis = new FileInputStream(f);
-        //BufferedInputStream bis=new BufferedInputStream(fis);
+        BufferedInputStream bs=new BufferedInputStream(fis);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-        byte[] b = new byte[2048];
+        byte[] b = new byte[8048];
         int len;
-        while ((len = fis.read(b)) != -1) {
+        int count=0;
+        while ((len = bs.read(b)) != -1) {
             bos.write(b, 0, len);
+            count++;
         }
-        fis.close()
+        if (count==0){
+            Thread.sleep(2000)
+            while ((len = bs.read(b)) != -1) {
+                bos.write(b, 0, len);
+                count++;
+            }
+        }
+        bs.close();
+        fis.close();
         ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
 
         dis = new DataInputStream(bis);

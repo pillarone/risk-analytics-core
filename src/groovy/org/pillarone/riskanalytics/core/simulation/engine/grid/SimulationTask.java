@@ -12,7 +12,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 import org.gridgain.grid.Grid;
 import org.gridgain.grid.GridNode;
-import org.pillarone.riskanalytics.core.simulation.engine.actions.CalculatorAction;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.JobResult;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultWriter;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultTransferObject;
@@ -41,8 +40,10 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
     private Map<UUID, Integer> progress = new HashMap<UUID, Integer>();
     private Calculator calculator;
 
-    private long time;
-    private long start;
+    private long time,start;
+    private int totalJobs = 0;
+
+    private boolean stopped, cancelled;
 
     protected Collection<? extends GridJob> split(int gridSize, SimulationConfiguration simulationConfiguration) {
         currentState = SimulationState.INITIALIZING;
@@ -78,7 +79,7 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
 
         this.simulationConfiguration = simulationConfiguration;
         currentState = SimulationState.RUNNING;
-        start=System.currentTimeMillis();
+        totalJobs = jobs.size();
         return jobs;
     }
 
@@ -120,9 +121,10 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
 
         Grid grid = GridHelper.getGrid();
         grid.removeMessageListener(this);
-        if (error) {
+        if (error || cancelled) {
             simulation.delete();
-            currentState = SimulationState.ERROR;
+            currentState = error ? SimulationState.ERROR : SimulationState.CANCELED;
+            GridHelper.getGrid().removeMessageListener(this);
             return false;
         }
         LOG.info("Received " + messageCount + " messages. Sent " + totalMessageCount + " messages.");
@@ -132,8 +134,9 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
 
         simulation.setEnd(new Date());
         simulation.save();
-        currentState = SimulationState.FINISHED;
+        currentState = stopped ? SimulationState.STOPPED : SimulationState.FINISHED;
         LOG.info("Task completed in " + (System.currentTimeMillis() - time) + "ms");
+        GridHelper.getGrid().removeMessageListener(this);
         return true;
     }
 
@@ -141,7 +144,7 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
         messageCount++;
         ResultTransferObject result = (ResultTransferObject) serializable;
         resultWriter.writeResult(result);
-        progress.put(uuid, result.getProgress());
+        progress.put(result.getJobIdentifier(), result.getProgress());
     }
 
     public SimulationState getSimulationState() {
@@ -156,16 +159,24 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
         return simulationErrors;
     }
 
+    public void cancel() {
+        cancelled = true;
+    }
+
+    public void stop() {
+        stopped = true;
+    }
+
     public int getProgress() {
         if (!(currentState == SimulationState.POST_SIMULATION_CALCULATIONS)) {
-            if(progress.isEmpty()) {
+            if (progress.isEmpty()) {
                 return 0;
             }
             int sum = 0;
             for (Integer value : progress.values()) {
                 sum += value;
             }
-            return sum / progress.size();
+            return sum / totalJobs;
         } else {
             return calculator.getProgress();
         }
@@ -196,16 +207,15 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
         return simBlocks;
     }
 
-    private int getTotalProcessorCount(Grid grid) {
+    protected int getTotalProcessorCount(Grid grid) {
         Collection<GridNode> nodes = grid.getAllNodes();
         List<String> usedHosts = new ArrayList<String>();
         int processorCount = 0;
         for (GridNode node : nodes) {
-            /*if (!usedHosts.contains(node.getPhysicalAddress())) {
+            if (!usedHosts.contains(node.getPhysicalAddress())) {
                 processorCount += node.getMetrics().getAvailableProcessors();
                 usedHosts.add(node.getPhysicalAddress());
-            }*/
-            processorCount++;
+            }
         }
         LOG.info("Found " + processorCount + " CPUs on " + nodes.size() + " nodes");
         return processorCount;

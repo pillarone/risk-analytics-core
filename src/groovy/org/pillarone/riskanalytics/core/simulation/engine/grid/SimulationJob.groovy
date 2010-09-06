@@ -16,13 +16,14 @@ class SimulationJob extends GridJobAdapter<JobResult> {
     private SimulationConfiguration simulationConfiguration
     private GridNode master
     private SimulationRunner runner = SimulationRunner.createRunner()
+    private UUID jobIdentifier = UUID.randomUUID()
 
     private static Log LOG = LogFactory.getLog(SimulationJob)
 
     public SimulationJob(SimulationConfiguration simulationConfiguration, GridNode gridNode) {
         this.master = gridNode
         this.simulationConfiguration = simulationConfiguration
-        this.simulationConfiguration.outputStrategy = new GridOutputStrategy(gridNode, runner);
+        this.simulationConfiguration.outputStrategy = new GridOutputStrategy(gridNode, runner, jobIdentifier);
     }
 
     JobResult execute() {
@@ -34,8 +35,14 @@ class SimulationJob extends GridJobAdapter<JobResult> {
         GridOutputStrategy outputStrategy = this.simulationConfiguration.outputStrategy
         return new JobResult(
                 totalMessagesSent: outputStrategy.totalMessages, start: start, end: new Date(),
-                nodeName: GridHelper.getGrid().getLocalNode().getId().toString(), simulationException: runner.error?.error
+                nodeName: jobIdentifier.toString(), simulationException: runner.error?.error
         )
     }
+
+    void cancel() {
+        runner.cancel()
+        super.cancel()
+    }
+
 
 }

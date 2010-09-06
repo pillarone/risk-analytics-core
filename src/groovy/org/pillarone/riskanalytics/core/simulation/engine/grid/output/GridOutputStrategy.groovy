@@ -19,14 +19,16 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
     private Grid grid
     private GridNode node
     private SimulationRunner runner
+    private UUID jobIdentifier
 
     private int resultCount = 0
 
     int totalMessages = 0
 
-    public GridOutputStrategy(GridNode masterNode, SimulationRunner runner) {
+    public GridOutputStrategy(GridNode masterNode, SimulationRunner runner, UUID jobIdentifier) {
         node = masterNode
         this.runner = runner
+        this.jobIdentifier = jobIdentifier
     }
 
     private Grid getGrid() {
@@ -66,7 +68,7 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
         for (Map.Entry<ResultDescriptor, ByteArrayOutputStream> entry: streamCache.entrySet()) {
             ResultDescriptor resultDescriptor = entry.key
             ByteArrayOutputStream stream = entry.value
-            getGrid().sendMessage(node, new ResultTransferObject(resultDescriptor, stream.toByteArray(), runner.getProgress()));
+            getGrid().sendMessage(node, new ResultTransferObject(resultDescriptor, jobIdentifier, stream.toByteArray(), runner.getProgress()));
             totalMessages++
             stream.reset();
         }

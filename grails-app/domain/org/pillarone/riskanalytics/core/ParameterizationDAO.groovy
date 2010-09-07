@@ -1,12 +1,12 @@
 package org.pillarone.riskanalytics.core
 
-import org.pillarone.riskanalytics.core.parameter.Parameter
-import org.pillarone.riskanalytics.core.user.Person
+import groovy.sql.GroovyRowResult
+import groovy.sql.Sql
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import groovy.sql.Sql
-import groovy.sql.GroovyRowResult
+import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
+import org.pillarone.riskanalytics.core.user.Person
 
 class ParameterizationDAO {
 
@@ -40,6 +40,8 @@ class ParameterizationDAO {
         creator nullable: true
         lastUpdater nullable: true
     }
+
+    static mapping = { comments(sort: "path", order: "asc") }
 
     String toString() {
         "$name v$itemVersion"

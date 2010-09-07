@@ -6,6 +6,7 @@ import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.parameter.Parameter
+import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
 import org.pillarone.riskanalytics.core.parameterization.ParameterWriter
 import org.pillarone.riskanalytics.core.parameterization.validation.IParameterizationValidator
@@ -15,11 +16,10 @@ import org.pillarone.riskanalytics.core.simulation.ILimitedPeriodCounter
 import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.util.PropertiesUtils
 import org.springframework.transaction.TransactionStatus
-import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
-import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 
 class Parameterization extends ModellingItem {
 
@@ -184,13 +184,17 @@ class Parameterization extends ModellingItem {
                 comment.added = false
             } else if (comment.updated) {
                 CommentDAO commentDAO = dao.comments.find { it.path == comment.path && it.periodIndex == comment.period }
-                comment.applyToDomainObject(commentDAO)
-                comment.updated = false
+                if (commentDAO) {
+                    comment.applyToDomainObject(commentDAO)
+                    comment.updated = false
+                }
             } else if (comment.deleted) {
                 CommentDAO commentDAO = dao.comments.find { it.path == comment.path && it.periodIndex == comment.period }
-                dao.removeFromComments(commentDAO)
-                commentDAO.delete()
-                iterator.remove()
+                if (commentDAO) {
+                    dao.removeFromComments(commentDAO)
+                    commentDAO.delete()
+                    iterator.remove()
+                }
             }
         }
     }

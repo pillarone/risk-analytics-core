@@ -12,6 +12,7 @@ if they are not here...
 import org.pillarone.riskanalytics.core.wiring.PortReplicatorCategory as PRC
 
 import org.pillarone.riskanalytics.core.wiring.WiringUtils
+import org.pillarone.riskanalytics.core.packets.PacketList
 
 abstract class DynamicComposedComponent extends ComposedComponent {
 
@@ -87,7 +88,6 @@ abstract class DynamicComposedComponent extends ComposedComponent {
                 props[component.name] = component
             }
         }
-
         return props
     }
 
@@ -126,21 +126,60 @@ abstract class DynamicComposedComponent extends ComposedComponent {
         return subComponents;
     }
 
+    /**
+     * Remove all sub components from componentList
+     */
     public void clear() {
         componentList.clear()
     }
 
+    /**
+     * This procedure should no longer be used directly, instead the wrapper method
+     * containing the PacketList instead of its String name should be used within
+     * derived classes.
+     * @param dynamicComponent
+     * @param channelName
+     */
+    @Deprecated
     protected void replicateOutChannels(Component dynamicComponent, String channelName) {
         for (Component component: componentList) {
             doWire PRC, dynamicComponent, channelName, component, channelName
         }
     }
 
+    protected void replicateOutChannels(Component dynamicComponent, PacketList sender) {
+        if (isSenderWired(sender)) {
+            replicateOutChannels dynamicComponent, channelName(dynamicComponent, sender)
+        }
+    }
+
+    /**
+     * This procedure should no longer be used directly, instead the wrapper method
+     * containing the PacketList instead of its String name should be used within
+     * derived classes.
+     * @param dynamicComponent
+     * @param channelName
+     */
+    @Deprecated
     protected void replicateInChannels(Component dynamicComponent, String channelName) {
         // PMO-650: sorting is necessary in order to produce reproducible results.
         Collections.sort(componentList, ComponentComparator.getInstance())
         for (Component component: componentList) {
             doWire PRC, component, channelName, dynamicComponent, channelName
+        }
+    }
+
+    protected void replicateInChannels(Component dynamicComponent, PacketList receiver) {
+        if (isReceiverWired(receiver)) {
+            replicateInChannels dynamicComponent, channelName(dynamicComponent, receiver)
+        }
+    }
+
+    private String channelName(Component dynamicComponent, PacketList receiver) {
+        for (Map.Entry entry: dynamicComponent.properties) {
+            if (entry.value.is(receiver)) {
+                return entry.key
+            }
         }
     }
 

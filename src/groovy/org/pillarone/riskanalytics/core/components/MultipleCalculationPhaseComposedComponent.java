@@ -12,15 +12,13 @@ import java.util.Map;
  *
  * @author: stefan.kunz (at) intuitive-collaboration (dot) com
  */
-abstract public class MultipleCalculationPhaseComposedComponent extends ComposedComponent {
+abstract public class MultipleCalculationPhaseComposedComponent extends ComposedComponent implements IChannelAllocation {
 
     private Map<ITransmitter, String> phaseTransmitterInput = new HashMap<ITransmitter, String>();
     private Map<ITransmitter, String> phaseTransmitterOutput = new HashMap<ITransmitter, String>();
 
     protected static final String PHASE_START = "start";
     protected static final String PHASE_DO_CALCULATION = "calculation";
-
-    abstract public void allocateChannelsToPhases();
 
     public void start() {
         transmitIncomingStartPhasePackets();

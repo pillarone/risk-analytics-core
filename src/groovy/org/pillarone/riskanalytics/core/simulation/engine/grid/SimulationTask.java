@@ -120,6 +120,7 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
                 }
             }
         }
+        resultWriter.close();
         Grid grid = GridHelper.getGrid();
         grid.removeMessageListener(this);
         if (error || cancelled) {

@@ -47,6 +47,10 @@ class CalculatorTests extends GroovyTestCase {
 
     }
 
+    protected void tearDown() {
+        resultWriter.close()
+    }
+
     void testResults() {
 
         int initialRecordCount = PostSimulationCalculation.count()

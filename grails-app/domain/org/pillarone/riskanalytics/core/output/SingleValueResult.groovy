@@ -1,7 +1,6 @@
 package org.pillarone.riskanalytics.core.output
 
 import org.hibernate.FetchMode
-import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultWriter
 
 class SingleValueResult {
 

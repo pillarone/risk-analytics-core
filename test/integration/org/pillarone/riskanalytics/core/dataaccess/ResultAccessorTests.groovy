@@ -69,6 +69,13 @@ class ResultAccessorTests extends GroovyTestCase {
         }
     }
 
+    protected void tearDown() {
+        resultWriter.close()
+    }
+
+
+
+
     void testAvgIsStochastic() {
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 0)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 10)

@@ -173,4 +173,8 @@ public class GroovyUtils {
         }
         return result
     }
+
+    static Long getId(def domainClass) {
+        return domainClass.id
+    }
 }

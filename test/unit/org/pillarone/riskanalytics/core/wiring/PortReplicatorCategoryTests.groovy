@@ -59,8 +59,8 @@ class PortReplicatorCategoryTests extends GroovyTestCase {
 
         WiringUtils.use(PortReplicatorCategory) {
             compound.outPort1 = compound.subComponent1.outValue1
-            shouldFailWithCause(java.lang.UnsupportedOperationException, {outerComponent.outValue1 = compound.outPort1})
-            shouldFailWithCause(java.lang.UnsupportedOperationException, {compound.inPort1 = outerComponent.input1})
+            shouldFail(java.lang.UnsupportedOperationException, {outerComponent.outValue1 = compound.outPort1})
+            shouldFail(java.lang.UnsupportedOperationException, {compound.inPort1 = outerComponent.input1})
         }
     }
 
@@ -70,8 +70,8 @@ class PortReplicatorCategoryTests extends GroovyTestCase {
         WiringUtils.use(PortReplicatorCategory) {
             compound.outPort1 = compound.subComponent1.outValue1
             compound.subComponent1.input1 = compound.inPort1
-            shouldFailWithCause(java.lang.UnsupportedOperationException, {compound.subComponent1.input1 = compound.outPort1})
-            shouldFailWithCause(java.lang.UnsupportedOperationException, {compound.outPort1 = compound.subComponent1.input1})
+            shouldFail(java.lang.UnsupportedOperationException, {compound.subComponent1.input1 = compound.outPort1})
+            shouldFail(java.lang.UnsupportedOperationException, {compound.outPort1 = compound.subComponent1.input1})
         }
     }
 
@@ -82,9 +82,9 @@ class PortReplicatorCategoryTests extends GroovyTestCase {
             compound.outPort1 = compound.subComponent1.outValue1
             compound.subComponent1.input1 = compound.inPort1
             // input can only be replicated into the compoundComponent [compound.in -> subComponen.in]
-            shouldFailWithCause(java.lang.UnsupportedOperationException, {compound.inPort1 = compound.subComponent1.input1})
+            shouldFail(java.lang.UnsupportedOperationException, {compound.inPort1 = compound.subComponent1.input1})
             // output can only be replicated out of the compoundComponent [subComponen.out -> compound.out]
-            shouldFailWithCause(java.lang.UnsupportedOperationException, {compound.subComponent1.outValue1 = compound.outPort1})
+            shouldFail(java.lang.UnsupportedOperationException, {compound.subComponent1.outValue1 = compound.outPort1})
         }
     }
 

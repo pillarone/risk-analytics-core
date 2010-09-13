@@ -18,8 +18,7 @@ abstract class ConfigObjectBasedModellingItem extends ModellingItem {
     }
 
 
-    abstract public IConfigObjectWriter getWriter() {
-    }
+    abstract public IConfigObjectWriter getWriter()
 
     public Class getModelClass() {
         Class modelClass = null

@@ -9,7 +9,7 @@ import org.joda.time.DateTime
 class VariableLengthPeriodCounter implements ILimitedPeriodCounter {
 
     private List<DateTime> dates
-    final int currentPeriod
+    int currentPeriod
 
     public VariableLengthPeriodCounter(List<DateTime> dates) {
         currentPeriod = 0

@@ -4,6 +4,7 @@ import groovy.util.ConfigObject;
 import org.codehaus.groovy.grails.commons.ApplicationHolder;
 import org.pillarone.riskanalytics.core.output.SingleValueResultPOJO;
 import org.pillarone.riskanalytics.core.output.batch.AbstractBulkInsert;
+import org.pillarone.riskanalytics.core.util.GroovyUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +20,9 @@ public abstract class AbstractResultsBulkInsert extends AbstractBulkInsert {
             values.add(getSimulationRunId());
             values.add(result.getPeriod());
             values.add(result.getIteration());
-            values.add(result.getPath().getId());
-            values.add(result.getField().getId());
-            values.add(result.getCollector().getId());
+            values.add(GroovyUtils.getId(result.getPath()));
+            values.add(GroovyUtils.getId(result.getField()));
+            values.add(GroovyUtils.getId(result.getCollector()));
             values.add(result.getValue());
             values.add(result.getValueIndex());
             writeResult(values);

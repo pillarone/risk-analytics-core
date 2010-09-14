@@ -36,6 +36,12 @@ Options:
             exclude(name: "hibernate/*")
             exclude(name: "spring/*")
         }
+        fileset(dir: pluginClassesDirPath) {
+            exclude(name: "hibernate")
+            exclude(name: "spring")
+            exclude(name: "hibernate/*")
+            exclude(name: "spring/*")
+        }
         fileset(dir: resourcesDirPath, includes: "**/*")
     }
 

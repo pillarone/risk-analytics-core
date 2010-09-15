@@ -13,7 +13,7 @@ grails.project.dependency.resolution = {
     }
 
     def myResolver = new URLResolver()
-    myResolver.addArtifactPattern "https://svn.intuitive-collaboration.com/GrailsPlugins/grails-[artifact]/tags/LATEST_RELEASE/grails-[artifact]-[revision].[ext]"
+    myResolver.addArtifactPattern "https://build.intuitive-collaboration.com/plugins/[artifact]/grails-[artifact]-[revision].[ext]"
 
     resolver myResolver
 }

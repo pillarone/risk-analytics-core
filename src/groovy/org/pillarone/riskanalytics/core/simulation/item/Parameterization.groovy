@@ -20,6 +20,7 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Commen
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.util.PropertiesUtils
 import org.springframework.transaction.TransactionStatus
+import org.pillarone.riskanalytics.core.workflow.Status
 
 class Parameterization extends ModellingItem {
 
@@ -42,6 +43,7 @@ class Parameterization extends ModellingItem {
 
     List validationErrors
 
+    Status status
 
     public Parameterization(Map params) {
         this(params.remove("name").toString())
@@ -56,6 +58,7 @@ class Parameterization extends ModellingItem {
         versionNumber = new VersionNumber('1')
         parameterHolders = []
         comments = []
+        status = Status.NONE
     }
 
     protected Object createDao() {
@@ -147,6 +150,7 @@ class Parameterization extends ModellingItem {
         dao.modelClassName = modelClass.name
         dao.creator = creator
         dao.lastUpdater = lastUpdater
+        dao.status = status
         saveParameters(dao)
         saveComments(dao)
     }
@@ -213,6 +217,7 @@ class Parameterization extends ModellingItem {
         modelClass = getClass().getClassLoader().loadClass(dao.modelClassName)
         creator = dao.creator
         lastUpdater = dao.lastUpdater
+        status = dao.status
         if (completeLoad) {
             loadParameters(dao)
             loadComments(dao)

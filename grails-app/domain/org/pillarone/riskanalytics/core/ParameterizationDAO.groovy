@@ -7,6 +7,7 @@ import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 import org.pillarone.riskanalytics.core.user.Person
+import org.pillarone.riskanalytics.core.workflow.Status
 
 class ParameterizationDAO {
 
@@ -24,6 +25,8 @@ class ParameterizationDAO {
     Person creator
     Person lastUpdater
     boolean valid
+
+    Status status
 
     javax.sql.DataSource dataSource
 

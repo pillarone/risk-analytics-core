@@ -5,8 +5,13 @@ import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import static org.pillarone.riskanalytics.core.workflow.Status.*
 import org.pillarone.riskanalytics.core.parameterization.ParameterizationHelper
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
+import org.pillarone.riskanalytics.core.user.UserManagement
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 
 class StatusChangeService {
+
+    private static Log LOG = LogFactory.getLog(StatusChangeService)
 
     private Map<Status, Closure> actions = [
             (NONE): { Parameterization parameterization ->
@@ -17,17 +22,24 @@ class StatusChangeService {
                     parameterization.status = Status.REJECTED
                     parameterization.save()
                 }
-                parameterization = incrementVersion(parameterization, parameterization.status == NONE)
-                parameterization.status = DATA_ENTRY
-                parameterization.save()
-                return parameterization
+                Parameterization newParameterization = incrementVersion(parameterization, parameterization.status == NONE)
+                newParameterization.status = DATA_ENTRY
+                newParameterization.save()
+                if (parameterization.status == Status.REJECTED) {
+                    audit(IN_REVIEW, DATA_ENTRY, parameterization, newParameterization)
+                } else {
+                    audit(NONE, DATA_ENTRY, null, newParameterization)
+                }
+                return newParameterization
             },
             (IN_REVIEW): { Parameterization parameterization ->
+                audit(parameterization.status, IN_REVIEW, parameterization, parameterization)
                 parameterization.status = IN_REVIEW
                 parameterization.save()
                 return parameterization
             },
             (IN_PRODUCTION): { Parameterization parameterization ->
+                audit(parameterization.status, IN_PRODUCTION, parameterization, parameterization)
                 parameterization.status = IN_PRODUCTION
                 parameterization.save()
                 return parameterization
@@ -35,7 +47,11 @@ class StatusChangeService {
     ]
 
     Parameterization changeStatus(Parameterization parameterization, Status to) {
-        return actions.get(to).call(parameterization)
+        Parameterization newParameterization = null
+        AuditLog.withTransaction { status ->
+            newParameterization = actions.get(to).call(parameterization)
+        }
+        return newParameterization
     }
 
     //TODO: re-use MIF
@@ -54,5 +70,14 @@ class StatusChangeService {
         def newId = newItem.save()
         newItem.load()
         return newItem
+    }
+
+    private void audit(Status from, Status to, Parameterization fromParameterization, Parameterization toParameterization) {
+        AuditLog auditLog = new AuditLog(fromStatus: from, toStatus: to, fromParameterization: fromParameterization?.dao, toParameterization: toParameterization.dao)
+        auditLog.date = new Date()
+        auditLog.person = UserManagement.getCurrentUser()
+        if (!auditLog.save(flush: true)) {
+            LOG.error "Error saving audit log: ${auditLog.errors}"
+        }
     }
 }

@@ -6,6 +6,7 @@ import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
 import org.pillarone.riskanalytics.core.output.*
+import org.pillarone.riskanalytics.core.workflow.Status
 
 class SimulationTests extends GroovyTestCase {
 
@@ -21,6 +22,7 @@ class SimulationTests extends GroovyTestCase {
         params.modelClassName = CoreModel.name
         params.itemVersion = '1'
         params.periodCount = 1
+        params.status = Status.NONE
         assertNotNull "params not saved", params.save()
         params
     }

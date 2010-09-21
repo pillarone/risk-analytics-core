@@ -12,6 +12,7 @@ import org.pillarone.riskanalytics.core.parameterization.validation.ValidatorReg
 import org.pillarone.riskanalytics.core.parameterization.validation.TestValidationService
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
+import org.pillarone.riskanalytics.core.workflow.Status
 
 class ParameterizationTests extends GroovyTestCase {
 
@@ -385,6 +386,7 @@ class ParameterizationTests extends GroovyTestCase {
         dao.itemVersion = '1'
         dao.name = daoName
         dao.modelClassName = modelClass.name
+        dao.status = Status.NONE
         return dao
     }
 }

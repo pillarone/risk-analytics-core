@@ -8,10 +8,15 @@ import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.pillarone.riskanalytics.core.user.UserManagement
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 
 class StatusChangeService {
 
     private static Log LOG = LogFactory.getLog(StatusChangeService)
+
+    public static StatusChangeService getService() {
+        return (StatusChangeService) ApplicationHolder.application.mainContext.getBean("statusChangeService")
+    }
 
     private Map<Status, Closure> actions = [
             (NONE): { Parameterization parameterization ->

@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.parameter.comment
 
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.pillarone.riskanalytics.core.workflow.Status
 
 
 class CommentDAOTests extends GroovyTestCase {
@@ -17,6 +18,7 @@ class CommentDAOTests extends GroovyTestCase {
         parameterization.modelClassName = EmptyModel.name
         parameterization.itemVersion = "1"
         parameterization.periodCount = 1
+        parameterization.status = Status.NONE
         assertNotNull parameterization.save()
 
         Tag tag = new Tag(name: 'tag').save()

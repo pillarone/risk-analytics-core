@@ -16,6 +16,7 @@ class AuditLog {
 
     static constraints = {
         fromParameterization(nullable: true)
+        person(nullable: true)
     }
 
     String toString() {

@@ -319,6 +319,7 @@ class Parameterization extends ModellingItem {
     void removeComment(Comment comment) {
         if (comment.added) {
             comments.remove(comment)
+            comment.deleted = true
             return
         }
         comment.deleted = true

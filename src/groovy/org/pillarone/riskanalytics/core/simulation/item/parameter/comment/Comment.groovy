@@ -6,18 +6,20 @@ import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.user.UserManagement
 
-class Comment {
+class Comment implements Cloneable {
 
     String path
     int period
     Date lastChange
     Person user
-    private String comment
+    protected String comment
     private Set<Tag> tags = new HashSet()
 
     boolean added = false
     boolean updated = false
     boolean deleted = false
+
+    protected Comment() { }
 
     public Comment(CommentDAO commentDAO) {
         path = commentDAO.path
@@ -77,7 +79,7 @@ class Comment {
         updateChangeInfo()
     }
 
-    private void updateChangeInfo() {
+    protected void updateChangeInfo() {
         user = UserManagement.getCurrentUser()
         lastChange = new Date()
     }
@@ -103,4 +105,17 @@ class Comment {
             dao.removeFromTags(tag)
         }
     }
+
+    public Comment clone() {
+        Comment clone = (Comment) super.clone()
+        clone.lastChange = (Date) lastChange.clone()
+        clone.tags = (Set) tags.clone()
+
+        clone.added = false
+        clone.updated = false
+        clone.deleted = false
+        return clone;
+    }
+
+
 }

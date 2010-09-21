@@ -4,6 +4,9 @@ import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import static org.pillarone.riskanalytics.core.workflow.Status.*
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
+import org.pillarone.riskanalytics.core.parameter.comment.workflow.IssueStatus
 
 class StatusChangeServiceTests extends GroovyTestCase {
 
@@ -69,5 +72,150 @@ class StatusChangeServiceTests extends GroovyTestCase {
 
         assertEquals DATA_ENTRY, newParameterization.status
         assertEquals "R2", newParameterization.versionNumber.toString()
+    }
+
+    void testCopyNonClosedIssues() {
+        Parameterization parameterization = new Parameterization("name")
+        parameterization.status = IN_REVIEW
+        parameterization.versionNumber = new VersionNumber("R1")
+        parameterization.modelClass = EmptyModel
+        parameterization.periodCount = 0
+
+        Comment comment = new Comment("path", 0)
+        comment.text = "text"
+        parameterization.addComment(comment)
+
+        WorkflowComment comment2 = new WorkflowComment("path", 0)
+        comment2.text = "text"
+        parameterization.addComment(comment2)
+
+        WorkflowComment comment3 = new WorkflowComment("path", 0)
+        comment3.text = "text"
+        comment3.resolve()
+        comment3.close()
+        parameterization.addComment(comment3)
+
+        parameterization.save()
+
+        Parameterization newParameterization = statusChangeService.changeStatus(parameterization, DATA_ENTRY)
+        assertNotSame newParameterization, parameterization
+
+        assertEquals 1, newParameterization.comments.size()
+        assertEquals IssueStatus.OPEN, newParameterization.comments[0].status
+
+    }
+
+    void testCommentsToDataEntry() {
+        Parameterization parameterization = new Parameterization("name")
+        parameterization.status = IN_REVIEW
+        parameterization.versionNumber = new VersionNumber("R1")
+        parameterization.modelClass = EmptyModel
+        parameterization.periodCount = 0
+
+        WorkflowComment comment3 = new WorkflowComment("path", 0)
+        comment3.text = "text"
+        comment3.resolve()
+        comment3.close()
+        parameterization.addComment(comment3)
+
+        parameterization.save()
+
+        Parameterization newParameterization = statusChangeService.changeStatus(parameterization, DATA_ENTRY)
+        assertNotSame newParameterization, parameterization
+
+        assertEquals 0, newParameterization.comments.size()
+        assertEquals DATA_ENTRY, newParameterization.status
+    }
+
+    void testCommentsToDataEntryFailed() {
+        Parameterization parameterization = new Parameterization("name")
+        parameterization.status = IN_REVIEW
+        parameterization.versionNumber = new VersionNumber("R1")
+        parameterization.modelClass = EmptyModel
+        parameterization.periodCount = 0
+
+        WorkflowComment comment3 = new WorkflowComment("path", 0)
+        comment3.text = "text"
+        comment3.resolve()
+        parameterization.addComment(comment3)
+
+        parameterization.save()
+
+        shouldFail(WorkflowException, { statusChangeService.changeStatus(parameterization, DATA_ENTRY) })
+    }
+
+    void testCommentsToInReview() {
+        Parameterization parameterization = new Parameterization("name")
+        parameterization.status = DATA_ENTRY
+        parameterization.versionNumber = new VersionNumber("R1")
+        parameterization.modelClass = EmptyModel
+        parameterization.periodCount = 0
+
+        WorkflowComment comment3 = new WorkflowComment("path", 0)
+        comment3.text = "text"
+        comment3.resolve()
+        parameterization.addComment(comment3)
+
+        parameterization.save()
+
+        Parameterization newParameterization = statusChangeService.changeStatus(parameterization, IN_REVIEW)
+        assertSame newParameterization, parameterization
+
+        assertEquals 1, newParameterization.comments.size()
+        assertEquals IN_REVIEW, newParameterization.status
+    }
+
+    void testCommentsToInReviewFailed() {
+        Parameterization parameterization = new Parameterization("name")
+        parameterization.status = DATA_ENTRY
+        parameterization.versionNumber = new VersionNumber("R1")
+        parameterization.modelClass = EmptyModel
+        parameterization.periodCount = 0
+
+        WorkflowComment comment3 = new WorkflowComment("path", 0)
+        comment3.text = "text"
+        parameterization.addComment(comment3)
+
+        parameterization.save()
+
+        shouldFail(WorkflowException, { statusChangeService.changeStatus(parameterization, IN_REVIEW) })
+    }
+
+    void testCommentsToInProduction() {
+        Parameterization parameterization = new Parameterization("name")
+        parameterization.status = IN_REVIEW
+        parameterization.versionNumber = new VersionNumber("R1")
+        parameterization.modelClass = EmptyModel
+        parameterization.periodCount = 0
+
+        WorkflowComment comment3 = new WorkflowComment("path", 0)
+        comment3.text = "text"
+        comment3.resolve()
+        comment3.close()
+        parameterization.addComment(comment3)
+
+        parameterization.save()
+
+        Parameterization newParameterization = statusChangeService.changeStatus(parameterization, IN_PRODUCTION)
+        assertSame newParameterization, parameterization
+
+        assertEquals 1, newParameterization.comments.size()
+        assertEquals IN_PRODUCTION, newParameterization.status
+    }
+
+    void testCommentsToInProductionFailed() {
+        Parameterization parameterization = new Parameterization("name")
+        parameterization.status = IN_REVIEW
+        parameterization.versionNumber = new VersionNumber("R1")
+        parameterization.modelClass = EmptyModel
+        parameterization.periodCount = 0
+
+        WorkflowComment comment3 = new WorkflowComment("path", 0)
+        comment3.text = "text"
+        parameterization.addComment(comment3)
+
+        parameterization.save()
+
+        shouldFail(WorkflowException, { statusChangeService.changeStatus(parameterization, IN_PRODUCTION) })
     }
 }

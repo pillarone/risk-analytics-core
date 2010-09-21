@@ -9,6 +9,9 @@ import org.pillarone.riskanalytics.core.user.UserManagement
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
+import org.pillarone.riskanalytics.core.parameter.comment.workflow.IssueStatus
 
 class StatusChangeService {
 
@@ -53,6 +56,7 @@ class StatusChangeService {
 
     Parameterization changeStatus(Parameterization parameterization, Status to) {
         Parameterization newParameterization = null
+        reviewComments(parameterization, to)
         AuditLog.withTransaction { status ->
             newParameterization = actions.get(to).call(parameterization)
         }
@@ -72,6 +76,14 @@ class StatusChangeService {
         newItem.modelClass = item.modelClass
         newItem.versionNumber = newR ? new VersionNumber("R1") : VersionNumber.incrementVersion(item)
 
+        for (Comment comment in item.comments) {
+            if (comment instanceof WorkflowComment) {
+                if (comment.status != IssueStatus.CLOSED) {
+                    newItem.addComment(comment.clone())
+                }
+            }
+        }
+
         def newId = newItem.save()
         newItem.load()
         return newItem
@@ -84,5 +96,44 @@ class StatusChangeService {
         if (!auditLog.save(flush: true)) {
             LOG.error "Error saving audit log: ${auditLog.errors}"
         }
+    }
+
+    private void reviewComments(Parameterization from, Status to) {
+        switch (to) {
+            case DATA_ENTRY:
+                for (Comment comment in from.comments) {
+                    if (comment instanceof WorkflowComment) {
+                        if (comment.status == IssueStatus.RESOLVED) {
+                            throw new WorkflowException(from.name, to, "Resolved comments found - must be closed or reopened.")
+                        }
+                    }
+                }
+                break;
+            case IN_REVIEW:
+                for (Comment comment in from.comments) {
+                    if (comment instanceof WorkflowComment) {
+                        if (comment.status == IssueStatus.OPEN) {
+                            throw new WorkflowException(from.name, to, "Open comments found - must be resolved first.")
+                        }
+                    }
+                }
+                break;
+            case IN_PRODUCTION:
+                for (Comment comment in from.comments) {
+                    if (comment instanceof WorkflowComment) {
+                        if (comment.status != IssueStatus.CLOSED) {
+                            throw new WorkflowException(from.name, to, "Unclosed comments found - must be closed first.")
+                        }
+                    }
+                }
+                break;
+        }
+    }
+}
+
+class WorkflowException extends RuntimeException {
+
+    public WorkflowException(String itemName, Status to, String cause) {
+        super("Cannot change status of $itemName to ${to.displayName}. Cause: $cause".toString())
     }
 }

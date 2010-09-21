@@ -8,6 +8,7 @@ import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.workflow.Status
+import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowCommentDAO
 
 class ParameterizationDAO {
 
@@ -30,7 +31,7 @@ class ParameterizationDAO {
 
     javax.sql.DataSource dataSource
 
-    static hasMany = [parameters: Parameter, comments: CommentDAO]
+    static hasMany = [parameters: Parameter, comments: CommentDAO, issues: WorkflowCommentDAO]
     static transients = ['dataSource']
 
 

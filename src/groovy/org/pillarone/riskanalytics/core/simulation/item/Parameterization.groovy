@@ -21,6 +21,8 @@ import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.util.PropertiesUtils
 import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.workflow.Status
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
+import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowCommentDAO
 
 class Parameterization extends ModellingItem {
 
@@ -182,25 +184,65 @@ class Parameterization extends ModellingItem {
         while (iterator.hasNext()) {
             Comment comment = iterator.next()
             if (comment.added) {
-                CommentDAO commentDAO = new CommentDAO(parameterization: dao)
-                comment.applyToDomainObject(commentDAO)
-                dao.addToComments(commentDAO)
-                comment.added = false
+                commentAdded(dao, comment)
             } else if (comment.updated) {
-                CommentDAO commentDAO = dao.comments.find { it.path == comment.path && it.periodIndex == comment.period }
-                if (commentDAO) {
-                    comment.applyToDomainObject(commentDAO)
-                    comment.updated = false
-                }
+                commentUpdated(dao, comment)
             } else if (comment.deleted) {
-                CommentDAO commentDAO = dao.comments.find { it.path == comment.path && it.periodIndex == comment.period }
-                if (commentDAO) {
-                    dao.removeFromComments(commentDAO)
-                    commentDAO.delete()
+                if (commentDeleted(dao, comment)) {
                     iterator.remove()
                 }
             }
         }
+    }
+
+    private void commentAdded(ParameterizationDAO dao, Comment comment) {
+        CommentDAO commentDAO = new CommentDAO(parameterization: dao)
+        comment.applyToDomainObject(commentDAO)
+        dao.addToComments(commentDAO)
+        comment.added = false
+    }
+
+    private void commentAdded(ParameterizationDAO dao, WorkflowComment comment) {
+        WorkflowCommentDAO commentDAO = new WorkflowCommentDAO(parameterization: dao)
+        comment.applyToDomainObject(commentDAO)
+        dao.addToIssues(commentDAO)
+        comment.added = false
+    }
+
+    private void commentUpdated(ParameterizationDAO dao, Comment comment) {
+        CommentDAO commentDAO = dao.comments.find { it.path == comment.path && it.periodIndex == comment.period }
+        if (commentDAO) {
+            comment.applyToDomainObject(commentDAO)
+            comment.updated = false
+        }
+    }
+
+    private void commentUpdated(ParameterizationDAO dao, WorkflowComment comment) {
+        WorkflowCommentDAO commentDAO = dao.issues.find { it.path == comment.path && it.periodIndex == comment.period }
+        if (commentDAO) {
+            comment.applyToDomainObject(commentDAO)
+            comment.updated = false
+        }
+    }
+
+    private boolean commentDeleted(ParameterizationDAO dao, Comment comment) {
+        CommentDAO commentDAO = dao.comments.find { it.path == comment.path && it.periodIndex == comment.period }
+        if (commentDAO) {
+            dao.removeFromComments(commentDAO)
+            commentDAO.delete()
+            return true
+        }
+        return false
+    }
+
+    private boolean commentDeleted(ParameterizationDAO dao, WorkflowComment comment) {
+        WorkflowCommentDAO commentDAO = dao.issues.find { it.path == comment.path && it.periodIndex == comment.period }
+        if (commentDAO) {
+            dao.removeFromIssues(commentDAO)
+            commentDAO.delete()
+            return true
+        }
+        return false
     }
 
     protected void mapFromDao(Object dao, boolean completeLoad) {
@@ -238,6 +280,10 @@ class Parameterization extends ModellingItem {
 
         for (CommentDAO c in dao.comments) {
             comments << new Comment(c)
+        }
+
+        for (WorkflowCommentDAO c in dao.issues) {
+            comments << new WorkflowComment(c)
         }
     }
 

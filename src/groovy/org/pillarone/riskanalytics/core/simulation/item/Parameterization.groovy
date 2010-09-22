@@ -334,6 +334,13 @@ class Parameterization extends ModellingItem {
         return result.size() > 0 && result.any { it.endTime != null }
     }
 
+    public boolean isEditable() {
+        if(status != Status.NONE && status != Status.DATA_ENTRY) {
+            return false
+        }
+        return !isUsedInSimulation()
+    }
+
     public List<SimulationRun> getSimulations() {
         if (!isLoaded()) {
             load()

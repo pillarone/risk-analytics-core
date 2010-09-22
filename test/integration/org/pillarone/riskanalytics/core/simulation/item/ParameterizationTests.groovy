@@ -444,6 +444,28 @@ class ParameterizationTests extends GroovyTestCase {
         assertFalse parameterization.valid
     }
 
+    void testIsEditable() {
+        Parameterization parameterization = new Parameterization("newParams")
+        parameterization.modelClass = EmptyModel
+        parameterization.periodCount = 1
+        parameterization.save()
+
+        assertEquals Status.NONE, parameterization.status
+        assertTrue parameterization.isEditable()
+
+        parameterization.status = Status.DATA_ENTRY
+        assertTrue parameterization.isEditable()
+
+        parameterization.status = Status.REJECTED
+        assertFalse parameterization.isEditable()
+
+        parameterization.status = Status.IN_REVIEW
+        assertFalse parameterization.isEditable()
+
+        parameterization.status = Status.IN_PRODUCTION
+        assertFalse parameterization.isEditable()
+    }
+
 
     private def createDao(Class modelClass, String daoName) {
         ParameterizationDAO dao = new ParameterizationDAO()

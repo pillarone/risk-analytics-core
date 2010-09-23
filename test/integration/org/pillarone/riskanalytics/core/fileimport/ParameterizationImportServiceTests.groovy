@@ -21,6 +21,48 @@ class ParameterizationImportServiceTests extends GroovyTestCase {
 
     }
 
+    void testImportParameterizationWithComments() {
+
+        File paramFile = new File(getModelFolder(), "core/CoreParametersWithComments.groovy")
+
+        def count = ParameterizationDAO.count()
+
+        assertTrue "import not successful", service.importFile(paramFile.toURI().toURL())
+        assertEquals count + 1, ParameterizationDAO.count()
+
+        ParameterizationDAO parameterization = ParameterizationDAO.findByName("coreParamTest")
+        assertNotNull parameterization
+        assertEquals "Error by comments import", parameterization.comments.size(), 1
+        List comments = parameterization.comments as List
+
+        assertEquals comments[0].path, "Core:exampleInputOutputComponent:parmParameterObject"
+        assertEquals comments[0].periodIndex, 0
+        assertEquals comments[0].comment, "comment text"
+        assertNull comments[0].user
+        assertEquals comments[0].timeStamp, new Date(1285144738000)
+        List tags = comments[0].tags as List
+        assertEquals tags.size(), 1
+        assertEquals tags[0].tag.name, "FIXED"
+
+    }
+
+    void testImportParameterizationWithoutComments() {
+
+        File paramFile = new File(getModelFolder(), "core/CoreParametersWithoutComments.groovy")
+
+        def count = ParameterizationDAO.count()
+
+        assertTrue "import not successful", service.importFile(paramFile.toURI().toURL())
+        assertEquals count + 1, ParameterizationDAO.count()
+
+        ParameterizationDAO parameterization = ParameterizationDAO.findByName("coreParamWithoutComments")
+        assertNotNull parameterization
+
+        assertNull parameterization.comments
+
+    }
+
+
 
     void testPrepare() {
 

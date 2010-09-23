@@ -362,6 +362,10 @@ class Parameterization extends ModellingItem {
                 }
             }
         }
+        original.comments = []
+        comments.each { Comment comment ->
+            original.comments << comment.toConfigObject()
+        }
 
         return original
     }

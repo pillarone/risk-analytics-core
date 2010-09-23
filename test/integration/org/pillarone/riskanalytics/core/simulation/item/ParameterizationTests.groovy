@@ -2,15 +2,15 @@ package org.pillarone.riskanalytics.core.simulation.item
 
 import models.core.CoreModel
 import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.pillarone.riskanalytics.core.example.model.EmptyModel
+import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObject
 import org.pillarone.riskanalytics.core.fileimport.ParameterizationImportService
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.StringParameter
-import org.pillarone.riskanalytics.core.example.model.EmptyModel
-import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObject
-import org.pillarone.riskanalytics.core.simulation.item.parameter.StringParameterHolder
-import org.pillarone.riskanalytics.core.parameterization.validation.ValidatorRegistry
-import org.pillarone.riskanalytics.core.parameterization.validation.TestValidationService
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
+import org.pillarone.riskanalytics.core.parameterization.validation.TestValidationService
+import org.pillarone.riskanalytics.core.parameterization.validation.ValidatorRegistry
+import org.pillarone.riskanalytics.core.simulation.item.parameter.StringParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 
 class ParameterizationTests extends GroovyTestCase {
@@ -329,7 +329,7 @@ class ParameterizationTests extends GroovyTestCase {
         ConfigObject configObject = parameterization.toConfigObject()
 
 
-        assertEquals 6, configObject.size()
+        assertEquals 7, configObject.size()
         assertTrue configObject.containsKey("applicationVersion")
         assertTrue configObject.containsKey("periodLabels")
         assertEquals CoreModel, configObject.model
@@ -344,7 +344,7 @@ class ParameterizationTests extends GroovyTestCase {
 
         parameterization.periodLabels = ["Q1"]
         configObject = parameterization.toConfigObject()
-        assertEquals 6, configObject.size()
+        assertEquals 7, configObject.size()
         assertEquals "periodLabels", ["Q1"], configObject.periodLabels
     }
 

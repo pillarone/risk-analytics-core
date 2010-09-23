@@ -18,7 +18,8 @@ class RiskAnalyticsCoreGrailsPlugin {
             "backgroundThread": "1.3",
             "jodaTime": "0.5",
             "quartz": "0.4.1",
-            "acegi": "0.5.3"
+            "acegi": "0.5.3",
+            "mavenPublisher": "0.6"
     ]
     // resources that are excluded from plugin packaging
     def pluginExcludes = [

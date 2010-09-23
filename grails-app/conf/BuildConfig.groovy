@@ -18,6 +18,7 @@ grails.project.dependency.resolution = {
     resolver myResolver
 }
 
+
 coverage {
     exclusions = [
             'models/**',

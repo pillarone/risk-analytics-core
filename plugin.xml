@@ -67,6 +67,7 @@ Persistence &amp; Simulation engine.
     <plugin name='jodaTime' version='0.5' />
     <plugin name='quartz' version='0.4.1' />
     <plugin name='acegi' version='0.5.3' />
+    <plugin name='mavenPublisher' version='0.6' />
   </dependencies>
   <behavior />
 </plugin>

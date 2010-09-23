@@ -20,7 +20,7 @@ class PortReplicationTests extends GroovyTestCase {
         subComponent = new RelayComponent()
     }
 
-    void test() {
+    void testNothing() {
 
     }
 

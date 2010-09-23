@@ -29,17 +29,13 @@ abstract class ModellingItem {
         itemChangedListener = []
     }
 
-    abstract protected def createDao() {
-    }
+    abstract protected def createDao()
 
-    abstract public def getDaoClass() {
-    }
+    abstract public def getDaoClass()
 
-    abstract protected void mapToDao(def dao) {
-    }
+    abstract protected void mapToDao(def dao)
 
-    abstract protected void mapFromDao(def dao, boolean completeLoad) {
-    }
+    abstract protected void mapFromDao(def dao, boolean completeLoad) 
 
     protected void saveDependentData(def dao) {}
 

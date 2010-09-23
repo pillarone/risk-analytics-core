@@ -1,4 +1,4 @@
-<plugin name='risk-analytics-core' version='1.0.3.2' grailsVersion='1.2.0 &gt; *'>
+<plugin name='risk-analytics-core' version='1.0.4.1' grailsVersion='1.3.4 &gt; *'>
   <author>Intuitive Collaboration AG</author>
   <authorEmail>info@pillarone.org</authorEmail>
   <title>RiskAnalytics core</title>
@@ -67,9 +67,6 @@ Persistence &amp; Simulation engine.
     <plugin name='jodaTime' version='0.5' />
     <plugin name='quartz' version='0.4.1' />
     <plugin name='acegi' version='0.5.3' />
-    <resolvers>
-      <resolver type='grailsPlugins' name='grailsPlugins' />
-    </resolvers>
   </dependencies>
   <behavior />
 </plugin>

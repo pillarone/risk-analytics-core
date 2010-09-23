@@ -10,7 +10,7 @@ public class ContinuousPeriodCounter implements IPeriodCounter {
 
     private DateTime startOfFirstPeriod
 
-    final int periodCount = 0
+    int periodCount = 0
     private Period periodLength
 
 

@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.user
 
+import org.codehaus.groovy.grails.plugins.springsecurity.AuthorizeTools
+
 /**
  * User domain class.
  */
@@ -35,4 +37,8 @@ class Person {
 		enabled()
         settings()
 	}
+
+    public Set<String> roles() {
+        return AuthorizeTools.authoritiesToRoles(authorities)
+    }
 }

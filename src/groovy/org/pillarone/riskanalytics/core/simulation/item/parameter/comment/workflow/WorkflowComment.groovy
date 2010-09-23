@@ -58,12 +58,12 @@ class WorkflowComment extends Comment {
     }
 
     void reopen() {
-        if (status == IssueStatus.CLOSED) {
+        if (status == IssueStatus.RESOLVED) {
             status = IssueStatus.OPEN
             updated = true
             updateChangeInfo()
         } else {
-            throw new IllegalStateException("Cannot close a comment which is ${status.displayName}")
+            throw new IllegalStateException("Cannot reopen a comment which is ${status.displayName}")
         }
     }
 

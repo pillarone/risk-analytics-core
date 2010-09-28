@@ -335,10 +335,24 @@ class Parameterization extends ModellingItem {
     }
 
     public boolean isEditable() {
-        if(status != Status.NONE && status != Status.DATA_ENTRY) {
+        if (status != Status.NONE && status != Status.DATA_ENTRY) {
             return false
         }
         return !isUsedInSimulation()
+    }
+
+    public List<String> getAllEditablePaths() {
+        List result = []
+        for (Comment comment in comments) {
+            if (comment instanceof WorkflowComment) {
+                result << comment.path
+            }
+        }
+        return result
+    }
+
+    public boolean newVersionAllowed() {
+        return status == Status.NONE || status == Status.DATA_ENTRY
     }
 
     public List<SimulationRun> getSimulations() {

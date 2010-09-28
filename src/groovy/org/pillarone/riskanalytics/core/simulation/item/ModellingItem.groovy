@@ -35,7 +35,7 @@ abstract class ModellingItem {
 
     abstract protected void mapToDao(def dao)
 
-    abstract protected void mapFromDao(def dao, boolean completeLoad) 
+    abstract protected void mapFromDao(def dao, boolean completeLoad)
 
     protected void saveDependentData(def dao) {}
 
@@ -66,6 +66,9 @@ abstract class ModellingItem {
         }
     }
 
+    public boolean isEditable() {
+        return false
+    }
 
     abstract protected def loadFromDB()
 

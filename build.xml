@@ -69,6 +69,7 @@
     <target name="release-plugin" depends="cruise" description="Releases the plugin in our P1 plugin repository. Working on server only!">
         <exec executable="${grails}" failonerror="true" resolveexecutable="true">
             <arg value="maven-install"/>
+            <env key="GRAILS_HOME" value="${GRAILS_HOME}"/>
         </exec>
         <exec executable="${grails}" failonerror="true" resolveexecutable="true">
             <arg value="maven-deploy"/>

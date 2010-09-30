@@ -64,6 +64,9 @@ public class ComponentUtils {
     }
 
     public static String insertBlanks(String componentName) {
+        if (componentName == null) {
+            return null;
+        }
         StringBuffer displayNameBuffer = new StringBuffer();
 
         int index = 0;

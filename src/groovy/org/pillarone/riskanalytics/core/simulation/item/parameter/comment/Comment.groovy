@@ -6,7 +6,7 @@ import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.user.UserManagement
 
-class Comment {
+class Comment implements Cloneable {
 
     String path
     int period
@@ -134,4 +134,15 @@ class Comment {
         sb.append("]")
         return sb.toString()
     }
+
+    public Object clone() {
+        Comment comment = new Comment(path, period)
+        comment.user = user
+        comment.comment = this.comment
+        comment.setTags(tags)
+        comment.lastChange = lastChange
+        return comment
+    }
+
+
 }

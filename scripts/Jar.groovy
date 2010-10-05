@@ -128,6 +128,8 @@ private void copyLibraries(String target) {
         fileset(dir: './lib', includes: '*.jar')
         fileset(dir: pluginsDirPath, includes: '**/lib/*.jar')
         fileset(dir: grailsHome, includes: 'lib/*.jar dist/*.jar')
+        fileset(dir: "$userHome/.ivy2/cache/org.springframework.security/org.springframework.security.core/jars", includes: '*.jar')
+        fileset(dir: "$userHome/.ivy2/cache/org.springframework.security/org.springframework.security.web/jars", includes: '*.jar')
     }
 }
 

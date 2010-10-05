@@ -5,6 +5,8 @@ import org.pillarone.riskanalytics.core.model.Model
 import models.core.CoreModel
 import org.pillarone.riskanalytics.core.example.marker.ITestComponentMarker
 import org.pillarone.riskanalytics.core.components.Component
+import org.pillarone.riskanalytics.core.example.parameter.ExampleMultiDimensionalConstraints
+import org.pillarone.riskanalytics.core.example.marker.ITest2ComponentMarker
 
 
 class ConstrainedMultiDimensionalParameterTests extends GroovyTestCase {
@@ -37,5 +39,29 @@ class ConstrainedMultiDimensionalParameterTests extends GroovyTestCase {
         List numbers = constrainedMultiDimensionalParameter.getValuesAsObjects(1)
         assertEquals 2, numbers.size()
         assertTrue numbers.every { it instanceof Number }
+    }
+
+
+    void testReferencePaths() {
+        IMultiDimensionalConstraints markerConstraint = new ExampleMultiDimensionalConstraints()
+        ConstrainedMultiDimensionalParameter parameter = new ConstrainedMultiDimensionalParameter(
+                [['example output component', 'hierarchy output component'], [1.0, 0.0]], ['component', 'values'], markerConstraint
+        )
+        assertTrue 'hierarchy output component', parameter.referencePaths(ITestComponentMarker, 'hierarchy output component')
+        assertTrue 'hierarchy output component', parameter.referencePaths(ITestComponentMarker, 'example output component')
+        assertFalse 'hierarchy output component', parameter.referencePaths(ITest2ComponentMarker, 'hierarchy output component')
+        assertFalse 'hierarchy output component', parameter.referencePaths(ITestComponentMarker, '1.0')
+    }
+
+
+    void testUpdateReferenceValues() {
+        IMultiDimensionalConstraints markerConstraint = new ExampleMultiDimensionalConstraints()
+        ConstrainedMultiDimensionalParameter parameter = new ConstrainedMultiDimensionalParameter(
+                [['example output component', 'hierarchy output component'], [1.0, 0.0]], ['component', 'values'], markerConstraint
+        )
+        assertTrue 'hierarchy output component', parameter.updateReferenceValues(ITestComponentMarker, 'hierarchy output component', 'flat output component')
+        assertTrue 'hierarchy output component', parameter.updateReferenceValues(ITestComponentMarker, 'example output component', 'flat output component')
+        assertFalse 'hierarchy output component', parameter.updateReferenceValues(ITest2ComponentMarker, 'hierarchy output component', 'flat output component')
+        assertFalse 'hierarchy output component', parameter.updateReferenceValues(ITestComponentMarker, '1.0', '5.0')
     }
 }

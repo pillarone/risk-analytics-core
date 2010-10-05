@@ -162,6 +162,7 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
 
     public boolean updateReferenceValues(Class markerInterface, String oldValue, String newValue) {
         Integer column = constraints.getColumnIndex(markerInterface);
+        if (column == null) return false;
         boolean atLeastOneUpdated = false;
         for (int row = getTitleRowCount(); row < getRowCount(); row++) {
             String value = (String) getValueAt(row, column);

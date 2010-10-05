@@ -11,6 +11,8 @@ import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObject
 import org.pillarone.riskanalytics.core.example.marker.ITestComponentMarker
 import org.pillarone.riskanalytics.core.example.marker.ITest2ComponentMarker
 import org.pillarone.riskanalytics.core.parameterization.ConstrainedString
+import org.pillarone.riskanalytics.core.example.parameter.ExampleMultiDimensionalConstraints
+import org.pillarone.riskanalytics.core.parameterization.ComboBoxTableMultiDimensionalParameter
 
 class ParameterObjectParameterHolderTests extends GroovyTestCase {
 
@@ -209,56 +211,4 @@ class ParameterObjectParameterHolderTests extends GroovyTestCase {
         assertEquals 2d, holder.classifierParameters.get("p3").businessObject
 
     }
-
-
-    void testReferencePaths() {
-        ExampleParameterObject parameterObject = new ExampleParameterObject(
-                parameters : ExampleParameterObjectClassifier.getStrategy(ExampleParameterObjectClassifier.TYPE0,
-                        [a: 100, b: 20]),
-                classifier: ExampleParameterObjectClassifier.TYPE0)
-        ParameterObjectParameterHolder parameterHolder = new ParameterObjectParameterHolder('x:y:z', 0, parameterObject)
-        assertEquals 'a found', ['x:y:z'], parameterHolder.referencePaths(ITestComponentMarker, 'a')
-        assertEquals 'reference not found', [], parameterHolder.referencePaths(ITestComponentMarker, 'cherry')
-        assertEquals 'reference not found, wrong marker', [], parameterHolder.referencePaths(ITest2ComponentMarker, 'apple')
-    }
-
-    void testUpdateReferenceValues() {
-        ConstrainedString constrainedString = new ConstrainedString(ITestComponentMarker, 'apple')
-        ConstrainedStringParameterHolder parameterHolder = new ConstrainedStringParameterHolder('europe:suisse', 0, constrainedString)
-        assertEquals 'verify original value', 'apple', parameterHolder.getBusinessObject().stringValue
-
-        assertEquals 'one reference path found', ['europe:suisse'], parameterHolder.updateReferenceValues(ITestComponentMarker, 'apple', 'banana')
-        assertEquals 'correct modification: apple -> banana', 'subBanana', parameterHolder.getBusinessObject().stringValue
-
-        assertEquals 'reference not found', [], parameterHolder.updateReferenceValues(ITestComponentMarker, 'apple', 'cherry')
-        assertEquals 'correct modification: apple -> cherry', 'subBanana', parameterHolder.getBusinessObject().stringValue
-
-        assertEquals 'reference banana found', ['europe:suisse'], parameterHolder.updateReferenceValues(ITestComponentMarker, 'banana', 'cherry')
-        assertEquals 'correct modification: banana -> cherry', 'subCherry', parameterHolder.getBusinessObject().stringValue
-
-        assertEquals 'reference not found, wrong marker', [], parameterHolder.updateReferenceValues(ITest2ComponentMarker, 'banana', 'apple')
-        assertEquals 'reference not found, banana -> apple', 'subCherry', parameterHolder.getBusinessObject().stringValue
-    }
-
-/*     List<String> referencePaths(Class markerInterface, String refValue) {
-        if (classifierParameters.size() > 0) {
-            for (ParameterHolder parameterHolder: classifierParameters.values()) {
-                if (parameterHolder instanceof MultiDimensionalParameterHolder) {
-                    return parameterHolder.referencePaths(markerInterface, refValue)
-                }
-            }
-        }
-        return Collections.emptyList()
-    }
-
-    List<String> updateReferenceValues(Class markerInterface, String oldValue, String newValue) {
-        if (classifierParameters.size() > 0) {
-            for (ParameterHolder parameterHolder: classifierParameters.values()) {
-                if (parameterHolder instanceof MultiDimensionalParameterHolder) {
-                    return parameterHolder.updateReferenceValues(markerInterface, oldValue, newValue)
-                }
-            }
-        }
-        return Collections.emptyList()
-    }*/
 }

@@ -13,15 +13,16 @@ import org.pillarone.riskanalytics.core.simulation.engine.grid.ContextClassLoade
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.0.3.1.2-kti"
+    def version = "1.0.5-kti"
     // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "1.2.0 > *"
+    def grailsVersion = "1.3.4 > *"
     // the other plugins this plugin depends on
     def dependsOn = [
             "backgroundThread": "1.3",
             "jodaTime": "0.5",
             "quartz": "0.4.1",
-            "acegi": "0.5.3"
+            "springSecurityCore": "1.0.1",
+            "mavenPublisher": "0.6"
     ]
     // resources that are excluded from plugin packaging
     def pluginExcludes = [

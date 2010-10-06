@@ -79,10 +79,12 @@ abstract class DynamicMultiPhaseComposedComponent extends DynamicComposedCompone
      * @param phase used as corresponding value and stored within phasePerTransmitterOutput
      */
     public void setTransmitterPhaseOutput(PacketList packetList, String phase) {
-        for (ITransmitter transmitter : getAllOutputTransmitter()) {
-            if (transmitter.getTarget().is(packetList)) {
-                phasePerTransmitterOutput.put(transmitter, phase)
-                increaseNumberOfTransmitter(numberOfTransmitterPerPhaseOutput, phase)
+        if (isSenderWired(packetList)) {
+            for (ITransmitter transmitter : getAllOutputTransmitter()) {
+                if (transmitter.getSource().is(packetList)) {
+                    phasePerTransmitterOutput.put(transmitter, phase)
+                    increaseNumberOfTransmitter(numberOfTransmitterPerPhaseOutput, phase)
+                }
             }
         }
     }
@@ -92,19 +94,21 @@ abstract class DynamicMultiPhaseComposedComponent extends DynamicComposedCompone
      * @param phase used as corresponding value and stored within phasePerTransmitterInput
      */
     public void setTransmitterPhaseInput(PacketList packetList, String phase) {
-        for (ITransmitter transmitter : getAllInputTransmitter()) {
-            if (transmitter.getTarget().is(packetList)) {
-                phasePerTransmitterInput.put(transmitter, phase)
-                increaseNumberOfTransmitter(numberOfTransmitterPerPhaseInput, phase)
+        if (isReceiverWired(packetList)) {
+            for (ITransmitter transmitter : getAllInputTransmitter()) {
+                if (transmitter.getTarget().is(packetList)) {
+                    phasePerTransmitterInput.put(transmitter, phase)
+                    increaseNumberOfTransmitter(numberOfTransmitterPerPhaseInput, phase)
 
-                List<ITransmitter> replicationTransmitters = replicationInputTransmitterPerPhase.get(phase)
-                if (!replicationTransmitters) {
-                    replicationTransmitters = new ArrayList<ITransmitter>()
-                    replicationInputTransmitterPerPhase.put(phase, replicationTransmitters)
-                }
-                for (ITransmitter replicationTransmitter : getAllInputReplicationTransmitter()) {
-                    if (transmitter.getTarget().is(replicationTransmitter.getSource())) {
-                        replicationTransmitters.add(replicationTransmitter)
+                    List<ITransmitter> replicationTransmitters = replicationInputTransmitterPerPhase.get(phase)
+                    if (!replicationTransmitters) {
+                        replicationTransmitters = new ArrayList<ITransmitter>()
+                        replicationInputTransmitterPerPhase.put(phase, replicationTransmitters)
+                    }
+                    for (ITransmitter replicationTransmitter : getAllInputReplicationTransmitter()) {
+                        if (transmitter.getTarget().is(replicationTransmitter.getSource())) {
+                            replicationTransmitters.add(replicationTransmitter)
+                        }
                     }
                 }
             }

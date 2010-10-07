@@ -9,7 +9,6 @@ import org.pillarone.riskanalytics.core.output.CollectingModeFactory
 import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
 import org.gridgain.grid.GridSpringBean
 import org.gridgain.grid.GridConfigurationAdapter
-import org.pillarone.riskanalytics.core.simulation.engine.grid.ContextClassLoaderAwareGridJBossMarshaller
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
@@ -46,7 +45,6 @@ Persistence & Simulation engine.
         //override gridgain beans because we need a custom config
         "grid.cfg"(GridConfigurationAdapter) {
             gridName = "pillarone"
-            marshaller = ref('marshaller')
 
             if (!Boolean.getBoolean("GRIDGAIN_HOME")) {
                 def gridgainHomeDefault = new File("./").absolutePath + File.separator + 'grails-app' + File.separator + 'conf' + File.separator + 'gridgain'
@@ -59,7 +57,6 @@ Persistence & Simulation engine.
             configuration = ref('grid.cfg')
         }
 
-        marshaller(ContextClassLoaderAwareGridJBossMarshaller) { }
     }
 
     def doWithDynamicMethods = {ctx ->

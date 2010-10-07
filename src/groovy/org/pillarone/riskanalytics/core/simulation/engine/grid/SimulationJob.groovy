@@ -14,16 +14,14 @@ import org.pillarone.riskanalytics.core.simulation.engine.grid.output.JobResult
 class SimulationJob extends GridJobAdapter<JobResult> {
 
     private SimulationConfiguration simulationConfiguration
-    private GridNode master
     private SimulationRunner runner = SimulationRunner.createRunner()
     private UUID jobIdentifier = UUID.randomUUID()
 
     private static Log LOG = LogFactory.getLog(SimulationJob)
 
-    public SimulationJob(SimulationConfiguration simulationConfiguration, GridNode gridNode) {
-        this.master = gridNode
+    public SimulationJob(SimulationConfiguration simulationConfiguration, UUID masterNodeId) {
         this.simulationConfiguration = simulationConfiguration
-        this.simulationConfiguration.outputStrategy = new GridOutputStrategy(gridNode, runner, jobIdentifier);
+        this.simulationConfiguration.outputStrategy = new GridOutputStrategy(masterNodeId, runner, jobIdentifier);
     }
 
     JobResult execute() {

@@ -3,11 +3,11 @@ package org.pillarone.riskanalytics.core.simulation.engine.grid.output
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.gridgain.grid.Grid
-import org.gridgain.grid.GridNode
 import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
 import org.pillarone.riskanalytics.core.output.SingleValueResultPOJO
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationRunner
 import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper
+import org.gridgain.grid.GridRichNode
 
 class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
 
@@ -17,7 +17,7 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
     private HashMap<ResultDescriptor, ByteArrayOutputStream> streamCache = new HashMap<ResultDescriptor, ByteArrayOutputStream>();
 
     private Grid grid
-    private GridNode node
+    private UUID masterNodeId
     private SimulationRunner runner
     private UUID jobIdentifier
 
@@ -25,8 +25,8 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
 
     int totalMessages = 0
 
-    public GridOutputStrategy(GridNode masterNode, SimulationRunner runner, UUID jobIdentifier) {
-        node = masterNode
+    public GridOutputStrategy(UUID masterNodeId, SimulationRunner runner, UUID jobIdentifier) {
+        this.masterNodeId = masterNodeId
         this.runner = runner
         this.jobIdentifier = jobIdentifier
     }
@@ -68,7 +68,13 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
         for (Map.Entry<ResultDescriptor, ByteArrayOutputStream> entry: streamCache.entrySet()) {
             ResultDescriptor resultDescriptor = entry.key
             ByteArrayOutputStream stream = entry.value
-            getGrid().sendMessage(node, new ResultTransferObject(resultDescriptor, jobIdentifier, stream.toByteArray(), runner.getProgress()));
+            GridRichNode master
+            for(GridRichNode node in getGrid().allNodes) {
+                if(node.getId() == this.masterNodeId) {
+                    master = node
+                }
+            }
+            getGrid().sendMessage(master, new ResultTransferObject(resultDescriptor, jobIdentifier, stream.toByteArray(), runner.getProgress()));
             totalMessages++
             stream.reset();
         }

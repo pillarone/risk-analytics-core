@@ -10,6 +10,7 @@ class ResultAccessor {
     private static HashMap<String, Integer> pathCache = new HashMap<String, Integer>();
     private static HashMap<String, Integer> fieldCache = new HashMap<String, Integer>();
 
+    private static HashMap<String,CompareValues> comparators=null;
 
     static List getRawData(SimulationRun simulationRun) {
 
@@ -390,7 +391,6 @@ class ResultAccessor {
     }
 
     public static List getValuesSortedNew(SimulationRun simulationRun, int period, long pathId, long collectorId, long fieldId) {
-        long tstamp = System.currentTimeMillis();
         File iterationFile = new File(getSimRunPath(simulationRun) + File.separator + pathId + "_" + period + "_" + fieldId);
         IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
         List<Double> values = new ArrayList<Double>();
@@ -398,7 +398,6 @@ class ResultAccessor {
             values.add(ifa.getValue());
         }
         Collections.sort(values);
-        tstamp = System.currentTimeMillis() - tstamp;
         return values;
     }
 
@@ -406,6 +405,93 @@ class ResultAccessor {
         return getValuesSortedNew(simulationRun, periodIndex, getPathId(pathName, simulationRun.id), 0, getFieldId(fieldName, simulationRun.id));
     }
 
+    public static synchronized void initComparators(){
+
+        if (comparators!=null)return;
+
+        comparators=new HashMap<String,CompareValues>();
+
+        comparators.put("<",new CompareValues(){
+             public boolean compareValues(double d1,double d2){
+                 if (d1<d2)
+                    return true;
+                 return false;
+             }
+        });
+        comparators.put("<=",new CompareValues(){
+             public boolean compareValues(double d1,double d2){
+                 if (d1<=d2)
+                    return true;
+                 return false;
+             }
+        });
+        comparators.put("=",new CompareValues(){
+             public boolean compareValues(double d1,double d2){
+                 if (d1==d2)
+                    return true;
+                 return false;
+             }
+        });
+        comparators.put(">=",new CompareValues(){
+             public boolean compareValues(double d1,double d2){
+                 if (d1>=d2)
+                    return true;
+                 return false;
+             }
+        });
+
+         comparators.put(">",new CompareValues(){
+             public boolean compareValues(double d1,double d2){
+                 if (d1>d2)
+                    return true;
+                 return false;
+             }
+        });
+    }
+
+    public static List getCriteriaConstrainedIterations(SimulationRun simulationRun,int period,String path,String field,
+    String criteria,double conditionValue){
+        initComparators();
+        File iterationFile = new File(getSimRunPath(simulationRun) + File.separator + getPathId(path, simulationRun.id)
+                + "_" + period + "_" + getFieldId(field, simulationRun.id));
+        HashMap<Integer, Double> tmpValues = new HashMap<Integer, Double>(10000);
+        List<Integer> iterations = new ArrayList<Integer>();
+        IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
+        
+         while (ifa.fetchNext()) {
+            tmpValues.put(ifa.getId(), ifa.getValue());
+        }
+        CompareValues currentComparator=comparators.get(criteria);
+        if (currentComparator!=null){
+
+            for (int i=0;i<tmpValues.size();i++){
+                if (currentComparator.compareValues(tmpValues.get(i),conditionValue))
+                    iterations.add(i);
+            }
+        }
+        return iterations;
+    }
+
+    public static List getIterationConstrainedValues(SimulationRun simulationRun,int period,String path,String field,
+    List<Integer> iterations){
+        File iterationFile = new File(getSimRunPath(simulationRun) + File.separator + getPathId(path, simulationRun.id)
+                        + "_" + period + "_" + getFieldId(field, simulationRun.id));
+        HashMap<Integer, Double> tmpValues = new HashMap<Integer, Double>(10000);
+        List<Double> values = new ArrayList<Double>();
+        IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
+        Collections.sort(iterations);
+
+        while (ifa.fetchNext()) {
+            tmpValues.put(ifa.getId(), ifa.getValue());
+        }
+
+        for (int i:iterations){
+            Double d=null;
+            if ((d=tmpValues.get(i))!=null)
+                values.add(d)
+        }
+        return values;
+    }
 
 }
 
@@ -458,5 +544,9 @@ class IterationFileAccessor {
 
     public double getValue() {
         return value;
-    }
+    }   
+}
+
+interface CompareValues{
+    public boolean compareValues(double d1,double d2);
 }

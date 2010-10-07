@@ -9,6 +9,7 @@ import org.pillarone.riskanalytics.core.user.UserSettings
 import org.pillarone.riskanalytics.core.user.UserManagement
 import grails.plugins.springsecurity.SpringSecurityService
 import org.pillarone.riskanalytics.core.user.PersonAuthority
+import org.pillarone.riskanalytics.core.output.SimulationRun
 
 class CoreBootStrap {
 
@@ -61,6 +62,17 @@ class CoreBootStrap {
                 actuaryFR.save()
                 PersonAuthority.create(actuaryFR, userGroup)
 
+            }
+        }
+        //delete all unfinished simulations
+        SimulationRun.withTransaction {status ->
+            def unfinishedSimulations = SimulationRun.findAllByEndTime(null)
+            unfinishedSimulations.each {SimulationRun simulationRun ->
+                try {
+                    simulationRun.delete()
+                } catch (Exception ex) {
+                    ex.printStackTrace()
+                }
             }
         }
 

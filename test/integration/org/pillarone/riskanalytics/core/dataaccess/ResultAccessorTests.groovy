@@ -53,7 +53,7 @@ class ResultAccessorTests extends GroovyTestCase {
             path2 = new PathMapping(pathName: 'testPath2').save()
         }
 
-        field = FieldMapping.findByFieldName('Ultimate')
+        field = FieldMapping.findByFieldName('ultimate')
         if (field == null) {
             field = new FieldMapping(fieldName: 'ultimate').save()
         }
@@ -190,6 +190,45 @@ class ResultAccessorTests extends GroovyTestCase {
         assertEquals 5, values[1]
         assertEquals 10, values[2]
         assertEquals 20, values[3]
+    }
+
+    void testGetConstrainedIteration(){
+        writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 20)
+        writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 10)
+        writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 2, value: 5)
+
+        List values = ResultAccessor.getCriteriaConstrainedIterations(simulationRun, 0, path1.pathName, field.fieldName,">",10);
+        assertEquals 0, values[0]
+
+        values = ResultAccessor.getCriteriaConstrainedIterations(simulationRun, 0, path1.pathName, field.fieldName,"<",20);
+        assertEquals 2, values.size()
+
+        values = ResultAccessor.getCriteriaConstrainedIterations(simulationRun, 0, path1.pathName, field.fieldName,">=",0);
+        assertEquals 3, values.size()
+
+        values = ResultAccessor.getCriteriaConstrainedIterations(simulationRun, 0, path1.pathName, field.fieldName,"<=",10);
+        assertEquals 2, values.size()
+
+        values = ResultAccessor.getCriteriaConstrainedIterations(simulationRun, 0, path1.pathName, field.fieldName,"<",10);
+        assertEquals 2, values[0]
+
+        values = ResultAccessor.getCriteriaConstrainedIterations(simulationRun, 0, path1.pathName, field.fieldName,"=",10);
+        assertEquals 1, values[0]
+    }
+
+    void testIterationConstrainedValues(){
+        writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 20)
+        writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 10)
+        writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 2, value: 5)
+        List<Integer> iterations=new ArrayList<Integer>()
+        iterations.add(2)
+        iterations.add(0)
+        iterations.add(1)
+        List values = ResultAccessor.getIterationConstrainedValues(simulationRun, 0, path1.pathName, field.fieldName,iterations);
+
+        assertEquals 20,values[0]
+        assertEquals 10,values[1]
+        assertEquals 5,values[2]
     }
 
     private void writeResult(SingleValueResult result) {

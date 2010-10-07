@@ -57,22 +57,21 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
         List<SimulationBlock> simulationBlocks = generateBlocks(SIMULATION_BLOCK_SIZE, simulationConfiguration.getSimulation().getNumberOfIterations());
 
         LOG.info("Number of generated blocks: " + simulationBlocks.size());
-        int maximumBlocksPerNode = new BigDecimal(simulationBlocks.size()).divide(new BigDecimal(cpuCount), RoundingMode.UP).intValue();
         List<SimulationJob> jobs = new ArrayList<SimulationJob>();
+        List<SimulationConfiguration> configurations=new ArrayList<SimulationConfiguration>(cpuCount);
 
-        int nextBlockIndex = 0;
-        for (int i = 0; i < cpuCount; i++) {
+        for (int i=0;i<cpuCount;i++){
             SimulationConfiguration newConfiguration = simulationConfiguration.clone();
-            for (int j = 0; j < maximumBlocksPerNode; j++) {
-                if (nextBlockIndex < simulationBlocks.size()) {
-                    newConfiguration.addSimulationBlock(simulationBlocks.get(nextBlockIndex));
-                    nextBlockIndex++;
-                }
-            }
-            if (newConfiguration.getSimulationBlocks().size() > 0) {
-                jobs.add(new SimulationJob(newConfiguration, grid.getLocalNode()));
-                LOG.info("Created a new job with block count " + newConfiguration.getSimulationBlocks().size());
-            }
+            configurations.add(newConfiguration);
+        }
+        
+        for (int i=0;i<simulationBlocks.size();i++){
+            configurations.get(i%cpuCount).addSimulationBlock(simulationBlocks.get(i));
+        }
+
+        for (int i=0;i<cpuCount;i++){
+            jobs.add(new SimulationJob(configurations.get(i), grid.getLocalNode()));
+            LOG.info("Created a new job with block count " + configurations.get(i).getSimulationBlocks().size());
         }
 
         resultWriter = new ResultWriter((Long) simulationConfiguration.getSimulation().id);

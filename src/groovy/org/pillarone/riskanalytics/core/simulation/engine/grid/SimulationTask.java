@@ -1,23 +1,17 @@
 package org.pillarone.riskanalytics.core.simulation.engine.grid;
 
-import org.gridgain.grid.GridTaskSplitAdapter;
+import org.gridgain.grid.*;
 import org.pillarone.riskanalytics.core.output.Calculator;
 import org.pillarone.riskanalytics.core.simulation.SimulationState;
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration;
-import org.gridgain.grid.GridJob;
-import org.gridgain.grid.GridJobResult;
 
-import org.gridgain.grid.GridMessageListener;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
-import org.gridgain.grid.Grid;
-import org.gridgain.grid.GridNode;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.JobResult;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultWriter;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultTransferObject;
 import org.pillarone.riskanalytics.core.simulation.item.Simulation;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
@@ -58,19 +52,19 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
 
         LOG.info("Number of generated blocks: " + simulationBlocks.size());
         List<SimulationJob> jobs = new ArrayList<SimulationJob>();
-        List<SimulationConfiguration> configurations=new ArrayList<SimulationConfiguration>(cpuCount);
+        List<SimulationConfiguration> configurations = new ArrayList<SimulationConfiguration>(cpuCount);
 
-        for (int i=0;i<cpuCount;i++){
+        for (int i = 0; i < cpuCount; i++) {
             SimulationConfiguration newConfiguration = simulationConfiguration.clone();
             configurations.add(newConfiguration);
         }
-        
-        for (int i=0;i<simulationBlocks.size();i++){
-            configurations.get(i%cpuCount).addSimulationBlock(simulationBlocks.get(i));
+
+        for (int i = 0; i < simulationBlocks.size(); i++) {
+            configurations.get(i % cpuCount).addSimulationBlock(simulationBlocks.get(i));
         }
 
-        for (int i=0;i<cpuCount;i++){
-            jobs.add(new SimulationJob(configurations.get(i), grid.getLocalNode()));
+        for (int i = 0; i < cpuCount; i++) {
+            jobs.add(new SimulationJob(configurations.get(i), grid.localNode().getId()));
             LOG.info("Created a new job with block count " + configurations.get(i).getSimulationBlocks().size());
         }
 
@@ -139,7 +133,7 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
         return true;
     }
 
-    public synchronized void onMessage(UUID uuid, Serializable serializable) {
+    public synchronized void onMessage(UUID uuid, Object serializable) {
         messageCount.incrementAndGet();
         ResultTransferObject result = (ResultTransferObject) serializable;
         resultWriter.writeResult(result);
@@ -208,7 +202,7 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
     }
 
     protected int getTotalProcessorCount(Grid grid) {
-        Collection<GridNode> nodes = grid.getAllNodes();
+        Collection<GridRichNode> nodes = grid.getAllNodes();
         List<String> usedHosts = new ArrayList<String>();
         int processorCount = 0;
         for (GridNode node : nodes) {

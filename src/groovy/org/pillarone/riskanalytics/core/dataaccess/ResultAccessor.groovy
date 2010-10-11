@@ -10,7 +10,7 @@ class ResultAccessor {
     private static HashMap<String, Integer> pathCache = new HashMap<String, Integer>();
     private static HashMap<String, Integer> fieldCache = new HashMap<String, Integer>();
 
-    private static HashMap<String,CompareValues> comparators=null;
+    private static HashMap<String, CompareValues> comparators = null;
 
     static List getRawData(SimulationRun simulationRun) {
 
@@ -275,7 +275,7 @@ class ResultAccessor {
 
     private static List getPathsNew(SimulationRun simulationRun) {
         File simRun = new File(getSimRunPath(simulationRun));
-        if(simRun.listFiles().length == 0) {
+        if (simRun.listFiles().length == 0) {
             return []
         }
 
@@ -297,19 +297,20 @@ class ResultAccessor {
                     "FROM org.pillarone.riskanalytics.core.output.PathMapping as p " +
                     "WHERE p.pathName = ?", [pathName]);
 
-            pathId = new Integer((int)res[0]);
+            pathId = new Integer((int) res[0]);
             pathCache.put(pathName + simId, pathId)
         }
         return pathId;
     }
 //
+
     private static int getFieldId(String fieldName, long simId) {
         Integer fieldId = null;
         if ((fieldId = pathCache.get(fieldName + simId)) == null) {
             def res = SingleValueResult.executeQuery("SELECT DISTINCT f.id " +
                     "FROM org.pillarone.riskanalytics.core.output.FieldMapping as f " +
                     "WHERE f.fieldName = ?", [fieldName]);
-            fieldId = new Integer((int)res[0]);
+            fieldId = new Integer((int) res[0]);
             pathCache.put(fieldName + simId, fieldId)
         }
         return fieldId;
@@ -376,8 +377,8 @@ class ResultAccessor {
         }
         List<Double> values = new ArrayList<Double>(tmpValues.size());
         for (int i = 0; i <= tmpValues.size(); i++) {
-            Double d=null
-            if ((d=tmpValues.get(i))!=null){
+            Double d = null
+            if ((d = tmpValues.get(i)) != null) {
                 values.add(d);
             }
         }
@@ -405,77 +406,77 @@ class ResultAccessor {
         return getValuesSortedNew(simulationRun, periodIndex, getPathId(pathName, simulationRun.id), 0, getFieldId(fieldName, simulationRun.id));
     }
 
-    public static synchronized void initComparators(){
+    public static synchronized void initComparators() {
 
-        if (comparators!=null)return;
+        if (comparators != null) return;
 
-        comparators=new HashMap<String,CompareValues>();
+        comparators = new HashMap<String, CompareValues>();
 
-        comparators.put("<",new CompareValues(){
-             public boolean compareValues(double d1,double d2){
-                 if (d1<d2)
+        comparators.put("<", new CompareValues() {
+            public boolean compareValues(double d1, double d2) {
+                if (d1 < d2)
                     return true;
-                 return false;
-             }
+                return false;
+            }
         });
-        comparators.put("<=",new CompareValues(){
-             public boolean compareValues(double d1,double d2){
-                 if (d1<=d2)
+        comparators.put("<=", new CompareValues() {
+            public boolean compareValues(double d1, double d2) {
+                if (d1 <= d2)
                     return true;
-                 return false;
-             }
+                return false;
+            }
         });
-        comparators.put("=",new CompareValues(){
-             public boolean compareValues(double d1,double d2){
-                 if (d1==d2)
+        comparators.put("=", new CompareValues() {
+            public boolean compareValues(double d1, double d2) {
+                if (d1 == d2)
                     return true;
-                 return false;
-             }
+                return false;
+            }
         });
-        comparators.put(">=",new CompareValues(){
-             public boolean compareValues(double d1,double d2){
-                 if (d1>=d2)
+        comparators.put(">=", new CompareValues() {
+            public boolean compareValues(double d1, double d2) {
+                if (d1 >= d2)
                     return true;
-                 return false;
-             }
+                return false;
+            }
         });
 
-         comparators.put(">",new CompareValues(){
-             public boolean compareValues(double d1,double d2){
-                 if (d1>d2)
+        comparators.put(">", new CompareValues() {
+            public boolean compareValues(double d1, double d2) {
+                if (d1 > d2)
                     return true;
-                 return false;
-             }
+                return false;
+            }
         });
     }
 
-    public static List getCriteriaConstrainedIterations(SimulationRun simulationRun,int period,String path,String field,
-    String criteria,double conditionValue){
+    public static List getCriteriaConstrainedIterations(SimulationRun simulationRun, int period, String path, String field,
+                                                        String criteria, double conditionValue) {
         initComparators();
         File iterationFile = new File(getSimRunPath(simulationRun) + File.separator + getPathId(path, simulationRun.id)
                 + "_" + period + "_" + getFieldId(field, simulationRun.id));
         HashMap<Integer, Double> tmpValues = new HashMap<Integer, Double>(10000);
         List<Integer> iterations = new ArrayList<Integer>();
         IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
-        
-         while (ifa.fetchNext()) {
+
+        while (ifa.fetchNext()) {
             tmpValues.put(ifa.getId(), ifa.getValue());
         }
-        CompareValues currentComparator=comparators.get(criteria);
-        if (currentComparator!=null){
+        CompareValues currentComparator = comparators.get(criteria);
+        if (currentComparator != null) {
 
-            for (int i=0;i<tmpValues.size();i++){
-                if (currentComparator.compareValues(tmpValues.get(i),conditionValue))
+            for (int i = 1; i <= tmpValues.size(); i++) {
+                if (currentComparator.compareValues(tmpValues.get(i), conditionValue))
                     iterations.add(i);
             }
         }
         return iterations;
     }
 
-    public static List getIterationConstrainedValues(SimulationRun simulationRun,int period,String path,String field,
-    List<Integer> iterations){
+    public static List getIterationConstrainedValues(SimulationRun simulationRun, int period, String path, String field,
+                                                     List<Integer> iterations) {
         File iterationFile = new File(getSimRunPath(simulationRun) + File.separator + getPathId(path, simulationRun.id)
-                        + "_" + period + "_" + getFieldId(field, simulationRun.id));
+                + "_" + period + "_" + getFieldId(field, simulationRun.id));
         HashMap<Integer, Double> tmpValues = new HashMap<Integer, Double>(10000);
         List<Double> values = new ArrayList<Double>();
         IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
@@ -485,9 +486,9 @@ class ResultAccessor {
             tmpValues.put(ifa.getId(), ifa.getValue());
         }
 
-        for (int i:iterations){
-            Double d=null;
-            if ((d=tmpValues.get(i))!=null)
+        for (int i: iterations) {
+            Double d = null;
+            if ((d = tmpValues.get(i)) != null)
                 values.add(d)
         }
         return values;
@@ -504,17 +505,17 @@ class IterationFileAccessor {
     public IterationFileAccessor(File f) {
 
         FileInputStream fis = new FileInputStream(f);
-        BufferedInputStream bs=new BufferedInputStream(fis);
+        BufferedInputStream bs = new BufferedInputStream(fis);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
         byte[] b = new byte[8048];
         int len;
-        int count=0;
+        int count = 0;
         while ((len = bs.read(b)) != -1) {
             bos.write(b, 0, len);
             count++;
         }
-        if (count==0){
+        if (count == 0) {
             Thread.sleep(2000)
             while ((len = bs.read(b)) != -1) {
                 bos.write(b, 0, len);
@@ -544,9 +545,11 @@ class IterationFileAccessor {
 
     public double getValue() {
         return value;
-    }   
+    }
 }
 
-interface CompareValues{
-    public boolean compareValues(double d1,double d2);
+interface CompareValues {
+    public boolean compareValues(double d1, double d2)
+
+    ;
 }

@@ -148,17 +148,10 @@ class ParameterHolderFactory {
     private static List<String> renameReferencingParameters(Parameterization parameterization, String oldComponentPath, String newComponentPath) {
         String oldComponentName = ComponentUtils.getComponentNormalizedName(oldComponentPath)
         String newComponentName = ComponentUtils.getComponentNormalizedName(newComponentPath)
-        List<String> modifiedReferencePaths = new ArrayList<String>()
         Class markerInterface = getMarkerInterface(parameterization, oldComponentPath)
-        if (markerInterface) {
-            for (ParameterHolder parameterHolder: parameterization.parameterHolders) {
-                if (parameterHolder instanceof IMarkerValueAccessor) {
-                    modifiedReferencePaths.addAll(parameterHolder.updateReferenceValues(markerInterface, oldComponentName, newComponentName))
-                }
-
-            }
+        return affectedParameterHolders(parameterization, markerInterface, oldComponentName).collectAll { parameterHolder ->
+            parameterHolder.updateReferenceValues(markerInterface, oldComponentName, newComponentName)
         }
-        return modifiedReferencePaths
     }
 
     /**
@@ -168,16 +161,22 @@ class ParameterHolderFactory {
      */
     public static List<String> referencingParametersPaths(Parameterization parameterization, String componentPath) {
         String componentName = ComponentUtils.getComponentNormalizedName(componentPath)
-        List<String> modifiedReferencePaths = new ArrayList<String>()
         Class markerInterface = getMarkerInterface(parameterization, componentPath)
+        return affectedParameterHolders(parameterization, markerInterface, componentPath).collectAll { parameterHolder ->
+            parameterHolder.referencePaths(markerInterface, componentName)
+        }
+    }
+
+    private static List<ParameterHolder> affectedParameterHolders(Parameterization parameterization, Class markerInterface, String componentPath) {
+        List<ParameterHolder> referencedParameterHolders = new ArrayList<ParameterHolder>()
         if (markerInterface) {
             for (ParameterHolder parameterHolder: parameterization.parameterHolders) {
                 if (parameterHolder instanceof IMarkerValueAccessor) {
-                    modifiedReferencePaths.addAll(parameterHolder.referencePaths(markerInterface, componentName))
+                    referencedParameterHolders.add parameterHolder
                 }
             }
         }
-        return modifiedReferencePaths
+        return referencedParameterHolders
     }
 
     /**

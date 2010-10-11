@@ -230,7 +230,7 @@ class ResultAccessorTests extends GroovyTestCase {
         assertEquals 10, values[1]
         assertEquals 5, values[2]
     }
-
+//
     private void writeResult(SingleValueResult result) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(bos);

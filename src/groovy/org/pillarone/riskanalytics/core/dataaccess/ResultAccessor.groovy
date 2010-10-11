@@ -472,7 +472,7 @@ class ResultAccessor {
         }
         return iterations;
     }
-
+//
     public static List getIterationConstrainedValues(SimulationRun simulationRun, int period, String path, String field,
                                                      List<Integer> iterations) {
         File iterationFile = new File(getSimRunPath(simulationRun) + File.separator + getPathId(path, simulationRun.id)

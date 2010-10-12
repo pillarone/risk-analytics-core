@@ -29,6 +29,8 @@ class ParameterizationDAO {
 
     Status status
 
+    Long dealId
+
     javax.sql.DataSource dataSource
 
     static hasMany = [parameters: Parameter, comments: CommentDAO, issues: WorkflowCommentDAO]
@@ -43,6 +45,7 @@ class ParameterizationDAO {
         modificationDate nullable: true
         creator nullable: true
         lastUpdater nullable: true
+        dealId(nullable: true)
     }
 
     static mapping = { comments(sort: "path", order: "asc") }

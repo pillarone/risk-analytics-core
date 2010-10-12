@@ -46,6 +46,7 @@ class Parameterization extends ModellingItem {
     List validationErrors
 
     Status status
+    Long dealId
 
     public Parameterization(Map params) {
         this(params.remove("name").toString())
@@ -153,6 +154,7 @@ class Parameterization extends ModellingItem {
         dao.creator = creator
         dao.lastUpdater = lastUpdater
         dao.status = status
+        dao.dealId = dealId
         saveParameters(dao)
         saveComments(dao)
     }
@@ -260,6 +262,7 @@ class Parameterization extends ModellingItem {
         creator = dao.creator
         lastUpdater = dao.lastUpdater
         status = dao.status
+        dealId = dao.dealId
         if (completeLoad) {
             loadParameters(dao)
             loadComments(dao)

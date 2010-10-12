@@ -75,7 +75,8 @@ class StatusChangeService {
         newItem.periodLabels = item.periodLabels
         newItem.modelClass = item.modelClass
         newItem.versionNumber = newR ? new VersionNumber("R1") : VersionNumber.incrementVersion(item)
-
+        newItem.dealId = item.dealId
+        
         for (Comment comment in item.comments) {
             if (comment instanceof WorkflowComment) {
                 if (comment.status != IssueStatus.CLOSED) {

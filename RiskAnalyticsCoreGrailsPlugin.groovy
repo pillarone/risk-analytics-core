@@ -7,6 +7,12 @@ import org.pillarone.riskanalytics.core.parameterization.ConstraintsFactory
 import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
 import org.pillarone.riskanalytics.core.output.CollectingModeFactory
 import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
+import org.springframework.remoting.rmi.RmiProxyFactoryBean
+import org.pillarone.riskanalytics.core.remoting.ITransactionService
+import org.springframework.remoting.rmi.RmiServiceExporter
+import org.pillarone.riskanalytics.core.remoting.IResultService
+import org.pillarone.riskanalytics.core.remoting.impl.ResultService
+import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
@@ -40,7 +46,29 @@ Persistence & Simulation engine.
     }
 
     def doWithSpring = {
-        // TODO Implement runtime spring config (optional)
+        transactionService(RmiProxyFactoryBean) {
+            serviceInterface = ITransactionService
+            serviceUrl = ConfigurationHolder.config.transactionServiceUrl
+            refreshStubOnConnectFailure = true
+            lookupStubOnStartup = false
+        }
+
+        resultServiceExporter(RmiServiceExporter) {
+            serviceName = "ResultService"
+            serviceInterface = IResultService
+            service = ref("resultService")
+        }
+
+        Properties attributes = new Properties()
+        attributes.put("*", "PROPAGATION_REQUIRED,readOnly")
+
+        resultService(TransactionProxyFactoryBean) {
+            transactionManager = ref("transactionManager")
+            target = ref("resultServiceBean")
+            transactionAttributes = attributes
+        }
+
+        resultService(ResultService) { }
     }
 
     def doWithDynamicMethods = {ctx ->

@@ -11,6 +11,8 @@ environments {
     calculationBulkInsert = null
     keyFiguresToCalculate = null
 
+    transactionServiceUrl = "rmi://localhost:1099/TransactionService"
+
     development {
         log4j = {
             info 'org.pillarone.riskanalytics.core'

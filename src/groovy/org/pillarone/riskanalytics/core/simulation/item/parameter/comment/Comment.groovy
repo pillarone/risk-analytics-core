@@ -39,6 +39,21 @@ class Comment implements Cloneable {
         added = true
     }
 
+    public Comment(Map commentMap) {
+        this(commentMap['path'], commentMap['period'])
+
+        comment = commentMap['comment']
+        commentMap['tags']?.each {String tagName ->
+            Tag tag = Tag.findByName(tagName)
+            if (!tag) {
+                tag = new Tag(name: tagName)
+                tag.save()
+            }
+            addTag(tag)
+        }
+        lastChange = commentMap['lastChange']
+    }
+
     public List<Tag> getTags() {
         return tags.toList()
     }
@@ -104,6 +119,22 @@ class Comment implements Cloneable {
         for (CommentTag tag in tagsToRemove) {
             dao.removeFromTags(tag)
         }
+    }
+    
+    public String toConfigObject() {
+        StringBuilder sb = new StringBuilder("[")
+        sb.append("path:'" + path + "', period:" + period + ", lastChange:new Date(" + lastChange.getTime() + "),user:null, comment: '" + comment + "'")
+        if (tags && !tags.isEmpty()) {
+            sb.append(", tags:([")
+            tags.eachWithIndex {Tag tag, int index ->
+                sb.append("'" + tag.name + "'")
+                if (index != tags.size() - 1)
+                    sb.append(",")
+            }
+            sb.append("] as Set)")
+        }
+        sb.append("]")
+        return sb.toString()
     }
 
     public Comment clone() {

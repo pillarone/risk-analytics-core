@@ -391,6 +391,7 @@ class Parameterization extends ModellingItem {
     void removeComment(Comment comment) {
         if (comment.added) {
             comments.remove(comment)
+            comment.deleted = true
             return
         }
         comment.deleted = true
@@ -432,6 +433,10 @@ class Parameterization extends ModellingItem {
                     configObject[p.periodIndex] = p.businessObject
                 }
             }
+        }
+        original.comments = []
+        comments.each { Comment comment ->
+            original.comments << comment.toConfigObject()
         }
 
         return original

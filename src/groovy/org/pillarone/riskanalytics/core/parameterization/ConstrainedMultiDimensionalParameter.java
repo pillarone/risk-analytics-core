@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.parameterization;
 import org.pillarone.riskanalytics.core.components.Component;
 import org.pillarone.riskanalytics.core.components.IComponentMarker;
 import org.pillarone.riskanalytics.core.model.Model;
+import org.pillarone.riskanalytics.core.simulation.item.parameter.IMarkerValueAccessor;
 import org.pillarone.riskanalytics.core.util.GroovyUtils;
 
 import java.math.BigDecimal;
@@ -152,5 +153,24 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
     @Override
     public int getValueColumnCount() {
         return titles.size();
+    }
+
+    public boolean referencePaths(Class markerInterface, String value) {
+        Integer column = constraints.getColumnIndex(markerInterface);
+        return (column != null && values.get(column).indexOf(value) > -1);
+    }
+
+    public boolean updateReferenceValues(Class markerInterface, String oldValue, String newValue) {
+        Integer column = constraints.getColumnIndex(markerInterface);
+        if (column == null) return false;
+        boolean atLeastOneUpdated = false;
+        for (int row = getTitleRowCount(); row < getRowCount(); row++) {
+            String value = (String) getValueAt(row, column);
+            if (value.equals(oldValue)) {
+                setValueAt(newValue, row, column);
+                atLeastOneUpdated = true;
+            }
+        }
+        return atLeastOneUpdated;
     }
 }

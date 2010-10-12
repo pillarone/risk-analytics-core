@@ -5,6 +5,7 @@ import org.pillarone.riskanalytics.core.fileimport.FileImportService
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 
 public class ParameterizationHelper {
 
@@ -51,6 +52,17 @@ public class ParameterizationHelper {
             periodLabels = configObject.periodLabels as String[]
         }
         result.periodLabels = periodLabels
+        //comments
+        if (configObject.containsKey("comments")) {
+            List comments = configObject.comments as List
+            if (!comments.isEmpty()) {
+                GroovyShell shell = new GroovyShell(ParameterizationHelper.class.getClassLoader())
+                comments.each {
+                    result.addComment(new Comment((Map) shell.evaluate(it)))
+                }
+            }
+        }
+
         return result
     }
 

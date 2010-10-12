@@ -3,8 +3,9 @@ package org.pillarone.riskanalytics.core.simulation.item.parameter
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameterization.ConstrainedString
 import org.pillarone.riskanalytics.core.parameter.ConstrainedStringParameter
+import org.pillarone.riskanalytics.core.components.ComponentUtils
 
-class ConstrainedStringParameterHolder extends ParameterHolder {
+class ConstrainedStringParameterHolder extends ParameterHolder implements IMarkerValueAccessor {
 
     private ConstrainedString value;
 
@@ -42,4 +43,19 @@ class ConstrainedStringParameterHolder extends ParameterHolder {
         return holder
     }
 
+    List<String> referencePaths(Class markerInterface, String refValue) {
+        List<String> paths = new ArrayList()
+        if (markerInterface.is(value.markerClass) && ComponentUtils.getNormalizedName(value.stringValue).equals(refValue)) {
+            paths.add(path)
+        }
+        return paths
+    }
+
+    List<String> updateReferenceValues(Class markerInterface, String oldValue, String newValue) {
+        List<String> paths = referencePaths(markerInterface, oldValue)
+        if (paths) {
+            setValue(ComponentUtils.getModelName(newValue, ComponentUtils.SUB))
+        }
+        return paths
+    }
 }

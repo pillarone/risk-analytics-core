@@ -66,12 +66,14 @@
         </copy>
     </target>
 
-    <target name="release-plugin" depends="cruise" description="Releases the plugin in our P1 plugin repository">
+    <target name="release-plugin" depends="cruise" description="Releases the plugin in our P1 plugin repository. Working on server only!">
         <exec executable="${grails}" failonerror="true" resolveexecutable="true">
-            <arg value="release-plugin"/>
-            <arg value="&quot;-repository=pillarone&quot;"/>
-            <arg value="-zipOnly"/>
-            <arg value="-skipDocs"/>
+            <arg value="maven-install"/>
+            <env key="GRAILS_HOME" value="${GRAILS_HOME}"/>
+        </exec>
+        <exec executable="${grails}" failonerror="true" resolveexecutable="true">
+            <arg value="maven-deploy"/>
+            <arg value="-repository=pillarone"/>
             <env key="GRAILS_HOME" value="${GRAILS_HOME}"/>
         </exec>
     </target>

@@ -153,6 +153,7 @@ class Parameterization extends ModellingItem {
         dao.modelClassName = modelClass.name
         dao.creator = creator
         dao.lastUpdater = lastUpdater
+        dao.comment = comment
         dao.status = status
         dao.dealId = dealId
         saveParameters(dao)
@@ -263,6 +264,7 @@ class Parameterization extends ModellingItem {
         lastUpdater = dao.lastUpdater
         status = dao.status
         dealId = dao.dealId
+        comment = dao.comment
         if (completeLoad) {
             loadParameters(dao)
             loadComments(dao)

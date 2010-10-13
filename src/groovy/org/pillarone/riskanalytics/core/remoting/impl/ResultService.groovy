@@ -9,11 +9,17 @@ import org.pillarone.riskanalytics.core.dataaccess.ResultAccessor
 import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
 import java.text.SimpleDateFormat
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
+import org.pillarone.riskanalytics.core.remoting.ParameterizationInfo
 
 class ResultService implements IResultService {
 
-    List<Long> getParameterizationIdsForTransactionId(long dealId) {
-        return ParameterizationDAO.findAllByDealId(dealId)*.id
+    List<ParameterizationInfo> getParameterizationInfosForTransactionId(long dealId) {
+        List<ParameterizationInfo> result = []
+        List<ParameterizationDAO> parameterizations = ParameterizationDAO.findAllByDealId(dealId)
+        for (ParameterizationDAO dao in parameterizations) {
+            result << new ParameterizationInfo(parameterizationId: dao.id, name: dao.name, version: dao.itemVersion, comment: dao.comment, user: dao.lastUpdater?.username)
+        }
+        return result
     }
 
     List<ResultInfo> getResults(long simulationId, List<String> paths) {

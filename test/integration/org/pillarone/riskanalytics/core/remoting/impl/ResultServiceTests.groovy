@@ -8,13 +8,14 @@ import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.remoting.SimulationInfo
 import org.pillarone.riskanalytics.core.output.PathMapping
 import org.pillarone.riskanalytics.core.output.FieldMapping
-import org.pillarone.riskanalytics.core.ParameterizationDAO
+
 import org.pillarone.riskanalytics.core.output.CollectorMapping
 import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
 import org.pillarone.riskanalytics.core.output.SingleValueResult
 import java.text.SimpleDateFormat
 import org.pillarone.riskanalytics.core.remoting.ResultInfo
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
+import org.pillarone.riskanalytics.core.remoting.ParameterizationInfo
 
 
 class ResultServiceTests extends GroovyTestCase {
@@ -50,17 +51,19 @@ class ResultServiceTests extends GroovyTestCase {
     }
 
 
-    void testGetParamIds() {
+    void testGetParamInfos() {
         Parameterization parameterization1 = new Parameterization("test1")
         parameterization1.modelClass = CoreModel
         parameterization1.dealId = 1
         parameterization1.periodCount = 1
+        parameterization1.comment = "comment 1"
         parameterization1.save()
 
         Parameterization parameterization2 = new Parameterization("test2")
         parameterization2.modelClass = CoreModel
         parameterization2.dealId = 1
         parameterization2.periodCount = 1
+        parameterization2.comment = "comment 2"
         parameterization2.save()
 
         Parameterization parameterization3 = new Parameterization("test2")
@@ -69,11 +72,19 @@ class ResultServiceTests extends GroovyTestCase {
         parameterization3.periodCount = 1
         parameterization3.save()
 
-        List ids = resultService.getParameterizationIdsForTransactionId(1)
+        List<ParameterizationInfo> infos = resultService.getParameterizationInfosForTransactionId(1)
 
-        assertEquals 2, ids.size()
-        assertTrue ids.contains(parameterization1.id)
-        assertTrue ids.contains(parameterization2.id)
+        assertEquals 2, infos.size()
+        ParameterizationInfo info = infos.find { it.parameterizationId == parameterization1.id}
+        assertEquals parameterization1.name, info.name
+        assertEquals parameterization1.comment, info.comment
+        assertEquals parameterization1.versionNumber.toString(), info.version
+
+        info = infos.find { it.parameterizationId == parameterization2.id}
+        assertEquals parameterization2.name, info.name
+        assertEquals parameterization2.comment, info.comment
+        assertEquals parameterization2.versionNumber.toString(), info.version
+
     }
 
     void testGetSimulationInfos() {

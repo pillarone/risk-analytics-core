@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface IResultService {
 
-    List<Long> getParameterizationIdsForTransactionId(long dealId);
+    List<ParameterizationInfo> getParameterizationInfosForTransactionId(long dealId);
 
     List<SimulationInfo> getSimulationInfos(long parameterizationId);
 

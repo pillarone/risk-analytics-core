@@ -16,7 +16,7 @@ import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.2-ALPHA-2.2"
+    def version = "1.2-ALPHA-2.3"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.4 > *"
     // the other plugins this plugin depends on
@@ -56,6 +56,7 @@ Persistence & Simulation engine.
         resultServiceExporter(RmiServiceExporter) {
             serviceName = "ResultService"
             serviceInterface = IResultService
+            registryPort = ConfigurationHolder.config.resultServiceRegistryPort
             service = ref("resultService")
         }
 
@@ -68,7 +69,7 @@ Persistence & Simulation engine.
             transactionAttributes = attributes
         }
 
-        resultService(ResultService) { }
+        resultServiceBean(ResultService) { }
     }
 
     def doWithDynamicMethods = {ctx ->

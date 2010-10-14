@@ -12,6 +12,7 @@ environments {
     keyFiguresToCalculate = null
 
     transactionServiceUrl = "rmi://localhost:1099/TransactionService"
+    resultServiceRegistryPort = 1099
 
     development {
         log4j = {

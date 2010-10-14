@@ -20,7 +20,7 @@ class RemotingUtils {
             LOG.error "Error obtaining remote service: ${t.message}"
             return [
                     getAllTransactions: {
-                        return [new TransactionInfo(1, "Sample deal")]
+                        return [new TransactionInfo(1, "Connection failed - contact support.")]
                     }
             ] as ITransactionService
         }

@@ -27,6 +27,21 @@ class StatusChangeServiceTests extends GroovyTestCase {
         assertEquals "R1", newParameterization.versionNumber.toString()
     }
 
+    void testToDataEntryFromNoneAlreadyInWorkflow() {
+        Parameterization existingParameterization = new Parameterization("name")
+        existingParameterization.modelClass = EmptyModel
+        existingParameterization.periodCount = 0
+        existingParameterization.versionNumber = new VersionNumber("R1")
+        existingParameterization.save()
+
+        Parameterization parameterization = new Parameterization("name")
+        parameterization.modelClass = EmptyModel
+        parameterization.periodCount = 0
+        parameterization.save()
+
+        shouldFail(WorkflowException, { statusChangeService.changeStatus(parameterization, DATA_ENTRY)})
+    }
+
     void testToProduction() {
         Parameterization parameterization = new Parameterization("name")
         parameterization.status = IN_REVIEW

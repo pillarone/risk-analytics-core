@@ -12,6 +12,7 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
 import org.pillarone.riskanalytics.core.parameter.comment.workflow.IssueStatus
+import org.pillarone.riskanalytics.core.ParameterizationDAO
 
 class StatusChangeService {
 
@@ -29,6 +30,11 @@ class StatusChangeService {
                 if (parameterization.status == IN_REVIEW) {
                     parameterization.status = Status.REJECTED
                     parameterization.save()
+                } else if (parameterization.status == NONE) {
+                    ParameterizationDAO dao = ParameterizationDAO.findByNameAndItemVersionLike(parameterization.name, "R%")
+                    if (dao != null) {
+                        throw new WorkflowException(parameterization.name, DATA_ENTRY, "Parameterization is already in workflow.")
+                    }
                 }
                 Parameterization newParameterization = incrementVersion(parameterization, parameterization.status == NONE)
                 newParameterization.status = DATA_ENTRY
@@ -76,7 +82,7 @@ class StatusChangeService {
         newItem.modelClass = item.modelClass
         newItem.versionNumber = newR ? new VersionNumber("R1") : VersionNumber.incrementVersion(item)
         newItem.dealId = item.dealId
-        
+
         for (Comment comment in item.comments) {
             if (comment instanceof WorkflowComment) {
                 if (comment.status != IssueStatus.CLOSED) {

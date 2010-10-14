@@ -8,6 +8,7 @@ import org.pillarone.riskanalytics.core.output.SingleValueResultPOJO
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationRunner
 import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper
 import org.gridgain.grid.GridRichNode
+import org.gridgain.grid.lang.GridPredicate
 
 class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
 
@@ -68,13 +69,20 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
         for (Map.Entry<ResultDescriptor, ByteArrayOutputStream> entry: streamCache.entrySet()) {
             ResultDescriptor resultDescriptor = entry.key
             ByteArrayOutputStream stream = entry.value
-            GridRichNode master
-            for(GridRichNode node in getGrid().allNodes) {
-                if(node.getId() == this.masterNodeId) {
+            /*GridRichNode master
+            for (GridRichNode node in getGrid().allNodes) {
+                if (node.getId() == this.masterNodeId) {
                     master = node
                 }
             }
-            getGrid().sendMessage(master, new ResultTransferObject(resultDescriptor, jobIdentifier, stream.toByteArray(), runner.getProgress()));
+            getGrid().sendMessage(master, new ResultTransferObject(resultDescriptor, jobIdentifier, stream.toByteArray(), runner.getProgress()));*/
+            getGrid().send(new ResultTransferObject(resultDescriptor, jobIdentifier, stream.toByteArray(),
+                    runner.getProgress()), new GridPredicate<GridRichNode>() {
+                @Override public boolean apply(GridRichNode n) {
+                    return (n.getId() == masterNodeId);
+                }
+            }
+            );
             totalMessages++
             stream.reset();
         }

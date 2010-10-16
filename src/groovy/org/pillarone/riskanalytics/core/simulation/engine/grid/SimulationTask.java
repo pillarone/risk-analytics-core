@@ -19,7 +19,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration, Object> implements GridMessageListener {
+public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration, Object> {
 
     private static Log LOG = LogFactory.getLog(SimulationTask.class);
 
@@ -40,10 +40,14 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
 
     private boolean stopped, cancelled;
 
+    private ResultTransferListener resultTransferListener;
+
     protected Collection<? extends GridJob> split(int gridSize, SimulationConfiguration simulationConfiguration) {
         currentState = SimulationState.INITIALIZING;
         time = System.currentTimeMillis();
         simulationConfiguration.getSimulation().setStart(new Date());
+
+        resultTransferListener = new ResultTransferListener(this);
 
         Grid grid = GridHelper.getGrid();
         int cpuCount = getTotalProcessorCount(grid);
@@ -63,13 +67,14 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
             configurations.get(i % cpuCount).addSimulationBlock(simulationBlocks.get(i));
         }
 
-        for (int i = 0; i < cpuCount; i++) {
+        for (int i = 0; i < Math.min(cpuCount, simulationBlocks.size()); i++) {
             jobs.add(new SimulationJob(configurations.get(i), grid.localNode().getId()));
             LOG.info("Created a new job with block count " + configurations.get(i).getSimulationBlocks().size());
         }
 
         resultWriter = new ResultWriter((Long) simulationConfiguration.getSimulation().id);
-        grid.addMessageListener(this);
+        //grid.addMessageListener(this);
+        grid.listen(resultTransferListener);
 
         this.simulationConfiguration = simulationConfiguration;
         currentState = SimulationState.RUNNING;
@@ -115,7 +120,9 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
         }
         resultWriter.close();
         Grid grid = GridHelper.getGrid();
-        grid.removeMessageListener(this);
+        //grid.removeMessageListener(this);
+        resultTransferListener.removeListener();
+
         if (error || cancelled) {
             simulation.delete();
             currentState = error ? SimulationState.ERROR : SimulationState.CANCELED;
@@ -202,16 +209,18 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
     }
 
     protected int getTotalProcessorCount(Grid grid) {
-        Collection<GridRichNode> nodes = grid.getAllNodes();
+        Collection<GridRichNode> nodes = grid.nodes();
         List<String> usedHosts = new ArrayList<String>();
         int processorCount = 0;
         for (GridNode node : nodes) {
-            if (!usedHosts.contains(node.getPhysicalAddress())) {
-                processorCount += node.getMetrics().getAvailableProcessors();
-                usedHosts.add(node.getPhysicalAddress());
+            String ip = node.externalAddresses().iterator().next();
+            if (!usedHosts.contains(ip)) {
+                processorCount += node.metrics().getAvailableProcessors();
+                usedHosts.add(ip);
             }
         }
         LOG.info("Found " + processorCount + " CPUs on " + nodes.size() + " nodes");
         return processorCount;
+        //return 4;
     }
 }

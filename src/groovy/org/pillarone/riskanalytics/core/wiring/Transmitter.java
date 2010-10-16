@@ -39,7 +39,7 @@ public class Transmitter implements ITransmitter {
         }
         target.addAll(source);
         setTransmitted(true);
-        if (LOG.isDebugEnabled()) {
+        if (LOG.isInfoEnabled() && source.size() > 1) {
             StringBuffer buffer = new StringBuffer();
             buffer.append(senderChannelName);
             buffer.append(" [");
@@ -53,7 +53,7 @@ public class Transmitter implements ITransmitter {
             buffer.append(" -> ");
             buffer.append(receiver.getClass());
             buffer.append(")");
-            LOG.debug(buffer.toString());
+            LOG.info(buffer.toString());
         }
         notifyReceiver();
     }
@@ -87,13 +87,17 @@ public class Transmitter implements ITransmitter {
     }
 
     public String toString() {
-        return "" + sender.getClass().getSimpleName() +
+//        return "" + sender.getClass().getSimpleName() +
+//                " sends to " +
+//                receiver.getClass().getSimpleName() +
+//                ", packet type: " +
+//                source.getType().getSimpleName() +
+//                " using " +
+//                this.getClass().getSimpleName() +
+//                ", senderChannelName " + senderChannelName;
+        return "" + sender.getName() +
                 " sends to " +
-                receiver.getClass().getSimpleName() +
-                ", packet type: " +
-                source.getType().getSimpleName() +
-                " using " +
-                this.getClass().getSimpleName() +
+                receiver.getName() +
                 ", senderChannelName " + senderChannelName;
     }
 }

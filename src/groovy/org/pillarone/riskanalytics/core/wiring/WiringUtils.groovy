@@ -63,7 +63,7 @@ public class WiringUtils {
 
     static void use(Class category, Closure work) {
         //if (LOG.isDebugEnabled()) LOG.debug "starting wiring for ${work.delegate.getName()} with ${category.name}."
-        LOG.info "starting wiring for ${work.delegate.getName()} with ${category.name}."
+        if (LOG.isInfoEnabled()) LOG.info "starting wiring for ${work.delegate.getName()} with ${category.name}."
         def changedClasses = [] as Set
         boolean componentFound = work.delegate.properties.any { k, v -> v instanceof Component }
         assert componentFound, "Components to be wired must be properties of the callee!"
@@ -76,7 +76,7 @@ public class WiringUtils {
 
         try {
             work()
-            //logWiring (work.delegate)
+            if (LOG.isInfoEnabled()) logWiring (work.delegate)
         } finally {
             for (changedClass in changedClasses) {
                 ExpandoMetaClass emc = GrailsClassUtils.getExpandoMetaClass(changedClass)
@@ -88,28 +88,28 @@ public class WiringUtils {
     }
 
     private static void logWiring(def target) {
-        String logMsg="#Thread:"+Thread.currentThread().getId()+"\n";
+        String logMsg = "#Thread:" + Thread.currentThread().getId() + "\n";
         if (target instanceof Model) {
             Model model = (Model) target;
             for (Component c: model.allComponents) {
-                logMsg+=logTransmitter (c)
+                logMsg += logTransmitter(c)
             }
         } else {
-            logMsg+=logTransmitter(target);
+            logMsg += logTransmitter(target);
         }
         LOG.info(logMsg);
     }
 
-    private static String logTransmitter (Component c){
+    private static String logTransmitter(Component c) {
 
-        String logMsg="### Component "+c.getName()+"\nINPUT TRANSMITTER:\n"
-        for (Transmitter t:c.allInputTransmitter){
-            logMsg+="  "+t.toString()+"\n"
+        String logMsg = "### Component ${c.getName()} (${c.getClass().getCanonicalName()}) \nINPUT TRANSMITTER:\n"
+        for (Transmitter t: c.allInputTransmitter) {
+            logMsg += "\t" + t.toString() + "\n"
         }
-        logMsg+="OUTPUT TRANSMITTER:\n";
+        logMsg += "OUTPUT TRANSMITTER:\n";
 
-        for (Transmitter t:c.allOutputTransmitter){
-            logMsg+="  "+t.toString()+"\n"
+        for (Transmitter t: c.allOutputTransmitter) {
+            logMsg += "\t" + t.toString() + "\n"
         }
 
         return logMsg;

@@ -2,19 +2,22 @@ package org.pillarone.riskanalytics.core.simulation.engine
 
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.gridgain.grid.Grid
-import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
-import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
-import org.pillarone.riskanalytics.core.simulation.item.Parameterization
-import org.pillarone.riskanalytics.core.simulation.item.Simulation
+
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationTask
-import org.gridgain.grid.GridTaskFuture
+
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.model.ModelHelper
 import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
-import org.gridgain.grid.GridMessageListener
+
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationHandler
+import org.pillarone.riskanalytics.core.output.PacketCollector
+import org.pillarone.riskanalytics.core.output.CollectingModeFactory
+import org.pillarone.riskanalytics.core.output.ICollectingModeStrategy
+import org.pillarone.riskanalytics.core.output.CollectorFactory
+import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
+import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 
 public class RunSimulationService {
 
@@ -48,8 +51,8 @@ public class RunSimulationService {
      * @param configuration the simulation details
      * @return the result of the grid gain task
      */
-    public SimulationHandler runSimulationOnGrid(SimulationConfiguration configuration) {
-        configuration.mappingCache = createMappingCache(configuration)
+    public SimulationHandler runSimulationOnGrid(SimulationConfiguration configuration, ResultConfiguration resultConfiguration) {
+        configuration.mappingCache = createMappingCache(configuration, resultConfiguration)
         configuration.prepareSimulationForGrid()
 
         SimulationTask task = new SimulationTask()
@@ -65,15 +68,20 @@ public class RunSimulationService {
      * @param simulationConfiguration the simulation details
      * @return a mapping cache filled with all necessary mappings for this simulation.
      */
-    private MappingCache createMappingCache(SimulationConfiguration simulationConfiguration) {
+    private MappingCache createMappingCache(SimulationConfiguration simulationConfiguration, ResultConfiguration resultConfiguration) {
         Model model = simulationConfiguration.simulation.modelClass.newInstance()
         model.init()
 
-        ParameterApplicator applicator = new ParameterApplicator(model: model, parameterization: simulationConfiguration.simulation.parameterization)
-        applicator.init()
-        applicator.applyParameterForPeriod(0)
+        ParameterApplicator parameterApplicator = new ParameterApplicator(model: model, parameterization: simulationConfiguration.simulation.parameterization)
+        parameterApplicator.init()
+        parameterApplicator.applyParameterForPeriod(0)
 
-        Set paths = ModelHelper.getAllPossibleOutputPaths(model)
+        SimulationRunner runner = SimulationRunner.createRunner()
+        CollectorFactory collectorFactory = runner.currentScope.collectorFactory
+        List<PacketCollector> drillDownCollectors = resultConfiguration.getResolvedCollectors(model, collectorFactory)
+        List<String> drillDownPaths = getDrillDownPaths(drillDownCollectors)
+        Set paths = ModelHelper.getAllPossibleOutputPaths(model, drillDownPaths)
+
         Set fields = ModelHelper.getAllPossibleFields(model)
         MappingCache cache = new MappingCache()
         cache.initCache(model)
@@ -89,5 +97,15 @@ public class RunSimulationService {
         return cache
     }
 
+    private List<String> getDrillDownPaths(List<PacketCollector> collectors) {
+        List<String> paths = []
+        ICollectingModeStrategy drillDownCollector = CollectingModeFactory.getStrategy("AGGREGATED_DRILL_DOWN")
+        for (PacketCollector collector : collectors) {
+            if (collector.mode.class.equals(drillDownCollector.class)) {
+                paths << collector.path
+            }
+        }
+        return paths
+    }
 
 }

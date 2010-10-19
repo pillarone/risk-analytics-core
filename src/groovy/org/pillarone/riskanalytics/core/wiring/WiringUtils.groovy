@@ -62,8 +62,8 @@ public class WiringUtils {
     }
 
     static void use(Class category, Closure work) {
-        //if (LOG.isDebugEnabled()) LOG.debug "starting wiring for ${work.delegate.getName()} with ${category.name}."
-        if (LOG.isInfoEnabled()) LOG.info "starting wiring for ${work.delegate.getName()} with ${category.name}."
+        if (LOG.isDebugEnabled()) LOG.debug "starting wiring for ${work.delegate.getName()} with ${category.name}."
+        //if (LOG.isInfoEnabled()) LOG.info "starting wiring for ${work.delegate.getName()} with ${category.name}."
         def changedClasses = [] as Set
         boolean componentFound = work.delegate.properties.any { k, v -> v instanceof Component }
         assert componentFound, "Components to be wired must be properties of the callee!"
@@ -76,7 +76,7 @@ public class WiringUtils {
 
         try {
             work()
-            if (LOG.isInfoEnabled()) logWiring (work.delegate)
+            if (LOG.isDebugEnabled()) logWiring (work.delegate)
         } finally {
             for (changedClass in changedClasses) {
                 ExpandoMetaClass emc = GrailsClassUtils.getExpandoMetaClass(changedClass)
@@ -104,12 +104,12 @@ public class WiringUtils {
 
         String logMsg = "### Component ${c.getName()} (${c.getClass().getCanonicalName()}) \nINPUT TRANSMITTER:\n"
         for (Transmitter t: c.allInputTransmitter) {
-            logMsg += "\t" + t.toString() + "\n"
+            logMsg += "\t" + t + "\n"
         }
         logMsg += "OUTPUT TRANSMITTER:\n";
 
         for (Transmitter t: c.allOutputTransmitter) {
-            logMsg += "\t" + t.toString() + "\n"
+            logMsg += "\t" + t + "\n"
         }
 
         return logMsg;

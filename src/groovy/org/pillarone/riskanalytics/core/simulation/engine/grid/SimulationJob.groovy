@@ -16,6 +16,7 @@ class SimulationJob extends GridJobAdapter<JobResult> {
     private SimulationConfiguration simulationConfiguration
     private SimulationRunner runner = SimulationRunner.createRunner()
     private UUID jobIdentifier = UUID.randomUUID()
+    private int jobCount = 0;
 
     private static Log LOG = LogFactory.getLog(SimulationJob)
 
@@ -27,6 +28,7 @@ class SimulationJob extends GridJobAdapter<JobResult> {
     JobResult execute() {
         Date start = new Date()
         ExpandoMetaClass.enableGlobally()
+        runner.setJobCount(jobCount)
         runner.setSimulationConfiguration(simulationConfiguration)
         runner.start()
 
@@ -40,6 +42,10 @@ class SimulationJob extends GridJobAdapter<JobResult> {
     void cancel() {
         runner.cancel()
         super.cancel()
+    }
+
+    public void setJobCount(int jobCount) {
+        this.jobCount = jobCount;
     }
 
 

@@ -19,7 +19,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration, Object> {
+public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Object> {
 
     private static Log LOG = LogFactory.getLog(SimulationTask.class);
 
@@ -42,7 +42,72 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
 
     private ResultTransferListener resultTransferListener;
 
-    protected Collection<? extends GridJob> split(int gridSize, SimulationConfiguration simulationConfiguration) {
+    public final Map<? extends GridJob,GridNode> map(List<GridNode> subgrid,
+                                                 SimulationConfiguration simulationConfiguration)
+                                          throws GridException{
+
+        Map<SimulationJob, GridNode> jobsToNodes = new HashMap<SimulationJob, GridNode>(subgrid.size());
+        HashMap<Integer,List<SimulationJob>> jobCountPerGrid=new HashMap<Integer,List<SimulationJob>>(); 
+
+        currentState = SimulationState.INITIALIZING;
+        time = System.currentTimeMillis();
+        simulationConfiguration.getSimulation().setStart(new Date());
+
+        resultTransferListener = new ResultTransferListener(this);
+
+        Grid grid = GridHelper.getGrid();
+        int cpuCount = getTotalProcessorCount(grid);
+
+        List<SimulationBlock> simulationBlocks = generateBlocks(SIMULATION_BLOCK_SIZE, simulationConfiguration.getSimulation().getNumberOfIterations());
+
+        LOG.info("Number of generated blocks: " + simulationBlocks.size());
+        List<SimulationJob> jobs = new ArrayList<SimulationJob>();
+        List<SimulationConfiguration> configurations = new ArrayList<SimulationConfiguration>(cpuCount);
+
+        for (int i = 0; i < cpuCount; i++) {
+            SimulationConfiguration newConfiguration = simulationConfiguration.clone();
+            configurations.add(newConfiguration);
+        }
+
+        for (int i = 0; i < simulationBlocks.size(); i++) {
+            configurations.get(i % cpuCount).addSimulationBlock(simulationBlocks.get(i));
+        }
+
+        for (int i = 0; i < Math.min(cpuCount, simulationBlocks.size()); i++) {
+            jobs.add(new SimulationJob(configurations.get(i), grid.localNode().getId()));
+            LOG.info("Created a new job with block count " + configurations.get(i).getSimulationBlocks().size());
+        }
+
+        resultWriter = new ResultWriter((Long) simulationConfiguration.getSimulation().id);
+        //grid.addMessageListener(this);
+        grid.listen(resultTransferListener);
+
+        this.simulationConfiguration = simulationConfiguration;
+        currentState = SimulationState.RUNNING;
+        totalJobs = jobs.size();
+
+        for (int i=0;i<jobs.size();i++){
+            int gridNumber=i%subgrid.size();
+            jobsToNodes.put(jobs.get(i),subgrid.get(gridNumber));
+            List<SimulationJob> tmpList;
+            if ((tmpList=jobCountPerGrid.get(gridNumber))==null){
+                tmpList=new ArrayList<SimulationJob>();
+                jobCountPerGrid.put(gridNumber,tmpList);
+            }
+            tmpList.add(jobs.get(i));
+        }
+
+        for (int i:jobCountPerGrid.keySet()){
+            List<SimulationJob> tmpList=jobCountPerGrid.get(i);
+            for (SimulationJob simulationJob:tmpList){
+                simulationJob.setJobCount(tmpList.size());
+            }
+        }
+        
+        return jobsToNodes;
+    }
+    
+    /*protected Collection<? extends GridJob> split(int gridSize, SimulationConfiguration simulationConfiguration) {
         currentState = SimulationState.INITIALIZING;
         time = System.currentTimeMillis();
         simulationConfiguration.getSimulation().setStart(new Date());
@@ -80,7 +145,7 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
         currentState = SimulationState.RUNNING;
         totalJobs = jobs.size();
         return jobs;
-    }
+    }*/
 
     @SuppressWarnings({"ThrowableInstanceNeverThrown"})
     public Object reduce(List<GridJobResult> gridJobResults) {
@@ -221,6 +286,6 @@ public class SimulationTask extends GridTaskSplitAdapter<SimulationConfiguration
         }
         LOG.info("Found " + processorCount + " CPUs on " + nodes.size() + " nodes");
         return processorCount;
-        //return 4;
+        //return 8;
     }
 }

@@ -39,7 +39,7 @@ public class Transmitter implements ITransmitter {
         }
         target.addAll(source);
         setTransmitted(true);
-        if (LOG.isInfoEnabled() && source.size() > 1) {
+        if (LOG.isDebugEnabled() && source.size() > 1) {
             StringBuffer buffer = new StringBuffer();
             buffer.append(senderChannelName);
             buffer.append(" [");

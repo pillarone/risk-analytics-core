@@ -102,11 +102,6 @@ class Comment implements Cloneable {
         dao.comment = comment
         dao.timeStamp = lastChange
         dao.user = user
-        for (Tag tag in tags) {
-            if (!dao.tags*.tag?.contains(tag)) {
-                dao.addToTags(new CommentTag(tag: tag))
-            }
-        }
 
         List tagsToRemove = []
         for (CommentTag tag in dao.tags) {
@@ -116,7 +111,16 @@ class Comment implements Cloneable {
         }
         for (CommentTag tag in tagsToRemove) {
             dao.removeFromTags(tag)
+
         }
+        tagsToRemove.each {it.delete()}
+
+        for (Tag tag in tags) {
+            if (!dao.tags*.tag?.contains(tag)) {
+                dao.addToTags(new CommentTag(tag: tag))
+            }
+        }
+
     }
 
     public String toConfigObject() {

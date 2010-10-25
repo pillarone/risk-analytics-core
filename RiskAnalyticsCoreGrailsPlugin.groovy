@@ -46,17 +46,27 @@ Persistence & Simulation engine.
     }
 
     def doWithSpring = {
+        ConfigObject config = ConfigurationHolder.config
+
+        String url = "rmi://localhost:1099/TransactionService"
+        if (config.containsKey("transactionServiceUrl")) {
+            url = config.transactionServiceUrl
+        }
         transactionService(RmiProxyFactoryBean) {
             serviceInterface = ITransactionService
-            serviceUrl = ConfigurationHolder.config.transactionServiceUrl
+            serviceUrl = url
             refreshStubOnConnectFailure = true
             lookupStubOnStartup = false
         }
 
+        int port = 1099
+        if (config.containsKey("resultServiceRegistryPort")) {
+            port = config.resultServiceRegistryPort
+        }
         resultServiceExporter(RmiServiceExporter) {
             serviceName = "ResultService"
             serviceInterface = IResultService
-            registryPort = ConfigurationHolder.config.resultServiceRegistryPort
+            registryPort = port
             service = ref("resultService")
         }
 

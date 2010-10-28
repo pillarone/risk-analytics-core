@@ -60,7 +60,7 @@ public class SimulationRunner {
      */
     public void start() {
         synchronized (lockObj){
-            if (messageCount==null||messageCount.get()!=0){
+            if (messageCount==null){
                 messageCount=new AtomicInteger(0);
             }
         }
@@ -90,6 +90,7 @@ public class SimulationRunner {
                     lockObj.wait(WAIT_TIMEOUT)
                 }
             }
+            
             LOG.info("Finished Initialization of Thread "+Thread.currentThread().getId());
             
             long initializationTime = System.currentTimeMillis() - start
@@ -100,6 +101,7 @@ public class SimulationRunner {
                 deleteCancelledSimulation()
                 shouldReturn = true
             }
+            messageCount.set(0);
             if (shouldReturn) return
             LOG.info "${currentScope?.simulationBlocks?.blockSize.sum()} iterations completed in ${System.currentTimeMillis() - (start + initializationTime)}ms"
 
@@ -114,6 +116,7 @@ public class SimulationRunner {
             }
 
         } catch (Throwable t) {
+            messageCount.set(0);
             notifySimulationStateChanged(currentScope?.simulation, SimulationState.ERROR)
             simulationState = SimulationState.ERROR
             error = new SimulationError(

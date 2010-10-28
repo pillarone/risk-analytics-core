@@ -26,6 +26,13 @@ class SimulationJob extends GridJobAdapter<JobResult> {
     }
 
     JobResult execute() {
+
+        //***** https://issuetracking.intuitive-collaboration.com/jira/browse/KTI-15
+        getClass().getClassLoader().loadClass("java.lang.Character")
+        getClass().getClassLoader().loadClass("java.lang.reflect.InvocationTargetException")
+        getClass().getClassLoader().loadClass("org.pillarone.riskanalytics.core.components.ComponentUtils")
+        //***** http://www.gridgainsystems.com/jiveforums/thread.jspa?threadID=1324&tstart=0
+
         Date start = new Date()
         ExpandoMetaClass.enableGlobally()
         runner.setJobCount(jobCount)

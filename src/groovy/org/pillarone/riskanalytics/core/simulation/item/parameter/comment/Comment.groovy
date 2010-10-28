@@ -102,6 +102,7 @@ class Comment implements Cloneable {
         dao.comment = comment
         dao.timeStamp = lastChange
         dao.user = user
+        dao.periodIndex = period
 
         List tagsToRemove = []
         for (CommentTag tag in dao.tags) {

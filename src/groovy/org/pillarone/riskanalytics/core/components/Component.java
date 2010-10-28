@@ -34,38 +34,8 @@ abstract public class Component implements Cloneable {
     }
 
     public String getNormalizedName() {
-        String value = name;
-
-        if (value == null) {
-            return null;
-        }
-
-        if (value.startsWith("sub")) {
-            value = value.substring(3);
-        }
-        if (value.startsWith("parm")) {
-            value = value.substring(4);
-        }
-        if (value.startsWith("out")) {
-            value = value.substring(3);
-        }
-
-        StringBuffer displayNameBuffer = new StringBuffer();
-
-        int index = 0;
-        for (char c : value.toCharArray()) {
-            if (Character.isUpperCase(c) && index == 0) {
-                displayNameBuffer.append(Character.toLowerCase(c));
-            } else if (Character.isUpperCase(c)) {
-                displayNameBuffer.append(" ").append(Character.toLowerCase(c));
-            } else {
-                displayNameBuffer.append(c);
-            }
-            index++;
-        }
-        return displayNameBuffer.toString();
+        return ComponentUtils.getNormalizedName(name);
     }
-
 
     public void setName(String name) {
         this.name = name;

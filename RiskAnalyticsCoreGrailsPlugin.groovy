@@ -12,7 +12,7 @@ import org.gridgain.grid.GridConfigurationAdapter
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.0.5.1-kti"
+    def version = "1.1.0.1-kti"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.4 > *"
     // the other plugins this plugin depends on

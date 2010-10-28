@@ -8,7 +8,7 @@ import org.pillarone.riskanalytics.core.parameterization.IParameterObjectClassif
 import org.pillarone.riskanalytics.core.parameterization.IParameterObject
 import org.pillarone.riskanalytics.core.parameterization.AbstractMultiDimensionalParameter
 
-class ParameterObjectParameterHolder extends ParameterHolder {
+class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerValueAccessor {
 
     //Needed to create the object required during simulation
     private IParameterObject businessObject
@@ -147,4 +147,25 @@ class ParameterObjectParameterHolder extends ParameterHolder {
         classifierParameters = inStream.readObject()
     }
 
+    List<String> referencePaths(Class markerInterface, String refValue) {
+        if (classifierParameters.size() > 0) {
+            for (ParameterHolder parameterHolder: classifierParameters.values()) {
+                if (parameterHolder instanceof MultiDimensionalParameterHolder) {
+                    return parameterHolder.referencePaths(markerInterface, refValue)
+                }
+            }
+        }
+        return Collections.emptyList()
+    }
+
+    List<String> updateReferenceValues(Class markerInterface, String oldValue, String newValue) {
+        if (classifierParameters.size() > 0) {
+            for (ParameterHolder parameterHolder: classifierParameters.values()) {
+                if (parameterHolder instanceof MultiDimensionalParameterHolder) {
+                    return parameterHolder.updateReferenceValues(markerInterface, oldValue, newValue)
+                }
+            }
+        }
+        return Collections.emptyList()
+    }
 }

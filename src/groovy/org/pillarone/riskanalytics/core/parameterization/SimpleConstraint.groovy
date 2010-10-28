@@ -20,4 +20,7 @@ class SimpleConstraint implements IMultiDimensionalConstraints {
     }
 
 
+    Integer getColumnIndex(Class marker) {
+        return null;
+    }
 }

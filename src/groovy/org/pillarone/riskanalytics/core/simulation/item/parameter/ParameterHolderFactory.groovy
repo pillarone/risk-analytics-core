@@ -6,6 +6,11 @@ import org.pillarone.riskanalytics.core.parameterization.ConstrainedString
 import org.pillarone.riskanalytics.core.parameterization.IParameterObject
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.parameter.*
+import org.pillarone.riskanalytics.core.model.Model
+import org.pillarone.riskanalytics.core.components.Component
+import org.pillarone.riskanalytics.core.components.IComponentMarker
+import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
+import org.pillarone.riskanalytics.core.components.ComponentUtils
 
 class ParameterHolderFactory {
 
@@ -111,8 +116,9 @@ class ParameterHolderFactory {
      * Removes all parameters whose path starts with oldPath and adds copies of the old parameters
      * to the parameterization with the path replaced with newPath.
      * This can be used to rename all parameters of a component inclusive all of their sub component parameters.
+     * Furthermore all parameters referencing it are renamed accordingly.
      */
-    public static void renamePathOfParameter(Parameterization parameterization, String oldPath, String newPath) {
+    public static List<String> renamePathOfParameter(Parameterization parameterization, String oldPath, String newPath) {
         List removedParameters = []
         List clonedParameters = []
         parameterization.parameters.each {ParameterHolder parameterHolder ->
@@ -129,6 +135,86 @@ class ParameterHolderFactory {
         clonedParameters.each {ParameterHolder parameterHolder ->
             parameterization.addParameter parameterHolder
         }
+        return renameReferencingParameters(parameterization, oldPath, newPath)
+    }
+
+    /**
+     * @param parameterization
+     * @param oldComponentPath
+     * @param newComponentPath
+     * @return all referencing components being renamed from oldComponentPath to newComponentPath using the marker
+     *          interface of the component @ oldComponentPath
+     */
+    private static List<String> renameReferencingParameters(Parameterization parameterization, String oldComponentPath, String newComponentPath) {
+        String oldComponentName = ComponentUtils.getComponentNormalizedName(oldComponentPath)
+        String newComponentName = ComponentUtils.getComponentNormalizedName(newComponentPath)
+        Class markerInterface = getMarkerInterface(parameterization, oldComponentPath)
+        return affectedParameterHolders(parameterization, markerInterface, oldComponentName).collectAll { parameterHolder ->
+            parameterHolder.updateReferenceValues(markerInterface, oldComponentName, newComponentName)
+        }
+    }
+
+    /**
+     * @param parameterization
+     * @param componentPath
+     * @return model path of all parameters referencing the component using its marker interface
+     */
+    public static List<String> referencingParametersPaths(Parameterization parameterization, String componentPath) {
+        String componentName = ComponentUtils.getComponentNormalizedName(componentPath)
+        Class markerInterface = getMarkerInterface(parameterization, componentPath)
+        List<ParameterHolder> markerParameterHolders = affectedParameterHolders(parameterization, markerInterface, componentPath)
+        List<String> referencingPaths = []
+        for (ParameterHolder parameterHolder : markerParameterHolders) {
+            if (!parameterHolder.removed) {
+                List<String> paths = parameterHolder.referencePaths(markerInterface, componentName)
+                if (paths.size() > 0) {
+                    referencingPaths.addAll paths
+                }
+            }
+        }
+        return referencingPaths
+    }
+
+    private static List<ParameterHolder> affectedParameterHolders(Parameterization parameterization, Class markerInterface, String componentPath) {
+        List<ParameterHolder> referencedParameterHolders = new ArrayList<ParameterHolder>()
+        if (markerInterface) {
+            for (ParameterHolder parameterHolder: parameterization.parameterHolders) {
+                if (parameterHolder instanceof IMarkerValueAccessor) {
+                    referencedParameterHolders.add parameterHolder
+                }
+            }
+        }
+        return referencedParameterHolders
+    }
+
+    /**
+     * @param parameterization
+     * @param path of component
+     * @return class of the marker interface the component @path is implementing or <tt>null</tt> if not found
+     */
+    private static Class getMarkerInterface(Parameterization parameterization, String path) {
+        Model model = (Model) parameterization.modelClass.newInstance()
+        // fill model.allComponents
+        model.init()
+        // init component.name
+        model.injectComponentNames()
+        // find the component class of the component @path
+        Class componentClassToBeRenamed
+        for (Component component: model.allComponents) {
+            if (component instanceof DynamicComposedComponent && path.contains(component.name)) {
+                componentClassToBeRenamed = component.createDefaultSubComponent().class
+                break
+            }
+        }
+        if (componentClassToBeRenamed) {
+            // search the marker interface
+            for (Class intf: componentClassToBeRenamed.interfaces) {
+                if (IComponentMarker.isAssignableFrom(intf)) {
+                    return intf
+                }
+            }
+        }
+        return null
     }
 
     public static void duplicateParameters(Parameterization parameterization, String oldPath, String newPath) {

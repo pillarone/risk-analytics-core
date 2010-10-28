@@ -13,6 +13,8 @@ import org.pillarone.riskanalytics.core.output.CollectorMapping
 import org.pillarone.riskanalytics.core.output.batch.AbstractBulkInsert
 import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
 import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
+import org.pillarone.riskanalytics.core.output.SimulationRun
+
 class CoreBootStrap {
 
     SpringSecurityService authenticateService
@@ -72,6 +74,17 @@ class CoreBootStrap {
                 actuaryFR.save()
                 PersonAuthority.create(actuaryFR, userGroup)
 
+            }
+        }
+        //delete all unfinished simulations
+        SimulationRun.withTransaction {status ->
+            def unfinishedSimulations = SimulationRun.findAllByEndTime(null)
+            unfinishedSimulations.each {SimulationRun simulationRun ->
+                try {
+                    simulationRun.delete()
+                } catch (Exception ex) {
+                    ex.printStackTrace()
+                }
             }
         }
 

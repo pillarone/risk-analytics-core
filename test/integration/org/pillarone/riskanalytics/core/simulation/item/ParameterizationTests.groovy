@@ -2,14 +2,16 @@ package org.pillarone.riskanalytics.core.simulation.item
 
 import models.core.CoreModel
 import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.pillarone.riskanalytics.core.example.model.EmptyModel
+import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObject
 import org.pillarone.riskanalytics.core.fileimport.ParameterizationImportService
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.StringParameter
-import org.pillarone.riskanalytics.core.example.model.EmptyModel
-import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObject
-import org.pillarone.riskanalytics.core.simulation.item.parameter.StringParameterHolder
-import org.pillarone.riskanalytics.core.parameterization.validation.ValidatorRegistry
+import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 import org.pillarone.riskanalytics.core.parameterization.validation.TestValidationService
+import org.pillarone.riskanalytics.core.parameterization.validation.ValidatorRegistry
+import org.pillarone.riskanalytics.core.simulation.item.parameter.StringParameterHolder
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 
 class ParameterizationTests extends GroovyTestCase {
 
@@ -135,6 +137,40 @@ class ParameterizationTests extends GroovyTestCase {
         assertEquals initialCount, Parameter.count()
     }
 
+
+    void testAddRemoveComment() {
+        Parameterization parameterization = new Parameterization("newParams")
+        parameterization.periodCount = 1
+        parameterization.modelClass = EmptyModel
+
+        int initialCount = CommentDAO.count()
+
+        Comment newComment = new Comment("path", 0)
+        newComment.text = "text"
+
+        parameterization.addComment(newComment)
+        parameterization.removeComment(newComment)
+
+        parameterization.save()
+
+        assertEquals 0, parameterization.comments.size()
+        assertEquals initialCount, CommentDAO.count()
+
+        parameterization.addComment(newComment)
+
+        parameterization.save()
+
+        assertEquals 1, parameterization.comments.size()
+        assertEquals initialCount + 1, CommentDAO.count()
+
+        parameterization.removeComment(newComment)
+
+        parameterization.save()
+
+        assertEquals 0, parameterization.comments.size()
+        assertEquals initialCount, CommentDAO.count()
+    }
+
     void testSimpleParameterUpdate() {
         Parameterization parameterization = new Parameterization("testSimpleParameterUpdate")
         parameterization.periodCount = 1
@@ -161,6 +197,35 @@ class ParameterizationTests extends GroovyTestCase {
         assertEquals 1, parameterization.parameters.size()
 
         assertEquals "newValue", parameterization.parameters[0].businessObject
+    }
+
+    void testSimpleCommentUpdate() {
+        Parameterization parameterization = new Parameterization("testSimpleParameterUpdate")
+        parameterization.periodCount = 1
+        parameterization.modelClass = EmptyModel
+
+        int initialCount = CommentDAO.count()
+
+        Comment comment = new Comment("path", 0)
+        comment.text = "text"
+        parameterization.addComment(comment)
+
+        parameterization.save()
+
+        assertEquals 1, parameterization.comments.size()
+        assertEquals initialCount + 1, CommentDAO.count()
+
+        comment.text = "newValue"
+
+        parameterization.save()
+
+        assertEquals 1, parameterization.comments.size()
+        assertEquals initialCount + 1, CommentDAO.count()
+
+        parameterization.load()
+        assertEquals 1, parameterization.comments.size()
+
+        assertEquals "newValue", parameterization.comments[0].text
     }
 
     void testPMO_1007() {
@@ -264,7 +329,7 @@ class ParameterizationTests extends GroovyTestCase {
         ConfigObject configObject = parameterization.toConfigObject()
 
 
-        assertEquals 6, configObject.size()
+        assertEquals 7, configObject.size()
         assertTrue configObject.containsKey("applicationVersion")
         assertTrue configObject.containsKey("periodLabels")
         assertEquals CoreModel, configObject.model
@@ -279,7 +344,7 @@ class ParameterizationTests extends GroovyTestCase {
 
         parameterization.periodLabels = ["Q1"]
         configObject = parameterization.toConfigObject()
-        assertEquals 6, configObject.size()
+        assertEquals 7, configObject.size()
         assertEquals "periodLabels", ["Q1"], configObject.periodLabels
     }
 

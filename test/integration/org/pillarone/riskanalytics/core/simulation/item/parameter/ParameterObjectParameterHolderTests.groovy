@@ -7,6 +7,12 @@ import org.pillarone.riskanalytics.core.parameter.ParameterEntry
 import org.pillarone.riskanalytics.core.parameter.ParameterObjectParameter
 import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObjectClassifier
 import org.pillarone.riskanalytics.core.parameter.StringParameter
+import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObject
+import org.pillarone.riskanalytics.core.example.marker.ITestComponentMarker
+import org.pillarone.riskanalytics.core.example.marker.ITest2ComponentMarker
+import org.pillarone.riskanalytics.core.parameterization.ConstrainedString
+import org.pillarone.riskanalytics.core.example.parameter.ExampleMultiDimensionalConstraints
+import org.pillarone.riskanalytics.core.parameterization.ComboBoxTableMultiDimensionalParameter
 
 class ParameterObjectParameterHolderTests extends GroovyTestCase {
 
@@ -205,5 +211,4 @@ class ParameterObjectParameterHolderTests extends GroovyTestCase {
         assertEquals 2d, holder.classifierParameters.get("p3").businessObject
 
     }
-
 }

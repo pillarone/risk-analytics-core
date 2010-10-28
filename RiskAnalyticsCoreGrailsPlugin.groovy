@@ -12,7 +12,7 @@ import org.gridgain.grid.GridConfigurationAdapter
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.1.0.1-kti"
+    def version = "1.1.0.2-kti"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.4 > *"
     // the other plugins this plugin depends on
@@ -46,11 +46,12 @@ Persistence & Simulation engine.
         "grid.cfg"(GridConfigurationAdapter) {
             gridName = "pillarone"
 
-            if (!Boolean.getBoolean("GRIDGAIN_HOME")) {
-                def gridgainHomeDefault = new File("./").absolutePath + File.separator + 'grails-app' + File.separator + 'conf' + File.separator + 'gridgain'
-                if (log.isInfoEnabled()) log.info("GRIDGAIN_HOME is not defined. A default path is provided as: $gridgainHomeDefault")
-                gridGainHome = gridgainHomeDefault
+            def gridgainHomeDefault = new File("./").absolutePath + File.separator + 'grails-app' + File.separator + 'conf' + File.separator + 'gridgain'
+            String ggHome = System.getProperty("GRIDGAIN_HOME")
+            if (ggHome != null) {
+                gridgainHomeDefault = new File(ggHome).absolutePath
             }
+            gridGainHome = gridgainHomeDefault
 
         }
         grid(GridSpringBean) {

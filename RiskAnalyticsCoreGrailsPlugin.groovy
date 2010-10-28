@@ -9,10 +9,11 @@ import org.pillarone.riskanalytics.core.output.CollectingModeFactory
 import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
 import org.gridgain.grid.GridSpringBean
 import org.gridgain.grid.GridConfigurationAdapter
+import org.pillarone.riskanalytics.core.FileConstants
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.1.0.2-kti"
+    def version = "1.1.0.3-kti"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.4 > *"
     // the other plugins this plugin depends on
@@ -46,7 +47,7 @@ Persistence & Simulation engine.
         "grid.cfg"(GridConfigurationAdapter) {
             gridName = "pillarone"
 
-            def gridgainHomeDefault = new File("./").absolutePath + File.separator + 'grails-app' + File.separator + 'conf' + File.separator + 'gridgain'
+            String gridgainHomeDefault = FileConstants.GRIDGAIN_HOME
             String ggHome = System.getProperty("GRIDGAIN_HOME")
             if (ggHome != null) {
                 gridgainHomeDefault = new File(ggHome).absolutePath

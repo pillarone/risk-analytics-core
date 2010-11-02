@@ -125,8 +125,10 @@ class Comment implements Cloneable {
     }
 
     public String toConfigObject() {
-        StringBuilder sb = new StringBuilder("[")
-        sb.append("path:'" + path + "', period:" + period + ", lastChange:new Date(" + lastChange.getTime() + "),user:null, comment: '" + comment + "'")
+        char c = (char) 92
+        StringBuilder sb = new StringBuilder("\"\"[")
+        String newComment = comment.replace("${c}", "&#92;")
+        sb.append("path:'${path}', period:${period}, lastChange:new Date(${lastChange.getTime()}),user:null, comment: ${c}\"${c}\"${c}\"${newComment}${c}\"${c}\"${c}\"")
         if (tags && !tags.isEmpty()) {
             sb.append(", tags:([")
             tags.eachWithIndex {Tag tag, int index ->
@@ -136,7 +138,7 @@ class Comment implements Cloneable {
             }
             sb.append("] as Set)")
         }
-        sb.append("]")
+        sb.append("]\"\"")
         return sb.toString()
     }
 

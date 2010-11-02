@@ -13,6 +13,7 @@ class SingleValueResult {
     FieldMapping field
     int valueIndex
     Double value
+    Date date
 
     static constraints = {
         period min: 0
@@ -21,6 +22,7 @@ class SingleValueResult {
         value()
         collector nullable:true
         field nullable:true
+        date nullable:true
     }
 
     static mapping = {
@@ -29,6 +31,6 @@ class SingleValueResult {
     }
 
     String toString() {
-        "${path.pathName}, ${field.fieldName}, $value" 
+        "${path.pathName}, ${field.fieldName}, $value ($date)"
     }
 }

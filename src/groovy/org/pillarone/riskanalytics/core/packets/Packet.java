@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.packets;
 
+import org.joda.time.DateTime;
 import org.pillarone.riskanalytics.core.components.Component;
 
 import java.util.HashMap;
@@ -17,6 +18,8 @@ public class Packet implements Cloneable, Comparable {
      *  Business components have to set the property. It is evaluated in AbstractCollectingModeStrategy.
      */
     public Integer period;
+
+    private DateTime date;
 
     public Packet() {
     }
@@ -79,5 +82,13 @@ public class Packet implements Cloneable, Comparable {
 
     public void setSenderChannelName(String senderChannelName) {
         this.senderChannelName = senderChannelName;
+    }
+
+    public DateTime getDate() {
+        return date;
+    }
+
+    public void setDate(DateTime date) {
+        this.date = date;
     }
 }

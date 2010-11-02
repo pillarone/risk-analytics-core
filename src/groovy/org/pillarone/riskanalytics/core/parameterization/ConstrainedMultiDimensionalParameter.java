@@ -3,7 +3,6 @@ package org.pillarone.riskanalytics.core.parameterization;
 import org.pillarone.riskanalytics.core.components.Component;
 import org.pillarone.riskanalytics.core.components.IComponentMarker;
 import org.pillarone.riskanalytics.core.model.Model;
-import org.pillarone.riskanalytics.core.simulation.item.parameter.IMarkerValueAccessor;
 import org.pillarone.riskanalytics.core.util.GroovyUtils;
 
 import java.math.BigDecimal;
@@ -25,7 +24,10 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
         if (constraints.matches(row, column, value)) {
             super.setValueAt(value, row, column);
         } else {
-            throw new IllegalArgumentException("Value does not pass constraints");
+            if (Number.class.isAssignableFrom(constraints.getColumnType(column)) && (value instanceof Number)) {
+                super.setValueAt(GroovyUtils.numberValue(constraints.getColumnType(column), value), row, column);
+            } else
+                throw new IllegalArgumentException("Value does not pass constraints");
         }
     }
 

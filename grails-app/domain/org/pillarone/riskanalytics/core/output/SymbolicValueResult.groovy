@@ -7,5 +7,6 @@ public class SymbolicValueResult {
     SimulationRun simulationRun
     int period
     Double value
+    Date date
     int iteration
 }

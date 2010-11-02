@@ -231,10 +231,12 @@ class ResultAccessorTests extends GroovyTestCase {
         assertEquals 5, values[2]
     }
 //
+
     private void writeResult(SingleValueResult result) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(bos);
         dos.writeInt(result.iteration);
+        dos.writeInt(1);
         dos.writeDouble(result.value);
 
         resultWriter.writeResult(new ResultTransferObject(new ResultDescriptor(result.field.id, result.path.id, result.period), null, bos.toByteArray(), 0));

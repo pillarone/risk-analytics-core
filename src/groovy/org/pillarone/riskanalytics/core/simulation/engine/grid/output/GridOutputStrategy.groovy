@@ -45,20 +45,35 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
 
     ICollectorOutputStrategy leftShift(List results) {
         LOG.debug("Received ${results.size()} results...")
+        HashMap<ResultDescriptor, List<Double>> singleResults = new HashMap<ResultDescriptor, List<Double>>();
+        int iteration;
         for (SingleValueResultPOJO result in results) {
+            iteration = result.iteration;
             ResultDescriptor descriptor = new ResultDescriptor(result.field.id, result.path.id, result.period)
+
+            List<Double> values = singleResults.get(descriptor);
+            if (values == null) {
+                values = new ArrayList<Double>();
+                singleResults.put(descriptor, values);
+            }
+            values.add(result.value);
+            resultCount++;
+        }
+
+        for (ResultDescriptor descriptor: singleResults.keySet()) {
+            List<Double> values = singleResults.get(descriptor);
             ByteArrayOutputStream buffer = streamCache.get(descriptor);
             if (buffer == null) {
                 buffer = new ByteArrayOutputStream();
                 streamCache.put(descriptor, buffer);
             }
             DataOutputStream dos = new DataOutputStream(buffer);
-            dos.writeInt(result.iteration);
-            dos.writeDouble(result.value);
-
-            resultCount++;
-
+            dos.writeInt(iteration);
+            dos.writeInt(values.size());
+            for (Double d: values)
+                dos.writeDouble(d);
         }
+
         if (resultCount > PACKET_LIMIT) {
             sendResults()
         }

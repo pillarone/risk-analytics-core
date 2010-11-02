@@ -533,7 +533,10 @@ class IterationFileAccessor {
     public boolean fetchNext() {
         if (dis.available() > 4) {
             id = dis.readInt();
-            value = dis.readDouble();
+            int len = dis.readInt();
+            value = 0;
+            for (int i = 0; i < len; i++)
+                value += dis.readDouble();
             return true;
         }
         return false;

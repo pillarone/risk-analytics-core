@@ -104,11 +104,7 @@ class Comment implements Cloneable {
         dao.comment = comment
         dao.timeStamp = lastChange
         dao.user = user
-        for (Tag tag in tags) {
-            if (!dao.tags*.tag?.contains(tag)) {
-                dao.addToTags(new CommentTag(tag: tag))
-            }
-        }
+        dao.periodIndex = period
 
         List tagsToRemove = []
         for (CommentTag tag in dao.tags) {
@@ -118,12 +114,23 @@ class Comment implements Cloneable {
         }
         for (CommentTag tag in tagsToRemove) {
             dao.removeFromTags(tag)
+
         }
+        tagsToRemove.each {it.delete()}
+
+        for (Tag tag in tags) {
+            if (!dao.tags*.tag?.contains(tag)) {
+                dao.addToTags(new CommentTag(tag: tag))
+            }
+        }
+
     }
     
     public String toConfigObject() {
-        StringBuilder sb = new StringBuilder("[")
-        sb.append("path:'" + path + "', period:" + period + ", lastChange:new Date(" + lastChange.getTime() + "),user:null, comment: '" + comment + "'")
+        char c = (char) 92
+        StringBuilder sb = new StringBuilder("\"\"[")
+        String newComment = comment.replace("${c}", "&#92;")
+        sb.append("path:'${path}', period:${period}, lastChange:new Date(${lastChange.getTime()}),user:null, comment: ${c}\"${c}\"${c}\"${newComment}${c}\"${c}\"${c}\"")
         if (tags && !tags.isEmpty()) {
             sb.append(", tags:([")
             tags.eachWithIndex {Tag tag, int index ->
@@ -133,7 +140,7 @@ class Comment implements Cloneable {
             }
             sb.append("] as Set)")
         }
-        sb.append("]")
+        sb.append("]\"\"")
         return sb.toString()
     }
 

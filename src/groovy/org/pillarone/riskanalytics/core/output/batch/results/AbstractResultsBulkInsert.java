@@ -6,6 +6,7 @@ import org.pillarone.riskanalytics.core.output.SingleValueResultPOJO;
 import org.pillarone.riskanalytics.core.output.batch.AbstractBulkInsert;
 import org.pillarone.riskanalytics.core.util.GroovyUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +26,12 @@ public abstract class AbstractResultsBulkInsert extends AbstractBulkInsert {
             values.add(GroovyUtils.getId(result.getCollector()));
             values.add(result.getValue());
             values.add(result.getValueIndex());
+            if (result.getDate() == null) {
+                values.add(null);
+            }
+            else {
+                values.add(new SimpleDateFormat("yyyy-MM-dd").format(result.getDate()));
+            }
             writeResult(values);
             values.clear();
         }

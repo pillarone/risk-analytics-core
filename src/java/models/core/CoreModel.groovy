@@ -7,7 +7,7 @@ import org.pillarone.riskanalytics.core.example.component.ExampleDynamicComponen
 import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
 import org.joda.time.DateTime
 import junit.framework.Assert
-import org.pillarone.riskanalytics.core.simulation.VariableLengthPeriodCounter
+import org.pillarone.riskanalytics.core.simulation.ValuationDatePeriodCounter
 
 /**
  * Model with different components that can be used for tests in the core plugin
@@ -37,7 +37,7 @@ class CoreModel extends StochasticModel {
         Assert.assertNotNull(exampleInputOutputComponent.parmParameterObject != null)
 
         //return three dates in order to test if the period count is adjusted correctly
-        return new VariableLengthPeriodCounter([new DateTime(), new DateTime(), new DateTime()])
+        return new ValuationDatePeriodCounter([new DateTime(), new DateTime(), new DateTime()])
     }
 
 

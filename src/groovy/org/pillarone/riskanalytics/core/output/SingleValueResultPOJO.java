@@ -1,7 +1,9 @@
 package org.pillarone.riskanalytics.core.output;
 
+import java.util.Date;
+
 /**
- * Data class which transports a single result from a collecting mode strategy to a output strategy.
+ * Data class which transports a single result from a collecting mode strategy to an output strategy.
  * This class is a 'copy' of SingleValueResult, but it performs better because it is not a domain class.
  *
  * Using a domain class instead would generate hibernate overhead.
@@ -16,6 +18,7 @@ public class SingleValueResultPOJO {
     private FieldMapping field;
     private int valueIndex;
     private Double value;
+    private Date date;
 
     public CollectorMapping getCollector() {
         return collector;
@@ -79,5 +82,13 @@ public class SingleValueResultPOJO {
 
     public void setValueIndex(int valueIndex) {
         this.valueIndex = valueIndex;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 }

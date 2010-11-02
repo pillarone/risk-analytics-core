@@ -4,8 +4,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pillarone.riskanalytics.core.packets.Packet;
 import org.pillarone.riskanalytics.core.packets.PacketList;
+import org.pillarone.riskanalytics.core.simulation.engine.PeriodScope;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -24,11 +26,39 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
      * @return
      */
     protected List<SingleValueResultPOJO> createSingleValueResults(PacketList packetList, Map<String, Number> valueMap, int valueIndex) {
-        int period = packetCollector.getSimulationScope().getIterationScope().getPeriodScope().getCurrentPeriod();
+        PeriodScope periodScope = packetCollector.getSimulationScope().getIterationScope().getPeriodScope();
+        return createSingleValueResults(valueMap, valueIndex, getPeriod(packetList, periodScope), getDate(packetList, periodScope));
+    }
+
+    /**
+     * @param packetList
+     * @param periodScope
+     * @return period property of the packet if set or the current period
+     */
+    private int getPeriod(PacketList packetList, PeriodScope periodScope) {
+        int period = periodScope.getCurrentPeriod();
         if (packetList.size() > 0 && ((Packet) packetList.get(0)).period != null) {
             period = ((Packet) packetList.get(0)).period;
         }
-        return createSingleValueResults(valueMap, valueIndex, period);
+        return period;
+    }
+
+    /**
+     *
+     * @param packetList
+     * @param periodScope
+     * @return date property of packet if SingleValueCollectingModeStrategy used or beginning of current period
+     */
+    private Date getDate(PacketList packetList, PeriodScope periodScope) {
+        Date date = null;
+        if (packetCollector.getMode() instanceof SingleValueCollectingModeStrategy
+                && packetList.size() > 0 && ((Packet) packetList.get(0)).getDate() != null) {
+            date = ((Packet) packetList.get(0)).getDate().toDate();
+        }
+        else if (periodScope.getPeriodCounter() != null) {
+            date = periodScope.getCurrentPeriodStartDate().toDate();
+        }
+        return date;
     }
 
     /**
@@ -37,7 +67,7 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
      * The key of the value map is the field name.
      * If a value is infinite or NaN a log statement is created and the packet ignored.
      */
-    private List<SingleValueResultPOJO> createSingleValueResults(Map<String, Number> valueMap, int valueIndex, int period) {
+    private List<SingleValueResultPOJO> createSingleValueResults(Map<String, Number> valueMap, int valueIndex, int period, Date date) {
         List<SingleValueResultPOJO> results = new ArrayList(valueMap.size());
         int iteration = packetCollector.getSimulationScope().getIterationScope().getCurrentIteration();
         PathMapping path = packetCollector.getSimulationScope().getMappingCache().lookupPath(packetCollector.getPath());
@@ -54,6 +84,7 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
             result.setField(packetCollector.getSimulationScope().getMappingCache().lookupField(name));
             result.setValueIndex(valueIndex);
             result.setValue(value);
+            result.setDate(date);
             results.add(result);
         }
         return results;

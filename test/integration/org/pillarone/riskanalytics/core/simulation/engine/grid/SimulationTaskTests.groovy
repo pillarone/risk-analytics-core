@@ -1,9 +1,10 @@
 package org.pillarone.riskanalytics.core.simulation.engine.grid
 
+
 import org.gridgain.grid.Grid
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
-import org.pillarone.riskanalytics.core.simulation.engine.SimulationRunner
+import org.gridgain.grid.GridNode
 
 
 class SimulationTaskTests extends GroovyTestCase {
@@ -15,11 +16,13 @@ class SimulationTaskTests extends GroovyTestCase {
 
         //tests will have to be adjusted for other values
         assertEquals 1000, SimulationTask.SIMULATION_BLOCK_SIZE
+        List<GridNode> mockNodes = new ArrayList<GridNode>();
+        mockNodes.add(null);
 
-        Collection jobs = simulationTask.split(1, configuration)
+        Collection jobs = simulationTask.map(mockNodes, configuration).keySet();
         assertEquals 1, jobs.size()
 
-        SimulationConfiguration runner = jobs[0].simulationConfiguration
+        SimulationConfiguration runner = jobs.iterator().next().simulationConfiguration
         assertEquals 1, runner.simulationBlocks.size()
 
         SimulationBlock block = runner.simulationBlocks[0]
@@ -39,10 +42,14 @@ class SimulationTaskTests extends GroovyTestCase {
         //tests will have to be adjusted for other values
         assertEquals 1000, SimulationTask.SIMULATION_BLOCK_SIZE
 
-        Collection jobs = simulationTask.split(1, configuration)
+        List<GridNode> mockNodes = new ArrayList<GridNode>();
+        mockNodes.add(null);
+
+        Collection jobs = simulationTask.map(mockNodes, configuration).keySet();
+
         assertEquals 1, jobs.size()
 
-        SimulationConfiguration runner = jobs[0].simulationConfiguration
+        SimulationConfiguration runner = jobs.iterator().next().simulationConfiguration
         assertEquals 3, runner.simulationBlocks.size()
 
         List<SimulationBlock> blocks = runner.simulationBlocks.sort { it.streamOffset }
@@ -73,18 +80,24 @@ class SimulationTaskTests extends GroovyTestCase {
         //tests will have to be adjusted for other values
         assertEquals 1000, SimulationTask.SIMULATION_BLOCK_SIZE
 
-        Collection jobs = simulationTask.split(1, configuration)
+        List<GridNode> mockNodes = new ArrayList<GridNode>();
+        mockNodes.add(null);
+
+        Collection jobs = simulationTask.map(mockNodes, configuration).keySet();
         assertEquals 2, jobs.size()
         jobs = jobs.sort { it.simulationConfiguration.simulationBlocks.size() }
 
-        SimulationConfiguration runner = jobs[0].simulationConfiguration
+        SimulationConfiguration runner = jobs.iterator().next().simulationConfiguration
         assertEquals 1, runner.simulationBlocks.size()
 
-        assertEquals 2, runner.simulationBlocks[0].streamOffset
-        assertEquals 2000, runner.simulationBlocks[0].iterationOffset
-        assertEquals 500, runner.simulationBlocks[0].blockSize
+        assertEquals 1, runner.simulationBlocks[0].streamOffset
+        assertEquals 1000, runner.simulationBlocks[0].iterationOffset
+        assertEquals 1000, runner.simulationBlocks[0].blockSize
 
-        runner = jobs[1].simulationConfiguration
+        Iterator it = jobs.iterator()
+        while (it.hasNext())
+            runner = it.next().simulationConfiguration;
+
         assertEquals 2, runner.simulationBlocks.size()
         List<SimulationBlock> blocks = runner.simulationBlocks.sort { it.streamOffset }
         SimulationBlock block = blocks[0]
@@ -93,9 +106,9 @@ class SimulationTaskTests extends GroovyTestCase {
         assertEquals 1000, block.blockSize
 
         block = blocks[1]
-        assertEquals 1, block.streamOffset
-        assertEquals 1000, block.iterationOffset
-        assertEquals 1000, block.blockSize
+        assertEquals 2, block.streamOffset
+        assertEquals 2000, block.iterationOffset
+        assertEquals 500, block.blockSize
 
         assertNotNull configuration.simulation.start
         assertNull configuration.simulation.end
@@ -129,3 +142,4 @@ class TestSimulationTask extends SimulationTask {
 
 
 }
+

@@ -4,7 +4,6 @@ import org.pillarone.riskanalytics.core.output.CollectorMapping
 import org.pillarone.riskanalytics.core.output.FieldMapping
 import org.pillarone.riskanalytics.core.output.PathMapping
 import org.pillarone.riskanalytics.core.output.SingleValueResult
-import java.text.SimpleDateFormat
 
 class GenericBulkInsert extends AbstractResultsBulkInsert {
 
@@ -20,7 +19,9 @@ class GenericBulkInsert extends AbstractResultsBulkInsert {
             result.collector = CollectorMapping.get(Long.parseLong(values[5]))
             result.value = Double.parseDouble(values[6])
             result.valueIndex = Integer.parseInt(values[7])
-            result.date = Date.parse(values[8])
+            if (values[8] != "null") {
+                result.date = Date.parse(values[8])
+            }
             result.save()
         }
     }

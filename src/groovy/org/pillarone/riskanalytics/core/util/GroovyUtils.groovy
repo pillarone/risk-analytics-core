@@ -177,4 +177,17 @@ public class GroovyUtils {
     static Long getId(def domainClass) {
         return domainClass.id
     }
+
+    static Object numberValue(Class clazz, Object value) {
+        switch (clazz) {
+            case Integer.class: return value.intValue()
+            case BigDecimal.class: return value.intValue()
+            case BigInteger.class: return value.intValue()
+            case Double.class: return value.doubleValue()
+            case Float.class: return value.floatValue()
+            case Long.class: return value.longValue()
+            case Short.class: return value.shortValue()
+            default: return value;
+        }
+    }
 }

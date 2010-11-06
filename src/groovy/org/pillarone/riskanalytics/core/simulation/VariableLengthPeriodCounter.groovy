@@ -15,4 +15,9 @@ class VariableLengthPeriodCounter extends ValuationDatePeriodCounter {
         return dates.size() - 1
     }
 
+    int belongsToPeriod(DateTime date) {
+        if (date.isAfter(dates[-1])) return -1
+        return super.belongsToPeriod(date)
+    }
+
 }

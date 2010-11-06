@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.simulation
 
 import org.joda.time.DateTime
 import org.joda.time.Period
+import org.apache.commons.lang.NotImplementedException
 
 /**
  * An implementation of {@code IPeriodCounter } in which every period has the same length.
@@ -66,5 +67,9 @@ public class ContinuousPeriodCounter implements IPeriodCounter {
                 return true
             }
         return false
+    }
+
+    def int belongsToPeriod(DateTime date) {
+        throw new NotImplementedException();
     }
 }

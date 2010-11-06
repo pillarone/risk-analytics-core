@@ -36,4 +36,10 @@ public interface IPeriodCounter {
      */
     boolean periodIncludesBeginningOfYear()
 
+    /**
+     * @param date
+     * @return period number containing the date
+     */
+    int belongsToPeriod(DateTime date)
+
 }

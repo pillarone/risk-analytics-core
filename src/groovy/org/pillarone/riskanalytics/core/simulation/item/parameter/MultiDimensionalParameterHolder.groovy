@@ -5,6 +5,8 @@ import org.pillarone.riskanalytics.core.parameterization.AbstractMultiDimensiona
 import org.pillarone.riskanalytics.core.parameter.MultiDimensionalParameter
 import org.pillarone.riskanalytics.core.parameterization.ConstrainedMultiDimensionalParameter
 import org.pillarone.riskanalytics.core.parameterization.ComboBoxTableMultiDimensionalParameter
+import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.parameterization.IMultiDimensionalConstraints
 
 class MultiDimensionalParameterHolder extends ParameterHolder implements IMarkerValueAccessor {
 
@@ -38,8 +40,47 @@ class MultiDimensionalParameterHolder extends ParameterHolder implements IMarker
 
     public MultiDimensionalParameterHolder clone() {
         MultiDimensionalParameterHolder holder = (MultiDimensionalParameterHolder) super.clone();
-        holder.value = (AbstractMultiDimensionalParameter) new GroovyShell(getClass().getClassLoader()).evaluate(value.toString())
+        List<Integer> columnIndicesOfTypeDateTime = getColumnIndexOfTypeDateTime(holder)
+        if (!columnIndicesOfTypeDateTime.isEmpty()) {
+            // do a "deep clone" if any of the columns contains values of type DateTime
+            IMultiDimensionalConstraints constraints = (IMultiDimensionalConstraints) value.constraints.class.newInstance()
+            List titles = []
+            for (int column = 0; column < value.getColumnCount(); column++) {
+                titles << new String((String) value.titles[column])
+            }
+            List cellValues = []
+            for (int column = 0; column < value.getColumnCount(); column++) {
+                cellValues << []
+                if (columnIndicesOfTypeDateTime.contains(column)) {
+                    for (int row = value.getTitleRowCount(); row < value.getRowCount(); row++) {
+                        cellValues[column][row - 1] = new DateTime(value.getValueAt(row, column).getMillis())
+                    }
+                }
+                else {
+                    for (int row = value.getTitleRowCount(); row < value.getRowCount(); row++) {
+                        cellValues[column][row - 1] = value.getValueAt(row, column).clone()
+                    }
+                }
+            }
+            holder.value = new ConstrainedMultiDimensionalParameter(cellValues, titles, constraints)
+        }
+        else {
+            // method does not work for DateTime values
+            holder.value = (AbstractMultiDimensionalParameter) new GroovyShell(getClass().getClassLoader()).evaluate(value.toString())
+        }
         return holder
+    }
+
+    private static List<Integer> getColumnIndexOfTypeDateTime(MultiDimensionalParameterHolder parameterHolder) {
+        List<Integer> columnIndicesOfTypeDateTime = []
+        if (parameterHolder.value instanceof ConstrainedMultiDimensionalParameter) {
+            for (int column = 0; column < parameterHolder.value.getColumnCount(); column++) {
+                if (parameterHolder.value.constraints.getColumnType(column).equals(DateTime.class)) {
+                    columnIndicesOfTypeDateTime << column
+                }
+            }
+        }
+        return columnIndicesOfTypeDateTime
     }
 
     List<String> referencePaths(Class markerInterface, String refValue) {

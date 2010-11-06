@@ -64,4 +64,16 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
         return dates.size()
     }
 
+    int belongsToPeriod(DateTime date) {
+        int period = -1
+        for (DateTime periodStart : dates) {
+            if (periodStart.isAfter(date)) {
+                return period
+            }
+            else {
+                period++
+            }
+        }
+        return period
+    }
 }

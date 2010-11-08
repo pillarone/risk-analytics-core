@@ -1,8 +1,7 @@
 package org.pillarone.riskanalytics.core.parameter.comment
 
-import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.ParameterizationDAO
-
+import org.pillarone.riskanalytics.core.user.Person
 
 class CommentDAO {
 
@@ -19,6 +18,7 @@ class CommentDAO {
 
     static constraints = {
         user(nullable: true)
+        comment(size: 1..4080)
     }
 
     String toString() {

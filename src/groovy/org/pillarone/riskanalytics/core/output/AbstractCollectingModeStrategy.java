@@ -18,42 +18,41 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
     private Log LOG = LogFactory.getLog(AbstractCollectingModeStrategy.class);
 
     /**
-     * @param packetList    The first packet within the list is used to try to get none standard period information.
-     *                      Period information in following packets is ignored. If no period information is found the
+     * @param packet        Period information in following packets is ignored. If no period information is found the
      *                      current period of the packetCollector is used.
      * @param valueMap      field, value map
      * @param valueIndex    Used when aggregating single packets
      * @return
      */
-    protected List<SingleValueResultPOJO> createSingleValueResults(PacketList packetList, Map<String, Number> valueMap, int valueIndex) {
+    protected List<SingleValueResultPOJO> createSingleValueResults(Packet packet , Map<String, Number> valueMap, int valueIndex) {
         PeriodScope periodScope = packetCollector.getSimulationScope().getIterationScope().getPeriodScope();
-        return createSingleValueResults(valueMap, valueIndex, getPeriod(packetList, periodScope), getDate(packetList, periodScope));
+        return createSingleValueResults(valueMap, valueIndex, getPeriod(packet, periodScope), getDate(packet, periodScope));
     }
 
     /**
-     * @param packetList
+     * @param packet
      * @param periodScope
      * @return period property of the packet if set or the current period
      */
-    private int getPeriod(PacketList packetList, PeriodScope periodScope) {
+    private int getPeriod(Packet packet, PeriodScope periodScope) {
         int period = periodScope.getCurrentPeriod();
-        if (packetList.size() > 0 && ((Packet) packetList.get(0)).period != null) {
-            period = ((Packet) packetList.get(0)).period;
+        if (packet != null && packet.period != null) {
+            period = packet.period;
         }
         return period;
     }
 
     /**
      *
-     * @param packetList
+     * @param packet
      * @param periodScope
      * @return date property of packet if SingleValueCollectingModeStrategy used or beginning of current period
      */
-    private Date getDate(PacketList packetList, PeriodScope periodScope) {
+    private Date getDate(Packet packet, PeriodScope periodScope) {
         Date date = null;
         if (packetCollector.getMode() instanceof SingleValueCollectingModeStrategy
-                && packetList.size() > 0 && ((Packet) packetList.get(0)).getDate() != null) {
-            date = ((Packet) packetList.get(0)).getDate().toDate();
+                && packet != null && packet.getDate() != null) {
+            date = packet.getDate().toDate();
         }
         else if (periodScope.getPeriodCounter() != null) {
             date = periodScope.getCurrentPeriodStartDate().toDate();

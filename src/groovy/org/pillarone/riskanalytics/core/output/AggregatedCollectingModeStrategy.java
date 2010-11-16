@@ -24,7 +24,7 @@ public class AggregatedCollectingModeStrategy extends AbstractCollectingModeStra
                 packetValues.put(entry.getKey(), ((Double)packetValues.get(entry.getKey())) + ((Double)entry.getValue()));
             }
         }
-        return createSingleValueResults(packets, packetValues, 0);
+        return createSingleValueResults((Packet) packets.get(0), packetValues, 0);
     }
 
     public String getDisplayName(Locale locale) {

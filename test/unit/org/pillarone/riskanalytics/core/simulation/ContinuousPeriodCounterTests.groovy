@@ -114,4 +114,13 @@ class ContinuousPeriodCounterTests extends GroovyTestCase {
         assertEquals "period end after increment", endOfPeriodAfterIncrement, counter.currentPeriodEnd
     }
 
+    void testBelongsToPeriod() {
+        DateTime start = new DateTime(2010,1,1,0,0,0,0)
+        ContinuousPeriodCounter counter = new ContinuousPeriodCounter(start, PeriodBase.YEARLY.toPeriod())
+
+        assertEquals "period 0 for 2010-03-31", 0, counter.belongsToPeriod(new DateTime(2010,3,31,0,0,0,0))
+        assertEquals "period 0 for 2010-12-31", 0, counter.belongsToPeriod(new DateTime(2010,12,31,0,0,0,0))
+        assertEquals "period 1 for 2011-12-31", 1, counter.belongsToPeriod(new DateTime(2011,12,31,0,0,0,0))
+        assertEquals "period 2 for 2012-12-31", 2, counter.belongsToPeriod(new DateTime(2012,12,31,0,0,0,0))
+    }
 }

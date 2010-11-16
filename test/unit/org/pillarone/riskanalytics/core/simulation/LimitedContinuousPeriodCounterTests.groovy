@@ -2,7 +2,6 @@ package org.pillarone.riskanalytics.core.simulation
 
 import org.joda.time.DateTime
 import org.joda.time.Period
-import org.joda.time.PeriodType
 
 class LimitedContinuousPeriodCounterTests extends GroovyTestCase {
 

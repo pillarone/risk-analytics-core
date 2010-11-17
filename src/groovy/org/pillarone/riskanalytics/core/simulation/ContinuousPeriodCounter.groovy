@@ -2,6 +2,8 @@ package org.pillarone.riskanalytics.core.simulation
 
 import org.joda.time.DateTime
 import org.joda.time.Period
+import org.apache.commons.lang.NotImplementedException
+import org.joda.time.Days
 
 /**
  * An implementation of {@code IPeriodCounter } in which every period has the same length.
@@ -66,5 +68,15 @@ public class ContinuousPeriodCounter implements IPeriodCounter {
                 return true
             }
         return false
+    }
+
+    int belongsToPeriod(DateTime date) {
+        int period = 0;
+        DateTime movingEndOfPeriodDate = startOfFirstPeriod.plus(periodLength)
+        while (date.isAfter(movingEndOfPeriodDate)) {
+            movingEndOfPeriodDate = movingEndOfPeriodDate.plus(periodLength)
+            period++
+        }
+        return period
     }
 }

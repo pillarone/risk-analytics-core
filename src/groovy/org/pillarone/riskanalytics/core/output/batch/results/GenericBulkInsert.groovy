@@ -19,6 +19,9 @@ class GenericBulkInsert extends AbstractResultsBulkInsert {
             result.collector = CollectorMapping.get(Long.parseLong(values[5]))
             result.value = Double.parseDouble(values[6])
             result.valueIndex = Integer.parseInt(values[7])
+            if (values[8] != "null") {
+                result.date = Date.parse(values[8])
+            }
             result.save()
         }
     }

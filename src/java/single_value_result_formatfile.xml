@@ -10,7 +10,8 @@
   <FIELD ID="7" xsi:type="CharTerm" TERMINATOR="," MAX_LENGTH="41"/>
   <FIELD ID="8" xsi:type="CharTerm" TERMINATOR="," MAX_LENGTH="41"/>
   <FIELD ID="9" xsi:type="CharTerm" TERMINATOR="," MAX_LENGTH="30"/>
-  <FIELD ID="10" xsi:type="CharTerm" TERMINATOR="\r\n" MAX_LENGTH="12"/>
+  <FIELD ID="10" xsi:type="CharTerm" TERMINATOR="," MAX_LENGTH="12"/>
+  <FIELD ID="11" xsi:type="CharTerm" TERMINATOR="\r\n" MAX_LENGTH="10"/>
  </RECORD>
  <ROW>
   <COLUMN SOURCE="1" NAME="id" xsi:type="SQLNUMERIC" PRECISION="19" SCALE="0"/>
@@ -23,5 +24,6 @@
   <COLUMN SOURCE="3" NAME="simulation_run_id" xsi:type="SQLNUMERIC" PRECISION="19" SCALE="0"/>
   <COLUMN SOURCE="9" NAME="value" xsi:type="SQLFLT8"/>
   <COLUMN SOURCE="10" NAME="value_index" xsi:type="SQLINT"/>
+  <COLUMN SOURCE="11" NAME="date" xsi:type="SQLDATE"/>
  </ROW>
 </BCPFORMAT>

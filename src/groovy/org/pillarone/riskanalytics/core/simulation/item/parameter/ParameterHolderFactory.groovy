@@ -149,9 +149,17 @@ class ParameterHolderFactory {
         String oldComponentName = ComponentUtils.getComponentNormalizedName(oldComponentPath)
         String newComponentName = ComponentUtils.getComponentNormalizedName(newComponentPath)
         Class markerInterface = getMarkerInterface(parameterization, oldComponentPath)
-        return affectedParameterHolders(parameterization, markerInterface, oldComponentName).collectAll { parameterHolder ->
-            parameterHolder.updateReferenceValues(markerInterface, oldComponentName, newComponentName)
+        List<ParameterHolder> markerParameterHolders = affectedParameterHolders(parameterization, markerInterface, oldComponentName)
+        List<String> referencingPaths = []
+        for (ParameterHolder parameterHolder: markerParameterHolders) {
+            if (!parameterHolder.removed) {
+                List<String> paths = parameterHolder.updateReferenceValues(markerInterface, oldComponentName, newComponentName)
+                if (paths.size() > 0) {
+                    referencingPaths.addAll paths
+                }
+            }
         }
+        return referencingPaths
     }
 
     /**

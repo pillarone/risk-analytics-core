@@ -23,7 +23,7 @@ class ModelHelperTests extends GroovyTestCase {
         applicator.init()
         applicator.applyParameterForPeriod(0)
 
-        Set paths = ModelHelper.getAllPossibleOutputPaths(coreModel)
+        Set paths = ModelHelper.getAllPossibleOutputPaths(coreModel, null)
         assertEquals 6, paths.size()
         assertTrue paths.any {it.contains("hierarchyLevel")}
 

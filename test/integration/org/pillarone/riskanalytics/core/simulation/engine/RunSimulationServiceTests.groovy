@@ -61,7 +61,7 @@ class RunSimulationServiceTests extends GrailsUnitTestCase {
         simulationConfiguration.simulation = run
         simulationConfiguration.outputStrategy = new NoOutput()
 
-        SimulationHandler runner = runSimulationService.runSimulationOnGrid(simulationConfiguration)
+        SimulationHandler runner = runSimulationService.runSimulationOnGrid(simulationConfiguration, resultConfig)
         assertNotNull runner
 
         while (runner.simulationState != SimulationState.FINISHED) {

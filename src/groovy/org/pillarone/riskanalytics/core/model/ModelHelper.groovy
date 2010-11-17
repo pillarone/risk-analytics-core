@@ -88,7 +88,7 @@ class ModelHelper {
             if (key.startsWith("out")) {
                 String path = prefix + ":${key}"
                 results.add path
-                if (drillDownPaths.contains(path)) {
+                if ((drillDownPaths != null) && drillDownPaths.contains(path)) {
                     findDrillDownCandidates component, path, outputPathsByMarkerInterface
                 }
             } else if (value instanceof Component) {

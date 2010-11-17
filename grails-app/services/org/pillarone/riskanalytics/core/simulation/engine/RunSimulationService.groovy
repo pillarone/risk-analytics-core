@@ -99,10 +99,13 @@ public class RunSimulationService {
 
     private List<String> getDrillDownPaths(List<PacketCollector> collectors) {
         List<String> paths = []
+        // todo: requires a proper refactoring as the core plugin itself knows nothing about the aggregate drill down collector
         ICollectingModeStrategy drillDownCollector = CollectingModeFactory.getStrategy("AGGREGATED_DRILL_DOWN")
-        for (PacketCollector collector : collectors) {
-            if (collector.mode.class.equals(drillDownCollector.class)) {
-                paths << collector.path
+        if (drillDownCollector != null) {
+            for (PacketCollector collector : collectors) {
+                if (collector.mode.class.equals(drillDownCollector.class)) {
+                    paths << collector.path
+                }
             }
         }
         return paths

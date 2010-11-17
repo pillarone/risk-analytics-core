@@ -44,7 +44,7 @@
 
 
     <target name="compile" depends="init" description="--> Compiles a Grails application">
-        <grails command="compile" jvmargs="-Xmx1024m -XX:MaxPermSize=512m -Dtools.jar=../jre1.5.0_11/lib/tools.jar"/>
+        <grails command="compile" jvmargs="-Xmx1024m -XX:MaxPermSize=512m"/>
     </target>
 
 
@@ -59,7 +59,7 @@
             <!--<arg value="-coverage"/>-->
             <env key="GRAILS_HOME" value="${GRAILS_HOME}"/>
             <env key="JAVA_OPTS"
-                 value="-Xmx1024m -XX:MaxPermSize=512m -Dtools.jar=../jre1.5.0_11/lib/tools.jar -Djava.awt.headless=false -Duser.language='en'"/>
+                 value="-Xmx1024m -XX:MaxPermSize=512m -Djava.awt.headless=false -Duser.language='en'"/>
         </exec>
         <copy todir="${dist.dir}">
             <fileset dir="target" includes="test-reports/"/>

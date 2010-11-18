@@ -535,8 +535,11 @@ class IterationFileAccessor {
             id = dis.readInt();
             int len = dis.readInt();
             value = 0;
-            for (int i = 0; i < len; i++)
+            for (int i = 0; i < len; i++){
                 value += dis.readDouble();
+                dis.readLong();
+            }
+
             return true;
         }
         return false;

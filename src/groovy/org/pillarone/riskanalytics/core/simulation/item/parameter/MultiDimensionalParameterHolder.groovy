@@ -40,7 +40,9 @@ class MultiDimensionalParameterHolder extends ParameterHolder implements IMarker
 
     public MultiDimensionalParameterHolder clone() {
         MultiDimensionalParameterHolder holder = (MultiDimensionalParameterHolder) super.clone();
-        List<Integer> columnIndicesOfTypeDateTime = getColumnIndexOfTypeDateTime(holder)
+        holder.value = (AbstractMultiDimensionalParameter) value.clone()
+        
+        /*List<Integer> columnIndicesOfTypeDateTime = getColumnIndexOfTypeDateTime(holder)
         if (!columnIndicesOfTypeDateTime.isEmpty()) {
             // do a "deep clone" if any of the columns contains values of type DateTime
             IMultiDimensionalConstraints constraints = (IMultiDimensionalConstraints) value.constraints.class.newInstance()
@@ -67,7 +69,7 @@ class MultiDimensionalParameterHolder extends ParameterHolder implements IMarker
         else {
             // method does not work for DateTime values
             holder.value = (AbstractMultiDimensionalParameter) new GroovyShell(getClass().getClassLoader()).evaluate(value.toString())
-        }
+        }*/
         return holder
     }
 

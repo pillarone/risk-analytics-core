@@ -238,6 +238,7 @@ class ResultAccessorTests extends GroovyTestCase {
         dos.writeInt(result.iteration);
         dos.writeInt(1);
         dos.writeDouble(result.value);
+        dos.writeDouble(0);
 
         resultWriter.writeResult(new ResultTransferObject(new ResultDescriptor(result.field.id, result.path.id, result.period), null, bos.toByteArray(), 0));
     }

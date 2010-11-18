@@ -45,23 +45,23 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
 
     ICollectorOutputStrategy leftShift(List results) {
         LOG.debug("Received ${results.size()} results...")
-        HashMap<ResultDescriptor, List<Double>> singleResults = new HashMap<ResultDescriptor, List<Double>>();
+        HashMap<ResultDescriptor, List<IterationValue>> singleResults = new HashMap<ResultDescriptor, List<IterationValue>>();
         int iteration;
         for (SingleValueResultPOJO result in results) {
             iteration = result.iteration;
             ResultDescriptor descriptor = new ResultDescriptor(result.field.id, result.path.id, result.period)
 
-            List<Double> values = singleResults.get(descriptor);
+            List<IterationValue> values = singleResults.get(descriptor);
             if (values == null) {
-                values = new ArrayList<Double>();
+                values = new ArrayList<IterationValue>();
                 singleResults.put(descriptor, values);
             }
-            values.add(result.value);
+            values.add(new IterationValue(result.value,result.date!=null?result.date.getTime():0));
             resultCount++;
         }
 
         for (ResultDescriptor descriptor: singleResults.keySet()) {
-            List<Double> values = singleResults.get(descriptor);
+            List<IterationValue> values = singleResults.get(descriptor);
             ByteArrayOutputStream buffer = streamCache.get(descriptor);
             if (buffer == null) {
                 buffer = new ByteArrayOutputStream();
@@ -70,8 +70,11 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
             DataOutputStream dos = new DataOutputStream(buffer);
             dos.writeInt(iteration);
             dos.writeInt(values.size());
-            for (Double d: values)
-                dos.writeDouble(d);
+            for (IterationValue i: values){
+                dos.writeDouble(i.value);
+                dos.writeLong(i.tstamp);
+            }
+
         }
 
         if (resultCount > PACKET_LIMIT) {
@@ -103,5 +106,14 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
         }
         LOG.debug("Sent results back for ${streamCache.size()} streams. Total count: ${totalMessages}")
         resultCount = 0
+    }
+}
+
+class IterationValue{
+    public double value;
+    public long tstamp;
+    public IterationValue(double value,long tstamp){
+        this.value=value;
+        this.tstamp=tstamp;
     }
 }

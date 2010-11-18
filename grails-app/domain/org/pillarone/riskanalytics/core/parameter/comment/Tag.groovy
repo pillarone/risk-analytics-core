@@ -1,8 +1,12 @@
 package org.pillarone.riskanalytics.core.parameter.comment
 
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.EnumTagType
+
 class Tag {
 
     String name
+
+    EnumTagType tagType = EnumTagType.COMMENT
 
     String toString() {
         name

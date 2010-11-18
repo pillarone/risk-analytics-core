@@ -6,7 +6,10 @@ import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.parameter.Parameter
+import org.pillarone.riskanalytics.core.parameter.ParameterizationTag
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
+import org.pillarone.riskanalytics.core.parameter.comment.Tag
+import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowCommentDAO
 import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
 import org.pillarone.riskanalytics.core.parameterization.ParameterWriter
 import org.pillarone.riskanalytics.core.parameterization.validation.IParameterizationValidator
@@ -17,12 +20,11 @@ import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.util.PropertiesUtils
-import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.workflow.Status
-import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
-import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowCommentDAO
+import org.springframework.transaction.TransactionStatus
 
 class Parameterization extends ModellingItem {
 
@@ -38,6 +40,7 @@ class Parameterization extends ModellingItem {
     Integer periodCount
     List<ParameterHolder> parameterHolders
     List<Comment> comments
+    List<Tag> tags
     List periodLabels
 
     boolean orderByPath = false
@@ -61,6 +64,7 @@ class Parameterization extends ModellingItem {
         versionNumber = new VersionNumber('1')
         parameterHolders = []
         comments = []
+        tags = []
         status = Status.NONE
     }
 
@@ -158,6 +162,7 @@ class Parameterization extends ModellingItem {
         dao.dealId = dealId
         saveParameters(dao)
         saveComments(dao)
+        saveTags(dao)
     }
 
     protected void saveParameters(ParameterizationDAO dao) {
@@ -182,6 +187,26 @@ class Parameterization extends ModellingItem {
         }
     }
 
+    protected void saveTags(ParameterizationDAO dao) {
+        List tagsToRemove = []
+        for (ParameterizationTag tag in dao.tags) {
+            if (!tags.contains(tag.tag)) {
+                tagsToRemove << tag
+            }
+        }
+        for (ParameterizationTag tag in tagsToRemove) {
+            dao.removeFromTags(tag)
+
+        }
+        tagsToRemove.each {it.delete()}
+
+        for (Tag tag in tags) {
+            if (!dao.tags*.tag?.contains(tag)) {
+                dao.addToTags(new ParameterizationTag(tag: tag))
+            }
+        }
+    }
+
     protected void saveComments(ParameterizationDAO dao) {
         Iterator<Comment> iterator = comments.iterator()
         while (iterator.hasNext()) {
@@ -197,6 +222,8 @@ class Parameterization extends ModellingItem {
             }
         }
     }
+
+
 
     private void commentAdded(ParameterizationDAO dao, Comment comment) {
         CommentDAO commentDAO = new CommentDAO(parameterization: dao)
@@ -268,6 +295,7 @@ class Parameterization extends ModellingItem {
         if (completeLoad) {
             loadParameters(dao)
             loadComments(dao)
+            tags = dao.tags*.tag
         }
         LOG.info("Parameterization $name loaded in ${System.currentTimeMillis() - time}ms")
     }
@@ -401,6 +429,24 @@ class Parameterization extends ModellingItem {
         }
         comment.deleted = true
         comment.updated = false
+    }
+
+    public List<Tag> getTags() {
+        return tags
+    }
+
+    public void setTags(Set selectedTags) {
+        selectedTags.each {Tag tag ->
+            if (!tags.contains(tag))
+                tags << tag
+        }
+        List tagsToRemove = []
+        tags.each {Tag tag ->
+            if (!selectedTags.contains(tag))
+                tagsToRemove << tag
+        }
+        if (tagsToRemove.size() > 0)
+            tags.removeAll(tagsToRemove)
     }
 
     List getParameters(String path) {

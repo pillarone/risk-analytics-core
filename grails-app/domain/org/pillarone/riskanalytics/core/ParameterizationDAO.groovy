@@ -5,10 +5,11 @@ import groovy.sql.Sql
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.parameter.Parameter
+import org.pillarone.riskanalytics.core.parameter.ParameterizationTag
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
+import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowCommentDAO
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.workflow.Status
-import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowCommentDAO
 
 class ParameterizationDAO {
 
@@ -33,7 +34,7 @@ class ParameterizationDAO {
 
     javax.sql.DataSource dataSource
 
-    static hasMany = [parameters: Parameter, comments: CommentDAO, issues: WorkflowCommentDAO]
+    static hasMany = [parameters: Parameter, comments: CommentDAO, issues: WorkflowCommentDAO, tags: ParameterizationTag]
     static transients = ['dataSource']
 
 

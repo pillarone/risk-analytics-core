@@ -38,6 +38,7 @@ class MultiDimensionalParameterHolder extends ParameterHolder implements IMarker
         value = newValue
     }
 
+    // todo(msp): https://issuetracking.intuitive-collaboration.com/jira/browse/PMO-1350
     public MultiDimensionalParameterHolder clone() {
         MultiDimensionalParameterHolder holder = (MultiDimensionalParameterHolder) super.clone();
         List<Integer> columnIndicesOfTypeDateTime = getColumnIndexOfTypeDateTime(holder)
@@ -65,13 +66,14 @@ class MultiDimensionalParameterHolder extends ParameterHolder implements IMarker
             holder.value = new ConstrainedMultiDimensionalParameter(cellValues, titles, constraints)
         }
         else {
-            // method does not work for DateTime values
+            // method does not work for DateTime values, the following line does not a proper clone!
             holder.value = (AbstractMultiDimensionalParameter) new GroovyShell(getClass().getClassLoader()).evaluate(value.toString())
+            holder.value.valuesConverted = value.valuesConverted
         }
         return holder
     }
 
-    private static List<Integer> getColumnIndexOfTypeDateTime(MultiDimensionalParameterHolder parameterHolder) {
+    private List<Integer> getColumnIndexOfTypeDateTime(MultiDimensionalParameterHolder parameterHolder) {
         List<Integer> columnIndicesOfTypeDateTime = []
         if (parameterHolder.value instanceof ConstrainedMultiDimensionalParameter) {
             for (int column = 0; column < parameterHolder.value.getColumnCount(); column++) {

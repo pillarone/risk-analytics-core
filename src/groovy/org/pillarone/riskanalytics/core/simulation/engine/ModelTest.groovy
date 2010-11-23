@@ -178,6 +178,8 @@ abstract class ModelTest extends GroovyTestCase {
         List lines = reference.readLines()
         for (int i = 1; i < lines.size(); i++) {
             String line = lines[i]
+//            LOG.debug "$i $line"
+//            String[] info = line.split("\t")
             String[] info = line.split()
             int iteration = Integer.parseInt(info[0])
             int period = Integer.parseInt(info[1])
@@ -193,6 +195,7 @@ abstract class ModelTest extends GroovyTestCase {
 
         for (int i = 1; i < resultLines.size(); i++) {
             String line = resultLines[i]
+//            String[] info = line.split("\t")
             String[] info = line.split()
             int iteration = Integer.parseInt(info[0])
             int period = Integer.parseInt(info[1])

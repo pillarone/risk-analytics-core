@@ -118,6 +118,12 @@ abstract class Model {
      */
     abstract IPeriodCounter createPeriodCounter(DateTime beginOfFirstPeriod)
 
+    void applyGlobalParameters() {
+    }
+
+    void injectResourceParameters() {
+    }
+
     /**
      * @return If the model needs a start date set before it can run correctly.
      */

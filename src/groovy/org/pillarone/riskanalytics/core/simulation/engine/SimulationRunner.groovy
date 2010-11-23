@@ -218,6 +218,8 @@ public class SimulationRunner {
         Action initModel = new InitModelAction(simulationScope: simulationScope)
         Action randomSeed = new RandomSeedAction(simulationScope: simulationScope)
         Action initParams = new PrepareParameterizationAction(simulationScope: simulationScope, periodScope: periodScope)
+        Action injectResourceParams = new PrepareResourceParameterizationAction(simulationScope: simulationScope)
+        Action applyGlobalParams = new ApplyGlobalParametersAction(simulationScope: simulationScope)
         Action periodCounter = new CreatePeriodCounterAction(simulationScope: simulationScope)
         Action prepareStructure = new PrepareStructureInformationAction(simulationScope: simulationScope)
         Action wireModel = new WireModelAction(simulationScope: simulationScope)
@@ -243,6 +245,8 @@ public class SimulationRunner {
         runner.preSimulationActions << randomSeed
         runner.preSimulationActions << initParams
         runner.preSimulationActions << prepareStructure
+        runner.preSimulationActions << injectResourceParams
+        runner.preSimulationActions << applyGlobalParams
         runner.preSimulationActions << wireModel
         runner.preSimulationActions << periodCounter
         runner.preSimulationActions << injectScopes

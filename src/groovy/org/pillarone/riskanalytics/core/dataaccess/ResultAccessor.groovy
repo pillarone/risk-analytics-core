@@ -97,6 +97,19 @@ class ResultAccessor {
         }
     }
 
+    static Double getNthOrderStatistic(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName,
+                                       String fieldName, double percentage, boolean countingFromLowerEnd) {
+        double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
+        if (countingFromLowerEnd) {
+            int rank = (int) (simulationRun.getIterations() * percentage * 0.01)
+            return rank == 0 ?  null : values[rank - 1]
+        }
+        else {
+            int rank = (int) (simulationRun.getIterations() * (1 - percentage) * 0.01)
+            return values[-rank]
+        }
+    }
+
     static Double getPercentile(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName, String fieldName, Double percentile) {
         def result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, path, collectorName, fieldName, PostSimulationCalculation.PERCENTILE, percentile)
         if (result != null) {

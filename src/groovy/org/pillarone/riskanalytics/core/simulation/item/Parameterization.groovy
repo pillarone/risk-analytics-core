@@ -364,7 +364,9 @@ class Parameterization extends ModellingItem {
         } catch (Exception e) {
             LOG.error("Exception in method isUsedInSimulation : $e.message", e)
         }
-        return result.size() > 0 && result.any { it.endTime != null }
+        // lock a parameterization as soon as a simulation has started
+        // https://issuetracking.intuitive-collaboration.com/jira/browse/PMO-1242
+        return result.size() > 0
     }
 
     public boolean isEditable() {

@@ -20,9 +20,9 @@ public class MathUtils {
     };
     public static int DEFAULT_RANDOM_SEED = 2;
 
-    public static double calculatePercentile(double[] values, double percentile) {
+    public static double calculatePercentile(double[] values, double severity) {
         Arrays.sort(values);
-        return calculatePercentileOfSortedValues(values, percentile);
+        return calculatePercentileOfSortedValues(values, severity);
     }
 
     public static void setRandomStreamBase(F2NL607 base) {
@@ -74,6 +74,7 @@ public class MathUtils {
     /**
      * Clones the provided stream and selects defined subStream. If subStream is not positive, the stream
      * itselfs is returned.
+     *
      * @param stream
      * @param subStream
      * @return
@@ -86,7 +87,8 @@ public class MathUtils {
                 streamStartingAtSubstream.resetNextSubstream();
             }
             return streamStartingAtSubstream;
-        } else {
+        }
+        else {
             return stream;
         }
     }
@@ -96,37 +98,36 @@ public class MathUtils {
      * If an array is not yet sorted use Arrays.sort(values) before applying this function;
      *
      * @param sortedValues
-     * @param percentile
+     * @param severity
      * @return
      */
-    public static double calculatePercentileOfSortedValues(double[] sortedValues, double percentile) {
+    public static double calculatePercentileOfSortedValues(double[] sortedValues, double severity) {
+        severity = severity / 100d;
         int size = sortedValues.length;
-        double n = (percentile / 100) * (size - 1.0) + 1.0;
-        int k = (int) n;
-        double d = n - (double) k;
-
-        if (k - 1 == 0) {
+        int g = (int) Math.floor((size + 1 / 3d) * severity + 1 / 3d);
+        double gamma = (size + 1 / 3d) * severity + 1 / 3d - g;
+        if (g == 0) {
             return sortedValues[0];
-        } else if (k == size) {
+        }
+        else if (g >= size) {
             return sortedValues[size - 1];
-        } else {
-            double result = sortedValues[k - 1];
-            result += d * (sortedValues[k] - sortedValues[k - 1]);
-            return result;
+        }
+        else {
+            return (1 - gamma) * sortedValues[g - 1] + gamma * sortedValues[g];
         }
     }
 
-    public static double calculateVar(double[] values, double var) {
-        return calculateVar(values, var, calculateMean(values));
+    public static double calculateVar(double[] values, double severity) {
+        return calculateVar(values, severity, calculateMean(values));
     }
 
-    public static double calculateVarOfSortedValues(double[] sortedValues, double var, double mean) {
-        return calculatePercentileOfSortedValues(sortedValues, var) - mean;
+    public static double calculateVarOfSortedValues(double[] sortedValues, double severity, double mean) {
+        return calculatePercentileOfSortedValues(sortedValues, severity) - mean;
     }
 
-    public static double calculateVar(double[] values, double var, double mean) {
+    public static double calculateVar(double[] values, double severity, double mean) {
         Arrays.sort(values);
-        return calculateVarOfSortedValues(values, var, mean);
+        return calculateVarOfSortedValues(values, severity, mean);
     }
 
     public static double calculateTvar(double[] values, double tvar) {
@@ -138,28 +139,28 @@ public class MathUtils {
      * If an array is not yet sorted use Arrays.sort(values) before applying this function;
      *
      * @param sortedValues
-     * @param tvar
+     * @param severity
      * @return
      */
-    public static double calculateTvarOfSortedValues(double[] sortedValues, double tvar) {
-        double size = (double) sortedValues.length;
-        double n = (tvar / 100) * (size - 1.0) + 1.0;
-        int k = (int) n;
-        double d = n - (double) k;
-
+    public static double calculateTvarOfSortedValues(double[] sortedValues, double severity) {
+        severity = severity / 100d;
+        int size = sortedValues.length;
+        int g = (int) Math.floor((size + 1 / 3d) * severity + 1 / 3d);
+        double gamma = (size + 1 / 3d) * severity + 1 / 3d - g;
         int index = 0;
-        if (d == 0) {
-            index = k - 1;
-        } else {
-            index = k;
+        if (gamma == 0) {
+            index = Math.min(g - 1, size - 1);
+        }
+        else {
+            index = Math.min(g, size - 1);
         }
         double sum = 0;
         for (int i = index; i < size; i++) {
             sum += sortedValues[i];
         }
-        double mean = sum / (size - index);
+        double mean = sum / (double) (size - index);
 
-        return mean - (calculateSum(sortedValues) / size);
+        return mean - (calculateSum(sortedValues) / (double) size);
     }
 
     public static double calculateStandardDeviation(double[] values) {

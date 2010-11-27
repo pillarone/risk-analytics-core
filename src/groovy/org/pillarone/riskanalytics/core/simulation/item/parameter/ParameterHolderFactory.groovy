@@ -123,10 +123,7 @@ class ParameterHolderFactory {
         List clonedParameters = []
         parameterization.parameters.each {ParameterHolder parameterHolder ->
             if (parameterHolder.path.startsWith(oldPath + ":")) {
-                ParameterHolder cloned = parameterHolder.clone()
-                cloned.path = cloned.path.replace("${oldPath}", "${newPath}")
-                removedParameters << parameterHolder
-                clonedParameters << cloned
+                renamePathOfParameter(parameterHolder, removedParameters, clonedParameters, oldPath, newPath)
             }
         }
         removedParameters.each {ParameterHolder parameterHolder ->
@@ -136,6 +133,24 @@ class ParameterHolderFactory {
             parameterization.addParameter parameterHolder
         }
         return renameReferencingParameters(parameterization, oldPath, newPath)
+    }
+
+    private static ParameterHolder renamePathOfParameter(ParameterHolder parameterHolder, List<ParameterHolder> removedParameters,
+                                              List<ParameterHolder> clonedParameters, String oldPath, String newPath) {
+        ParameterHolder cloned = parameterHolder.clone()
+        cloned.path = cloned.path.replace(oldPath, newPath)
+        println cloned.path
+        removedParameters << parameterHolder
+        clonedParameters << cloned
+        if (cloned instanceof ParameterObjectParameterHolder) {
+            // recursive step down
+            cloned.getClassifierParameters().clear()
+            for (Map.Entry<String, ParameterHolder> nestedParameterHolder : ((ParameterObjectParameterHolder) parameterHolder).getClassifierParameters().entrySet()) {
+                ParameterHolder clonedNested = renamePathOfParameter(nestedParameterHolder.value, removedParameters, clonedParameters, oldPath, newPath)
+                cloned.getClassifierParameters().putAt(nestedParameterHolder.key, clonedNested)
+            }
+        }
+        return cloned
     }
 
     /**

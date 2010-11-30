@@ -41,6 +41,13 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
         }
     }
 
+    DateTime getPeriodStart(int periodIndex){
+        if (periodIndex<0 || periodIndex >= dates.size()){
+            throw new UnsupportedOperationException("Period out of range, impossible to determine start date")
+        }
+        return dates.get(periodIndex)
+    }
+
     boolean periodIncludesBeginningOfYear() {
         if (currentPeriod + 1 < dates.size()) {
             int startDayOfYear = getCurrentPeriodStart().dayOfYear().get()

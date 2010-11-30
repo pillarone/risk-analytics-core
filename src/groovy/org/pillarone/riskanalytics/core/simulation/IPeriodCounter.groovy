@@ -42,4 +42,6 @@ public interface IPeriodCounter {
      */
     int belongsToPeriod(DateTime date)
 
+    DateTime getPeriodStart(int periodIndex)
+
 }

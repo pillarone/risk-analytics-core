@@ -34,7 +34,7 @@ public class ContinuousPeriodCounter implements IPeriodCounter {
         return getPeriodStart(periodCount)
     }
 
-    public DateTime getPeriodStart(int periodIndex) {
+    DateTime getPeriodStart(int periodIndex) {
         periodStartToDate(periodIndex).dayOfMonth().withMinimumValue()
     }
 

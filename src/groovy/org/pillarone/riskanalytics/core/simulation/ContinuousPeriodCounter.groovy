@@ -6,7 +6,7 @@ import org.apache.commons.lang.NotImplementedException
 import org.joda.time.Days
 
 /**
- * An implementation of {@code IPeriodCounter } in which every period has the same length.
+ * An implementation of  {@code IPeriodCounter}  in which every period has the same length.
  */
 public class ContinuousPeriodCounter implements IPeriodCounter {
 
@@ -42,7 +42,7 @@ public class ContinuousPeriodCounter implements IPeriodCounter {
         return getPeriodEnd(periodCount)
     }
 
-    protected DateTime getPeriodEnd(int periodIndex) {
+    DateTime getPeriodEnd(int periodIndex) {
         DateTime startOfNext = new DateTime(getPeriodStart(periodIndex + 1))
         return startOfNext.minusDays(1)
     }
@@ -65,8 +65,8 @@ public class ContinuousPeriodCounter implements IPeriodCounter {
             return false
         }
         else if (startDayOfYear > endDayOfYear) {
-                return true
-            }
+            return true
+        }
         return false
     }
 

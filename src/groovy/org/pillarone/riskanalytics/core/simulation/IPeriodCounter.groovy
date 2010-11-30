@@ -44,4 +44,6 @@ public interface IPeriodCounter {
 
     DateTime getPeriodStart(int periodIndex)
 
+    DateTime getPeriodEnd(int periodIndex)
+
 }

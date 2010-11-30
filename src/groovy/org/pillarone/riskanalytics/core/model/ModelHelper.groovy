@@ -167,7 +167,8 @@ class ModelHelper {
             builder.append(drillDownComponentName1)
             builder.append(PATH_SEPARATOR)
             for (String drillDownComponentName2 : componentNameByMarkerInterface.get(markerClass2)) {
-                StringBuilder builder2 = (StringBuilder) builder.clone()
+                //StringBuilder builder2 = (StringBuilder) builder.clone()
+                StringBuilder builder2 = new StringBuilder(builder.toString());
                 builder2.append(markerPath2)
                 builder2.append(PATH_SEPARATOR)
                 builder2.append(drillDownComponentName2)

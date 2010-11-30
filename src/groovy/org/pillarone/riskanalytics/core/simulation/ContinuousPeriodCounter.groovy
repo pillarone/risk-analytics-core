@@ -34,7 +34,7 @@ public class ContinuousPeriodCounter implements IPeriodCounter {
         return getPeriodStart(periodCount)
     }
 
-    protected DateTime getPeriodStart(int periodIndex) {
+    public DateTime getPeriodStart(int periodIndex) {
         periodStartToDate(periodIndex).dayOfMonth().withMinimumValue()
     }
 
@@ -71,8 +71,8 @@ public class ContinuousPeriodCounter implements IPeriodCounter {
     }
 
     int belongsToPeriod(DateTime date) {
-        int period = 0;
-        DateTime movingEndOfPeriodDate = startOfFirstPeriod.plus(periodLength)
+        int period = -1;
+        DateTime movingEndOfPeriodDate = startOfFirstPeriod.minusDays(1)
         while (date.isAfter(movingEndOfPeriodDate)) {
             movingEndOfPeriodDate = movingEndOfPeriodDate.plus(periodLength)
             period++

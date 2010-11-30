@@ -23,7 +23,7 @@ class VariableLengthPeriodCounter extends ValuationDatePeriodCounter {
     }
 
     DateTime getPeriodEnd(int periodIndex) {
-        if (periodIndex < 0 || periodIndex >= dates.size() - 1) {
+        if (periodIndex >= dates.size() - 1) {
             throw new UnsupportedOperationException("Period out of range, impossible to determine end date")
         }
         if (periodIndex < dates.size() - 2) {
@@ -38,5 +38,4 @@ class VariableLengthPeriodCounter extends ValuationDatePeriodCounter {
         if (date.isAfter(dates[-1])) return -1
         return super.belongsToPeriod(date)
     }
-
 }

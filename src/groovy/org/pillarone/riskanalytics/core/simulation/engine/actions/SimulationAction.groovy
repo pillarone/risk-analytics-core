@@ -21,6 +21,7 @@ public class SimulationAction implements Action {
     SimulationScope simulationScope
     private volatile boolean stopped = false
     private volatile boolean canceled = false
+    private int numberOfIterationsLocal=0;
 
     /**
      * Loops over the number of iteration and calls iterationAction.perform().
@@ -30,7 +31,7 @@ public class SimulationAction implements Action {
         LOG.info "Using simulation blocks: ${simulationScope.simulationBlocks}"
         for (SimulationBlock simulationBlock: simulationScope.simulationBlocks) {
             initializeSimulationBlock(simulationBlock)
-            for (int iteration = 0; iteration < simulationScope.numberOfIterations && !stopped && !canceled; iteration++) {
+            for (int iteration = 0; iteration < numberOfIterationsLocal && !stopped && !canceled; iteration++) {
                 iterationAction.perform()
                 simulationScope.iterationsDone = simulationScope.iterationsDone + 1 // do not use simulationScope.iterationsDone++ because of a issue in StubFor
             }
@@ -46,7 +47,7 @@ public class SimulationAction implements Action {
         }
         LOG.info "Initialize block: ${simulationBlock}. Reset to substream #${simulationBlock.streamOffset}"
         iterationAction.iterationScope.currentIteration = simulationBlock.iterationOffset
-        simulationScope.numberOfIterations = simulationBlock.blockSize
+        numberOfIterationsLocal = simulationBlock.blockSize
     }
 
     /**

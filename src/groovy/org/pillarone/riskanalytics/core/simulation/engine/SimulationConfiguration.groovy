@@ -61,7 +61,6 @@ public class SimulationConfiguration implements Serializable, Cloneable {
 
     void addSimulationBlock(SimulationBlock simulationBlock) {
         simulationBlocks << simulationBlock
-        calculateTotalIterations()
     }
 
     private void calculateTotalIterations() {

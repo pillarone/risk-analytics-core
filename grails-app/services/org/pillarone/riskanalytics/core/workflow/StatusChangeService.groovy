@@ -1,18 +1,17 @@
 package org.pillarone.riskanalytics.core.workflow
 
-import org.pillarone.riskanalytics.core.simulation.item.Parameterization
-
-import static org.pillarone.riskanalytics.core.workflow.Status.*
-import org.pillarone.riskanalytics.core.parameterization.ParameterizationHelper
-import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
-import org.pillarone.riskanalytics.core.user.UserManagement
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.pillarone.riskanalytics.core.parameter.comment.workflow.IssueStatus
+import org.pillarone.riskanalytics.core.parameterization.ParameterizationHelper
+import org.pillarone.riskanalytics.core.simulation.item.Parameterization
+import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
-import org.pillarone.riskanalytics.core.parameter.comment.workflow.IssueStatus
-import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.pillarone.riskanalytics.core.user.UserManagement
+import static org.pillarone.riskanalytics.core.workflow.Status.*
 
 class StatusChangeService {
 
@@ -70,6 +69,7 @@ class StatusChangeService {
     }
 
     //TODO: re-use MIF
+
     private Parameterization incrementVersion(Parameterization item, boolean newR) {
         Parameterization newItem = new Parameterization(item.name)
 
@@ -88,6 +88,8 @@ class StatusChangeService {
                 if (comment.status != IssueStatus.CLOSED) {
                     newItem.addComment(comment.clone())
                 }
+            } else {
+                newItem.addComment(comment.clone())
             }
         }
 

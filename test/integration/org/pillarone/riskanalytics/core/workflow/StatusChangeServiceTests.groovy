@@ -1,12 +1,12 @@
 package org.pillarone.riskanalytics.core.workflow
 
-import org.pillarone.riskanalytics.core.simulation.item.Parameterization
-import static org.pillarone.riskanalytics.core.workflow.Status.*
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
+import org.pillarone.riskanalytics.core.parameter.comment.workflow.IssueStatus
+import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
-import org.pillarone.riskanalytics.core.parameter.comment.workflow.IssueStatus
+import static org.pillarone.riskanalytics.core.workflow.Status.*
 
 class StatusChangeServiceTests extends GroovyTestCase {
 
@@ -115,8 +115,8 @@ class StatusChangeServiceTests extends GroovyTestCase {
         Parameterization newParameterization = statusChangeService.changeStatus(parameterization, DATA_ENTRY)
         assertNotSame newParameterization, parameterization
 
-        assertEquals 1, newParameterization.comments.size()
-        assertEquals IssueStatus.OPEN, newParameterization.comments[0].status
+        assertEquals 2, newParameterization.comments.size()
+        assertEquals IssueStatus.OPEN, newParameterization.comments.findAll {it instanceof WorkflowComment}[0].status
 
     }
 

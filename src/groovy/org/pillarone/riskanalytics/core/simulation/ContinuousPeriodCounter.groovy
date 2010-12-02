@@ -8,6 +8,8 @@ import org.apache.commons.lang.NotImplementedException
  * An implementation of {@code IPeriodCounter } in which every period has the same length. This implementation
  * has not a defined number of periods, therefore endOfLastPeriod() is not implemented.
  */
+// todo(sku): getPeriodStart() should be removed, but it seems that this implementation serves a very specific
+//              use case in any of the business logic plugins.
 public class ContinuousPeriodCounter implements IPeriodCounter {
 
     private DateTime startOfFirstPeriod

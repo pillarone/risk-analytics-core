@@ -56,28 +56,24 @@ public interface IPeriodCounter {
      * @param date
      * @return start of the period the date belongs to
      */
-    DateTime startOfPeriod(DateTime date)
+    DateTime startOfPeriod(DateTime date) throws BeforeSimulationStartException, AfterSimulationEndException
 
     /**
      * @param period
      * @return start date of the period
      */
-    DateTime startOfPeriod(int period)
+    DateTime startOfPeriod(int period) throws NotInProjectionHorizon
 
     /**
      * @param date
      * @return end of the period the date belongs to
      */
-    DateTime endOfPeriod(DateTime date)
+    DateTime endOfPeriod(DateTime date) throws AfterSimulationEndException
 
     /**
      * @param period
      * @return end date of the period
      */
-    DateTime endOfPeriod(int period)
-
-    DateTime getPeriodStart(int periodIndex)
-
-    DateTime getPeriodEnd(int periodIndex)
+    DateTime endOfPeriod(int period) throws NotInProjectionHorizon
 
 }

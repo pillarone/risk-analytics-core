@@ -21,4 +21,8 @@ class LimitedContinuousPeriodCounter extends ContinuousPeriodCounter implements 
     int periodCount() {
         numberOfPeriods
     }
+
+    DateTime endOfLastPeriod() {
+        endOfPeriod(numberOfPeriods)
+    }
 }

@@ -85,15 +85,19 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
         return dates[belongsToPeriod(date)]
     }
 
-    DateTime startOfPeriod(int period) {
+    DateTime startOfPeriod(int period) throws NotInProjectionHorizon {
+        if (period >= dates.size()) throw new NotInProjectionHorizon()
         return dates[period]
     }
 
-    DateTime endOfPeriod(DateTime date) {
-        return dates[belongsToPeriod(date) + 1]
+    DateTime endOfPeriod(DateTime date) throws AfterSimulationEndException {
+        int period = belongsToPeriod(date) + 1
+        if (period >= dates.size()) throw new AfterSimulationEndException()
+        return dates[period]
     }
 
-    DateTime endOfPeriod(int period) {
+    DateTime endOfPeriod(int period) throws AfterSimulationEndException {
+        if (period >= dates.size() - 1) throw new AfterSimulationEndException()
         return dates[period + 1]
     }
 
@@ -101,6 +105,9 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
         return dates[0]
     }
 
+    /**
+     * @return the last valuation date
+     */
     DateTime endOfLastPeriod() {
         return dates[-1]
     }

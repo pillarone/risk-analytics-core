@@ -79,7 +79,7 @@ public class RunSimulationService {
         CollectorFactory collectorFactory = runner.currentScope.collectorFactory
         List<PacketCollector> drillDownCollectors = resultConfiguration.getResolvedCollectors(model, collectorFactory)
         List<String> drillDownPaths = getDrillDownPaths(drillDownCollectors)
-        Set paths = ModelHelper.getAllPossibleOutputPaths(model, null)
+        Set paths = ModelHelper.getAllPossibleOutputPaths(model, drillDownPaths)
 
         Set fields = ModelHelper.getAllPossibleFields(model)
         MappingCache cache = new MappingCache()

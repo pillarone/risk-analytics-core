@@ -5,6 +5,7 @@ import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
 import org.pillarone.riskanalytics.core.packets.PacketList
 import org.pillarone.riskanalytics.core.packets.Packet
 import org.pillarone.riskanalytics.core.components.IComponentMarker
+import org.pillarone.riskanalytics.core.components.ComposedComponent
 
 
 class ModelHelper {
@@ -12,10 +13,12 @@ class ModelHelper {
     // todo(sku): try to reuse same constants of PC project
     private static final String PATH_SEPARATOR = ':'
     private static final String PERILS = "claimsGenerators"
+    private static final String RESERVES = "claimsGenerators"
     private static final String CONTRACTS = "reinsuranceContracts"
     private static final String LOB = "linesOfBusiness"
     private static final String LOB_MARKER = "LobMarker"
     private static final String PERIL_MARKER = "PerilMarker"
+    private static final String RESERVE_MARKER = "IReserveMarker"
     private static final String CONTRACT_MARKER = "IReinsuranceContractMarker"
 
 
@@ -48,7 +51,9 @@ class ModelHelper {
                 results.addAll(getAllPossibleOutputPaths(prefix + ":${key}", value, outputPathsByMarkerInterface, drillDownPaths))
             }
         }
-        results.addAll getPossibleDrillDownOutputPaths(outputPathsByMarkerInterface)
+        Map<Class, List<String>> componentNameByMarkerInterface = new HashMap<Class, List<String>>()
+        collectComponentNamesByMarkerInterface(model.allComponents, componentNameByMarkerInterface)
+        results.addAll getPossibleDrillDownOutputPaths(outputPathsByMarkerInterface, componentNameByMarkerInterface)
         return injectStructure(results, ModelStructure.getStructureForModel(model.class))
     }
 
@@ -113,36 +118,56 @@ class ModelHelper {
         }
     }
 
-    private static Set<String> getPossibleDrillDownOutputPaths(Map<Class, List<String>> outputPathsByMarkerInterface) {
-        Set<String> results = []
-        Class lobMarker = outputPathsByMarkerInterface.keySet().find { clazz -> clazz.name.contains(LOB_MARKER) }
-        Class perilMarker = outputPathsByMarkerInterface.keySet().find { clazz -> clazz.name.contains(PERIL_MARKER) }
-        Class contractMarker = outputPathsByMarkerInterface.keySet().find { clazz -> clazz.name.contains(CONTRACT_MARKER) }
-        Map<Class, List<String>> componentNameByMarkerInterface = new HashMap<Class, List<String>>()
-        for (Map.Entry<Class, List<String>> outputPaths : outputPathsByMarkerInterface.entrySet()) {
-            List<String> componentNames = new ArrayList<String>()
-            for (String outputPath : outputPaths.value) {
-                componentNames.add getComponentName(outputPath)
+    /**
+     * @param components
+     * @param componentNameByMarkerInterface this map is filled by traversing all components including nested and checking
+     *                                          for every component if it implements a marker interface
+     */
+    public static void collectComponentNamesByMarkerInterface(List<Component> components, Map<Class, List<String>> componentNameByMarkerInterface) {
+        for (Component component : components) {
+            for (Class intf : component.class.interfaces) {
+                if (IComponentMarker.isAssignableFrom(intf)) {
+                    List<String> componentNames = componentNameByMarkerInterface.get(intf)
+                    if (componentNames == null) {
+                        componentNames = new ArrayList<String>()
+                        componentNameByMarkerInterface.put(intf, componentNames)
+                    }
+                    componentNames.add(component.name)
+                }
             }
-            componentNameByMarkerInterface.put(outputPaths.key, componentNames)
+            if (component instanceof ComposedComponent) {
+                collectComponentNamesByMarkerInterface component.allSubComponents(), componentNameByMarkerInterface
+            }
         }
+    }
+
+    private static Set<String> getPossibleDrillDownOutputPaths(Map<Class, List<String>> outputPathsByMarkerInterface,
+                                                               Map<Class, List<String>> componentNameByMarkerInterface) {
+        Set<String> results = []
+        Class lobMarker = componentNameByMarkerInterface.keySet().find { clazz -> clazz.name.contains(LOB_MARKER) }
+        Class perilMarker = componentNameByMarkerInterface.keySet().find { clazz -> clazz.name.contains(PERIL_MARKER) }
+        Class reserveMarker = componentNameByMarkerInterface.keySet().find { clazz -> clazz.name.contains(RESERVE_MARKER)}
+        Class contractMarker = componentNameByMarkerInterface.keySet().find { clazz -> clazz.name.contains(CONTRACT_MARKER) }
+
         for (String path : outputPathsByMarkerInterface.get(lobMarker)) {
             String pathWithoutChannel = getPathBase(path)
             String channel = getChannel(path)
             extendedPaths(componentNameByMarkerInterface, perilMarker, PERILS, pathWithoutChannel, channel, results)
+            extendedPaths(componentNameByMarkerInterface, reserveMarker, RESERVES, pathWithoutChannel, channel, results)
             extendedPaths(componentNameByMarkerInterface, contractMarker, CONTRACTS, pathWithoutChannel, channel, results)
         }
         for (String path : outputPathsByMarkerInterface.get(contractMarker)) {
             String pathWithoutChannel = getPathBase(path)
             String channel = getChannel(path)
             extendedPaths(componentNameByMarkerInterface, lobMarker, LOB, pathWithoutChannel, channel, results)
-            extendedPaths(componentNameByMarkerInterface, contractMarker, PERILS, pathWithoutChannel, channel, results)
+            extendedPaths(componentNameByMarkerInterface, perilMarker, PERILS, pathWithoutChannel, channel, results)
+            extendedPaths(componentNameByMarkerInterface, reserveMarker, RESERVES, pathWithoutChannel, channel, results)
             extendedPaths(componentNameByMarkerInterface, lobMarker, LOB, contractMarker, PERILS, pathWithoutChannel, channel, results)
         }
         return results
     }
 
-    private static extendedPaths(HashMap<Class, List<String>> componentNameByMarkerInterface, Class markerClass,
+    private static extendedPaths(Map<Class, List<String>> componentNameByMarkerInterface, Class markerClass,
                                        String markerPath, String pathWithoutChannel, String channel, Set<String> results) {
         for (String drillDownComponentName: componentNameByMarkerInterface.get(markerClass)) {
             StringBuilder builder = new StringBuilder(pathWithoutChannel)
@@ -156,7 +181,7 @@ class ModelHelper {
         }
     }
 
-    private static extendedPaths(HashMap<Class, List<String>> componentNameByMarkerInterface, Class markerClass1,
+    private static extendedPaths(Map<Class, List<String>> componentNameByMarkerInterface, Class markerClass1,
                                        String markerPath1, Class markerClass2, String markerPath2, String pathWithoutChannel,
                                        String channel, Set<String> results) {
         for (String drillDownComponentName1: componentNameByMarkerInterface.get(markerClass1)) {
@@ -167,7 +192,6 @@ class ModelHelper {
             builder.append(drillDownComponentName1)
             builder.append(PATH_SEPARATOR)
             for (String drillDownComponentName2 : componentNameByMarkerInterface.get(markerClass2)) {
-                //StringBuilder builder2 = (StringBuilder) builder.clone()
                 StringBuilder builder2 = new StringBuilder(builder.toString());
                 builder2.append(markerPath2)
                 builder2.append(PATH_SEPARATOR)

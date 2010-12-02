@@ -85,4 +85,7 @@ public class PacketCollector extends Component {
         WireCategory.doSetProperty(this, "inPackets", WireCategory.doGetProperty(component, outChannel))
     }
 
+    String toString() {
+        return "$path ${mode.getDisplayName()}"
+    }
 }

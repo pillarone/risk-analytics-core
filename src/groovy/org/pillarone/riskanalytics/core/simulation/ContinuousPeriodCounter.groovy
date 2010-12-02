@@ -42,7 +42,7 @@ public class ContinuousPeriodCounter implements IPeriodCounter {
         return getPeriodEnd(periodCount)
     }
 
-    protected DateTime getPeriodEnd(int periodIndex) {
+    DateTime getPeriodEnd(int periodIndex) {
         return new DateTime(getPeriodStart(periodIndex + 1))
     }
 

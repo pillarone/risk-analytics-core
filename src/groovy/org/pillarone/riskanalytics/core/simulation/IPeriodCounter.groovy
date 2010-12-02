@@ -76,8 +76,4 @@ public interface IPeriodCounter {
      */
     DateTime endOfPeriod(int period)
 
-    DateTime getPeriodStart(int periodIndex)
-
-    DateTime getPeriodEnd(int periodIndex)
-
 }

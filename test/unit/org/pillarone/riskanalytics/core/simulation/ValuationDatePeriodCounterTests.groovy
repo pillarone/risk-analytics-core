@@ -60,11 +60,11 @@ class ValuationDatePeriodCounterTests extends GroovyTestCase {
     }
 
     void testCurrentEndDate() {
-        assertEquals dates[1].minusDays(1).millis, periodCounter.currentPeriodEnd.millis
+        assertEquals dates[1].millis, periodCounter.currentPeriodEnd.millis
         periodCounter++
-        assertEquals dates[2].minusDays(1).millis, periodCounter.currentPeriodEnd.millis
+        assertEquals dates[2].millis, periodCounter.currentPeriodEnd.millis
         periodCounter++
-        assertEquals dates[3].minusDays(1).millis, periodCounter.currentPeriodEnd.millis
+        assertEquals dates[3].millis, periodCounter.currentPeriodEnd.millis
         periodCounter++
         shouldFail(UnsupportedOperationException) {
             periodCounter.currentPeriodEnd.millis

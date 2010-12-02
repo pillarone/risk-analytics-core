@@ -123,7 +123,7 @@ class ParameterHolderFactory {
         List clonedParameters = []
         parameterization.parameters.each {ParameterHolder parameterHolder ->
             if (parameterHolder.path.startsWith(oldPath + ":")) {
-                renamePathOfParameter(parameterHolder, removedParameters, clonedParameters, oldPath, newPath)
+                renamePathOfParameter(parameterHolder, removedParameters, clonedParameters, oldPath, newPath, false)
             }
         }
         removedParameters.each {ParameterHolder parameterHolder ->
@@ -136,17 +136,18 @@ class ParameterHolderFactory {
     }
 
     private static ParameterHolder renamePathOfParameter(ParameterHolder parameterHolder, List<ParameterHolder> removedParameters,
-                                              List<ParameterHolder> clonedParameters, String oldPath, String newPath) {
+                                              List<ParameterHolder> clonedParameters, String oldPath, String newPath, boolean isNested) {
         ParameterHolder cloned = parameterHolder.clone()
         cloned.path = cloned.path.replace(oldPath, newPath)
-        println cloned.path
-        removedParameters << parameterHolder
-        clonedParameters << cloned
+        if (!isNested) {
+            removedParameters << parameterHolder
+            clonedParameters << cloned
+        }
         if (cloned instanceof ParameterObjectParameterHolder) {
             // recursive step down
             cloned.getClassifierParameters().clear()
             for (Map.Entry<String, ParameterHolder> nestedParameterHolder : ((ParameterObjectParameterHolder) parameterHolder).getClassifierParameters().entrySet()) {
-                ParameterHolder clonedNested = renamePathOfParameter(nestedParameterHolder.value, removedParameters, clonedParameters, oldPath, newPath)
+                ParameterHolder clonedNested = renamePathOfParameter(nestedParameterHolder.value, removedParameters, clonedParameters, oldPath, newPath, true)
                 cloned.getClassifierParameters().putAt(nestedParameterHolder.key, clonedNested)
             }
         }

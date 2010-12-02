@@ -30,13 +30,14 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
     }
 
     DateTime getCurrentPeriodEnd() {
-        getNextPeriodStart().minusDays(1)
+        getNextPeriodStart()
     }
 
     DateTime getNextPeriodStart() {
         if (currentPeriod + 1 < dates.size()) {
             return dates.get(currentPeriod + 1)
-        } else {
+        }
+        else {
             throw new UnsupportedOperationException("Last period of a variable length period counter does not have an end date or next period date")
         }
     }
@@ -52,10 +53,11 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
                 return false
             }
             else if (startDayOfYear > endDayOfYear) {
-                    return true
-                }
+                return true
+            }
             return false
-        } else {
+        }
+        else {
             throw new UnsupportedOperationException("Unable to determine for last period")
         }
     }
@@ -65,6 +67,8 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
     }
 
     int belongsToPeriod(DateTime date) {
+        if (date.isBefore(startOfFirstPeriod())) throw new BeforeSimulationStartException()
+        if (date.isAfter(endOfLastPeriod())) throw new AfterSimulationEndException()
         int period = -1
         for (DateTime periodStart : dates) {
             if (periodStart.isAfter(date)) {
@@ -75,5 +79,29 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
             }
         }
         return period
+    }
+
+    DateTime startOfPeriod(DateTime date) {
+        return dates[belongsToPeriod(date)]
+    }
+
+    DateTime startOfPeriod(int period) {
+        return dates[period]
+    }
+
+    DateTime endOfPeriod(DateTime date) {
+        return dates[belongsToPeriod(date) + 1]
+    }
+
+    DateTime endOfPeriod(int period) {
+        return dates[period + 1]
+    }
+
+    DateTime startOfFirstPeriod() {
+        return dates[0]
+    }
+
+    DateTime endOfLastPeriod() {
+        return dates[-1]
     }
 }

@@ -49,7 +49,7 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
         int iteration;
         for (SingleValueResultPOJO result in results) {
             iteration = result.iteration;
-            ResultDescriptor descriptor = new ResultDescriptor(result.field.id, result.path.id, result.period)
+            ResultDescriptor descriptor = new ResultDescriptor(result.field.id, result.path.pathName, result.period)
 
             List<IterationValue> values = singleResults.get(descriptor);
             if (values == null) {

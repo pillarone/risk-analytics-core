@@ -9,10 +9,18 @@ public class ResultDescriptor implements Serializable {
     public static final char SEPARATOR = '_';
 
     private long pathId, fieldId, period;
+    private String path;
 
     public ResultDescriptor(long fieldId, long pathId, long period) {
         this.fieldId = fieldId;
+        this.path = pathId+"";
         this.pathId = pathId;
+        this.period = period;
+    }
+
+    public ResultDescriptor(long fieldId, String path, long period) {
+        this.fieldId = fieldId;
+        this.path = path;
         this.period = period;
     }
 
@@ -22,6 +30,10 @@ public class ResultDescriptor implements Serializable {
 
     public void setFieldId(long fieldId) {
         this.fieldId = fieldId;
+    }
+
+    public String getPath(){
+        return path;
     }
 
     public long getPathId() {
@@ -45,7 +57,7 @@ public class ResultDescriptor implements Serializable {
         if (obj instanceof ResultDescriptor) {
             ResultDescriptor resultDescriptor = (ResultDescriptor) obj;
             return resultDescriptor.getFieldId() == fieldId &&
-                    resultDescriptor.getPathId() == pathId &&
+                    resultDescriptor.getPath().equals(path) &&
                     resultDescriptor.getPeriod() == period;
         } else {
             return false;
@@ -54,7 +66,7 @@ public class ResultDescriptor implements Serializable {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(fieldId).append(pathId).append(period).toHashCode();
+        return new HashCodeBuilder().append(fieldId).append(path).append(period).toHashCode();
     }
 
     public String getFileName() {

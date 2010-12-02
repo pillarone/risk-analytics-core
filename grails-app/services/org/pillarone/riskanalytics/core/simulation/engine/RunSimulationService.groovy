@@ -80,14 +80,14 @@ public class RunSimulationService {
         CollectorFactory collectorFactory = runner.currentScope.collectorFactory
         List<PacketCollector> drillDownCollectors = resultConfiguration.getResolvedCollectors(model, collectorFactory)
         List<String> drillDownPaths = getDrillDownPaths(drillDownCollectors)
-        Set paths = ModelHelper.getAllPossibleOutputPaths(model, drillDownPaths)
+        Set paths = ModelHelper.getAllPossibleOutputPaths(model, null)
 
         Set fields = ModelHelper.getAllPossibleFields(model)
         MappingCache cache = new MappingCache()
         cache.initCache(model)
 
         for (String path in paths) {
-            cache.lookupPath(path)
+            cache.lookupPathDB(path)
         }
 
         for (String field in fields) {

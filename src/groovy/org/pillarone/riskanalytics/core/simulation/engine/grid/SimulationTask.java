@@ -2,12 +2,14 @@ package org.pillarone.riskanalytics.core.simulation.engine.grid;
 
 import org.gridgain.grid.*;
 import org.pillarone.riskanalytics.core.output.Calculator;
+import org.pillarone.riskanalytics.core.output.PathMapping;
 import org.pillarone.riskanalytics.core.simulation.SimulationState;
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.JobResult;
+import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultDescriptor;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultWriter;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultTransferObject;
 import org.pillarone.riskanalytics.core.simulation.item.Simulation;
@@ -208,6 +210,9 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
     public synchronized void onMessage(UUID uuid, Object serializable) {
         messageCount.incrementAndGet();
         ResultTransferObject result = (ResultTransferObject) serializable;
+        ResultDescriptor rd=result.getResultDescriptor();
+        PathMapping pm=simulationConfiguration.getMappingCache().lookupPathDB(rd.getPath());
+        rd.setPathId(pm.pathID());
         resultWriter.writeResult(result);
         progress.put(result.getJobIdentifier(), result.getProgress());
         notify();

@@ -34,7 +34,7 @@ public class ContinuousPeriodCounter implements IPeriodCounter {
         return getPeriodStart(periodCount)
     }
 
-    protected DateTime getPeriodStart(int periodIndex) {
+    DateTime getPeriodStart(int periodIndex) {
         periodStartToDate(periodIndex).dayOfMonth().withMinimumValue()
     }
 
@@ -64,8 +64,8 @@ public class ContinuousPeriodCounter implements IPeriodCounter {
             return false
         }
         else if (startDayOfYear > endDayOfYear) {
-                return true
-            }
+            return true
+        }
         return false
     }
 

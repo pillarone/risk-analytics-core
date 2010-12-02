@@ -1,7 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation
 
 import org.joda.time.DateTime
-import org.apache.commons.lang.NotImplementedException
 
 /**
  * A period counter which is backed by a list of dates.
@@ -37,7 +36,8 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
     DateTime getNextPeriodStart() {
         if (currentPeriod + 1 < dates.size()) {
             return dates.get(currentPeriod + 1)
-        } else {
+        }
+        else {
             throw new UnsupportedOperationException("Last period of a variable length period counter does not have an end date or next period date")
         }
     }
@@ -53,10 +53,11 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
                 return false
             }
             else if (startDayOfYear > endDayOfYear) {
-                    return true
-                }
+                return true
+            }
             return false
-        } else {
+        }
+        else {
             throw new UnsupportedOperationException("Unable to determine for last period")
         }
     }

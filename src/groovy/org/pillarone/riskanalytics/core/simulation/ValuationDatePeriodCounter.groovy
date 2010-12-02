@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.simulation
 
 import org.joda.time.DateTime
+import org.apache.commons.lang.NotImplementedException
 
 /**
  * A period counter which is backed by a list of dates.
@@ -30,7 +31,7 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
     }
 
     DateTime getCurrentPeriodEnd() {
-        getNextPeriodStart().minusDays(1)
+        getNextPeriodStart()
     }
 
     DateTime getNextPeriodStart() {
@@ -65,6 +66,8 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
     }
 
     int belongsToPeriod(DateTime date) {
+        if (date.isBefore(startOfFirstPeriod())) throw new BeforeSimulationStartException()
+        if (date.isAfter(endOfLastPeriod())) throw new AfterSimulationEndException()
         int period = -1
         for (DateTime periodStart : dates) {
             if (periodStart.isAfter(date)) {
@@ -75,5 +78,29 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
             }
         }
         return period
+    }
+
+    DateTime startOfPeriod(DateTime date) {
+        return dates[belongsToPeriod(date)]
+    }
+
+    DateTime startOfPeriod(int period) {
+        return dates[period]
+    }
+
+    DateTime endOfPeriod(DateTime date) {
+        return dates[belongsToPeriod(date) + 1]
+    }
+
+    DateTime endOfPeriod(int period) {
+        return dates[period + 1]
+    }
+
+    DateTime startOfFirstPeriod() {
+        return dates[0]
+    }
+
+    DateTime endOfLastPeriod() {
+        return dates[-1]
     }
 }

@@ -110,6 +110,7 @@ class ValuationDatePeriodCounterTests extends GroovyTestCase {
 
         shouldFail(BeforeSimulationStartException, { periodCounter.belongsToPeriod(date20080101)})
         shouldFail(AfterSimulationEndException, { periodCounter.belongsToPeriod(date20111231)})
+        shouldFail(AfterSimulationEndException, { periodCounter.belongsToPeriod(new DateTime(2011,1,3,0,0,0,0))})
     }
 
     void testStartOfPeriod() {

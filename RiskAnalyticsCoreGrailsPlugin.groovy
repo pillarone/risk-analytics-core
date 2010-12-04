@@ -10,6 +10,7 @@ import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
 import org.gridgain.grid.GridSpringBean
 import org.gridgain.grid.GridConfigurationAdapter
 import org.pillarone.riskanalytics.core.FileConstants
+import org.gridgain.grid.spi.discovery.multicast.GridMulticastDiscoverySpi
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
@@ -53,10 +54,16 @@ Persistence & Simulation engine.
                 gridgainHomeDefault = new File(ggHome).absolutePath
             }
             gridGainHome = gridgainHomeDefault
+            //Prevent broadcasting heartbeat msg so only local grid node is used for computing
+            discoverySpi=ref('gridmulticast')
 
         }
         grid(GridSpringBean) {
             configuration = ref('grid.cfg')
+        }
+
+        "gridmulticast"(GridMulticastDiscoverySpi){
+            multicastGroup="224.0.0.1"
         }
 
     }

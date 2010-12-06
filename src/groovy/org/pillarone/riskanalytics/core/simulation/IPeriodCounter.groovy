@@ -5,7 +5,7 @@ import org.joda.time.DateTime
 /**
  * Periods are defined similarly to the joda time library in the sense that we assume a left closed and right opened
  * interval. Therefore end period methods will return the start date of the next period, which is actually not part
- * ot the period.
+ * ot the period. Period counting starts with 0.
  */
 public interface IPeriodCounter {
 

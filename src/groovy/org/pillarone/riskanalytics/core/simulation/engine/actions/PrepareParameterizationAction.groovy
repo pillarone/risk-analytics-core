@@ -28,7 +28,7 @@ public class PrepareParameterizationAction implements Action {
         periodScope.parameterApplicator = applicator
         // PMO-758: Applying parameters before wiring is necessary,
         // similarly ApplyGlobalParameters and PrepareResourcesParameterizationAction depend on the following line
-//        simulationScope.parameterApplicator.applyParameterForPeriod(0)
+        simulationScope.parameterApplicator.applyParameterForPeriod(0)
     }
 
 

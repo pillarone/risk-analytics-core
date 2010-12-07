@@ -234,7 +234,7 @@ class ResultAccessor {
 
     public static Double getUltimatesForOneIteration(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName, int iteration) {
         // TODO (Jul 13, 2009, msh): Why do we use a Criteria here ? See getSingleValueFromView(...)
-        PathMapping path = PathMapping.findByPathName(pathName)
+        /*PathMapping path = PathMapping.findByPathName(pathName)
         FieldMapping field = FieldMapping.findByFieldName(fieldName)
         CollectorMapping collector = CollectorMapping.findByCollectorName(collectorName)
         def c = SingleValueResult.createCriteria()
@@ -253,7 +253,8 @@ class ResultAccessor {
         if (res.size() == 0) {
             return null
         }
-        return res[0][1]
+        return res[0][1]*/
+        return getSingleIterationValue(simulationRun,periodIndex,pathName,fieldName,iteration);
     }
 
     private static String getSimRunPath(SimulationRun simulationRun) {
@@ -421,6 +422,18 @@ class ResultAccessor {
         return values;
     }
 
+    public static Double getSingleIterationValue(SimulationRun simulationRun, int period, String path, String field,int iteration) {
+        File iterationFile = new File(getSimRunPath(simulationRun) + File.separator + getPathId(path, simulationRun.id)
+                + "_" + period + "_" + getFieldId(field, simulationRun.id));
+        IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
+
+        while (ifa.fetchNext()) {
+            if (ifa.getId()==iteration)
+                return new Double(ifa.getValue());
+        }
+        return null;
+    }
+
     public static List getValuesSortedNew(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
         return getValuesSortedNew(simulationRun, periodIndex, getPathId(pathName, simulationRun.id), 0, getFieldId(fieldName, simulationRun.id));
     }
@@ -491,7 +504,9 @@ class ResultAccessor {
         }
         return iterations;
     }
+
 //
+
     public static List getIterationConstrainedValues(SimulationRun simulationRun, int period, String path, String field,
                                                      List<Integer> iterations) {
         File iterationFile = new File(getSimRunPath(simulationRun) + File.separator + getPathId(path, simulationRun.id)
@@ -554,7 +569,7 @@ class IterationFileAccessor {
             id = dis.readInt();
             int len = dis.readInt();
             value = 0;
-            for (int i = 0; i < len; i++){
+            for (int i = 0; i < len; i++) {
                 value += dis.readDouble();
                 dis.readLong();
             }

@@ -49,7 +49,7 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
         int iteration;
         for (SingleValueResultPOJO result in results) {
             iteration = result.iteration;
-            ResultDescriptor descriptor = new ResultDescriptor(result.field.id, result.path.id, result.period)
+            ResultDescriptor descriptor = new ResultDescriptor(result.field.id, result.path.pathName, result.period)
 
             List<IterationValue> values = singleResults.get(descriptor);
             if (values == null) {
@@ -102,9 +102,10 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
             }
             );
             totalMessages++
-            stream.reset();
+            stream.reset()
         }
         LOG.debug("Sent results back for ${streamCache.size()} streams. Total count: ${totalMessages}")
+        streamCache.clear()
         resultCount = 0
     }
 }

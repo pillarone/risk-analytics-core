@@ -7,6 +7,10 @@ import org.pillarone.riskanalytics.core.parameterization.ConstraintsFactory
 import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
 import org.pillarone.riskanalytics.core.output.CollectingModeFactory
 import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
+import org.gridgain.grid.GridSpringBean
+import org.gridgain.grid.GridConfigurationAdapter
+import org.pillarone.riskanalytics.core.FileConstants
+import org.gridgain.grid.spi.discovery.multicast.GridMulticastDiscoverySpi
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
@@ -40,7 +44,27 @@ Persistence & Simulation engine.
     }
 
     def doWithSpring = {
-        // TODO Implement runtime spring config (optional)
+        //override gridgain beans because we need a custom config
+        "grid.cfg"(GridConfigurationAdapter) {
+            gridName = "pillarone"
+
+            String gridgainHomeDefault = FileConstants.GRIDGAIN_HOME
+            String ggHome = System.getProperty("GRIDGAIN_HOME")
+            if (ggHome != null) {
+                gridgainHomeDefault = new File(ggHome).absolutePath
+            }
+            gridGainHome = gridgainHomeDefault
+            //Prevent broadcasting heartbeat msg so only local grid node is used for computing
+            discoverySpi=ref('gridmulticast')
+
+        }
+        grid(GridSpringBean) {
+            configuration = ref('grid.cfg')
+        }
+
+        "gridmulticast"(GridMulticastDiscoverySpi){
+            multicastGroup="224.0.0.1"
+        }
     }
 
     def doWithDynamicMethods = {ctx ->

@@ -82,7 +82,18 @@ public class MappingCache implements Serializable {
     public PathMapping lookupPath(String path) {
         PathMapping pathMapping = paths.get(path)
         if (pathMapping == null) {
+            pathMapping = new PathMapping(pathName: path)
+            //paths.put(path, pathMapping)
+        }
+        return pathMapping;
+    }
+
+    public PathMapping lookupPathDB(String path){
+        PathMapping pathMapping = paths.get(path)
+        if (pathMapping == null) {
+            PathMapping.withTransaction{
             pathMapping = new PathMapping(pathName: path).save()
+            }
             paths.put(path, pathMapping)
         }
         return pathMapping;

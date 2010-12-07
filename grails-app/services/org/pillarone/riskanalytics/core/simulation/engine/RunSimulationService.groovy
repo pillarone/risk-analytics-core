@@ -86,7 +86,7 @@ public class RunSimulationService {
         cache.initCache(model)
 
         for (String path in paths) {
-            cache.lookupPath(path)
+            cache.lookupPathDB(path)
         }
 
         for (String field in fields) {

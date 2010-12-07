@@ -149,22 +149,26 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
 
     List<String> referencePaths(Class markerInterface, String refValue) {
         if (classifierParameters.size() > 0) {
+            List<String> references = new ArrayList<String>()
             for (ParameterHolder parameterHolder: classifierParameters.values()) {
                 if (parameterHolder instanceof MultiDimensionalParameterHolder) {
-                    return parameterHolder.referencePaths(markerInterface, refValue)
+                    references.addAll parameterHolder.referencePaths(markerInterface, refValue)
                 }
             }
+            return references
         }
         return Collections.emptyList()
     }
 
     List<String> updateReferenceValues(Class markerInterface, String oldValue, String newValue) {
         if (classifierParameters.size() > 0) {
+            List<String> referencePaths = new ArrayList<String>()
             for (ParameterHolder parameterHolder: classifierParameters.values()) {
                 if (parameterHolder instanceof MultiDimensionalParameterHolder) {
-                    return parameterHolder.updateReferenceValues(markerInterface, oldValue, newValue)
+                    referencePaths.addAll parameterHolder.updateReferenceValues(markerInterface, oldValue, newValue)
                 }
             }
+            return referencePaths
         }
         return Collections.emptyList()
     }

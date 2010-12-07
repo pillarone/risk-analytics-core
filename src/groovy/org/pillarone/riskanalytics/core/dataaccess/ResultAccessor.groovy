@@ -108,16 +108,22 @@ class ResultAccessor {
     }
 
     static Double getNthOrderStatistic(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName,
-                                       String fieldName, double percentage, boolean countingFromLowerEnd) {
+                                       String fieldName, double percentage, CompareOperator compareOperator) {
+        if ((compareOperator.equals(CompareOperator.LESS_THAN) && percentage == 0)
+                || compareOperator.equals(CompareOperator.GREATER_THAN) && percentage == 100) {
+            return null
+        }
         double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
-        if (countingFromLowerEnd) {
-            int rank = (int) (simulationRun.getIterations() * percentage * 0.01)
-            return rank == 0 ?  null : values[rank - 1]
+        Double rank =  simulationRun.getIterations() * percentage * 0.01
+        if (rank > 0) {
+            rank--        // -1 as array index starts with 0
         }
-        else {
-            int rank = (int) (simulationRun.getIterations() * (1 - percentage) * 0.01)
-            return values[-rank]
+        Integer index = rank.toInteger()
+        if (Math.abs(rank - index) > 0 && compareOperator.equals(CompareOperator.GREATER_EQUALS)
+            || compareOperator.equals(CompareOperator.GREATER_THAN)) {
+            index++
         }
+        return values[index]
     }
 
     static Double getPercentile(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName, String fieldName, Double percentile) {

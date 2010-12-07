@@ -7,13 +7,10 @@ import org.pillarone.riskanalytics.core.parameterization.ConstraintsFactory
 import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
 import org.pillarone.riskanalytics.core.output.CollectingModeFactory
 import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
-import org.gridgain.grid.GridSpringBean
-import org.gridgain.grid.GridConfigurationAdapter
-import org.pillarone.riskanalytics.core.FileConstants
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.1.2.1-kti"
+    def version = "1.1.3-kti"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.4 > *"
     // the other plugins this plugin depends on
@@ -43,22 +40,7 @@ Persistence & Simulation engine.
     }
 
     def doWithSpring = {
-        //override gridgain beans because we need a custom config
-        "grid.cfg"(GridConfigurationAdapter) {
-            gridName = "pillarone"
-
-            String gridgainHomeDefault = FileConstants.GRIDGAIN_HOME
-            String ggHome = System.getProperty("GRIDGAIN_HOME")
-            if (ggHome != null) {
-                gridgainHomeDefault = new File(ggHome).absolutePath
-            }
-            gridGainHome = gridgainHomeDefault
-
-        }
-        grid(GridSpringBean) {
-            configuration = ref('grid.cfg')
-        }
-
+        // TODO Implement runtime spring config (optional)
     }
 
     def doWithDynamicMethods = {ctx ->

@@ -2,10 +2,15 @@ package org.pillarone.riskanalytics.core.simulation
 
 import org.joda.time.DateTime
 
+/**
+ * Periods are defined similarly to the joda time library in the sense that we assume a left closed and right opened
+ * interval. Therefore end period methods will return the start date of the next period, which is actually not part
+ * ot the period. Period counting starts with 0.
+ */
 public interface IPeriodCounter {
 
     /**
-     * Resets the Period counter to its initial state.
+     * Resets the period counter to its initial state.
      * After a call to reset a period counter should behave like a newly create one.
      */
     void reset()
@@ -17,29 +22,58 @@ public interface IPeriodCounter {
     IPeriodCounter next()
 
     /**
-     * Returns the start date of the current period
+     * @return start date of current period
      */
     DateTime getCurrentPeriodStart()
 
     /**
-     * Returns the end date of the current period
+     * @return end date of current period. It has to correspond to the next period start date
      */
     DateTime getCurrentPeriodEnd()
 
     /**
-     * Returns the start date of the next period
+     * @return start date of next period
      */
     DateTime getNextPeriodStart()
 
     /**
-     * Return true if the current period includes January 1
+     * @return true if the current period includes January 1
      */
     boolean periodIncludesBeginningOfYear()
 
     /**
      * @param date
-     * @return period number containing the date
+     * @return period number date belongs to
+     * @throws BeforeSimulationStartException if the date is before startOfFirstPeriod()
+     * @throws AfterSimulationEndException if the date is after endOfLastPeriod()
      */
-    int belongsToPeriod(DateTime date)
+    int belongsToPeriod(DateTime date) throws BeforeSimulationStartException, AfterSimulationEndException
+
+    DateTime startOfFirstPeriod()
+    DateTime endOfLastPeriod()
+
+    /**
+     * @param date
+     * @return start of the period the date belongs to
+     */
+    DateTime startOfPeriod(DateTime date) throws BeforeSimulationStartException, AfterSimulationEndException
+
+    /**
+     * @param period
+     * @return start date of the period
+     */
+    DateTime startOfPeriod(int period) throws NotInProjectionHorizon
+
+    /**
+     * @param date
+     * @return end of the period the date belongs to
+     */
+    DateTime endOfPeriod(DateTime date) throws AfterSimulationEndException
+
+    /**
+     * @param period
+     * @return end date of the period
+     */
+    DateTime endOfPeriod(int period) throws NotInProjectionHorizon
 
 }

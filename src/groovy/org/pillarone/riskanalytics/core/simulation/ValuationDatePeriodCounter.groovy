@@ -3,8 +3,10 @@ package org.pillarone.riskanalytics.core.simulation
 import org.joda.time.DateTime
 
 /**
- * A period counter which is backed by a list of dates.
- * Because the period length may vary, certain operations are not supported in the last period.
+ * A period counter which is backed by a list of dates. Naming of this class may be misleading as this implementation
+ * has no underlying period concept but is based on valuation dates. Models based on this implementation will be run
+ * at certain valuation dates and evaluating for these dates cashflows, calculating interest, ...
+ * Implementation of methods may therefore be different for than in period base implementations!
  */
 class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
 
@@ -25,22 +27,35 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
         return this
     }
 
+    /**
+     * @return current valuation date
+     */
     DateTime getCurrentPeriodStart() {
         dates.get(currentPeriod)
     }
 
+    /**
+     * @return next valuation date
+     */
     DateTime getCurrentPeriodEnd() {
-        getNextPeriodStart().minusDays(1)
+        getNextPeriodStart()
     }
 
+    /**
+     * @return next valuation date
+     */
     DateTime getNextPeriodStart() {
         if (currentPeriod + 1 < dates.size()) {
             return dates.get(currentPeriod + 1)
-        } else {
-            throw new UnsupportedOperationException("Last period of a variable length period counter does not have an end date or next period date")
+        }
+        else {
+            throw new UnsupportedOperationException("Last period of a valuation date period counter does not have an end date or next period date")
         }
     }
 
+    /**
+     * @return true if the current valuation and next valuation date belong to different years
+     */
     boolean periodIncludesBeginningOfYear() {
         if (currentPeriod + 1 < dates.size()) {
             int startDayOfYear = getCurrentPeriodStart().dayOfYear().get()
@@ -52,19 +67,29 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
                 return false
             }
             else if (startDayOfYear > endDayOfYear) {
-                    return true
-                }
+                return true
+            }
             return false
-        } else {
-            throw new UnsupportedOperationException("Unable to determine for last period")
+        }
+        else {
+            throw new UnsupportedOperationException("Unable to determine for last valuation date")
         }
     }
 
+    /**
+     * @return number of valuation dates
+     */
     int periodCount() {
         return dates.size()
     }
 
+    /**
+     * @param date
+     * @return date is after ith valuation date
+     */
     int belongsToPeriod(DateTime date) {
+        if (date.isBefore(startOfFirstPeriod())) throw new BeforeSimulationStartException()
+        if (date.isAfter(endOfLastPeriod())) throw new AfterSimulationEndException()
         int period = -1
         for (DateTime periodStart : dates) {
             if (periodStart.isAfter(date)) {
@@ -75,5 +100,58 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
             }
         }
         return period
+    }
+
+    /**
+     * @param date
+     * @return valuation date at or before date
+     */
+    DateTime startOfPeriod(DateTime date) {
+        return dates[belongsToPeriod(date)]
+    }
+
+    /**
+     * @param period
+     * @return ith valuation date
+     * @throws AfterSimulationEndException if period is greater than number of valuation dates
+     */
+    DateTime startOfPeriod(int period) throws AfterSimulationEndException {
+        if (period >= dates.size()) throw new AfterSimulationEndException()
+        return dates[period]
+    }
+
+    /**
+     * @param date
+     * @return valuation date after date
+     * @throws AfterSimulationEndException if there is no valuation date after date
+     */
+    DateTime endOfPeriod(DateTime date) throws AfterSimulationEndException {
+        int period = belongsToPeriod(date) + 1
+        if (period >= dates.size()) throw new AfterSimulationEndException()
+        return dates[period]
+    }
+
+    /**
+     * @param period
+     * @return ith + 1 valudation date
+     * @throws AfterSimulationEndException if period is equal or greater than number of valuation dates
+     */
+    DateTime endOfPeriod(int period) throws AfterSimulationEndException {
+        if (period >= dates.size() - 1) throw new AfterSimulationEndException()
+        return dates[period + 1]
+    }
+
+    /**
+     * @return first valuation date
+     */
+    DateTime startOfFirstPeriod() {
+        return dates[0]
+    }
+
+    /**
+     * @return the last valuation date
+     */
+    DateTime endOfLastPeriod() {
+        return dates[-1]
     }
 }

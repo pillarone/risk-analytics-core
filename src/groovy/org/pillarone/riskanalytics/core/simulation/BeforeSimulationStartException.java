@@ -3,5 +3,5 @@ package org.pillarone.riskanalytics.core.simulation;
 /**
  * @author stefan.kunz (at) intuitive-collaboration (dot) com
  */
-class BeforeSimulationStartException extends NotInProjectionHorizon {
+public class BeforeSimulationStartException extends NotInProjectionHorizon {
 }

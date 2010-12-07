@@ -107,10 +107,10 @@ class VariableLengthPeriodCounterTests extends GroovyTestCase {
         assertEquals "period 2 for 2010-03-31", 2, periodCounter.belongsToPeriod(date20100331)
         assertEquals "period 2 for 2010-12-31", 2, periodCounter.belongsToPeriod(date20101231)
         assertEquals "period 2 for 2011-01-01", 2, periodCounter.belongsToPeriod(date20110101)
-        assertEquals "period 3 for 2011-01-02", 3, periodCounter.belongsToPeriod(date20110102)
 
         shouldFail(BeforeSimulationStartException, { periodCounter.belongsToPeriod(date20080101)})
         shouldFail(AfterSimulationEndException, { periodCounter.belongsToPeriod(date20111231)})
+        shouldFail(AfterSimulationEndException, { periodCounter.belongsToPeriod(date20110102)})
     }
 
     void testStartOfPeriod() {

@@ -10,9 +10,10 @@ class MysqlBulkInsert extends AbstractResultsBulkInsert {
         writer.append(";")
     }
 
-    void setSimulationRun(SimulationRun simulationRun) {
+    synchronized void setSimulationRun(SimulationRun simulationRun) {
         super.setSimulationRun(simulationRun);
         Sql sql = new Sql(simulationRun.dataSource)
+        deletePartitionIfExist(sql, "${simulationRunId}")
         sql.execute("ALTER TABLE single_value_result ADD PARTITION (PARTITION P${simulationRunId} VALUES IN (${simulationRunId}))")
     }
 
@@ -26,5 +27,19 @@ class MysqlBulkInsert extends AbstractResultsBulkInsert {
         time = System.currentTimeMillis() - time
         LOG.info("${numberOfResults} results saved in ${time} ms");
         sql.close()
+    }
+    /**
+     * if the partition exists before, it causes an exception
+     * @param sql
+     * @param partitionName
+     */
+    private void deletePartitionIfExist(Sql sql, String partitionName) {
+        try {
+            Object row = sql.firstRow("SELECT PARTITION_NAME FROM INFORMATION_SCHEMA.PARTITIONS where table_name='single_value_result' and PARTITION_NAME = ${partitionName}")
+            if (row != null) {
+                sql.execute("ALTER TABLE single_value_result DROP PARTITION ${partitionName}")
+            }
+        } catch (Exception e) {//the partition was not created yet
+        }
     }
 }

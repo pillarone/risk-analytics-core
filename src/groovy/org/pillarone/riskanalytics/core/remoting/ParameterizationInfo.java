@@ -52,4 +52,10 @@ public class ParameterizationInfo implements Serializable {
         this.user = user;
     }
 
+    @Override
+    public String toString() {
+        return "[" + getName() + " v" + getVersion() + " (" + getParameterizationId() + ")]";
+    }
+
+
 }

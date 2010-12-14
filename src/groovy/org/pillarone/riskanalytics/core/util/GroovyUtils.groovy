@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.util
 
+import org.joda.time.DateTime
+
 /**
  *  This class contains methods which are easy/short to implement in Groovy, but unreadable in Java.
  *
@@ -93,6 +95,8 @@ public class GroovyUtils {
                 buffer.append(it);
                 buffer.append("\"");
                 resultList << buffer.toString();
+            } else if (it instanceof DateTime) {
+                resultList << "new ${DateTime.class.name}(" + it.getMillis() + ")"
             } else {
                 resultList << it.toString();
             }

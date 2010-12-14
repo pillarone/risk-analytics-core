@@ -12,12 +12,14 @@ class Comment implements Cloneable {
     int period
     Date lastChange
     Person user
-    private String comment
+    protected String comment
     private Set<Tag> tags = new HashSet()
 
     boolean added = false
     boolean updated = false
     boolean deleted = false
+
+    protected Comment() { }
 
     public Comment(CommentDAO commentDAO) {
         path = commentDAO.path
@@ -92,7 +94,7 @@ class Comment implements Cloneable {
         updateChangeInfo()
     }
 
-    private void updateChangeInfo() {
+    protected void updateChangeInfo() {
         user = UserManagement.getCurrentUser()
         lastChange = new Date()
     }
@@ -142,13 +144,15 @@ class Comment implements Cloneable {
         return sb.toString()
     }
 
-    public Object clone() {
-        Comment comment = new Comment(path, period)
-        comment.user = user
-        comment.comment = this.comment
-        comment.setTags(tags)
-        comment.lastChange = lastChange
-        return comment
+    public Comment clone() {
+        Comment clone = (Comment) super.clone()
+        clone.lastChange = (Date) lastChange.clone()
+        clone.tags = (Set) tags.clone()
+
+        clone.added = false
+        clone.updated = false
+        clone.deleted = false
+        return clone;
     }
 
 

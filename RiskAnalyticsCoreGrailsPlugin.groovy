@@ -7,10 +7,16 @@ import org.pillarone.riskanalytics.core.parameterization.ConstraintsFactory
 import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
 import org.pillarone.riskanalytics.core.output.CollectingModeFactory
 import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
+import org.springframework.remoting.rmi.RmiProxyFactoryBean
+import org.pillarone.riskanalytics.core.remoting.ITransactionService
+import org.springframework.remoting.rmi.RmiServiceExporter
+import org.pillarone.riskanalytics.core.remoting.IResultService
+import org.pillarone.riskanalytics.core.remoting.impl.ResultService
+import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.1.3"
+    def version = "1.1.3-workflow"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.4 > *"
     // the other plugins this plugin depends on
@@ -40,7 +46,40 @@ Persistence & Simulation engine.
     }
 
     def doWithSpring = {
-        // TODO Implement runtime spring config (optional)
+        ConfigObject config = ConfigurationHolder.config
+
+        String url = "rmi://localhost:1099/TransactionService"
+        if (config.containsKey("transactionServiceUrl")) {
+            url = config.transactionServiceUrl
+        }
+        transactionService(RmiProxyFactoryBean) {
+            serviceInterface = ITransactionService
+            serviceUrl = url
+            refreshStubOnConnectFailure = true
+            lookupStubOnStartup = false
+        }
+
+        int port = 1099
+        if (config.containsKey("resultServiceRegistryPort")) {
+            port = config.resultServiceRegistryPort
+        }
+        resultServiceExporter(RmiServiceExporter) {
+            serviceName = "ResultService"
+            serviceInterface = IResultService
+            registryPort = port
+            service = ref("resultService")
+        }
+
+        Properties attributes = new Properties()
+        attributes.put("*", "PROPAGATION_REQUIRED,readOnly")
+
+        resultService(TransactionProxyFactoryBean) {
+            transactionManager = ref("transactionManager")
+            target = ref("resultServiceBean")
+            transactionAttributes = attributes
+        }
+
+        resultServiceBean(ResultService) { }
     }
 
     def doWithDynamicMethods = {ctx ->

@@ -1,7 +1,7 @@
 import org.apache.ivy.plugins.resolver.URLResolver
 
 //Use a custom plugins dir, because different branches use different plugin versions
-grails.project.plugins.dir = "../local-plugins/RiskAnalyticsCore-master"
+grails.project.plugins.dir = "../local-plugins/RiskAnalyticsCore-v1.2"
 
 grails.project.dependency.resolution = {
     inherits "global" // inherit Grails' default dependencies
@@ -17,7 +17,6 @@ grails.project.dependency.resolution = {
 
     resolver myResolver
 }
-
 
 coverage {
     exclusions = [

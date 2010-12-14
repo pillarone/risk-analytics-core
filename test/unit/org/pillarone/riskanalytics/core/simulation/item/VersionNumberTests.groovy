@@ -9,6 +9,8 @@ class VersionNumberTests extends GroovyTestCase {
     void testParse() {
         assertEquals '1', new VersionNumber('1').toString()
         assertEquals '1.1', new VersionNumber('1.1').toString()
+        assertEquals 'R1', new VersionNumber('R1').toString()
+        assertEquals 'R1.1', new VersionNumber('R1.1').toString()
         assertEquals '1.1.1', new VersionNumber('1.1.1').toString()
         assertEquals '2.10.111', new VersionNumber('2.10.111').toString()
     }
@@ -19,6 +21,13 @@ class VersionNumberTests extends GroovyTestCase {
         assertEquals new Integer(-1), new VersionNumber('1.1').compareTo(new VersionNumber('2'))
         assertEquals 1, new VersionNumber('1.10').compareTo(new VersionNumber('1.9'))
         assertEquals 0, new VersionNumber('1.10').compareTo(new VersionNumber('1.10'))
+
+        assertEquals 0, new VersionNumber('R1').compareTo(new VersionNumber('R1'))
+        assertEquals 1, new VersionNumber('R2').compareTo(new VersionNumber('R1'))
+        assertEquals(-1, new VersionNumber('R1').compareTo(new VersionNumber('R2')))
+        assertEquals(1, new VersionNumber('R1').compareTo(new VersionNumber('1')))
+        assertEquals(1, new VersionNumber('R1').compareTo(new VersionNumber('2')))
+
     }
 
     void testChild() {
@@ -40,6 +49,18 @@ class VersionNumberTests extends GroovyTestCase {
         parameterization.modelClass = EmptyModel
         daoMock.use {
             assertEquals '2', VersionNumber.incrementVersion(parameterization).toString()
+        }
+
+        dao = new ParameterizationDAO(itemVersion: 'R1')
+        daoMock = new MockFor(ParameterizationDAO)
+        daoMock.demand.findAllByNameAndModelClassName {name, className ->
+            [dao]
+        }
+
+        parameterization = new Parameterization(versionNumber: new VersionNumber('R1'), name: '')
+        parameterization.modelClass = EmptyModel
+        daoMock.use {
+            assertEquals 'R2', VersionNumber.incrementVersion(parameterization).toString()
         }
 
         dao = new ParameterizationDAO(itemVersion: '1')

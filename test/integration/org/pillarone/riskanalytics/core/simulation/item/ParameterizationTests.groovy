@@ -8,10 +8,13 @@ import org.pillarone.riskanalytics.core.fileimport.ParameterizationImportService
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.StringParameter
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
+import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowCommentDAO
 import org.pillarone.riskanalytics.core.parameterization.validation.TestValidationService
 import org.pillarone.riskanalytics.core.parameterization.validation.ValidatorRegistry
 import org.pillarone.riskanalytics.core.simulation.item.parameter.StringParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
+import org.pillarone.riskanalytics.core.workflow.Status
 
 class ParameterizationTests extends GroovyTestCase {
 
@@ -171,6 +174,40 @@ class ParameterizationTests extends GroovyTestCase {
         assertEquals initialCount, CommentDAO.count()
     }
 
+
+    void testAddRemoveIssue() {
+        Parameterization parameterization = new Parameterization("newParams")
+        parameterization.periodCount = 1
+        parameterization.modelClass = EmptyModel
+
+        int initialCount = WorkflowCommentDAO.count()
+
+        WorkflowComment newComment = new WorkflowComment("path", 0)
+        newComment.text = "text"
+
+        parameterization.addComment(newComment)
+        parameterization.removeComment(newComment)
+
+        parameterization.save()
+
+        assertEquals 0, parameterization.comments.size()
+        assertEquals initialCount, WorkflowCommentDAO.count()
+
+        parameterization.addComment(newComment)
+
+        parameterization.save()
+
+        assertEquals 1, parameterization.comments.size()
+        assertEquals initialCount + 1, WorkflowCommentDAO.count()
+
+        parameterization.removeComment(newComment)
+
+        parameterization.save()
+
+        assertEquals 0, parameterization.comments.size()
+        assertEquals initialCount, WorkflowCommentDAO.count()
+    }
+
     void testSimpleParameterUpdate() {
         Parameterization parameterization = new Parameterization("testSimpleParameterUpdate")
         parameterization.periodCount = 1
@@ -221,6 +258,35 @@ class ParameterizationTests extends GroovyTestCase {
 
         assertEquals 1, parameterization.comments.size()
         assertEquals initialCount + 1, CommentDAO.count()
+
+        parameterization.load()
+        assertEquals 1, parameterization.comments.size()
+
+        assertEquals "newValue", parameterization.comments[0].text
+    }
+
+    void testSimpleIssueUpdate() {
+        Parameterization parameterization = new Parameterization("testSimpleParameterUpdate")
+        parameterization.periodCount = 1
+        parameterization.modelClass = EmptyModel
+
+        int initialCount = WorkflowCommentDAO.count()
+
+        WorkflowComment comment = new WorkflowComment("path", 0)
+        comment.text = "text"
+        parameterization.addComment(comment)
+
+        parameterization.save()
+
+        assertEquals 1, parameterization.comments.size()
+        assertEquals initialCount + 1, WorkflowCommentDAO.count()
+
+        comment.text = "newValue"
+
+        parameterization.save()
+
+        assertEquals 1, parameterization.comments.size()
+        assertEquals initialCount + 1, WorkflowCommentDAO.count()
 
         parameterization.load()
         assertEquals 1, parameterization.comments.size()
@@ -378,6 +444,28 @@ class ParameterizationTests extends GroovyTestCase {
         assertFalse parameterization.valid
     }
 
+    void testIsEditable() {
+        Parameterization parameterization = new Parameterization("newParams")
+        parameterization.modelClass = EmptyModel
+        parameterization.periodCount = 1
+        parameterization.save()
+
+        assertEquals Status.NONE, parameterization.status
+        assertTrue parameterization.isEditable()
+
+        parameterization.status = Status.DATA_ENTRY
+        assertTrue parameterization.isEditable()
+
+        parameterization.status = Status.REJECTED
+        assertFalse parameterization.isEditable()
+
+        parameterization.status = Status.IN_REVIEW
+        assertFalse parameterization.isEditable()
+
+        parameterization.status = Status.IN_PRODUCTION
+        assertFalse parameterization.isEditable()
+    }
+
 
     private def createDao(Class modelClass, String daoName) {
         ParameterizationDAO dao = new ParameterizationDAO()
@@ -385,6 +473,7 @@ class ParameterizationTests extends GroovyTestCase {
         dao.itemVersion = '1'
         dao.name = daoName
         dao.modelClassName = modelClass.name
+        dao.status = Status.NONE
         return dao
     }
 }

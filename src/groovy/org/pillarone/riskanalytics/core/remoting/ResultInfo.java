@@ -12,10 +12,12 @@ public class ResultInfo implements Serializable {
 
         private int iteration;
         private double value;
+        private Date periodDate;
 
-        private IterationValuePair(final int iteration, final double value) {
+        private IterationValuePair(final int iteration, final double value, final Date date) {
             this.iteration = iteration;
             this.value = value;
+            this.periodDate = date;
         }
 
         public int getIteration() {
@@ -24,6 +26,10 @@ public class ResultInfo implements Serializable {
 
         public double getValue() {
             return value;
+        }
+
+        public Date getPeriodDate() {
+            return periodDate;
         }
     }
 
@@ -46,10 +52,12 @@ public class ResultInfo implements Serializable {
         return periodDate;
     }
 
+    @Deprecated
     public void setPeriodDate(final Date periodDate) {
         this.periodDate = periodDate;
     }
 
+    @Deprecated
     public int getPeriodIndex() {
         return periodIndex;
     }

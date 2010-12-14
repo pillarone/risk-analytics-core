@@ -183,8 +183,11 @@ class ResultServiceTests extends GroovyTestCase {
         assertEquals 2, resultInfo.values.size()
         assertEquals 0, resultInfo.values[0].iteration
         assertEquals 10, resultInfo.values[0].value
+        assertEquals first, resultInfo.values[0].periodDate
+
         assertEquals 1, resultInfo.values[1].iteration
         assertEquals 20, resultInfo.values[1].value
+        assertEquals first, resultInfo.values[1].periodDate
 
         resultInfo = results[1]
         assertEquals 1, resultInfo.periodIndex
@@ -194,8 +197,11 @@ class ResultServiceTests extends GroovyTestCase {
         assertEquals 2, resultInfo.values.size()
         assertEquals 0, resultInfo.values[0].iteration
         assertEquals 100, resultInfo.values[0].value
+        assertEquals second, resultInfo.values[0].periodDate
+
         assertEquals 1, resultInfo.values[1].iteration
         assertEquals 200, resultInfo.values[1].value
+        assertEquals second, resultInfo.values[1].periodDate
 
         String regExcombinedPath = path1RegExName + ":" + field.fieldName
         List<ResultInfo> resultsWithRegEx = resultService.getResults(simulation.id, [regExcombinedPath])

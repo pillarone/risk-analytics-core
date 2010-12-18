@@ -3,7 +3,6 @@ package org.pillarone.riskanalytics.core.parameter.comment.workflow
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.user.Person
 
-
 class WorkflowCommentDAO {
 
     ParameterizationDAO parameterization

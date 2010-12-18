@@ -1,14 +1,12 @@
 package org.pillarone.riskanalytics.core
 
+import models.core.CoreModel
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
-import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObjectClassifier
+import org.pillarone.riskanalytics.core.parameter.EnumParameter
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.ParameterObjectParameter
 import org.pillarone.riskanalytics.core.parameter.StringParameter
-import org.pillarone.riskanalytics.core.parameter.EnumParameter
-import models.core.CoreModel
 import org.pillarone.riskanalytics.core.workflow.Status
-
 
 class ParameterizationDAOTests extends GroovyTestCase {
 

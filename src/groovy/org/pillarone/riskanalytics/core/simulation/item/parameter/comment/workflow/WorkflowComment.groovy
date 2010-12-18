@@ -1,11 +1,9 @@
 package org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow
 
-import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
+import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.parameter.comment.workflow.IssueStatus
 import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowCommentDAO
-import org.pillarone.riskanalytics.core.parameter.comment.Tag
-import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
-
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 
 class WorkflowComment extends Comment {
 

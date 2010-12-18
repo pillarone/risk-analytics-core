@@ -1,9 +1,8 @@
 package org.pillarone.riskanalytics.core.user
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import grails.plugins.springsecurity.SpringSecurityService
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.codehaus.groovy.grails.plugins.springsecurity.GrailsUser
-
 
 class UserManagement {
 

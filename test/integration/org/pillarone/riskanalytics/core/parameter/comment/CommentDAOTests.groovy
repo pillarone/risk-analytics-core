@@ -1,9 +1,8 @@
 package org.pillarone.riskanalytics.core.parameter.comment
 
-import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.workflow.Status
-
 
 class CommentDAOTests extends GroovyTestCase {
 
@@ -23,7 +22,7 @@ class CommentDAOTests extends GroovyTestCase {
 
         Tag tag = new Tag(name: 'tag').save()
         assertNotNull tag
-        
+
         CommentDAO comment = new CommentDAO()
         comment.parameterization = parameterization
         comment.path = "path"

@@ -5,8 +5,8 @@ import org.pillarone.riskanalytics.core.BatchRun
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
-import org.pillarone.riskanalytics.core.output.*
 import org.pillarone.riskanalytics.core.workflow.Status
+import org.pillarone.riskanalytics.core.output.*
 
 class SimulationTests extends GroovyTestCase {
 

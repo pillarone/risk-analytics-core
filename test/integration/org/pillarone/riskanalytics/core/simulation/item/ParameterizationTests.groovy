@@ -8,13 +8,13 @@ import org.pillarone.riskanalytics.core.fileimport.ParameterizationImportService
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.StringParameter
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
+import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowCommentDAO
 import org.pillarone.riskanalytics.core.parameterization.validation.TestValidationService
 import org.pillarone.riskanalytics.core.parameterization.validation.ValidatorRegistry
 import org.pillarone.riskanalytics.core.simulation.item.parameter.StringParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
-import org.pillarone.riskanalytics.core.workflow.Status
-import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowCommentDAO
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
+import org.pillarone.riskanalytics.core.workflow.Status
 
 class ParameterizationTests extends GroovyTestCase {
 

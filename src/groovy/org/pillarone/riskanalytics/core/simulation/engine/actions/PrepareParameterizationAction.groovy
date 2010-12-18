@@ -9,8 +9,8 @@ import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 
 /**
  * Prepares the ParameterApplicator and applies the parameters of the first period. The later is required as following
- * actions like {@code ApplyGlobalParametersAction}, {@code PrepareResourceParameterizationAction} and
- * {@code WireModelAction} depend on parameters.
+ * actions like  {@code ApplyGlobalParametersAction} ,  {@code PrepareResourceParameterizationAction}  and
+ * {@code WireModelAction}  depend on parameters.
  */
 public class PrepareParameterizationAction implements Action {
 

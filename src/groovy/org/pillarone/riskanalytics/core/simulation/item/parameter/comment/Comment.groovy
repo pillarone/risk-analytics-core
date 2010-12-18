@@ -125,7 +125,7 @@ class Comment implements Cloneable {
         }
 
     }
-    
+
     public String toConfigObject() {
         char c = (char) 92
         StringBuilder sb = new StringBuilder("\"\"[")

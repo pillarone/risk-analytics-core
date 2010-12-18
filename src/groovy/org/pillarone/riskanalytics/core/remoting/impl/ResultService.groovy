@@ -50,7 +50,7 @@ class ResultService implements IResultService {
                 String path = fullPath.substring(0, fullPath.lastIndexOf(":"))
                 String field = fullPath.substring(fullPath.lastIndexOf(":") + 1)
                 for (Number value in ResultAccessor.getValues(run, i, path, AggregatedCollectingModeStrategy.IDENTIFIER, field)) {
-                    values << new ResultInfo.IterationValuePair(iteration, value.toDouble())
+                    values << new ResultInfo.IterationValuePair(iteration, value.toDouble(), periodDates[i])
                     iteration++
                 }
                 info.values = values

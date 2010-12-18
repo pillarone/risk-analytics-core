@@ -1,9 +1,9 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
 import org.apache.log4j.Logger
-import org.springframework.transaction.TransactionStatus
-import org.pillarone.riskanalytics.core.user.UserManagement
 import org.pillarone.riskanalytics.core.user.Person
+import org.pillarone.riskanalytics.core.user.UserManagement
+import org.springframework.transaction.TransactionStatus
 
 abstract class ModellingItem {
     final static Logger LOG = Logger.getLogger(ModellingItem)

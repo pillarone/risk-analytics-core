@@ -102,12 +102,12 @@ class VersionNumber implements Comparable, Cloneable {
 
     int compareTo(Object o) {
         o = o as VersionNumber
-        if(workflow) {
-            if(!o.workflow) {
+        if (workflow) {
+            if (!o.workflow) {
                 return 1
             }
         } else {
-            if(o.workflow) {
+            if (o.workflow) {
                 return -1
             }
         }

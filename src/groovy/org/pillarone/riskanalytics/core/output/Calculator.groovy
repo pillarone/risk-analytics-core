@@ -1,6 +1,5 @@
 package org.pillarone.riskanalytics.core.output
 
-import java.sql.ResultSet
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.commons.ApplicationHolder
@@ -58,12 +57,15 @@ class Calculator {
     }
 
     void calculate() {
-
+        long singleCollectorId = -1
         CollectorMapping collectorMapping = CollectorMapping.findByCollectorName(SingleValueCollectingModeStrategy.IDENTIFIER)
+        if (collectorMapping)
+            singleCollectorId = collectorMapping?.id
 
         startTime = System.currentTimeMillis()
-        List<Object[]> result = ResultAccessor.getAvgAndIsStochasticForSimulationRun(run)
-        totalCalculations = keyFigureCount * ResultAccessor.getAvgAndIsStochasticForSimulationRunCount(run)
+        List<Object[]> result = ResultAccessor.getAvgAndIsStochasticForSimulationRun(run, singleCollectorId)
+//        totalCalculations = keyFigureCount * ResultAccessor.getAvgAndIsStochasticForSimulationRunCount(run)
+        totalCalculations = keyFigureCount * ResultAccessor.getAvgAndIsStochasticForSimulationRunCount(result)
 
         for (Object[] array in result) {
             long path = array[0]
@@ -72,8 +74,9 @@ class Calculator {
             long field = array[3]
             double avg = array[4]
             //use only aggregated values
-            if(collector == collectorMapping?.id) {
-                continue
+            if (collector == collectorMapping?.id) {
+//                println "${collector}"
+//                continue
             }
 
             int isStochastic = array[5] == array[6] ? 1 : 0
@@ -81,7 +84,7 @@ class Calculator {
             bulkInsert.addResults(periodIndex, PostSimulationCalculation.IS_STOCHASTIC, null, path, field, collector, isStochastic)
 
             if (isStochastic == 0) {
-                double[] values = loadValues(path, periodIndex, collector, field)
+                double[] values = loadValues(path, periodIndex, collector, field, singleCollectorId)
                 if (keyFigures.get(PostSimulationCalculation.STDEV)) {
                     calculateStandardDeviation(periodIndex, path, collector, field, values, avg)
                     completedCalculations++
@@ -114,11 +117,11 @@ class Calculator {
     /**
      *  Values of path and periodIndex are loaded from the database and returned in a sorted double[]
      */
-    private double[] loadValues(long pathId, int periodIndex, long collector, long fieldId) {
+    private double[] loadValues(long pathId, int periodIndex, long collector, long fieldId, long singleCollectorId = -1) {
 
         long time = System.currentTimeMillis()
 
-        double[] results = ResultAccessor.getValuesSorted(run, periodIndex, pathId, collector, fieldId) as double[]
+        double[] results = ResultAccessor.getValuesSorted(run, periodIndex, pathId, collector, fieldId, singleCollectorId) as double[]
 
         LOG.debug("Loaded results for calculations ($pathId, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
         return results

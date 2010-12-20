@@ -1,9 +1,9 @@
 package org.pillarone.riskanalytics.core.dataaccess
 
+import groovy.sql.GroovyRowResult
+import groovy.sql.Sql
 import org.pillarone.riskanalytics.core.util.MathUtils
 import org.pillarone.riskanalytics.core.output.*
-import groovy.sql.Sql
-import groovy.sql.GroovyRowResult
 
 class ResultAccessor {
 
@@ -104,13 +104,13 @@ class ResultAccessor {
             return null
         }
         double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
-        Double rank =  simulationRun.getIterations() * percentage * 0.01
+        Double rank = simulationRun.getIterations() * percentage * 0.01
         if (rank > 0) {
             rank--        // -1 as array index starts with 0
         }
         Integer index = rank.toInteger()
         if (Math.abs(rank - index) > 0 && compareOperator.equals(CompareOperator.GREATER_EQUALS)
-            || compareOperator.equals(CompareOperator.GREATER_THAN)) {
+                || compareOperator.equals(CompareOperator.GREATER_THAN)) {
             index++
         }
         return values[index]
@@ -156,13 +156,24 @@ class ResultAccessor {
                 "s.simulationRun.id = ? ORDER BY value", [pathName, periodIndex, collectorName, fieldName, simulationRun.id])
     }
 
-    static List getValuesSorted(SimulationRun simulationRun, int period, long pathId, long collectorId, long fieldId) {
-        SingleValueResult.executeQuery("SELECT value FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
-                " WHERE s.path.id = ? AND " +
-                "s.period = ? AND " +
-                "s.collector.id = ? AND " +
-                "s.field.id = ? AND " +
-                "s.simulationRun.id = ? ORDER BY value", [pathId, period, collectorId, fieldId, simulationRun.id])
+    static List getValuesSorted(SimulationRun simulationRun, int period, long pathId, long collectorId, long fieldId, long singleCollectorId) {
+        if (singleCollectorId == collectorId) {
+            //single
+            List list = SingleValueResult.executeQuery("SELECT sum(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
+                    " WHERE s.path.id = ? AND " +
+                    "s.period = ? AND " +
+                    "s.collector.id = ? AND " +
+                    "s.field.id = ? AND " +
+                    "s.simulationRun.id = ? group by s.iteration ", [pathId, period, collectorId, fieldId, simulationRun.id])
+            list.sort()
+        } else {
+            SingleValueResult.executeQuery("SELECT value FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
+                    " WHERE s.path.id = ? AND " +
+                    "s.period = ? AND " +
+                    "s.collector.id = ? AND " +
+                    "s.field.id = ? AND " +
+                    "s.simulationRun.id = ? ORDER BY value", [pathId, period, collectorId, fieldId, simulationRun.id])
+        }
     }
 
     static List getValues(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
@@ -185,28 +196,65 @@ class ResultAccessor {
 
 
 
-    public static List<Object[]> getAvgAndIsStochasticForSimulationRun(SimulationRun simulationRun) {
+    public static List<Object[]> getAvgAndIsStochasticForSimulationRun(SimulationRun simulationRun, long singleCollectorId) {
         Sql sql = new Sql(simulationRun.dataSource)
-        List<GroovyRowResult> rows = sql.rows("SELECT path_id, period,collector_id, field_id, AVG(value) as average, MIN(value) as minimum, MAX(value) as maximum " +
-                "FROM single_value_result s " +
-                " WHERE simulation_run_id = " + simulationRun.id +
-                " GROUP BY period, path_id, collector_id, field_id")
-        def result = []
-        for (GroovyRowResult row in rows) {
-            def array = new Object[7]
-            for (int i = 0; i < 7; i++) {
-                array[i] = row.getAt(i)
-            }
-            result << array
-        }
+        def result = getAvgMinMaxForNotSingleCollector(sql, simulationRun, singleCollectorId)
+        //if the run not contains single value collectors
+        if (singleCollectorId != -1)
+            result.addAll(getAvgMinMaxForSingleCollector(sql, simulationRun, singleCollectorId))
         sql.close()
         return result
     }
 
+    public static List<Object[]> getAvgMinMaxForNotSingleCollector(Sql sql, SimulationRun simulationRun, long singleCollectorId) {
+        //ELECT path_id, period,collector_id, field_id, AVG(value) as average, MIN(value) as minimum, MAX(value) as maximum "
+        StringBuilder sb = new StringBuilder("SELECT path_id, period,collector_id, field_id, AVG(value) as average, MIN(value) as minimum, MAX(value) as maximum ")
+        sb.append(" FROM single_value_result s WHERE simulation_run_id = " + simulationRun.id + " and collector_id != " + singleCollectorId)
+        sb.append(" GROUP BY period, path_id, collector_id, field_id")
+        List<GroovyRowResult> rows = sql.rows(sb.toString())
+        return getResults(rows, 7)
+//        def result = []
+//        for (GroovyRowResult row in rows) {
+//            def array = new Object[7]
+//            for (int i = 0; i < 7; i++) {
+//                array[i] = row.getAt(i)
+//            }
+//            result << array
+//        }
+//        //sql not closed
+//        return result
+    }
+
+    public static List<Object[]> getAvgMinMaxForSingleCollector(Sql sql, SimulationRun simulationRun, long singleCollectorId) {
+        StringBuilder sb = new StringBuilder("select path_id, period,collector_id, field_id, AVG(sumV) as average, min(sumV) as minimum, max(sumV) as maximum from ")
+        sb.append("(select path_id, period,collector_id, field_id,sum(value) as sumV from single_value_result as s where simulation_run_id = " + simulationRun.id + "  and collector_id = " + singleCollectorId)
+        sb.append(" GROUP BY iteration ,period, path_id, collector_id, field_id) as t1 GROUP BY period, path_id, collector_id, field_id")
+        List<GroovyRowResult> rows = sql.rows(sb.toString())
+        return getResults(rows, 7)
+    }
 
 
-    public static int getAvgAndIsStochasticForSimulationRunCount(SimulationRun simulationRun) {
-        List result = getAvgAndIsStochasticForSimulationRun(simulationRun)
+    public static List<SingleValueResult> getSingleValueResults(String collector, String path, String field, SimulationRun run) {
+        StringBuilder sb = new StringBuilder("select  s.path.pathName,s.value, s.field.fieldName, s.iteration  from ${SingleValueResult.name} as s WHERE ")
+        sb.append(" s.collector.collectorName = ? AND s.field.fieldName = ? and s.path.pathName = ?   AND s.simulationRun.id = ?")
+        List list = SingleValueResult.executeQuery(sb.toString(), [collector, field, path, run.id])
+        return list
+    }
+
+    public synchronized static List<Object[]> getResults(List<GroovyRowResult> rows, int size) {
+        def result = []
+        for (GroovyRowResult row in rows) {
+            def array = new Object[size]
+            for (int i = 0; i < size; i++) {
+                array[i] = row.getAt(i)
+            }
+            result << array
+        }
+        return result
+    }
+
+
+    public static int getAvgAndIsStochasticForSimulationRunCount(List result) {
         int count = 0
         for (array in result) {
             int isStochastic = array[5] == array[6] ? 1 : 0

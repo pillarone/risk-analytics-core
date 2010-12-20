@@ -1,16 +1,10 @@
 package org.pillarone.riskanalytics.core.dataaccess
 
-import org.pillarone.riskanalytics.core.output.CollectorMapping
-import org.pillarone.riskanalytics.core.output.FieldMapping
-import org.pillarone.riskanalytics.core.output.PathMapping
-import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
-import org.pillarone.riskanalytics.core.ParameterizationDAO
-import org.pillarone.riskanalytics.core.output.SimulationRun
-import org.pillarone.riskanalytics.core.fileimport.ResultConfigurationImportService
-import org.pillarone.riskanalytics.core.fileimport.ParameterizationImportService
 import models.core.CoreModel
-import org.pillarone.riskanalytics.core.output.SingleValueResult
-
+import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.pillarone.riskanalytics.core.fileimport.ParameterizationImportService
+import org.pillarone.riskanalytics.core.fileimport.ResultConfigurationImportService
+import org.pillarone.riskanalytics.core.output.*
 
 class ResultAccessorTests extends GroovyTestCase {
 
@@ -70,7 +64,7 @@ class ResultAccessorTests extends GroovyTestCase {
         assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 0, iteration: 0, value: 5).save()
         assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 0, iteration: 0, value: 15).save()
 
-        List<Object[]> results = ResultAccessor.getAvgAndIsStochasticForSimulationRun(simulationRun)
+        List<Object[]> results = ResultAccessor.getAvgAndIsStochasticForSimulationRun(simulationRun, -1)
         assertEquals 2, results.size()
 
         Object[] result = results[0]

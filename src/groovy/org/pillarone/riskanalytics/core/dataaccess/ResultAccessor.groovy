@@ -99,21 +99,42 @@ class ResultAccessor {
 
     static Double getNthOrderStatistic(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName,
                                        String fieldName, double percentage, CompareOperator compareOperator) {
-        if ((compareOperator.equals(CompareOperator.LESS_THAN) && percentage == 0)
+        double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
+        double lowestPercentage = 100d / values.size()
+        if ((compareOperator.equals(CompareOperator.LESS_THAN) && percentage <= lowestPercentage)
                 || compareOperator.equals(CompareOperator.GREATER_THAN) && percentage == 100) {
             return null
         }
-        double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
         Double rank = simulationRun.getIterations() * percentage * 0.01
-        if (rank > 0) {
-            rank--        // -1 as array index starts with 0
-        }
+
         Integer index = rank.toInteger()
-        if (Math.abs(rank - index) > 0 && compareOperator.equals(CompareOperator.GREATER_EQUALS)
-                || compareOperator.equals(CompareOperator.GREATER_THAN)) {
-            index++
+        if (rank - index > 0) {
+            switch (compareOperator) {
+                case CompareOperator.GREATER_THAN:
+                case CompareOperator.GREATER_EQUALS:
+                    index++
+                    break
+            }
         }
-        return values[index]
+        else if (rank - index == 0) {
+            switch (compareOperator) {
+                case CompareOperator.GREATER_THAN:
+                    index++
+                    break
+                case CompareOperator.LESS_THAN:
+                    index--
+                    break
+            }
+        }
+        else if (rank - index < 0) {
+            switch (compareOperator) {
+                case CompareOperator.LESS_THAN:
+                case CompareOperator.LESS_EQUALS:
+                    index--
+                    break
+            }
+        }
+        return rank == 0 ? values[0] : values[--index]       // -1 as array index starts with 0
     }
 
     static Double getPercentile(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName, String fieldName, Double percentile) {
@@ -207,22 +228,11 @@ class ResultAccessor {
     }
 
     public static List<Object[]> getAvgMinMaxForNotSingleCollector(Sql sql, SimulationRun simulationRun, long singleCollectorId) {
-        //ELECT path_id, period,collector_id, field_id, AVG(value) as average, MIN(value) as minimum, MAX(value) as maximum "
         StringBuilder sb = new StringBuilder("SELECT path_id, period,collector_id, field_id, AVG(value) as average, MIN(value) as minimum, MAX(value) as maximum ")
         sb.append(" FROM single_value_result s WHERE simulation_run_id = " + simulationRun.id + " and collector_id != " + singleCollectorId)
         sb.append(" GROUP BY period, path_id, collector_id, field_id")
         List<GroovyRowResult> rows = sql.rows(sb.toString())
         return getResults(rows, 7)
-//        def result = []
-//        for (GroovyRowResult row in rows) {
-//            def array = new Object[7]
-//            for (int i = 0; i < 7; i++) {
-//                array[i] = row.getAt(i)
-//            }
-//            result << array
-//        }
-//        //sql not closed
-//        return result
     }
 
     public static List<Object[]> getAvgMinMaxForSingleCollector(Sql sql, SimulationRun simulationRun, long singleCollectorId) {

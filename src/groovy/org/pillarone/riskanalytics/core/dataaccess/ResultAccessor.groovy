@@ -244,11 +244,10 @@ class ResultAccessor {
     }
 
 
-    public static List<SingleValueResult> getSingleValueResults(String collector, String path, String field, SimulationRun run) {
-        StringBuilder sb = new StringBuilder("select  s.path.pathName,s.value, s.field.fieldName, s.iteration  from ${SingleValueResult.name} as s WHERE ")
+    public static List getSingleValueResults(String collector, String path, String field, SimulationRun run) {
+        StringBuilder sb = new StringBuilder("select  s.path.pathName, s.value, s.field.fieldName, s.iteration, s.period from ${SingleValueResult.name} as s WHERE ")
         sb.append(" s.collector.collectorName = ? AND s.field.fieldName = ? and s.path.pathName = ?   AND s.simulationRun.id = ?")
-        List list = SingleValueResult.executeQuery(sb.toString(), [collector, field, path, run.id])
-        return list
+        return SingleValueResult.executeQuery(sb.toString(), [collector, field, path, run.id])
     }
 
     public synchronized static List<Object[]> getResults(List<GroovyRowResult> rows, int size) {

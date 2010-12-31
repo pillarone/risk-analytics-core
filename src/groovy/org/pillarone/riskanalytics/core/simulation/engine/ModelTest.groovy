@@ -153,7 +153,7 @@ abstract class ModelTest extends GroovyTestCase {
     private void compareResults() {
         File refFile = new File(refFileName)
         if (!refFile.exists())
-            fail("No referenceResultFileName defined for ${modelClass.name}Model.")
+            fail("No referenceResultFileName defined for ${modelClass.name}: ($refFileName)")
         FileInputStream referenceFis = new FileInputStream(refFile)
 
         FileInputStream resultFis = new FileInputStream(new File(newFileName))

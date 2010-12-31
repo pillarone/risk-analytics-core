@@ -2,13 +2,13 @@ package org.pillarone.riskanalytics.core.simulation.engine
 
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.joda.time.DateTimeZone
 import org.pillarone.riskanalytics.core.batch.BatchRunInfoService
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.simulation.engine.actions.*
-import org.joda.time.DateTimeZone
 
 /**
  * This is the main entity to run a simulation. To do this, create a runner object (SimulationRunner.createRunner()).
@@ -44,7 +44,7 @@ public class SimulationRunner {
     BatchRunInfoService batchRunInfoService
 
     /** Setting the default time zone to UTC avoids problems in multi user context with different time zones
-     *  and switches off daylight saving capabilities and possible related problems. */
+     *  and switches off daylight saving capabilities and possible related problems.   */
     DateTimeZone utc = DateTimeZone.setDefault(DateTimeZone.UTC)
 
     /**

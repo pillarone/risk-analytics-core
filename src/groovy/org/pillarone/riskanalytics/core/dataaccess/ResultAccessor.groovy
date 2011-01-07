@@ -245,8 +245,8 @@ class ResultAccessor {
 
 
     public static List getSingleValueResults(String collector, String path, String field, SimulationRun run) {
-        StringBuilder sb = new StringBuilder("select  s.path.pathName, s.value, s.field.fieldName, s.iteration, s.period from ${SingleValueResult.name} as s WHERE ")
-        sb.append(" s.collector.collectorName = ? AND s.field.fieldName = ? and s.path.pathName = ?   AND s.simulationRun.id = ?")
+        StringBuilder sb = new StringBuilder("select  s.path.pathName, s.value, s.field.fieldName, s.iteration, s.period, s.valueIndex from ${SingleValueResult.name} as s WHERE ")
+        sb.append(" s.collector.collectorName = ? AND s.field.fieldName = ? and s.path.pathName = ?   AND s.simulationRun.id = ? ")
         return SingleValueResult.executeQuery(sb.toString(), [collector, field, path, run.id])
     }
 

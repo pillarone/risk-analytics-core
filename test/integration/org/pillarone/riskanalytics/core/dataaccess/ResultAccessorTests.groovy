@@ -165,7 +165,7 @@ class ResultAccessorTests extends GroovyTestCase {
         assertEquals 10, values[2]
         assertEquals 20, values[3]
 
-        values = ResultAccessor.getValuesSorted(simulationRun, 0, path1.id, collector.id, field.id)
+        values = ResultAccessor.getValuesSorted(simulationRun, 0, path1.id, collector.id, field.id, 0)
         assertEquals 4, values.size()
         assertEquals 0, values[0]
         assertEquals 5, values[1]

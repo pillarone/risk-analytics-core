@@ -43,10 +43,6 @@ public class SimulationRunner {
 
     BatchRunInfoService batchRunInfoService
 
-    /** Setting the default time zone to UTC avoids problems in multi user context with different time zones
-     *  and switches off daylight saving capabilities and possible related problems.   */
-    DateTimeZone utc = DateTimeZone.setDefault(DateTimeZone.UTC)
-
     /**
      * Starting a simulation run by performing the
      *

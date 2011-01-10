@@ -27,10 +27,6 @@ abstract class ModelTest extends GroovyTestCase {
 
     private static final Log LOG = LogFactory.getLog(ModelTest)
 
-    /** Setting the default time zone to UTC avoids problems in multi user context with different time zones
-     *  and switches off daylight saving capabilities and possible related problems. */
-    DateTimeZone utc = DateTimeZone.setDefault(DateTimeZone.UTC)
-
     String refFileName
     String newFileName
     private static final EPSILON = 1E-6
@@ -159,7 +155,7 @@ abstract class ModelTest extends GroovyTestCase {
     private void compareResults() {
         File refFile = new File(refFileName)
         if (!refFile.exists())
-            fail("No referenceResultFileName defined for ${modelClass.name}Model.")
+            fail("No referenceResultFileName defined for ${modelClass.name}: ($refFileName)")
         FileInputStream referenceFis = new FileInputStream(refFile)
 
         FileInputStream resultFis = new FileInputStream(new File(newFileName))

@@ -10,10 +10,15 @@ import org.pillarone.riskanalytics.core.user.UserManagement
 import grails.plugins.springsecurity.SpringSecurityService
 import org.pillarone.riskanalytics.core.user.PersonAuthority
 import org.pillarone.riskanalytics.core.output.SimulationRun
+import org.joda.time.DateTimeZone
 
 class CoreBootStrap {
 
     SpringSecurityService authenticateService
+
+    /** Setting the default time zone to UTC avoids problems in multi user context with different time zones
+     *  and switches off daylight saving capabilities and possible related problems. */
+    DateTimeZone utc = DateTimeZone.setDefault(DateTimeZone.UTC)
 
     def init = {servletContext ->
 

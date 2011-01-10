@@ -1,16 +1,10 @@
 package org.pillarone.riskanalytics.core.dataaccess
 
-import org.pillarone.riskanalytics.core.output.CollectorMapping
-import org.pillarone.riskanalytics.core.output.FieldMapping
-import org.pillarone.riskanalytics.core.output.PathMapping
-import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
-import org.pillarone.riskanalytics.core.ParameterizationDAO
-import org.pillarone.riskanalytics.core.output.SimulationRun
-import org.pillarone.riskanalytics.core.fileimport.ResultConfigurationImportService
-import org.pillarone.riskanalytics.core.fileimport.ParameterizationImportService
 import models.core.CoreModel
-import org.pillarone.riskanalytics.core.output.SingleValueResult
-
+import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.pillarone.riskanalytics.core.fileimport.ParameterizationImportService
+import org.pillarone.riskanalytics.core.fileimport.ResultConfigurationImportService
+import org.pillarone.riskanalytics.core.output.*
 
 class ResultAccessorTests extends GroovyTestCase {
 
@@ -70,7 +64,7 @@ class ResultAccessorTests extends GroovyTestCase {
         assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 0, iteration: 0, value: 5).save()
         assertNotNull new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 0, iteration: 0, value: 15).save()
 
-        List<Object[]> results = ResultAccessor.getAvgAndIsStochasticForSimulationRun(simulationRun)
+        List<Object[]> results = ResultAccessor.getAvgAndIsStochasticForSimulationRun(simulationRun, -1)
         assertEquals 2, results.size()
 
         Object[] result = results[0]
@@ -171,7 +165,7 @@ class ResultAccessorTests extends GroovyTestCase {
         assertEquals 10, values[2]
         assertEquals 20, values[3]
 
-        values = ResultAccessor.getValuesSorted(simulationRun, 0, path1.id, collector.id, field.id)
+        values = ResultAccessor.getValuesSorted(simulationRun, 0, path1.id, collector.id, field.id, 0)
         assertEquals 4, values.size()
         assertEquals 0, values[0]
         assertEquals 5, values[1]
@@ -243,13 +237,13 @@ class ResultAccessorTests extends GroovyTestCase {
 
         // mismatch --> < equal to <=, > equal to >=
         (1..99).each {
-            double lessEqual = ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, it+0.5, CompareOperator.LESS_EQUALS)
-            double lessThan = ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, it+0.5, CompareOperator.LESS_THAN)
-            double greaterEqual = ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, it+0.5, CompareOperator.GREATER_EQUALS)
-            double greaterThan = ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, it+0.5, CompareOperator.GREATER_THAN)
-            assertEquals "less ${it+0.5}%: $lessEqual == $lessThan", lessEqual, lessThan
-            assertEquals "greater ${it-0.5}%: $greaterEqual == $greaterThan", greaterEqual, greaterThan
-            assertTrue "different ${it+0.5}%: $lessEqual < $greaterEqual", lessEqual < greaterEqual
+            double lessEqual = ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, it + 0.5, CompareOperator.LESS_EQUALS)
+            double lessThan = ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, it + 0.5, CompareOperator.LESS_THAN)
+            double greaterEqual = ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, it + 0.5, CompareOperator.GREATER_EQUALS)
+            double greaterThan = ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, it + 0.5, CompareOperator.GREATER_THAN)
+            assertEquals "less ${it + 0.5}%: $lessEqual == $lessThan", lessEqual, lessThan
+            assertEquals "greater ${it - 0.5}%: $greaterEqual == $greaterThan", greaterEqual, greaterThan
+            assertTrue "different ${it + 0.5}%: $lessEqual < $greaterEqual", lessEqual < greaterEqual
         }
     }
 }

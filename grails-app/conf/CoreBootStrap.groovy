@@ -16,11 +16,11 @@ class CoreBootStrap {
 
     SpringSecurityService authenticateService
 
-    /** Setting the default time zone to UTC avoids problems in multi user context with different time zones
-     *  and switches off daylight saving capabilities and possible related problems. */
-    DateTimeZone utc = DateTimeZone.setDefault(DateTimeZone.UTC)
-
     def init = {servletContext ->
+
+        /** Setting the default time zone to UTC avoids problems in multi user context with different time zones
+         *  and switches off daylight saving capabilities and possible related problems.  */
+        DateTimeZone.setDefault(DateTimeZone.UTC)
 
         authenticateService = UserManagement.getSpringSecurityService()
 

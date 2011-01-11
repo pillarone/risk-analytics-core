@@ -127,6 +127,7 @@ class Comment implements Cloneable {
     public String toConfigObject() {
         char c = (char) 92
         StringBuilder sb = new StringBuilder("\"\"[")
+        //replace all occurrences end line Character(\n) in comment  with html code &#92;
         String newComment = comment.replace("${c}", "&#92;")
         sb.append("path:'${path}', period:${period}, lastChange:new Date(${lastChange.getTime()}),user:null, comment: ${c}\"${c}\"${c}\"${newComment}${c}\"${c}\"${c}\"")
         if (tags && !tags.isEmpty()) {

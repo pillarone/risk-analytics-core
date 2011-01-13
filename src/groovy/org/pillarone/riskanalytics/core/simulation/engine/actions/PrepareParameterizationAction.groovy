@@ -6,6 +6,10 @@ import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
 import org.pillarone.riskanalytics.core.simulation.engine.PeriodScope
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
+import org.pillarone.riskanalytics.core.components.Component
+import org.pillarone.riskanalytics.core.parameterization.IParameterObject
+import org.pillarone.riskanalytics.core.components.InitializingComponent
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 /**
  * Prepares the ParameterApplicator and applies the parameters of the first period. The later is required as following
@@ -28,7 +32,7 @@ public class PrepareParameterizationAction implements Action {
         periodScope.parameterApplicator = applicator
         // PMO-758: Applying parameters before wiring is necessary,
         // similarly ApplyGlobalParameters and PrepareResourcesParameterizationAction depend on the following line
-//        simulationScope.parameterApplicator.applyParameterForPeriod(0)
+        simulationScope.parameterApplicator.applyParameterForPeriod(0)
     }
 
 

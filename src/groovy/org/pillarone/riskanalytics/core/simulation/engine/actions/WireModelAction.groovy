@@ -19,8 +19,6 @@ public class WireModelAction implements Action {
         synchronized (this.getClass()) {
             Model model = simulationScope.model
             ResultConfiguration resultConfig = simulationScope.resultConfiguration
-            // PMO-758: Applying parameters before wiring is necessary
-            simulationScope.parameterApplicator.applyParameterForPeriod(0)
 
             model.wire()
             LOG.debug "Model wired"

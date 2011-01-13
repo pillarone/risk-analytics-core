@@ -33,7 +33,35 @@ public class PrepareParameterizationAction implements Action {
         // PMO-758: Applying parameters before wiring is necessary,
         // similarly ApplyGlobalParameters and PrepareResourcesParameterizationAction depend on the following line
         simulationScope.parameterApplicator.applyParameterForPeriod(0)
+        traverseModel(model)
     }
 
+    private void traverseModel(Model model) {
+        for (Component component in model.allComponents) {
+            traverseModel(component)
+        }
+    }
+
+    private void traverseModel(Component component) {
+        for (Map.Entry prop in GroovyUtils.getProperties(component)) {
+            if (prop.value instanceof Component || prop.value instanceof IParameterObject) {
+                traverseModel(prop.value)
+            }
+        }
+        if (component instanceof InitializingComponent) {
+            component.afterParameterInjection(simulationScope)
+        }
+    }
+
+    private void traverseModel(IParameterObject parameterObject) {
+        for (param in parameterObject.parameters) {
+            if (param instanceof IParameterObject) {
+                traverseModel(param)
+            }
+        }
+        if (parameterObject instanceof InitializingComponent) {
+            parameterObject.afterParameterInjection(simulationScope)
+        }
+    }
 
 }

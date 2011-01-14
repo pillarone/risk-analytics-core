@@ -12,6 +12,9 @@ class ExampleParameterObject implements IParameterObject, InitializingComponent 
 
     def injectedScope
 
+    int globalInt
+    String globalString
+
     Map getParameters() {
         return parameters;
     }

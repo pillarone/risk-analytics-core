@@ -10,6 +10,10 @@ import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.parameterization.IParameterObject
 import org.pillarone.riskanalytics.core.components.InitializingComponent
 import org.pillarone.riskanalytics.core.util.GroovyUtils
+import org.pillarone.riskanalytics.core.parameterization.global.GlobalParameterTarget
+import org.pillarone.riskanalytics.core.parameterization.global.GlobalParameterSource
+import org.pillarone.riskanalytics.core.components.GlobalParameterComponent
+import java.lang.reflect.Method
 
 /**
  * Prepares the ParameterApplicator and applies the parameters of the first period. The later is required as following
@@ -23,6 +27,9 @@ public class PrepareParameterizationAction implements Action {
     SimulationScope simulationScope
     PeriodScope periodScope
 
+    private List<GlobalParameterTarget> globalTargets = []
+    private List<GlobalParameterSource> globalSources = []
+
     public void perform() {
 
         Model model = simulationScope.model
@@ -34,6 +41,18 @@ public class PrepareParameterizationAction implements Action {
         // similarly ApplyGlobalParameters and PrepareResourcesParameterizationAction depend on the following line
         simulationScope.parameterApplicator.applyParameterForPeriod(0)
         traverseModel(model)
+        applyGlobalParameters()
+    }
+
+    private void applyGlobalParameters() {
+        for (GlobalParameterTarget target in globalTargets) {
+            String identifier = target.propertyName.substring(6).toLowerCase()
+            GlobalParameterSource source = globalSources.find { it.identifier == identifier }
+            if (source == null) {
+                throw new IllegalStateException("No global parameter with name $identifier found.")
+            }
+            source.applyToTarget(target)
+        }
     }
 
     private void traverseModel(Model model) {
@@ -43,9 +62,12 @@ public class PrepareParameterizationAction implements Action {
     }
 
     private void traverseModel(Component component) {
-        for (Map.Entry prop in GroovyUtils.getProperties(component)) {
+        for (Map.Entry<String, ?> prop in GroovyUtils.getProperties(component)) {
             if (prop.value instanceof Component || prop.value instanceof IParameterObject) {
                 traverseModel(prop.value)
+            }
+            if (prop.key.startsWith("global")) {
+                globalTargets << new GlobalParameterTarget(targetInstance: component, propertyName: prop.key)
             }
         }
         if (component instanceof InitializingComponent) {
@@ -53,10 +75,21 @@ public class PrepareParameterizationAction implements Action {
         }
     }
 
+    private void traverseModel(GlobalParameterComponent component) {
+        for (Map.Entry<String, Method> entry in component.globalMethods) {
+            globalSources << new GlobalParameterSource(identifier: entry.key, method: entry.value, source: component)
+        }
+    }
+
     private void traverseModel(IParameterObject parameterObject) {
         for (param in parameterObject.parameters) {
             if (param instanceof IParameterObject) {
                 traverseModel(param)
+            }
+        }
+        for (Map.Entry<String, ?> prop in GroovyUtils.getProperties(parameterObject)) {
+            if (prop.key.startsWith("global")) {
+                globalTargets << new GlobalParameterTarget(targetInstance: parameterObject, propertyName: prop.key)
             }
         }
         if (parameterObject instanceof InitializingComponent) {

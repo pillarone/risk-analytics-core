@@ -16,6 +16,9 @@ class ExampleInputOutputComponent extends Component implements InitializingCompo
 
     def injectedScope
 
+    int globalInt
+    String globalString
+
     protected void doCalculation() {
 
     }

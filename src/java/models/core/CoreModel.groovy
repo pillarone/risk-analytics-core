@@ -8,6 +8,7 @@ import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
 import org.joda.time.DateTime
 import junit.framework.Assert
 import org.pillarone.riskanalytics.core.simulation.ValuationDatePeriodCounter
+import org.pillarone.riskanalytics.core.example.component.ExampleParameterComponent
 
 /**
  * Model with different components that can be used for tests in the core plugin
@@ -18,12 +19,14 @@ class CoreModel extends StochasticModel {
     ExampleOutputComponent hierarchyOutputComponent
     ExampleInputOutputComponent exampleInputOutputComponent
     ExampleDynamicComponent dynamicComponent
+    ExampleParameterComponent parameterComponent
 
     void initComponents() {
         exampleOutputComponent = new ExampleOutputComponent()
         hierarchyOutputComponent = new ExampleOutputComponent()
         exampleInputOutputComponent = new ExampleInputOutputComponent()
         dynamicComponent = new ExampleDynamicComponent()
+        parameterComponent = new ExampleParameterComponent()
     }
 
     void wireComponents() {

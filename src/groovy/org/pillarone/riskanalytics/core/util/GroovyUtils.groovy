@@ -1,5 +1,9 @@
 package org.pillarone.riskanalytics.core.util
 
+import java.lang.reflect.Field
+import java.lang.reflect.Modifier
+import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
+import org.pillarone.riskanalytics.core.components.Component
 import org.joda.time.DateTime
 
 /**
@@ -193,5 +197,31 @@ public class GroovyUtils {
             case Short.class: return value.shortValue()
             default: return value;
         }
+    }
+
+    public static Map<String, Object> getProperties(def object) {
+        Map<String, Object> result = [:]
+
+        Class currentClass = object.getClass()
+        while (currentClass != Object.class) {
+            Field[] fields = currentClass.declaredFields
+            for (Field field in fields) {
+                if (!Modifier.isStatic(field.modifiers)) {
+                    field.accessible = true
+                    result.put(field.name, field.get(object))
+                }
+
+            }
+            currentClass = currentClass.superclass
+        }
+
+        if (object instanceof DynamicComposedComponent) {
+            List<Component> componentList = object.componentList
+            for (Component component in componentList) {
+                result.put(component.name, component)
+            }
+        }
+
+        return result
     }
 }

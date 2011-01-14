@@ -31,6 +31,8 @@ abstract class ModelTest extends GroovyTestCase {
     String newFileName
     private static final EPSILON = 1E-6
 
+    protected SimulationRunner runner
+
     String getParameterFileName() {
         (getModelClass().simpleName - "Model") + "Parameters"
     }
@@ -118,7 +120,7 @@ abstract class ModelTest extends GroovyTestCase {
     }
 
     final void testModelRun() {
-        SimulationRunner runner = SimulationRunner.createRunner()
+        runner = SimulationRunner.createRunner()
         ICollectorOutputStrategy output = getOutputStrategy()
         runner.simulationConfiguration = new SimulationConfiguration(simulation: run, outputStrategy: output)
 

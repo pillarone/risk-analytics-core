@@ -5,6 +5,7 @@ import com.google.common.collect.HashBiMap
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.packets.Packet
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 class StructureInformation implements IStructureInformation {
     Map componentsOfLine = [:]
@@ -56,7 +57,8 @@ class StructureInformation implements IStructureInformation {
 
     private List resolveSubComponents(Component c, String path) {
         List result = []
-        c.properties.each {k, v ->
+        GroovyUtils.getProperties(c).each {Map.Entry entry ->
+            def v = entry.value
             if (v instanceof Component) {
                 componentPaths[v] = path + ":${v.name}"
                 result.addAll(resolveSubComponents(v, path + ":${v.name}"))

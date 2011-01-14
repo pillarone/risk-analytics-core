@@ -180,13 +180,12 @@ class ResultAccessor {
     static List getValuesSorted(SimulationRun simulationRun, int period, long pathId, long collectorId, long fieldId, long singleCollectorId) {
         if (singleCollectorId == collectorId) {
             //single
-            List list = SingleValueResult.executeQuery("SELECT sum(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
+            return SingleValueResult.executeQuery("SELECT sum(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
                     " WHERE s.path.id = ? AND " +
                     "s.period = ? AND " +
                     "s.collector.id = ? AND " +
                     "s.field.id = ? AND " +
-                    "s.simulationRun.id = ? group by s.iteration ", [pathId, period, collectorId, fieldId, simulationRun.id])
-            list.sort()
+                    "s.simulationRun.id = ? group by s.iteration order by sum(value) asc ", [pathId, period, collectorId, fieldId, simulationRun.id])
         } else {
             SingleValueResult.executeQuery("SELECT value FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
                     " WHERE s.path.id = ? AND " +

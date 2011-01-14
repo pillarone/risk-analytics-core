@@ -7,6 +7,7 @@ import org.pillarone.riskanalytics.core.packets.Packet
 import org.pillarone.riskanalytics.core.packets.PacketList
 import org.pillarone.riskanalytics.core.components.InitializingComponent
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
+import junit.framework.Assert
 
 class ExampleInputOutputComponent extends Component implements InitializingComponent {
 
@@ -25,6 +26,8 @@ class ExampleInputOutputComponent extends Component implements InitializingCompo
 
     void afterParameterInjection(SimulationScope scope) {
         injectedScope = scope
+        Assert.assertNotNull globalString
+        Assert.assertEquals 1, globalInt
     }
 
 

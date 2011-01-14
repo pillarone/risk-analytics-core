@@ -29,6 +29,7 @@ public class PrepareParameterizationAction implements Action {
 
     private List<GlobalParameterTarget> globalTargets = []
     private List<GlobalParameterSource> globalSources = []
+    private List<InitializingComponent> initializingComponents = []
 
     public void perform() {
 
@@ -42,6 +43,7 @@ public class PrepareParameterizationAction implements Action {
         simulationScope.parameterApplicator.applyParameterForPeriod(0)
         traverseModel(model)
         applyGlobalParameters()
+        initializingComponents*.afterParameterInjection(simulationScope)
     }
 
     private void applyGlobalParameters() {
@@ -71,7 +73,7 @@ public class PrepareParameterizationAction implements Action {
             }
         }
         if (component instanceof InitializingComponent) {
-            component.afterParameterInjection(simulationScope)
+            initializingComponents << component
         }
     }
 
@@ -93,7 +95,7 @@ public class PrepareParameterizationAction implements Action {
             }
         }
         if (parameterObject instanceof InitializingComponent) {
-            parameterObject.afterParameterInjection(simulationScope)
+            initializingComponents << parameterObject
         }
     }
 

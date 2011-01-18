@@ -59,7 +59,21 @@ class MultiDimensionalParameterHolder extends ParameterHolder implements IMarker
                 }
                 else {
                     for (int row = value.getTitleRowCount(); row < value.getRowCount(); row++) {
-                        cellValues[column][row - 1] = value.getValueAt(row, column).clone()
+                        if (value.getValueAt(row, column) instanceof String) {
+                            cellValues[column][row - 1] = new String((String) value.getValueAt(row, column));
+                        }
+                        else if (value.getValueAt(row, column) instanceof Integer) {
+                            cellValues[column][row - 1] = new Integer((Integer) value.getValueAt(row, column));
+                        }
+                        else if (value.getValueAt(row, column) instanceof Double) {
+                            cellValues[column][row - 1] = new Double((Double) value.getValueAt(row, column));
+                        }
+                        else if (value.getValueAt(row, column) instanceof DateTime) {
+                            cellValues[column][row - 1] = new DateTime((DateTime) value.getValueAt(row, column));
+                        }
+                        else {
+                            cellValues[column][row - 1] = value.getValueAt(row, column).clone()
+                        }
                     }
                 }
             }

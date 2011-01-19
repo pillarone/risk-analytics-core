@@ -1,13 +1,13 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
-import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
-import org.pillarone.riskanalytics.core.simulation.item.Simulation
-import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
-import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
-import org.pillarone.riskanalytics.core.simulation.item.Parameterization
-import org.apache.commons.logging.LogFactory
 import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationBlock
+import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
+import org.pillarone.riskanalytics.core.simulation.item.Parameterization
+import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
 /**
  * The SimulationConfiguration is a descriptor for a runnable simulation. All runtime aspects e.g. numberOfIterations,
@@ -40,11 +40,14 @@ public class SimulationConfiguration implements Serializable, Cloneable {
 
         preparedSimulation.parameterization = new Parameterization(simulation.parameterization.name)
         preparedSimulation.parameterization.periodCount = simulation.parameterization.periodCount
+        preparedSimulation.parameterization.versionNumber = simulation.parameterization.versionNumber
+
         //clone parameters to make sure they don't have any model or component references
         preparedSimulation.parameterization.parameterHolders = simulation.parameterization.parameterHolders.collect { it.clone() }
 
 
         preparedSimulation.template = new ResultConfiguration(simulation.template.name)
+        preparedSimulation.template.versionNumber = simulation.template.versionNumber
         preparedSimulation.template.collectors = simulation.template.collectors
 
         preparedSimulation.structure = ModelStructure.getStructureForModel(simulation.modelClass)

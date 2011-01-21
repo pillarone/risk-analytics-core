@@ -1,21 +1,19 @@
 package org.pillarone.riskanalytics.core.simulation.engine.grid;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.gridgain.grid.*;
+import org.pillarone.riskanalytics.core.batch.BatchRunInfoService;
 import org.pillarone.riskanalytics.core.output.Calculator;
 import org.pillarone.riskanalytics.core.output.PathMapping;
 import org.pillarone.riskanalytics.core.simulation.SimulationState;
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration;
-
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.JobResult;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultDescriptor;
-import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultWriter;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultTransferObject;
+import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultWriter;
 import org.pillarone.riskanalytics.core.simulation.item.Simulation;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -44,12 +42,12 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
 
     private ResultTransferListener resultTransferListener;
 
-    public final Map<? extends GridJob,GridNode> map(List<GridNode> subgrid,
-                                                 SimulationConfiguration simulationConfiguration)
-                                          throws GridException{
+    public final Map<? extends GridJob, GridNode> map(List<GridNode> subgrid,
+                                                      SimulationConfiguration simulationConfiguration)
+            throws GridException {
 
         Map<SimulationJob, GridNode> jobsToNodes = new HashMap<SimulationJob, GridNode>(subgrid.size());
-        HashMap<Integer,List<SimulationJob>> jobCountPerGrid=new HashMap<Integer,List<SimulationJob>>(); 
+        HashMap<Integer, List<SimulationJob>> jobCountPerGrid = new HashMap<Integer, List<SimulationJob>>();
 
         currentState = SimulationState.INITIALIZING;
         time = System.currentTimeMillis();
@@ -88,27 +86,27 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         currentState = SimulationState.RUNNING;
         totalJobs = jobs.size();
 
-        for (int i=0;i<jobs.size();i++){
-            int gridNumber=i%subgrid.size();
-            jobsToNodes.put(jobs.get(i),subgrid.get(gridNumber));
+        for (int i = 0; i < jobs.size(); i++) {
+            int gridNumber = i % subgrid.size();
+            jobsToNodes.put(jobs.get(i), subgrid.get(gridNumber));
             List<SimulationJob> tmpList;
-            if ((tmpList=jobCountPerGrid.get(gridNumber))==null){
-                tmpList=new ArrayList<SimulationJob>();
-                jobCountPerGrid.put(gridNumber,tmpList);
+            if ((tmpList = jobCountPerGrid.get(gridNumber)) == null) {
+                tmpList = new ArrayList<SimulationJob>();
+                jobCountPerGrid.put(gridNumber, tmpList);
             }
             tmpList.add(jobs.get(i));
         }
 
-        for (int i:jobCountPerGrid.keySet()){
-            List<SimulationJob> tmpList=jobCountPerGrid.get(i);
-            for (SimulationJob simulationJob:tmpList){
+        for (int i : jobCountPerGrid.keySet()) {
+            List<SimulationJob> tmpList = jobCountPerGrid.get(i);
+            for (SimulationJob simulationJob : tmpList) {
                 simulationJob.setJobCount(tmpList.size());
             }
         }
-        
+
         return jobsToNodes;
     }
-    
+
     /*protected Collection<? extends GridJob> split(int gridSize, SimulationConfiguration simulationConfiguration) {
         currentState = SimulationState.INITIALIZING;
         time = System.currentTimeMillis();
@@ -193,25 +191,28 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         if (error || cancelled) {
             simulation.delete();
             currentState = error ? SimulationState.ERROR : SimulationState.CANCELED;
+            BatchRunInfoService.getService().batchSimulationStateChanged(simulation, currentState);
             return false;
         }
         LOG.info("Received " + messageCount + " messages. Sent " + totalMessageCount + " messages.");
         calculator = new Calculator(simulation.getSimulationRun());
         currentState = SimulationState.POST_SIMULATION_CALCULATIONS;
+        BatchRunInfoService.getService().batchSimulationStateChanged(simulation, currentState);
         calculator.calculate();
 
         simulation.setEnd(new Date());
         simulation.save();
         currentState = stopped ? SimulationState.STOPPED : SimulationState.FINISHED;
         LOG.info("Task completed in " + (System.currentTimeMillis() - time) + "ms");
+        BatchRunInfoService.getService().batchSimulationStateChanged(simulation, currentState);
         return true;
     }
 
     public synchronized void onMessage(UUID uuid, Object serializable) {
         messageCount.incrementAndGet();
         ResultTransferObject result = (ResultTransferObject) serializable;
-        ResultDescriptor rd=result.getResultDescriptor();
-        PathMapping pm=simulationConfiguration.getMappingCache().lookupPathDB(rd.getPath());
+        ResultDescriptor rd = result.getResultDescriptor();
+        PathMapping pm = simulationConfiguration.getMappingCache().lookupPathDB(rd.getPath());
         rd.setPathId(pm.pathID());
         resultWriter.writeResult(result);
         progress.put(result.getJobIdentifier(), result.getProgress());

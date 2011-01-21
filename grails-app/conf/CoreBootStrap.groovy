@@ -1,19 +1,16 @@
+import grails.plugins.springsecurity.SpringSecurityService
+
 import grails.util.Environment
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.pillarone.riskanalytics.core.fileimport.FileImportService
-import org.springframework.transaction.TransactionStatus
+import org.pillarone.riskanalytics.core.BatchRunSimulationRun
 import org.pillarone.riskanalytics.core.ParameterizationDAO
-import org.pillarone.riskanalytics.core.user.Authority
-import org.pillarone.riskanalytics.core.user.Person
-import org.pillarone.riskanalytics.core.user.UserSettings
-import org.pillarone.riskanalytics.core.user.UserManagement
-import grails.plugins.springsecurity.SpringSecurityService
-import org.pillarone.riskanalytics.core.user.PersonAuthority
-import org.pillarone.riskanalytics.core.output.CollectorMapping
-import org.pillarone.riskanalytics.core.output.batch.AbstractBulkInsert
-import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
+import org.pillarone.riskanalytics.core.fileimport.FileImportService
 import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
+import org.pillarone.riskanalytics.core.output.CollectorMapping
 import org.pillarone.riskanalytics.core.output.SimulationRun
+import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
+import org.springframework.transaction.TransactionStatus
+import org.pillarone.riskanalytics.core.user.*
 
 class CoreBootStrap {
 
@@ -81,6 +78,9 @@ class CoreBootStrap {
             def unfinishedSimulations = SimulationRun.findAllByEndTime(null)
             unfinishedSimulations.each {SimulationRun simulationRun ->
                 try {
+                    BatchRunSimulationRun brsr = BatchRunSimulationRun.findBySimulationRun(simulationRun)
+                    if (brsr)
+                        brsr.delete()
                     simulationRun.delete()
                 } catch (Exception ex) {
                     ex.printStackTrace()

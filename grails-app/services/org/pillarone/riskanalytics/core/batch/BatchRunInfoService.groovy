@@ -35,8 +35,8 @@ class BatchRunInfoService {
 
     public synchronized void batchSimulationStateChanged(Simulation simulation, SimulationState simulationState) {
         BatchRunSimulationRun brsr = runningBatchSimulationRuns.find { it.simulationRun.id == simulation.simulationRun.id}
-        if (brsr)
-            brsr.simulationState = simulationState
+        if (!brsr) return
+        brsr.simulationState = simulationState
         update(simulation, simulationState)
         if (simulationState == SimulationState.FINISHED)
             finishedSimulations << simulation
@@ -51,7 +51,6 @@ class BatchRunInfoService {
 
     private BatchRunSimulationRun update(Simulation simulation, SimulationState simulationState) {
         BatchRunSimulationRun batchRunSimulationRun = BatchRunSimulationRun.findBySimulationRun(simulation.simulationRun)
-        if (!batchRunSimulationRun) return null
         batchRunSimulationRun.simulationState = simulationState
         batchRunSimulationRun.save()
     }

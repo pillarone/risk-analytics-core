@@ -1,7 +1,5 @@
 package org.pillarone.riskanalytics.core
 
-import groovy.sql.GroovyRowResult
-import groovy.sql.Sql
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.parameter.Parameter
@@ -61,48 +59,6 @@ class ParameterizationDAO {
                 eq('modelClassName', modelClassName)
         }
         return results.size() > 0 ? results.get(0) : null
-    }
-
-    def beforeInsert = {
-        logDetails "beforeInsert", false
-    }
-
-    def beforeUpdate = {
-        logDetails "beforeUpdate", false
-    }
-
-    def afterInsert = {
-        logDetails "afterInsert", true
-    }
-
-    def afterUpdate = {
-        logDetails "afterUpdate", true
-    }
-
-    private void logDetails(String text, boolean printStackTrace) {
-        if (LOG.isTraceEnabled()) {
-            try {
-                LOG.trace "$text: id $id ($name $itemVersion): locking version (object): $version"
-                Sql sql = new Sql(dataSource)
-                List results = sql.rows("select version from parameterizationdao where id = ?", [id])
-                GroovyRowResult res = results[0]
-                String versionString = res == null ? "null" : res.getAt(0)
-                LOG.trace "$text: id $id ($name $itemVersion): locking version (db): ${versionString}"
-                if (printStackTrace) {
-                    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace().findAll {
-                        !(it.declaringClass.startsWith("sun.reflect")) &&
-                                !(it.declaringClass.startsWith("groovy.lang")) &&
-                                !(it.declaringClass.startsWith("java.lang.reflect")) &&
-                                !(it.declaringClass.startsWith("org.codehaus.groovy"))
-                    }
-                    LOG.trace "Stack: ${stackTrace*.toString().join("\n")}"
-                }
-
-            } catch (Throwable t) {
-                LOG.error "Exception during logging", t
-            }
-
-        }
     }
 
 }

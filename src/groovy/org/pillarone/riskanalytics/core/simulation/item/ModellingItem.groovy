@@ -146,6 +146,7 @@ abstract class ModellingItem {
                 def dao = getDao()
                 if (dao != null && deleteDaoImpl(dao)) {
                     result = true
+                    LOG.info  "${this.getClass().simpleName} $name deleted"
                 } else {
                     logErrors(dao)
                 }
@@ -160,6 +161,7 @@ abstract class ModellingItem {
 
     protected Object deleteDaoImpl(dao) {
         dao.delete(flush: true)
+        return true
     }
 
 

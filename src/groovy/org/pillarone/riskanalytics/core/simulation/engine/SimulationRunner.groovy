@@ -59,8 +59,6 @@ public class SimulationRunner {
         start = System.currentTimeMillis()
         Date startDate = new Date(start)
         currentScope?.simulation?.start = startDate
-        LOG.trace "Written start date ${startDate.time} to ${System.identityHashCode(currentScope?.simulation)}"
-        LOG.trace "New value read from simulation: ${currentScope?.simulation?.start?.time}"
         try {
             for (Action action in preSimulationActions) {
                 if (!performAction(action, null)) {
@@ -117,8 +115,6 @@ public class SimulationRunner {
         LOG.debug "end simulation"
         long end = System.currentTimeMillis()
         currentScope?.simulation?.end = new Date(end)
-        LOG.trace "Written end date ${end} to ${System.identityHashCode(currentScope?.simulation)}"
-        LOG.trace "New value read from simulation: ${currentScope?.simulation?.end?.time}"
         currentScope?.simulation?.save()
 
         LOG.info "simulation took ${end - start} ms"

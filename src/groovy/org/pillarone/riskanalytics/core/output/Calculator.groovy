@@ -1,6 +1,5 @@
 package org.pillarone.riskanalytics.core.output
 
-import java.sql.ResultSet
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.commons.ApplicationHolder
@@ -8,13 +7,14 @@ import org.jfree.data.statistics.HistogramDataset
 import org.pillarone.riskanalytics.core.dataaccess.ResultAccessor
 import org.pillarone.riskanalytics.core.output.batch.calculations.AbstractCalculationsBulkInsert
 import org.pillarone.riskanalytics.core.util.MathUtils
+import org.pillarone.riskanalytics.core.dataaccess.ResultDescriptor
 
 class Calculator {
 
     private static Log LOG = LogFactory.getLog(Calculator)
 
     private SimulationRun run
-    private List paths
+    private List<ResultDescriptor> resultDescriptors
     private int totalCalculations
     private int completedCalculations
     private Map keyFigures
@@ -29,9 +29,9 @@ class Calculator {
         bulkInsert = AbstractCalculationsBulkInsert.getBulkInsertInstance()
         bulkInsert.simulationRun = run
         this.run = run
-        paths = ResultAccessor.getPaths(run)
+        resultDescriptors = ResultAccessor.getResultDescriptors(run)
         keyFigures = ApplicationHolder.application.config.keyFiguresToCalculate
-        keyFigureCount = 0 //isStochastic + mean
+        keyFigureCount = 2 //isStochastic + mean
         keyFigures.entrySet().each {Map.Entry entry ->
             if (entry.value instanceof List) {
                 keyFigureCount += entry.value.size()
@@ -39,7 +39,7 @@ class Calculator {
                 keyFigureCount++
             }
         }
-        totalCalculations = keyFigureCount * paths.size() * run.periodCount
+        totalCalculations = keyFigureCount * resultDescriptors.size()
         completedCalculations = 0
     }
 
@@ -59,29 +59,25 @@ class Calculator {
 
     void calculate() {
 
-        CollectorMapping collectorMapping = CollectorMapping.findByCollectorName(SingleValueCollectingModeStrategy.IDENTIFIER)
+        CollectorMapping collectorMapping = CollectorMapping.findByCollectorName(AggregatedCollectingModeStrategy.IDENTIFIER)
 
         startTime = System.currentTimeMillis()
-        List<Object[]> result = ResultAccessor.getAvgAndIsStochasticForSimulationRun(run)
-        totalCalculations = keyFigureCount * ResultAccessor.getAvgAndIsStochasticForSimulationRunCount(run)
 
-        for (Object[] array in result) {
-            long path = array[0]
-            int periodIndex = array[1]
-            long collector = array[2]
-            long field = array[3]
-            double avg = array[4]
-            //use only aggregated values
-            if(collector == collectorMapping?.id) {
-                continue
-            }
+        for (ResultDescriptor descriptor in resultDescriptors) {
+            long path = descriptor.pathId
+            int periodIndex = descriptor.periodIndex
+            long collector = collectorMapping.id //TODO: handle different collectors correctly
+            long field = descriptor.fieldId
+//            if (collector == collectorMapping?.id) {
+//                continue
+//            }
+            double[] values = loadValues(path, periodIndex, collector, field)
+            boolean isStochastic = calculateIsStochastic(periodIndex, path, collector, field, values)
+            completedCalculations++
+            double avg = calculateMean(periodIndex, path, collector, field, values)
+            completedCalculations++
 
-            int isStochastic = array[5] == array[6] ? 1 : 0
-            bulkInsert.addResults(periodIndex, PostSimulationCalculation.MEAN, null, path, field, collector, avg)
-            bulkInsert.addResults(periodIndex, PostSimulationCalculation.IS_STOCHASTIC, null, path, field, collector, isStochastic)
-
-            if (isStochastic == 0) {
-                double[] values = loadValues(path, periodIndex, collector, field)
+            if (!isStochastic) {
                 if (keyFigures.get(PostSimulationCalculation.STDEV)) {
                     calculateStandardDeviation(periodIndex, path, collector, field, values, avg)
                     completedCalculations++
@@ -105,10 +101,12 @@ class Calculator {
                 if (pdf) {
                     calculatePDF(periodIndex, path, collector, field, values, pdf)
                 }
+            } else {
+                totalCalculations -= (keyFigureCount - 2)
             }
         }
         bulkInsert.saveToDB()
-        LOG.info("Post Simulation Calculation done in ${System.currentTimeMillis() - startTime}ms (#paths ${paths.size()})")
+        LOG.info("Post Simulation Calculation done in ${System.currentTimeMillis() - startTime}ms (#paths ${resultDescriptors.size()})")
     }
 
     /**
@@ -124,6 +122,26 @@ class Calculator {
         return results
     }
 
+
+    private double calculateMean(int periodIndex, long pathId, long collectorId, long fieldId, double[] results) {
+        long time = System.currentTimeMillis()
+
+        double mean = results.toList().sum() / results.size()
+        bulkInsert.addResults(periodIndex, PostSimulationCalculation.MEAN, null, pathId, fieldId, collectorId, mean)
+
+        LOG.debug("Calculated mean ($pathId, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
+        return mean
+    }
+
+    private boolean calculateIsStochastic(int periodIndex, long pathId, long collectorId, long fieldId, double[] results) {
+        long time = System.currentTimeMillis()
+
+        boolean isStochastic = results[0] == results[-1]
+        bulkInsert.addResults(periodIndex, PostSimulationCalculation.IS_STOCHASTIC, null, pathId, fieldId, collectorId, isStochastic ? 1 : 0)
+
+        LOG.debug("Calculated is stochastic ($pathId, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
+        return isStochastic
+    }
 
     private void calculateStandardDeviation(int periodIndex, long pathId, long collectorId, long fieldId, double[] results, double mean) {
         long time = System.currentTimeMillis()

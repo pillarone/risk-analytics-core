@@ -5,12 +5,23 @@ import org.pillarone.riskanalytics.core.output.*
 
 import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper
 
-class ResultAccessor {
+abstract class ResultAccessor {
 
     private static HashMap<String, Integer> pathCache = new HashMap<String, Integer>();
     private static HashMap<String, Integer> fieldCache = new HashMap<String, Integer>();
 
     private static HashMap<String, CompareValues> comparators = null;
+
+    public static List<ResultDescriptor> getResultDescriptors(SimulationRun run) {
+        List<ResultDescriptor> result = []
+        File file = new File(getSimRunPath(run))
+        for (File f in file.listFiles()) {
+            String[] ids = f.name.split("_")
+            result.add(new ResultDescriptor(Long.parseLong(ids[0]), Long.parseLong(ids[2]), 0, Integer.parseInt(ids[1])))
+        }
+
+        return result
+    }
 
     static List getRawData(SimulationRun simulationRun) {
 
@@ -114,13 +125,13 @@ class ResultAccessor {
             return null
         }
         double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
-        Double rank =  simulationRun.getIterations() * percentage * 0.01
+        Double rank = simulationRun.getIterations() * percentage * 0.01
         if (rank > 0) {
             rank--        // -1 as array index starts with 0
         }
         Integer index = rank.toInteger()
         if (Math.abs(rank - index) > 0 && compareOperator.equals(CompareOperator.GREATER_EQUALS)
-            || compareOperator.equals(CompareOperator.GREATER_THAN)) {
+                || compareOperator.equals(CompareOperator.GREATER_THAN)) {
             index++
         }
         return values[index]
@@ -254,7 +265,7 @@ class ResultAccessor {
             return null
         }
         return res[0][1]*/
-        return getSingleIterationValue(simulationRun,periodIndex,pathName,fieldName,iteration);
+        return getSingleIterationValue(simulationRun, periodIndex, pathName, fieldName, iteration);
     }
 
     private static String getSimRunPath(SimulationRun simulationRun) {
@@ -422,13 +433,13 @@ class ResultAccessor {
         return values;
     }
 
-    public static Double getSingleIterationValue(SimulationRun simulationRun, int period, String path, String field,int iteration) {
+    public static Double getSingleIterationValue(SimulationRun simulationRun, int period, String path, String field, int iteration) {
         File iterationFile = new File(getSimRunPath(simulationRun) + File.separator + getPathId(path, simulationRun.id)
                 + "_" + period + "_" + getFieldId(field, simulationRun.id));
         IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
 
         while (ifa.fetchNext()) {
-            if (ifa.getId()==iteration)
+            if (ifa.getId() == iteration)
                 return new Double(ifa.getValue());
         }
         return null;

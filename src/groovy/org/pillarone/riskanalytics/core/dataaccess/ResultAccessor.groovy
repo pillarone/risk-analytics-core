@@ -423,14 +423,8 @@ abstract class ResultAccessor {
     }
 
     public static List getValuesSortedNew(SimulationRun simulationRun, int period, long pathId, long collectorId, long fieldId) {
-        File iterationFile = new File(getSimRunPath(simulationRun) + File.separator + pathId + "_" + period + "_" + fieldId);
-        IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
-        List<Double> values = new ArrayList<Double>();
-        while (ifa.fetchNext()) {
-            values.add(ifa.getValue());
-        }
-        Collections.sort(values);
-        return values;
+        //delegate to java class -> performance improvement in PSC
+        return IterationFileAccessor.getValuesSorted(simulationRun.id, period, pathId, collectorId, fieldId)
     }
 
     public static Double getSingleIterationValue(SimulationRun simulationRun, int period, String path, String field, int iteration) {
@@ -541,66 +535,6 @@ abstract class ResultAccessor {
 
 }
 
-
-class IterationFileAccessor {
-    DataInputStream dis;
-    int id;
-    double value;
-
-    public IterationFileAccessor(File f) {
-
-        FileInputStream fis = new FileInputStream(f);
-        BufferedInputStream bs = new BufferedInputStream(fis);
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-        byte[] b = new byte[8048];
-        int len;
-        int count = 0;
-        while ((len = bs.read(b)) != -1) {
-            bos.write(b, 0, len);
-            count++;
-        }
-        if (count == 0) {
-            Thread.sleep(2000)
-            while ((len = bs.read(b)) != -1) {
-                bos.write(b, 0, len);
-                count++;
-            }
-        }
-        bs.close();
-        fis.close();
-        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-
-        dis = new DataInputStream(bis);
-
-    }
-
-    public boolean fetchNext() {
-        if (dis.available() > 4) {
-            id = dis.readInt();
-            int len = dis.readInt();
-            value = 0;
-            for (int i = 0; i < len; i++) {
-                value += dis.readDouble();
-                dis.readLong();
-            }
-
-            return true;
-        }
-        return false;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public double getValue() {
-        return value;
-    }
-}
-
 interface CompareValues {
     public boolean compareValues(double d1, double d2)
-
-    ;
 }

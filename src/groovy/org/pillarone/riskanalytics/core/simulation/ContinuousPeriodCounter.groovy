@@ -6,10 +6,9 @@ import org.apache.commons.lang.NotImplementedException
 
 /**
  * An implementation of {@code IPeriodCounter } in which every period has the same length. This implementation
- * has not a defined number of periods, therefore endOfLastPeriod() is not implemented.
+ * has not a defined number of periods, therefore endOfLastPeriod() is not implemented.<br>
+ * Be aware of the fact that this period counter allows only for periods beginning at the first day of a month.o
  */
-// todo(sku): getPeriodStart() should be removed, but it seems that this implementation serves a very specific
-//              use case in any of the business logic plugins.
 public class ContinuousPeriodCounter implements IPeriodCounter {
 
     private DateTime startOfFirstPeriod
@@ -36,6 +35,7 @@ public class ContinuousPeriodCounter implements IPeriodCounter {
         return getPeriodStart(periodCount)
     }
 
+    /** @return period start is always the first day of a month */
     DateTime getPeriodStart(int periodIndex) {
         periodStartToDate(periodIndex).dayOfMonth().withMinimumValue()
     }

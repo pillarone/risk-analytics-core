@@ -14,7 +14,6 @@ import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultWrit
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultTransferObject
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultDescriptor
 
-
 class ResultAccessorTests extends GroovyTestCase {
 
     SimulationRun simulationRun
@@ -72,9 +71,6 @@ class ResultAccessorTests extends GroovyTestCase {
     protected void tearDown() {
         resultWriter.close()
     }
-
-
-
 
     void testAvgIsStochastic() {
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 0)
@@ -192,6 +188,19 @@ class ResultAccessorTests extends GroovyTestCase {
         assertEquals 20, values[3]
     }
 
+
+
+    private void writeResult(SingleValueResult result) {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(bos);
+        dos.writeInt(result.iteration);
+        dos.writeInt(1);
+        dos.writeDouble(result.value);
+        dos.writeDouble(0);
+
+        resultWriter.writeResult(new ResultTransferObject(new ResultDescriptor(result.field.id, result.path.id, result.period), null, bos.toByteArray(), 0));
+    }
+
     void testGetConstrainedIteration() {
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 20)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 2, value: 10)
@@ -230,18 +239,6 @@ class ResultAccessorTests extends GroovyTestCase {
         assertEquals 10, values[1]
         assertEquals 5, values[2]
     }
-//
-
-    private void writeResult(SingleValueResult result) {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        DataOutputStream dos = new DataOutputStream(bos);
-        dos.writeInt(result.iteration);
-        dos.writeInt(1);
-        dos.writeDouble(result.value);
-        dos.writeDouble(0);
-
-        resultWriter.writeResult(new ResultTransferObject(new ResultDescriptor(result.field.id, result.path.id, result.period), null, bos.toByteArray(), 0));
-    }
 
     // todo(sku): migration needed to work on kti branch
 //    void testGetNthOrderStatisticSpare() {
@@ -253,7 +250,9 @@ class ResultAccessorTests extends GroovyTestCase {
 //
 //        assertEquals "0%", null, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 0.0, CompareOperator.LESS_THAN)
 //        assertEquals "0%", 0d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 0.0, CompareOperator.LESS_EQUALS)
-//        assertEquals "20%", 0d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 20.0, CompareOperator.LESS_THAN)
+//        assertEquals "0%", 0d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 0.0, CompareOperator.EQUALS)
+//        assertEquals "0%", 0d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 0.0, CompareOperator.GREATER_THAN)
+//        assertEquals "20%", null, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 20.0, CompareOperator.LESS_THAN)
 //        assertEquals "20%", 0d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 20.0, CompareOperator.LESS_EQUALS)
 //        assertEquals "25%", 0d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 25.0, CompareOperator.LESS_EQUALS)
 //        assertEquals "39%", 0d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 39.0, CompareOperator.LESS_EQUALS)
@@ -261,6 +260,8 @@ class ResultAccessorTests extends GroovyTestCase {
 //        assertEquals "50%", 5d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 50.0, CompareOperator.LESS_EQUALS)
 //        assertEquals "60%", 8d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 60.0, CompareOperator.LESS_EQUALS)
 //        assertEquals "80%", 10d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 80.0, CompareOperator.LESS_EQUALS)
+//        assertEquals "100%", 10d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 100.0, CompareOperator.LESS_THAN)
+//        assertEquals "100%", 20d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 100.0, CompareOperator.EQUALS)
 //        assertEquals "100%", 20d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 100.0, CompareOperator.LESS_EQUALS)
 //
 //        assertEquals "0%", 0d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 0.0, CompareOperator.GREATER_EQUALS)
@@ -283,10 +284,34 @@ class ResultAccessorTests extends GroovyTestCase {
 //            new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: it).save()
 //        }
 //
+//        exact match --> < lower than <=, > greater than >=
 //        (1..100).each {
 //            assertEquals "less equals $it%", it, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, it, CompareOperator.LESS_EQUALS)
 //            assertEquals "equals $it%", it, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, it, CompareOperator.EQUALS)
 //            assertEquals "greater equals $it%", it, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, it, CompareOperator.GREATER_EQUALS)
+//            if (it == 1) {
+//                assertEquals "less $it%", null, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, it, CompareOperator.LESS_THAN)
+//            }
+//            else {
+//                assertEquals "less $it%", it - 1, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, it, CompareOperator.LESS_THAN)
+//            }
+//            if (it == 100) {
+//                assertEquals "greater $it%", null, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, it, CompareOperator.GREATER_THAN)
+//            }
+//            else {
+//                assertEquals "greater $it%", it + 1, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, it, CompareOperator.GREATER_THAN)
+//            }
+//        }
+//
+//        mismatch --> < equal to <=, > equal to >=
+//        (1..99).each {
+//            double lessEqual = ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, it + 0.5, CompareOperator.LESS_EQUALS)
+//            double lessThan = ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, it + 0.5, CompareOperator.LESS_THAN)
+//            double greaterEqual = ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, it + 0.5, CompareOperator.GREATER_EQUALS)
+//            double greaterThan = ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, it + 0.5, CompareOperator.GREATER_THAN)
+//            assertEquals "less ${it + 0.5}%: $lessEqual == $lessThan", lessEqual, lessThan
+//            assertEquals "greater ${it - 0.5}%: $greaterEqual == $greaterThan", greaterEqual, greaterThan
+//            assertTrue "different ${it + 0.5}%: $lessEqual < $greaterEqual", lessEqual < greaterEqual
 //        }
 //    }
 }

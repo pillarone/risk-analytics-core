@@ -5,6 +5,7 @@ import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.components.ComposedComponent
 import org.pillarone.riskanalytics.core.packets.PacketList
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 import org.pillarone.riskanalytics.core.model.Model
 
 public class WiringUtils {
@@ -28,7 +29,7 @@ public class WiringUtils {
     }
 
     public static String getSenderChannelName(Component sender, PacketList source) {
-        return sender.properties.find {k, v -> v.is(source)}.key
+        return GroovyUtils.getProperties(sender).find {Map.Entry entry -> entry.value.is(source)}.key
     }
 
     static void forAllComponents(Component target, Closure whatToDo) {
@@ -41,7 +42,9 @@ public class WiringUtils {
     }
 
     static void forAllSubComponents(def target, Closure whatToDo) {
-        target.properties.each {propertyName, propertyValue ->
+        GroovyUtils.getProperties(target).each { Map.Entry entry ->
+            def propertyName = entry.key
+            def propertyValue = entry.value
             if (propertyValue != null && propertyValue instanceof Component) {
                 whatToDo(propertyName, propertyValue)
                 forAllSubComponents(target[propertyName], whatToDo)
@@ -63,9 +66,8 @@ public class WiringUtils {
 
     static void use(Class category, Closure work) {
         if (LOG.isDebugEnabled()) LOG.debug "starting wiring for ${work.delegate.getName()} with ${category.name}."
-        //if (LOG.isInfoEnabled()) LOG.info "starting wiring for ${work.delegate.getName()} with ${category.name}."
         def changedClasses = [] as Set
-        boolean componentFound = work.delegate.properties.any { k, v -> v instanceof Component }
+        boolean componentFound = GroovyUtils.getProperties(work.delegate).any { Map.Entry entry -> entry.value instanceof Component }
         assert componentFound, "Components to be wired must be properties of the callee!"
         forAllComponents(work.delegate) { componentName, component ->
             changedClasses << component.getClass()

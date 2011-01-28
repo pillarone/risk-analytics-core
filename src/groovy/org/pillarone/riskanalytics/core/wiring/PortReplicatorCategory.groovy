@@ -8,6 +8,7 @@ import org.pillarone.riskanalytics.core.wiring.ITransmitter
 import org.pillarone.riskanalytics.core.wiring.LinkedProperty
 import org.pillarone.riskanalytics.core.wiring.SilentTransmitter
 import org.pillarone.riskanalytics.core.wiring.Transmitter
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 class PortReplicatorCategory {
     static final Logger LOG = Logger.getLogger(PortReplicatorCategory)
@@ -23,8 +24,8 @@ class PortReplicatorCategory {
         def source = ((LinkedProperty) sender).source
         def sourcePropertyName = ((LinkedProperty) sender).name
 
-        PacketList sourceProperty = source.properties[sourcePropertyName]
-        PacketList targetProperty = receiver.properties[targetPropertyName]
+        PacketList sourceProperty = GroovyUtils.getProperties(source).get(sourcePropertyName)
+        PacketList targetProperty = GroovyUtils.getProperties(receiver).get(targetPropertyName)
 
         if (!sourceProperty.isCompatibleTo(targetProperty)) {
             throw new IllegalArgumentException("Wiring only allowed with same types for input and output")

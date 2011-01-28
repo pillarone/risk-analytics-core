@@ -28,6 +28,11 @@ class PacketUtils {
 
     public static final Map primitiveToWrapperClass = [
             (Double.TYPE): Double,
-            (Integer.TYPE): Integer
+            (Integer.TYPE): Integer,
+            (Float.TYPE): Float,
+            (Boolean.TYPE): Boolean,
+            (Short.TYPE): Short,
+            (Long.TYPE): Long,
+            (Byte.TYPE): Byte,
     ].asSynchronized()
 }

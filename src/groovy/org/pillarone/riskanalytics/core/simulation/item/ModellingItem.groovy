@@ -143,6 +143,7 @@ abstract class ModellingItem implements Serializable {
                 def dao = getDao()
                 if (dao != null && deleteDaoImpl(dao)) {
                     result = true
+                    LOG.info  "${this.getClass().simpleName} $name deleted"
                 } else {
                     logErrors(dao)
                 }
@@ -157,6 +158,7 @@ abstract class ModellingItem implements Serializable {
 
     protected Object deleteDaoImpl(dao) {
         dao.delete(flush: true)
+        return true
     }
 
 

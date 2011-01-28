@@ -30,6 +30,8 @@ abstract class ModelTest extends GroovyTestCase {
     String newFileName
     private static final EPSILON = 1E-6
 
+    protected SimulationRunner runner
+
     String getParameterFileName() {
         (getModelClass().simpleName - "Model") + "Parameters"
     }
@@ -118,7 +120,7 @@ abstract class ModelTest extends GroovyTestCase {
     }
 
     final void testModelRun() {
-        SimulationRunner runner = SimulationRunner.createRunner()
+        runner = SimulationRunner.createRunner()
         ICollectorOutputStrategy output = getOutputStrategy()
         runner.simulationConfiguration = new SimulationConfiguration(simulation: run, outputStrategy: output)
 
@@ -155,7 +157,7 @@ abstract class ModelTest extends GroovyTestCase {
     private void compareResults() {
         File refFile = new File(refFileName)
         if (!refFile.exists())
-            fail("No referenceResultFileName defined for ${modelClass.name}Model.")
+            fail("No referenceResultFileName defined for ${modelClass.name}: ($refFileName)")
         FileInputStream referenceFis = new FileInputStream(refFile)
 
         FileInputStream resultFis = new FileInputStream(new File(newFileName))

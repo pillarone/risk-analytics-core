@@ -11,6 +11,7 @@ import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 import org.pillarone.riskanalytics.core.wiring.ITransmitter
 import org.pillarone.riskanalytics.core.wiring.WiringUtils
 import org.pillarone.riskanalytics.core.components.IterationStore
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 public class InjectScopesAction implements Action {
 
@@ -50,23 +51,25 @@ public class InjectScopesAction implements Action {
      * @param component
      */
     private void createStoreForComponentIfNeeded(Component component) {
-        if (component.properties.keySet().contains('periodStore')) {
+        Set<String> propertyNames = GroovyUtils.getProperties(component).keySet()
+        if (propertyNames.contains('periodStore')) {
             component.periodStore = new PeriodStore(periodScope)
             iterationScope.periodStores << component.periodStore
         }
-        if (component.properties.keySet().contains('iterationStore')) {
+        if (propertyNames.contains('iterationStore')) {
             component.iterationStore = new IterationStore(iterationScope)
         }
     }
 
     private void injectScope(String scopeName, Component component) {
-        if (component.properties.keySet().contains(scopeName)) {
+        if (GroovyUtils.getProperties(component).keySet().contains(scopeName)) {
             component[scopeName] = this[scopeName]
         }
     }
 
     private void addFallBackSimulationContext(Component component) {
-        if (component.properties.keySet().contains("simulationContext") && !component.properties.keySet().contains("simulationScope")) {
+        Set<String> propertyNames = GroovyUtils.getProperties(component).keySet()
+        if (propertyNames.contains("simulationContext") && !propertyNames.contains("simulationScope")) {
             component["simulationContext"] = simulationScope
         }
 

@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger
  * A SimulationRunner instance has to be configured with a SimulationConfiguration before starting a simulation.
  * Each simulation has to use a new SimulationRunner instance.
  */
-//TODO: move db & progress stuff out of this class; set correct period count in simulation
+
 public class SimulationRunner {
 
     private static Log LOG = LogFactory.getLog(SimulationRunner)
@@ -70,8 +70,6 @@ public class SimulationRunner {
         start = System.currentTimeMillis()
         Date startDate = new Date(start)
         currentScope?.simulation?.start = startDate
-        LOG.trace "Written start date ${startDate.time} to ${System.identityHashCode(currentScope?.simulation)}"
-        LOG.trace "New value read from simulation: ${currentScope?.simulation?.start?.time}"
         try {
             for (Action action in preSimulationActions) {
                 if (!performAction(action, null)) {
@@ -90,12 +88,13 @@ public class SimulationRunner {
                     lockObj.wait(WAIT_TIMEOUT)
                 }
             }
-            
+
             LOG.info("Finished Initialization of Thread "+Thread.currentThread().getId());
-            
+
             long initializationTime = System.currentTimeMillis() - start
             LOG.info "Initialization completed in ${initializationTime}ms"
-            //Thread.sleep(2000);
+            notifySimulationStateChanged(currentScope?.simulation, SimulationState.RUNNING)
+
             boolean shouldReturn = false
             if (!performAction(simulationAction, SimulationState.RUNNING)) {
                 deleteCancelledSimulation()
@@ -127,7 +126,6 @@ public class SimulationRunner {
             )
             LOG.error this, t
             LOG.debug error.dump()
-//            currentScope.simulation.delete()
             return
         }
         if (simulationAction.isCancelled()) {
@@ -137,9 +135,6 @@ public class SimulationRunner {
         LOG.debug "end simulation"
         long end = System.currentTimeMillis()
         currentScope?.simulation?.end = new Date(end)
-        LOG.trace "Written end date ${end} to ${System.identityHashCode(currentScope?.simulation)}"
-        LOG.trace "New value read from simulation: ${currentScope?.simulation?.end?.time}"
-//        currentScope?.simulation?.save()
 
         LOG.info "simulation took ${end - start} ms"
         simulationState = simulationAction.isStopped() ? SimulationState.STOPPED : SimulationState.FINISHED
@@ -147,6 +142,7 @@ public class SimulationRunner {
 
     }
 
+    //TODO: still necessary
     private void deleteCancelledSimulation() {
         if (simulationAction.isCancelled()) {
             LOG.info "canceled simulation ${currentScope.simulation.name} will be deleted"
@@ -276,7 +272,6 @@ public class SimulationRunner {
         runner.simulationAction = simulationAction
 
         runner.postSimulationActions << finishOutputAction
-//        runner.postSimulationActions << calculatorAction
 
         runner.currentScope = simulationScope
         return runner

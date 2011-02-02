@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.parameterization.validation;
 
+import org.pillarone.riskanalytics.core.util.GroovyUtils;
+
 import java.util.Collection;
 import java.util.Locale;
 
@@ -39,7 +41,9 @@ public abstract class ParameterValidationError {
         this.periodIndex = periodIndex;
     }
 
-    public abstract String getLocalizedMessage(Locale locale);
+    public String getLocalizedMessage(Locale locale) {
+        return GroovyUtils.getText(msg, args != null ? args.toArray() : null, locale);
+    }
 
     @Override
     public String toString() {

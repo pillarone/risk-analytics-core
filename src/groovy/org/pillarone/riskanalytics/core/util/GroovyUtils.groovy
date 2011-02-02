@@ -2,8 +2,9 @@ package org.pillarone.riskanalytics.core.util
 
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
-import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
+import java.text.MessageFormat
 import org.pillarone.riskanalytics.core.components.Component
+import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
 
 /**
  *  This class contains methods which are easy/short to implement in Groovy, but unreadable in Java.
@@ -220,5 +221,30 @@ public class GroovyUtils {
         }
 
         return result
+    }
+
+    static Set getBundles(Locale locale) {
+        def resourceBundle = []
+        def resources = ResourceBundleRegistry.getValidationBundles()
+        for (String bundleName in resources) {
+            resourceBundle << ResourceBundle.getBundle(bundleName, locale)
+        }
+        return resourceBundle
+    }
+
+    public static String getText(String key, Object[] args, Locale locale) {
+        String text = null
+        Set<ResourceBundle> validationResourceBundles = getBundles(locale)
+        if (validationResourceBundles) {
+            for (ResourceBundle bundle: validationResourceBundles) {
+                if (text == null) {
+                    try {
+                        text = bundle.getString(key)
+                        text = MessageFormat.format(text, args)
+                    } catch (Exception ex) { text = null}
+                }
+            }
+        }
+        return text != null ? text : key
     }
 }

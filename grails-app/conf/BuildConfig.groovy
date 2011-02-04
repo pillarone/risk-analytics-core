@@ -12,11 +12,20 @@ grails.project.dependency.resolution = {
         grailsCentral()
     }
 
+    //even though this plugin does not need anything from this repo, it has to be added for the deploy script to check existing plugins
     mavenRepo "https://build.intuitive-collaboration.com/maven/plugins/"
-    def myResolver = new URLResolver()
-    myResolver.addArtifactPattern "https://build.intuitive-collaboration.com/plugins/[artifact]/grails-[artifact]-[revision].[ext]"
 
-    resolver myResolver
+    plugins {
+        runtime ":background-thread:1.3"
+        runtime ":hibernate:1.3.4"
+        runtime ":joda-time:0.5"
+        runtime ":maven-publisher:0.7.5"
+        runtime ":quartz:0.4.1"
+        runtime ":spring-security-core:1.0.1"
+        runtime ":tomcat:1.3.4"
+
+        test ":code-coverage:1.1.7"
+    }
 }
 
 grails.project.dependency.distribution = {

@@ -10,7 +10,7 @@ import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.2"
+    def version = "1.2.0.1"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.4 > *"
     // the other plugins this plugin depends on
@@ -19,7 +19,7 @@ class RiskAnalyticsCoreGrailsPlugin {
             "jodaTime": "0.5",
             "quartz": "0.4.1",
             "springSecurityCore": "1.0.1",
-            "mavenPublisher": "0.6"
+            "mavenPublisher": "0.7.5"
     ]
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
@@ -34,6 +34,8 @@ Persistence & Simulation engine.
 '''
 
     def documentation = "http://www.pillarone.org"
+
+    def groupId = "org.pillarone"
 
     def doWithWebDescriptor = {xml ->
         // TODO Implement additions to web.xml (optional), this event occurs before

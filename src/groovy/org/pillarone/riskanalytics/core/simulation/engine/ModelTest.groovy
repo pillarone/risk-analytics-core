@@ -17,6 +17,7 @@ import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.apache.commons.lang.builder.HashCodeBuilder
+import org.joda.time.DateTimeZone
 
 /**
  * An abstract class which provides functionality to run model tests.
@@ -25,6 +26,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 abstract class ModelTest extends GroovyTestCase {
 
     private static final Log LOG = LogFactory.getLog(ModelTest)
+
     String refFileName
     String newFileName
     private static final EPSILON = 1E-6

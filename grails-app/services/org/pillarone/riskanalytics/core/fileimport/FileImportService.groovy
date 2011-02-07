@@ -8,6 +8,7 @@ import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.util.ConfigObjectUtils
+import org.joda.time.DateTimeZone
 
 abstract class FileImportService {
 
@@ -20,6 +21,10 @@ abstract class FileImportService {
     abstract protected boolean saveItemObject(String fileContent)
 
     abstract String prepare(URL file, String itemName)
+
+    /** Setting the default time zone to UTC avoids problems in multi user context with different time zones
+     *  and switches off daylight saving capabilities and possible related problems. */
+    DateTimeZone utc = DateTimeZone.setDefault(DateTimeZone.UTC)
 
     public int compareFilesAndWriteToDB(List modelNames = null) {
 

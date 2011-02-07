@@ -28,11 +28,15 @@ class CoreBootStrap {
             if (Authority.count() == 0) {
 
                 Authority adminGroup = new Authority()
-                adminGroup.authority = "ROLE_ADMIN"
+                adminGroup.authority = UserManagement.ADMIN_ROLE
                 adminGroup.save()
 
+                Authority reviewGroup = new Authority()
+                reviewGroup.authority = UserManagement.REVIEWER_ROLE
+                reviewGroup.save()
+
                 Authority userGroup = new Authority()
-                userGroup.authority = "ROLE_USER"
+                userGroup.authority = UserManagement.USER_ROLE
                 userGroup.save()
 
                 Person admin = new Person()
@@ -42,6 +46,14 @@ class CoreBootStrap {
                 admin.settings = new UserSettings(language: "en")
                 admin.save()
                 PersonAuthority.create(admin, adminGroup)
+
+                Person reviewer = new Person()
+                reviewer.username = "reviewer"
+                reviewer.password = authenticateService.encodePassword("reviewer")
+                reviewer.enabled = true
+                reviewer.settings = new UserSettings(language: "en")
+                reviewer.save()
+                PersonAuthority.create(reviewer, reviewGroup)
 
                 Person actuary = new Person()
                 actuary.username = "actuary"

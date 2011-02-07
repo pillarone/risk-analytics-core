@@ -3,8 +3,11 @@ package org.pillarone.riskanalytics.core
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.parameter.Parameter
+import org.pillarone.riskanalytics.core.parameter.ParameterizationTag
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
+import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowCommentDAO
 import org.pillarone.riskanalytics.core.user.Person
+import org.pillarone.riskanalytics.core.workflow.Status
 
 class ParameterizationDAO {
 
@@ -23,9 +26,13 @@ class ParameterizationDAO {
     Person lastUpdater
     boolean valid
 
+    Status status
+
+    Long dealId
+
     javax.sql.DataSource dataSource
 
-    static hasMany = [parameters: Parameter, comments: CommentDAO]
+    static hasMany = [parameters: Parameter, comments: CommentDAO, issues: WorkflowCommentDAO, tags: ParameterizationTag]
     static transients = ['dataSource']
 
 
@@ -37,6 +44,7 @@ class ParameterizationDAO {
         modificationDate nullable: true
         creator nullable: true
         lastUpdater nullable: true
+        dealId(nullable: true)
     }
 
     static mapping = { comments(sort: "path", order: "asc") }

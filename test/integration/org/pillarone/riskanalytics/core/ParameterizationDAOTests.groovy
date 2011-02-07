@@ -1,13 +1,12 @@
 package org.pillarone.riskanalytics.core
 
+import models.core.CoreModel
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
-import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObjectClassifier
+import org.pillarone.riskanalytics.core.parameter.EnumParameter
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.ParameterObjectParameter
 import org.pillarone.riskanalytics.core.parameter.StringParameter
-import org.pillarone.riskanalytics.core.parameter.EnumParameter
-import models.core.CoreModel
-
+import org.pillarone.riskanalytics.core.workflow.Status
 
 class ParameterizationDAOTests extends GroovyTestCase {
 
@@ -18,6 +17,7 @@ class ParameterizationDAOTests extends GroovyTestCase {
         parameterization.modelClassName = EmptyModel.name
         parameterization.itemVersion = "1"
         parameterization.periodCount = 1
+        parameterization.status = Status.NONE
 
         def savedParameterization = parameterization.save()
         assertNotNull savedParameterization
@@ -33,7 +33,7 @@ class ParameterizationDAOTests extends GroovyTestCase {
         parameterization.modelClassName = EmptyModel.name
         parameterization.itemVersion = "1"
         parameterization.periodCount = 1
-
+        parameterization.status = Status.NONE
 
         StringParameter parameter = new StringParameter(path: "path", parameterValue: "value")
         parameterization.addToParameters(parameter)
@@ -61,6 +61,7 @@ class ParameterizationDAOTests extends GroovyTestCase {
         parameterization.modelClassName = EmptyModel.name
         parameterization.itemVersion = "2"
         parameterization.periodCount = 1
+        parameterization.status = Status.NONE
 
         parameterization.save()
 
@@ -90,6 +91,7 @@ class ParameterizationDAOTests extends GroovyTestCase {
         parameterization.modelClassName = EmptyModel.name
         parameterization.itemVersion = "2"
         parameterization.periodCount = 1
+        parameterization.status = Status.NONE
 
         parameterization.save()
 
@@ -130,6 +132,7 @@ class ParameterizationDAOTests extends GroovyTestCase {
         parameterization.modelClassName = EmptyModel.name
         parameterization.itemVersion = "1"
         parameterization.periodCount = 1
+        parameterization.status = Status.NONE
 
         StringParameter parameter = new StringParameter(path: "path", parameterValue: "value")
         parameter.save()
@@ -147,10 +150,10 @@ class ParameterizationDAOTests extends GroovyTestCase {
     }
 
     void testFind() {
-        ParameterizationDAO p1 = new ParameterizationDAO(name: 'name1', modelClassName: CoreModel.name, itemVersion: "1", valid: true, periodCount: 1).save()
+        ParameterizationDAO p1 = new ParameterizationDAO(name: 'name1', modelClassName: CoreModel.name, itemVersion: "1", valid: true, periodCount: 1, status: Status.NONE).save()
         assertNotNull p1
 
-        ParameterizationDAO p2 = new ParameterizationDAO(name: 'name1', modelClassName: EmptyModel.name, itemVersion: "1", valid: true, periodCount: 1).save()
+        ParameterizationDAO p2 = new ParameterizationDAO(name: 'name1', modelClassName: EmptyModel.name, itemVersion: "1", valid: true, periodCount: 1, status: Status.NONE).save()
         assertNotNull p2
 
         assertSame p1, ParameterizationDAO.find("name1", CoreModel.name, "1")

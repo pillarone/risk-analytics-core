@@ -29,6 +29,7 @@ class ParameterizationDAO {
     Status status
 
     Long dealId
+    Date valuationDate
 
     javax.sql.DataSource dataSource
 
@@ -45,6 +46,7 @@ class ParameterizationDAO {
         creator nullable: true
         lastUpdater nullable: true
         dealId(nullable: true)
+        valuationDate(nullable: true)
     }
 
     static mapping = { comments(sort: "path", order: "asc") }

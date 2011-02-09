@@ -82,6 +82,7 @@ class StatusChangeService {
         newItem.modelClass = item.modelClass
         newItem.versionNumber = newR ? new VersionNumber("R1") : VersionNumber.incrementVersion(item)
         newItem.dealId = item.dealId
+        newItem.valuationDate = item.valuationDate
 
         for (Comment comment in item.comments) {
             if (comment instanceof WorkflowComment) {

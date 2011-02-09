@@ -50,6 +50,7 @@ class Parameterization extends ModellingItem {
 
     Status status
     Long dealId
+    Date valuationDate
 
     public Parameterization(Map params) {
         this(params.remove("name").toString())
@@ -160,6 +161,7 @@ class Parameterization extends ModellingItem {
         dao.comment = comment
         dao.status = status
         dao.dealId = dealId
+        dao.valuationDate = valuationDate
         saveParameters(dao)
         saveComments(dao)
         saveTags(dao)
@@ -291,6 +293,7 @@ class Parameterization extends ModellingItem {
         lastUpdater = dao.lastUpdater
         status = dao.status
         dealId = dao.dealId
+        valuationDate = dao.valuationDate
         comment = dao.comment
         if (completeLoad) {
             loadParameters(dao)

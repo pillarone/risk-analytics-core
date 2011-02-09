@@ -18,7 +18,11 @@ class ResultService implements IResultService {
         List<ParameterizationInfo> result = []
         List<ParameterizationDAO> parameterizations = ParameterizationDAO.findAllByDealId(dealId)
         for (ParameterizationDAO dao in parameterizations) {
-            result << new ParameterizationInfo(parameterizationId: dao.id, name: dao.name, version: dao.itemVersion, comment: dao.comment, user: dao.lastUpdater?.username)
+            result << new ParameterizationInfo(
+                    parameterizationId: dao.id, name: dao.name, version: dao.itemVersion,
+                    comment: dao.comment, user: dao.lastUpdater?.username, status: dao.status,
+                    valuationDate: dao.valuationDate
+            )
         }
         return result
     }

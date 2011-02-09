@@ -1,16 +1,22 @@
 package org.pillarone.riskanalytics.core.remoting;
 
+import org.pillarone.riskanalytics.core.workflow.Status;
+
 import java.io.Serializable;
+import java.util.Date;
 
 public class ParameterizationInfo implements Serializable {
 
-    private static final long serialVersionUID = -4791429469257801819L;
+    private static final long serialVersionUID = -4791429469257801820L;
 
     private long parameterizationId;
     private String name;
     private String user;
     private String comment;
     private String version;
+
+    private Status status;
+    private Date valuationDate;
 
     public String getVersion() {
         return version;
@@ -50,6 +56,22 @@ public class ParameterizationInfo implements Serializable {
 
     public void setUser(final String user) {
         this.user = user;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public Date getValuationDate() {
+        return valuationDate;
+    }
+
+    public void setValuationDate(Date valuationDate) {
+        this.valuationDate = valuationDate;
     }
 
     @Override

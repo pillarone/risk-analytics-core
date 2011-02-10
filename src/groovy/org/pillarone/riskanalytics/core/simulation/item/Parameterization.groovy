@@ -509,4 +509,14 @@ class Parameterization extends ModellingItem {
         return new ParameterWriter()
     }
 
+    int getSize(Class commentType) {
+        switch (commentType) {
+            case CommentDAO:
+                return CommentDAO.executeQuery("select count(*) from ${CommentDAO.class.name} as c where c.parameterization.name = ? and c.parameterization.itemVersion = ? and c.parameterization.modelClassName = ?", [name, versionNumber.toString(), modelClass.name])[0]
+            case WorkflowCommentDAO:
+                return WorkflowCommentDAO.executeQuery("select count(*) from ${WorkflowCommentDAO.class.name} as w where w.parameterization.name = ? and w.parameterization.itemVersion = ? and w.parameterization.modelClassName = ?", [name, versionNumber.toString(), modelClass.name])[0]
+        }
+        return 0
+    }
+
 }

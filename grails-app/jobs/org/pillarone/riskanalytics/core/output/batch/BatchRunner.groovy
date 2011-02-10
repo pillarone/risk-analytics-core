@@ -15,7 +15,6 @@ public class BatchRunner implements Job {
     }
 
     public void execute(JobExecutionContext jobExecutionContext) {
-        LOG.info "executing Quartz Job (Batch) at ${new Date()}"
         synchronized (this) {
             getService().runBatches()
         }

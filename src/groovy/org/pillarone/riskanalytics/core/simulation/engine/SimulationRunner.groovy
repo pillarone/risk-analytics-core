@@ -2,7 +2,6 @@ package org.pillarone.riskanalytics.core.simulation.engine
 
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.joda.time.DateTimeZone
 import org.pillarone.riskanalytics.core.batch.BatchRunInfoService
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.SimulationState

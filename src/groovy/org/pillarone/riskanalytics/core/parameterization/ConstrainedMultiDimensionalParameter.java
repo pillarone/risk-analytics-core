@@ -24,10 +24,7 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
         if (constraints.matches(row, column, value)) {
             super.setValueAt(value, row, column);
         } else {
-            if (Number.class.isAssignableFrom(constraints.getColumnType(column)) && (value instanceof Number)) {
-                super.setValueAt(GroovyUtils.numberValue(constraints.getColumnType(column), value), row, column);
-            } else
-                throw new IllegalArgumentException("Value does not pass constraints");
+            throw new IllegalArgumentException("Value does not pass constraints");
         }
     }
 

@@ -125,10 +125,10 @@ class Comment implements Cloneable {
     }
 
     public String toConfigObject() {
+        //end line character
         char c = (char) 92
         StringBuilder sb = new StringBuilder("\"\"[")
-        //replace all occurrences end line Character(\n) in comment  with html code &#92;
-        String newComment = comment.replace("${c}", "&#92;")
+        String newComment = replaceCharacters(comment)
         sb.append("path:'${path}', period:${period}, lastChange:new Date(${lastChange.getTime()}),user:null, comment: ${c}\"${c}\"${c}\"${newComment}${c}\"${c}\"${c}\"")
         if (tags && !tags.isEmpty()) {
             sb.append(", tags:([")
@@ -141,6 +141,15 @@ class Comment implements Cloneable {
         }
         sb.append("]\"\"")
         return sb.toString()
+    }
+
+    private String replaceCharacters(String comment) {
+        char c = (char) 92
+        //replace all occurrences end line Character(\n) in comment  with html code &#92;
+        String newComment = comment.replace("${c}", "&#92;")
+        //replace quote character by html code
+        newComment = newComment.replace('"', '&rdquo;')
+        return newComment
     }
 
     public Object clone() {

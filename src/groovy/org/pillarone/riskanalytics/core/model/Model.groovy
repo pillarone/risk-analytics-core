@@ -163,4 +163,8 @@ abstract class Model {
     public int maxNumberOfFullyDistinctPeriods() {
         Integer.MAX_VALUE
     }
+
+    public String getDefaultResultConfiguration() {
+        return null
+    }
 }

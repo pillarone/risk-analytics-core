@@ -1,12 +1,11 @@
 package org.pillarone.riskanalytics.core.persistence;
 
-import org.hibernate.Hibernate;
+import org.apache.commons.lang.ObjectUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.usertype.UserType;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,7 +22,7 @@ public class DateTimeMillisUserType implements UserType {
     }
 
     public boolean equals(Object a, Object b) throws HibernateException {
-        return a == b || !(a == null || b == null) && a.equals(b);
+        return ObjectUtils.equals(a, b);
     }
 
     public int hashCode(Object o) throws HibernateException {
@@ -31,32 +30,43 @@ public class DateTimeMillisUserType implements UserType {
     }
 
     public Object nullSafeGet(ResultSet resultSet, String[] strings, Object o) throws HibernateException, SQLException {
-        BigInteger val = (BigInteger) Hibernate.BIG_INTEGER.nullSafeGet(resultSet, strings);
-        return new DateTime(val.longValue());
+        long millis = resultSet.getLong(strings[0]);
+        if (resultSet.wasNull()) {
+            return null;
+        }
+        return new DateTime(millis);
     }
 
     public void nullSafeSet(PreparedStatement preparedStatement, Object o, int i) throws HibernateException, SQLException {
-        Long millis = ((DateTime) o).getMillis();
-        Hibernate.BIG_INTEGER.nullSafeSet(preparedStatement, new BigInteger(millis.toString()), i);
+        if (o == null) {
+            preparedStatement.setNull(i, Types.BIGINT);
+        } else {
+            DateTime dateTime = (DateTime) o;
+            preparedStatement.setLong(i, dateTime.getMillis());
+        }
     }
 
     public Object deepCopy(Object o) throws HibernateException {
-        return new DateTime(o);
+        if(o == null) {
+            return null;
+        }
+        DateTime dateTime = (DateTime) o;
+        return new DateTime(dateTime.getMillis());
     }
 
     public boolean isMutable() {
-        return false;
+        return false; //DateTime is immutable
     }
 
-    public Serializable disassemble(Object o) throws HibernateException {
-        return (Serializable) o;
+    public Serializable disassemble(Object value) throws HibernateException {
+        return (Serializable) value; //DateTime is serializable
     }
 
-    public Object assemble(Serializable serializable, Object o) throws HibernateException {
-        return serializable;
+    public Object assemble(Serializable cached, Object owner) throws HibernateException {
+        return cached; //DateTime is serializable
     }
 
-    public Object replace(Object o, Object o1, Object o2) throws HibernateException {
-        return o;
+    public Object replace(Object original, Object target, Object owner) throws HibernateException {
+        return original;
     }
 }

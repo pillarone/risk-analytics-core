@@ -8,6 +8,8 @@ import org.pillarone.riskanalytics.core.output.Calculator;
 import org.pillarone.riskanalytics.core.output.PathMapping;
 import org.pillarone.riskanalytics.core.simulation.SimulationState;
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration;
+import org.pillarone.riskanalytics.core.simulation.engine.grid.mapping.AbstractNodeMappingStrategy;
+import org.pillarone.riskanalytics.core.simulation.engine.grid.mapping.INodeMappingStrategy;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.JobResult;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultDescriptor;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultTransferObject;
@@ -46,7 +48,9 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
                                                       SimulationConfiguration simulationConfiguration)
             throws GridException {
 
-        Map<SimulationJob, GridNode> jobsToNodes = new HashMap<SimulationJob, GridNode>(subgrid.size());
+        INodeMappingStrategy strategy = AbstractNodeMappingStrategy.getStrategy();
+        List<GridNode> nodes = new ArrayList<GridNode>(strategy.filterNodes(subgrid));
+        Map<SimulationJob, GridNode> jobsToNodes = new HashMap<SimulationJob, GridNode>(nodes.size());
         HashMap<Integer, List<SimulationJob>> jobCountPerGrid = new HashMap<Integer, List<SimulationJob>>();
 
         currentState = SimulationState.INITIALIZING;
@@ -56,7 +60,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         resultTransferListener = new ResultTransferListener(this);
 
         Grid grid = GridHelper.getGrid();
-        int cpuCount = getTotalProcessorCount(grid);
+        int cpuCount = strategy.getTotalCpuCount(nodes);
 
         List<SimulationBlock> simulationBlocks = generateBlocks(SIMULATION_BLOCK_SIZE, simulationConfiguration.getSimulation().getNumberOfIterations());
 
@@ -87,8 +91,8 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         totalJobs = jobs.size();
 
         for (int i = 0; i < jobs.size(); i++) {
-            int gridNumber = i % subgrid.size();
-            jobsToNodes.put(jobs.get(i), subgrid.get(gridNumber));
+            int gridNumber = i % nodes.size();
+            jobsToNodes.put(jobs.get(i), nodes.get(gridNumber));
             List<SimulationJob> tmpList;
             if ((tmpList = jobCountPerGrid.get(gridNumber)) == null) {
                 tmpList = new ArrayList<SimulationJob>();
@@ -279,19 +283,4 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         return simBlocks;
     }
 
-    protected int getTotalProcessorCount(Grid grid) {
-        Collection<GridRichNode> nodes = grid.nodes();
-        List<String> usedHosts = new ArrayList<String>();
-        int processorCount = 0;
-        for (GridNode node : nodes) {
-            String ip = node.externalAddresses().iterator().next();
-            if (!usedHosts.contains(ip)) {
-                processorCount += node.metrics().getAvailableProcessors();
-                usedHosts.add(ip);
-            }
-        }
-        LOG.info("Found " + processorCount + " CPUs on " + nodes.size() + " nodes");
-        return processorCount;
-        //return 8;
-    }
 }

@@ -5,9 +5,28 @@ import org.gridgain.grid.Grid
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.gridgain.grid.GridNode
+import org.pillarone.riskanalytics.core.simulation.engine.grid.mapping.AbstractNodeMappingStrategy
+import org.gridgain.grid.kernal.GridRichNodeImpl
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 
 class SimulationTaskTests extends GroovyTestCase {
+
+    private Class oldValue
+
+    void setUp() {
+        Object clazz = ConfigurationHolder.config.get(AbstractNodeMappingStrategy.STRATEGY_CLASS_KEY)
+        if (clazz instanceof Class) {
+            oldValue = clazz
+        }
+        ConfigurationHolder.config.put(AbstractNodeMappingStrategy.STRATEGY_CLASS_KEY, TestNodeStrategy)
+    }
+
+    @Override protected void tearDown() {
+        super.tearDown()
+        ConfigurationHolder.config.put(AbstractNodeMappingStrategy.STRATEGY_CLASS_KEY, oldValue)
+
+    }
 
     void testSplitOneJobOneBlock() {
         SimulationTask simulationTask = new TestSimulationTask(1)
@@ -17,7 +36,7 @@ class SimulationTaskTests extends GroovyTestCase {
         //tests will have to be adjusted for other values
         assertEquals 1000, SimulationTask.SIMULATION_BLOCK_SIZE
         List<GridNode> mockNodes = new ArrayList<GridNode>();
-        mockNodes.add(null);
+        mockNodes.add(new TestGridNode(1));
 
         Collection jobs = simulationTask.map(mockNodes, configuration).keySet();
         assertEquals 1, jobs.size()
@@ -43,7 +62,7 @@ class SimulationTaskTests extends GroovyTestCase {
         assertEquals 1000, SimulationTask.SIMULATION_BLOCK_SIZE
 
         List<GridNode> mockNodes = new ArrayList<GridNode>();
-        mockNodes.add(null);
+        mockNodes.add(new TestGridNode(1));
 
         Collection jobs = simulationTask.map(mockNodes, configuration).keySet();
 
@@ -81,7 +100,7 @@ class SimulationTaskTests extends GroovyTestCase {
         assertEquals 1000, SimulationTask.SIMULATION_BLOCK_SIZE
 
         List<GridNode> mockNodes = new ArrayList<GridNode>();
-        mockNodes.add(null);
+        mockNodes.add(new TestGridNode(2));
 
         Collection jobs = simulationTask.map(mockNodes, configuration).keySet();
         assertEquals 2, jobs.size()
@@ -127,6 +146,29 @@ class SimulationTaskTests extends GroovyTestCase {
     }
 }
 
+class TestNodeStrategy extends AbstractNodeMappingStrategy {
+
+    @Override
+    Set<GridNode> filterNodes(List<GridNode> allNodes) {
+        return allNodes
+    }
+
+    @Override
+    int getTotalCpuCount(List<GridNode> usableNodes) {
+        return usableNodes*.cpuCount.sum()
+    }
+
+
+}
+
+class TestGridNode extends GridRichNodeImpl {
+
+    int cpuCount
+
+    TestGridNode(int cpuCount) {
+        this.cpuCount = cpuCount
+    }
+}
 
 class TestSimulationTask extends SimulationTask {
 

@@ -59,18 +59,14 @@ class Calculator {
 
     void calculate() {
 
-        CollectorMapping collectorMapping = CollectorMapping.findByCollectorName(AggregatedCollectingModeStrategy.IDENTIFIER)
-
         startTime = System.currentTimeMillis()
 
         for (ResultDescriptor descriptor in resultDescriptors) {
             long path = descriptor.pathId
             int periodIndex = descriptor.periodIndex
-            long collector = collectorMapping.id //TODO: handle different collectors correctly
+            long collector = descriptor.collectorId
             long field = descriptor.fieldId
-//            if (collector == collectorMapping?.id) {
-//                continue
-//            }
+
             double[] values = loadValues(path, periodIndex, collector, field)
             boolean isStochastic = calculateIsStochastic(periodIndex, path, collector, field, values)
             completedCalculations++

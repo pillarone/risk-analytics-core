@@ -242,7 +242,7 @@ class ResultServiceTests extends GroovyTestCase {
         dos.writeDouble(result.value);
         dos.writeDouble(0);
 
-        resultWriter.writeResult(new ResultTransferObject(new ResultDescriptor(result.field.id, result.path.id, result.period), null, bos.toByteArray(), 0));
+        resultWriter.writeResult(new ResultTransferObject(new ResultDescriptor(result.field.id, result.path.id, result.collector.id, result.period), null, bos.toByteArray(), 0));
     }
 
 }

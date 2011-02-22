@@ -216,6 +216,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         messageCount.incrementAndGet();
         ResultTransferObject result = (ResultTransferObject) serializable;
         ResultDescriptor rd = result.getResultDescriptor();
+        //TODO: should be done before simulation start
         PathMapping pm = simulationConfiguration.getMappingCache().lookupPathDB(rd.getPath());
         rd.setPathId(pm.pathID());
         resultWriter.writeResult(result);

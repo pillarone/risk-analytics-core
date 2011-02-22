@@ -198,7 +198,7 @@ class ResultAccessorTests extends GroovyTestCase {
         dos.writeDouble(result.value);
         dos.writeDouble(0);
 
-        resultWriter.writeResult(new ResultTransferObject(new ResultDescriptor(result.field.id, result.path.id, result.period), null, bos.toByteArray(), 0));
+        resultWriter.writeResult(new ResultTransferObject(new ResultDescriptor(result.field.id, result.path.id, result.collector.id, result.period), null, bos.toByteArray(), 0));
     }
 
     void testGetConstrainedIteration() {
@@ -206,22 +206,22 @@ class ResultAccessorTests extends GroovyTestCase {
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 2, value: 10)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 3, value: 5)
 
-        List values = ResultAccessor.getCriteriaConstrainedIterations(simulationRun, 0, path1.pathName, field.fieldName, ">", 10);
+        List values = ResultAccessor.getCriteriaConstrainedIterations(simulationRun, 0, path1.pathName, field.fieldName, collector.collectorName, ">", 10);
         assertEquals 1, values[0]
 
-        values = ResultAccessor.getCriteriaConstrainedIterations(simulationRun, 0, path1.pathName, field.fieldName, "<", 20);
+        values = ResultAccessor.getCriteriaConstrainedIterations(simulationRun, 0, path1.pathName, field.fieldName, collector.collectorName, "<", 20);
         assertEquals 2, values.size()
 
-        values = ResultAccessor.getCriteriaConstrainedIterations(simulationRun, 0, path1.pathName, field.fieldName, ">=", 0);
+        values = ResultAccessor.getCriteriaConstrainedIterations(simulationRun, 0, path1.pathName, field.fieldName, collector.collectorName, ">=", 0);
         assertEquals 3, values.size()
 
-        values = ResultAccessor.getCriteriaConstrainedIterations(simulationRun, 0, path1.pathName, field.fieldName, "<=", 10);
+        values = ResultAccessor.getCriteriaConstrainedIterations(simulationRun, 0, path1.pathName, field.fieldName, collector.collectorName, "<=", 10);
         assertEquals 2, values.size()
 
-        values = ResultAccessor.getCriteriaConstrainedIterations(simulationRun, 0, path1.pathName, field.fieldName, "<", 10);
+        values = ResultAccessor.getCriteriaConstrainedIterations(simulationRun, 0, path1.pathName, field.fieldName, collector.collectorName, "<", 10);
         assertEquals 3, values[0]
 
-        values = ResultAccessor.getCriteriaConstrainedIterations(simulationRun, 0, path1.pathName, field.fieldName, "=", 10);
+        values = ResultAccessor.getCriteriaConstrainedIterations(simulationRun, 0, path1.pathName, field.fieldName, collector.collectorName, "=", 10);
         assertEquals 2, values[0]
     }
 
@@ -233,7 +233,7 @@ class ResultAccessorTests extends GroovyTestCase {
         iterations.add(3)
         iterations.add(1)
         iterations.add(2)
-        List values = ResultAccessor.getIterationConstrainedValues(simulationRun, 0, path1.pathName, field.fieldName, iterations);
+        List values = ResultAccessor.getIterationConstrainedValues(simulationRun, 0, path1.pathName, field.fieldName, collector.collectorName, iterations);
 
         assertEquals 20, values[0]
         assertEquals 10, values[1]

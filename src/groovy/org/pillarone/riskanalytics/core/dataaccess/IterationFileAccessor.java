@@ -1,6 +1,5 @@
 package org.pillarone.riskanalytics.core.dataaccess;
 
-import org.pillarone.riskanalytics.core.output.SimulationRun;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper;
 
 import java.io.*;
@@ -9,9 +8,9 @@ import java.util.Collections;
 import java.util.List;
 
 public class IterationFileAccessor {
-    DataInputStream dis;
-    int id;
-    double value;
+    protected DataInputStream dis;
+    protected int iteration;
+    protected List<Double> value;
 
     public IterationFileAccessor(File f) throws Exception {
         if (f.exists()) {
@@ -44,11 +43,11 @@ public class IterationFileAccessor {
 
     public boolean fetchNext() throws Exception {
         if (dis != null && dis.available() > 4) {
-            id = dis.readInt();
+            iteration = dis.readInt();
             int len = dis.readInt();
-            value = 0;
+            value = new ArrayList<Double>(len);
             for (int i = 0; i < len; i++) {
-                value += dis.readDouble();
+                value.add(dis.readDouble());
                 dis.readLong();
             }
 
@@ -57,16 +56,24 @@ public class IterationFileAccessor {
         return false;
     }
 
-    public int getId() {
-        return id;
+    public int getIteration() {
+        return iteration;
     }
 
     public double getValue() {
+        double result = 0;
+        for (Double d : value) {
+            result += d;
+        }
+        return result;
+    }
+
+    public List<Double> getSingleValues() {
         return value;
     }
 
     public static List getValuesSorted(Long runId, int period, long pathId, long collectorId, long fieldId) throws Exception {
-        File iterationFile = new File(GridHelper.getResultLocation(runId) + File.separator + pathId + "_" + period + "_" + fieldId);
+        File iterationFile = new File(GridHelper.getResultPathLocation(runId, pathId, fieldId, collectorId, period));
         IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
         List<Double> values = new ArrayList<Double>();
         while (ifa.fetchNext()) {

@@ -19,4 +19,8 @@ public class GridHelper {
     public static String getResultLocation(long runId) {
         return FileConstants.EXTERNAL_DATABASE_DIRECTORY + File.separator + "simulations" + File.separator + runId;
     }
+
+    public static String getResultPathLocation(long runId, long pathId, long fieldId, long collectorId, int period) {
+        return getResultLocation(runId) + File.separator + pathId + "_" + period + "_" + fieldId + "_" + collectorId;
+    }
 }

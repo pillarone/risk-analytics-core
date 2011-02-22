@@ -49,14 +49,14 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
         int iteration;
         for (SingleValueResultPOJO result in results) {
             iteration = result.iteration;
-            ResultDescriptor descriptor = new ResultDescriptor(result.field.id, result.path.pathName, result.period)
+            ResultDescriptor descriptor = new ResultDescriptor(result.field.id, result.path.pathName, result.collector.id, result.period)
 
             List<IterationValue> values = singleResults.get(descriptor);
             if (values == null) {
                 values = new ArrayList<IterationValue>();
                 singleResults.put(descriptor, values);
             }
-            values.add(new IterationValue(result.value,result.date!=null?result.date.getTime():0));
+            values.add(new IterationValue(result.value, result.date != null ? result.date.getTime() : 0));
             resultCount++;
         }
 
@@ -70,7 +70,7 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
             DataOutputStream dos = new DataOutputStream(buffer);
             dos.writeInt(iteration);
             dos.writeInt(values.size());
-            for (IterationValue i: values){
+            for (IterationValue i: values) {
                 dos.writeDouble(i.value);
                 dos.writeLong(i.tstamp);
             }
@@ -110,11 +110,12 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
     }
 }
 
-class IterationValue{
+class IterationValue {
     public double value;
     public long tstamp;
-    public IterationValue(double value,long tstamp){
-        this.value=value;
-        this.tstamp=tstamp;
+
+    public IterationValue(double value, long tstamp) {
+        this.value = value;
+        this.tstamp = tstamp;
     }
 }

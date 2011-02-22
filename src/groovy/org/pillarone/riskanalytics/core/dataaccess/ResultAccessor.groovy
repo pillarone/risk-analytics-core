@@ -17,7 +17,7 @@ abstract class ResultAccessor {
         File file = new File(getSimRunPath(run))
         for (File f in file.listFiles()) {
             String[] ids = f.name.split("_")
-            result.add(new ResultDescriptor(Long.parseLong(ids[0]), Long.parseLong(ids[2]), 0, Integer.parseInt(ids[1])))
+            result.add(new ResultDescriptor(Long.parseLong(ids[0]), Long.parseLong(ids[2]), Long.parseLong(ids[3]), Integer.parseInt(ids[1])))
         }
 
         return result
@@ -49,14 +49,14 @@ abstract class ResultAccessor {
     static Double getMean(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
         int pathId = getPathId(pathName, simulationRun.id);
         int fieldId = getFieldId(fieldName, simulationRun.id);
-
+        int collectorId = CollectorMapping.findByCollectorName(collectorName).id
         def result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, pathName, collectorName, fieldName, PostSimulationCalculation.MEAN)
 
         if (result != null) {
             return result.result
         } else {
 
-            File iterationFile = new File(getSimRunPath(simulationRun) + File.separator + pathId + "_" + periodIndex + "_" + fieldId);
+            File iterationFile = new File(GridHelper.getResultPathLocation(simulationRun.id, pathId, fieldId, collectorId, periodIndex))
             double avg = 0;
             double count = 0;
 
@@ -74,7 +74,8 @@ abstract class ResultAccessor {
     static Double getMin(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
         int pathId = getPathId(pathName, simulationRun.id);
         int fieldId = getFieldId(fieldName, simulationRun.id);
-        File iterationFile = new File(getSimRunPath(simulationRun) + File.separator + pathId + "_" + periodIndex + "_" + fieldId);
+        int collectorId = CollectorMapping.findByCollectorName(collectorName).id
+        File iterationFile = new File(GridHelper.getResultPathLocation(simulationRun.id, pathId, fieldId, collectorId, periodIndex))
         IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
         double min = Double.MAX_VALUE;
         while (ifa.fetchNext()) {
@@ -86,9 +87,10 @@ abstract class ResultAccessor {
     static Double getMax(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
         int pathId = getPathId(pathName, simulationRun.id);
         int fieldId = getFieldId(fieldName, simulationRun.id);
-        File iterationFile = new File(getSimRunPath(simulationRun) + File.separator + pathId + "_" + periodIndex + "_" + fieldId);
+        int collectorId = CollectorMapping.findByCollectorName(collectorName).id
+        File iterationFile = new File(GridHelper.getResultPathLocation(simulationRun.id, pathId, fieldId, collectorId, periodIndex))
         IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
-        double max = 0;
+        double max = Double.MIN_VALUE;
         while (ifa.fetchNext()) {
             max = Math.max(max, ifa.getValue());
         }
@@ -204,7 +206,7 @@ abstract class ResultAccessor {
     }
 
     static List getValuesSorted(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
-        return getValuesSorted(simulationRun, periodIndex, getPathId(pathName, simulationRun.id), 0, getFieldId(fieldName, simulationRun.id));
+        return getValuesSorted(simulationRun, periodIndex, getPathId(pathName, simulationRun.id), CollectorMapping.findByCollectorName(collectorName).id, getFieldId(fieldName, simulationRun.id));
     }
 
     static List getValuesSorted(SimulationRun simulationRun, int period, long pathId, long collectorId, long fieldId) {
@@ -213,15 +215,15 @@ abstract class ResultAccessor {
     }
 
     static List getValues(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
-        return getValues(simulationRun, periodIndex, getPathId(pathName, simulationRun.id), 0, getFieldId(fieldName, simulationRun.id));
+        return getValues(simulationRun, periodIndex, getPathId(pathName, simulationRun.id), CollectorMapping.findByCollectorName(collectorName).id, getFieldId(fieldName, simulationRun.id));
     }
 
     static List getValues(SimulationRun simulationRun, int period, long pathId, long collectorId, long fieldId) {
-        File iterationFile = new File(getSimRunPath(simulationRun) + File.separator + pathId + "_" + period + "_" + fieldId);
+        File iterationFile = new File(GridHelper.getResultPathLocation(simulationRun.id, pathId, fieldId, collectorId, period))
         HashMap<Integer, Double> tmpValues = new HashMap<Integer, Double>(10000);
         IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
         while (ifa.fetchNext()) {
-            tmpValues.put(ifa.getId(), ifa.getValue());
+            tmpValues.put(ifa.getIteration(), ifa.getValue());
         }
         List<Double> values = new ArrayList<Double>(tmpValues.size());
         for (int i = 0; i <= tmpValues.size(); i++) {
@@ -361,7 +363,7 @@ abstract class ResultAccessor {
         IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
 
         while (ifa.fetchNext()) {
-            if (ifa.getId() == iteration)
+            if (ifa.getIteration() == iteration)
                 return new Double(ifa.getValue());
         }
         return null;
@@ -411,17 +413,16 @@ abstract class ResultAccessor {
         });
     }
 
-    public static List getCriteriaConstrainedIterations(SimulationRun simulationRun, int period, String path, String field,
+    public static List getCriteriaConstrainedIterations(SimulationRun simulationRun, int period, String path, String field, String collector,
                                                         String criteria, double conditionValue) {
         initComparators();
-        File iterationFile = new File(getSimRunPath(simulationRun) + File.separator + getPathId(path, simulationRun.id)
-                + "_" + period + "_" + getFieldId(field, simulationRun.id));
+        File iterationFile = new File(GridHelper.getResultPathLocation(simulationRun.id, getPathId(path, simulationRun.id), getFieldId(field, simulationRun.id), CollectorMapping.findByCollectorName(collector).id, period))
         HashMap<Integer, Double> tmpValues = new HashMap<Integer, Double>(10000);
         List<Integer> iterations = new ArrayList<Integer>();
         IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
 
         while (ifa.fetchNext()) {
-            tmpValues.put(ifa.getId(), ifa.getValue());
+            tmpValues.put(ifa.getIteration(), ifa.getValue());
         }
         CompareValues currentComparator = comparators.get(criteria);
         if (currentComparator != null) {
@@ -434,17 +435,16 @@ abstract class ResultAccessor {
         return iterations;
     }
 
-    public static List getIterationConstrainedValues(SimulationRun simulationRun, int period, String path, String field,
+    public static List getIterationConstrainedValues(SimulationRun simulationRun, int period, String path, String field, String collector,
                                                      List<Integer> iterations) {
-        File iterationFile = new File(getSimRunPath(simulationRun) + File.separator + getPathId(path, simulationRun.id)
-                + "_" + period + "_" + getFieldId(field, simulationRun.id));
+        File iterationFile = new File(GridHelper.getResultPathLocation(simulationRun.id, getPathId(path, simulationRun.id), getFieldId(field, simulationRun.id), CollectorMapping.findByCollectorName(collector).id, period))
         HashMap<Integer, Double> tmpValues = new HashMap<Integer, Double>(10000);
         List<Double> values = new ArrayList<Double>();
         IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
         Collections.sort(iterations);
 
         while (ifa.fetchNext()) {
-            tmpValues.put(ifa.getId(), ifa.getValue());
+            tmpValues.put(ifa.getIteration(), ifa.getValue());
         }
 
         for (int i: iterations) {
@@ -453,6 +453,26 @@ abstract class ResultAccessor {
                 values.add(d)
         }
         return values;
+    }
+
+    public static List getSingleValueResults(String collector, String path, String field, SimulationRun run) {
+        List result = []
+        long pathId = getPathId(path, run.id)
+        long fieldId = getFieldId(field, run.id)
+        long collectorId = CollectorMapping.findByCollectorName(collector).id
+        for (int i = 0; i < run.periodCount; i++) {
+            File f = new File(GridHelper.getResultPathLocation(run.id, pathId, fieldId, collectorId, i))
+            IterationFileAccessor ifa = new IterationFileAccessor(f)
+            int index = 0
+            while (ifa.fetchNext()) {
+                int iteration = ifa.iteration
+                List<Double> values = ifa.singleValues
+                for (Double val in values) {
+                    result << [path, val, field, iteration, i, index++] as Object[]
+                }
+            }
+        }
+        return result
     }
 
 }

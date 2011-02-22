@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.util
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import java.text.MessageFormat
+import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
 
@@ -99,6 +100,8 @@ public class GroovyUtils {
                 buffer.append(it);
                 buffer.append("\"");
                 resultList << buffer.toString();
+            } else if (it instanceof DateTime) {
+                resultList << "new ${DateTime.class.name}(${it.year},${it.monthOfYear},${it.dayOfMonth},0,0,0,0)"
             } else {
                 resultList << it.toString();
             }

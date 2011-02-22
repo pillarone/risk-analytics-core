@@ -20,4 +20,18 @@ class AbstractParameterObjectClassifierTests extends GroovyTestCase {
         assertEquals 1, parameterObject.parameters.size()
         assertEquals dateTime, parameterObject.parameters.get("date")
     }
+
+    void testString() {
+        AbstractParameterObjectClassifier classifier = ExampleParameterObjectClassifier.TYPE0
+        String s  = "text"
+        String constructionString = classifier.getConstructionString([textProperty: s])
+
+        assertTrue constructionString.contains(/"textProperty":"text"/)
+
+        GroovyShell shell = new GroovyShell(this.getClass().getClassLoader())
+        ExampleParameterObject parameterObject = shell.evaluate(constructionString)
+
+        assertEquals 1, parameterObject.parameters.size()
+        assertEquals s, parameterObject.parameters.get("textProperty")
+    }
 }

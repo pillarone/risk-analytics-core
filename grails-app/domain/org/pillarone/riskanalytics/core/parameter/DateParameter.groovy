@@ -1,7 +1,7 @@
 package org.pillarone.riskanalytics.core.parameter
 
 import org.joda.time.DateTime
-import org.joda.time.contrib.hibernate.PersistentDateTime
+import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
 
 class DateParameter extends Parameter {
 
@@ -13,6 +13,6 @@ class DateParameter extends Parameter {
 
 
     static mapping = {
-        dateValue type: PersistentDateTime
+        dateValue type: DateTimeMillisUserType
     }
 }

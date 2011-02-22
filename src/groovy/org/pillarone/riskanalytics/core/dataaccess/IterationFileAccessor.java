@@ -14,35 +14,36 @@ public class IterationFileAccessor {
     double value;
 
     public IterationFileAccessor(File f) throws Exception {
+        if (f.exists()) {
+            FileInputStream fis = new FileInputStream(f);
+            BufferedInputStream bs = new BufferedInputStream(fis);
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-        FileInputStream fis = new FileInputStream(f);
-        BufferedInputStream bs = new BufferedInputStream(fis);
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-        byte[] b = new byte[8048];
-        int len;
-        int count = 0;
-        while ((len = bs.read(b)) != -1) {
-            bos.write(b, 0, len);
-            count++;
-        }
-        if (count == 0) {
-            Thread.sleep(2000);
+            byte[] b = new byte[8048];
+            int len;
+            int count = 0;
             while ((len = bs.read(b)) != -1) {
                 bos.write(b, 0, len);
                 count++;
             }
-        }
-        bs.close();
-        fis.close();
-        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+            if (count == 0) {
+                Thread.sleep(2000);
+                while ((len = bs.read(b)) != -1) {
+                    bos.write(b, 0, len);
+                    count++;
+                }
+            }
+            bs.close();
+            fis.close();
+            ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
 
-        dis = new DataInputStream(bis);
+            dis = new DataInputStream(bis);
+        }
 
     }
 
     public boolean fetchNext() throws Exception {
-        if (dis.available() > 4) {
+        if (dis != null && dis.available() > 4) {
             id = dis.readInt();
             int len = dis.readInt();
             value = 0;

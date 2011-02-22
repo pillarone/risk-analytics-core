@@ -27,6 +27,7 @@ import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationBlock
 abstract class ModelTest extends GroovyTestCase {
 
     private static final Log LOG = LogFactory.getLog(ModelTest)
+
     String refFileName
     String newFileName
     private static final EPSILON = 1E-6

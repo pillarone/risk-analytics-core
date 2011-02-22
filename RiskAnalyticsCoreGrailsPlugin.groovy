@@ -10,11 +10,16 @@ import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
 import org.gridgain.grid.GridSpringBean
 import org.gridgain.grid.GridConfigurationAdapter
 import org.pillarone.riskanalytics.core.FileConstants
-import org.gridgain.grid.spi.discovery.multicast.GridMulticastDiscoverySpi
+import org.pillarone.riskanalytics.core.remoting.ITransactionService
+import org.springframework.remoting.rmi.RmiProxyFactoryBean
+import org.springframework.remoting.rmi.RmiServiceExporter
+import org.pillarone.riskanalytics.core.remoting.IResultService
+import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
+import org.pillarone.riskanalytics.core.remoting.impl.ResultService
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.3-ALPHA-1-kti"
+    def version = "1.3-ALPHA-2.7-kti"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.4 > *"
     // the other plugins this plugin depends on
@@ -46,7 +51,41 @@ Persistence & Simulation engine.
     }
 
     def doWithSpring = {
-        //override gridgain beans because we need a custom config
+        ConfigObject config = ConfigurationHolder.config
+
+        String url = "rmi://localhost:1099/TransactionService"
+        if (config.containsKey("transactionServiceUrl")) {
+            url = config.transactionServiceUrl
+        }
+        transactionService(RmiProxyFactoryBean) {
+            serviceInterface = ITransactionService
+            serviceUrl = url
+            refreshStubOnConnectFailure = true
+            lookupStubOnStartup = false
+        }
+
+        int port = 1099
+        if (config.containsKey("resultServiceRegistryPort")) {
+            port = config.resultServiceRegistryPort
+        }
+        resultServiceExporter(RmiServiceExporter) {
+            serviceName = "ResultService"
+            serviceInterface = IResultService
+            registryPort = port
+            service = ref("resultService")
+        }
+
+        Properties attributes = new Properties()
+        attributes.put("*", "PROPAGATION_REQUIRED,readOnly")
+
+        resultService(TransactionProxyFactoryBean) {
+            transactionManager = ref("transactionManager")
+            target = ref("resultServiceBean")
+            transactionAttributes = attributes
+        }
+
+        resultServiceBean(ResultService) { }
+
         "grid.cfg"(GridConfigurationAdapter) {
             gridName = "pillarone"
 

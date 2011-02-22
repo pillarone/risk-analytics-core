@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.parameterization;
 
 import org.pillarone.riskanalytics.core.components.ComponentUtils;
 import org.pillarone.riskanalytics.core.model.Model;
+import org.pillarone.riskanalytics.core.util.CloneSupport;
 import org.pillarone.riskanalytics.core.util.GroovyUtils;
 
 import java.io.Serializable;
@@ -283,16 +284,7 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable, Se
         clone.simulationModel = null;
         clone.values = new ArrayList<List>(values.size());
         for (List list : values) {
-            if (list instanceof Cloneable) {
-                List newList = null;
-                if (list instanceof ArrayList) {
-                    newList = (List) ((ArrayList) list).clone();
-                }
-                if (list instanceof LinkedList) {
-                    newList = (List) ((LinkedList) list).clone();
-                }
-                clone.values.add(newList);
-            }
+            clone.values.add(CloneSupport.deepClone(list));
         }
         return clone;
     }

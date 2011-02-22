@@ -45,11 +45,14 @@ abstract class AbstractParameterObjectClassifier implements IParameterObjectClas
                 parameterString << "\"$k\":${createConstructionString(v)},"
             }
             else if (v instanceof IParameterObject) {
-                    parameterString << "\"$k\":${v.type.getConstructionString(v.parameters)},"
-                }
-                else {
-                    parameterString << "\"$k\":$v,"
-                }
+                parameterString << "\"$k\":${v.type.getConstructionString(v.parameters)},"
+            }
+            else if (v instanceof String) {
+                parameterString << "\"$k\":\"$v\","
+            }
+            else {
+                parameterString << "\"$k\":$v,"
+            }
         }
         if (parameterString.size() == 1) {
             parameterString << ':'

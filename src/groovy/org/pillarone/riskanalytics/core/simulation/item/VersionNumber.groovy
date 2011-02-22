@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.simulation.item
 class VersionNumber implements Comparable, Cloneable, Serializable {
 
     List versionNumbers
+    boolean workflow = false
 
     public VersionNumber(String version) {
         parse(version)
@@ -11,6 +12,10 @@ class VersionNumber implements Comparable, Cloneable, Serializable {
     private void parse(String versionString) {
         List list = new LinkedList<Integer>()
         int from = 0
+        if (versionString.startsWith("R")) {
+            workflow = true
+            from++
+        }
         int index
         while ((index = versionString.indexOf('.', from)) != -1) {
             list.add(Integer.parseInt(versionString.substring(from, index)))
@@ -75,7 +80,7 @@ class VersionNumber implements Comparable, Cloneable, Serializable {
 
 
     String toString() {
-        StringBuffer buffer = new StringBuffer()
+        StringBuffer buffer = new StringBuffer(workflow ? "R" : "")
         for (Integer version in versionNumbers) {
             buffer << version << '.'
         }
@@ -96,6 +101,16 @@ class VersionNumber implements Comparable, Cloneable, Serializable {
     }
 
     int compareTo(Object o) {
+        o = o as VersionNumber
+        if (workflow) {
+            if (!o.workflow) {
+                return 1
+            }
+        } else {
+            if (o.workflow) {
+                return -1
+            }
+        }
         int size = versionNumbers.size() > o.versionNumbers.size() ? versionNumbers.size() : o.versionNumbers.size()
         for (int i = 0; i < size; i++) {
             if (versionNumbers[i] != o.versionNumbers[i]) {

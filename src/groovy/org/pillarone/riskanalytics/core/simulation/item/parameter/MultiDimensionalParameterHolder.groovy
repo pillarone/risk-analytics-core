@@ -38,65 +38,10 @@ class MultiDimensionalParameterHolder extends ParameterHolder implements IMarker
         value = newValue
     }
 
-    // todo(msp): https://issuetracking.intuitive-collaboration.com/jira/browse/PMO-1350
     public MultiDimensionalParameterHolder clone() {
         MultiDimensionalParameterHolder holder = (MultiDimensionalParameterHolder) super.clone();
-        List<Integer> columnIndicesOfTypeDateTime = getColumnIndexOfTypeDateTime(holder)
-        if (!columnIndicesOfTypeDateTime.isEmpty()) {
-            // do a "deep clone" if any of the columns contains values of type DateTime
-            IMultiDimensionalConstraints constraints = (IMultiDimensionalConstraints) value.constraints.class.newInstance()
-            List titles = []
-            for (int column = 0; column < value.getColumnCount(); column++) {
-                titles << new String((String) value.titles[column])
-            }
-            List cellValues = []
-            for (int column = 0; column < value.getColumnCount(); column++) {
-                cellValues << []
-                if (columnIndicesOfTypeDateTime.contains(column)) {
-                    for (int row = value.getTitleRowCount(); row < value.getRowCount(); row++) {
-                        cellValues[column][row - 1] = new DateTime(value.getValueAt(row, column).getMillis())
-                    }
-                }
-                else {
-                    for (int row = value.getTitleRowCount(); row < value.getRowCount(); row++) {
-                        if (value.getValueAt(row, column) instanceof String) {
-                            cellValues[column][row - 1] = new String((String) value.getValueAt(row, column));
-                        }
-                        else if (value.getValueAt(row, column) instanceof Integer) {
-                            cellValues[column][row - 1] = new Integer((Integer) value.getValueAt(row, column));
-                        }
-                        else if (value.getValueAt(row, column) instanceof Double) {
-                            cellValues[column][row - 1] = new Double((Double) value.getValueAt(row, column));
-                        }
-                        else if (value.getValueAt(row, column) instanceof DateTime) {
-                            cellValues[column][row - 1] = new DateTime((DateTime) value.getValueAt(row, column));
-                        }
-                        else {
-                            cellValues[column][row - 1] = value.getValueAt(row, column).clone()
-                        }
-                    }
-                }
-            }
-            holder.value = new ConstrainedMultiDimensionalParameter(cellValues, titles, constraints)
-        }
-        else {
-            // method does not work for DateTime values, the following line does not a proper clone!
-            holder.value = (AbstractMultiDimensionalParameter) new GroovyShell(getClass().getClassLoader()).evaluate(value.toString())
-            holder.value.valuesConverted = value.valuesConverted
-        }
+        holder.value = (AbstractMultiDimensionalParameter) value.clone()
         return holder
-    }
-
-    private List<Integer> getColumnIndexOfTypeDateTime(MultiDimensionalParameterHolder parameterHolder) {
-        List<Integer> columnIndicesOfTypeDateTime = []
-        if (parameterHolder.value instanceof ConstrainedMultiDimensionalParameter) {
-            for (int column = 0; column < parameterHolder.value.getColumnCount(); column++) {
-                if (parameterHolder.value.constraints.getColumnType(column).equals(DateTime.class)) {
-                    columnIndicesOfTypeDateTime << column
-                }
-            }
-        }
-        return columnIndicesOfTypeDateTime
     }
 
     List<String> referencePaths(Class markerInterface, String refValue) {

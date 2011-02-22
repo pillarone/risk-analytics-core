@@ -118,6 +118,10 @@ class ResultConfiguration extends ModellingItem {
         return SimulationRun.findByResultConfigurationAndToBeDeleted(dao, false) != null
     }
 
+    boolean isEditable() {
+        return !isUsedInSimulation()
+    }
+
     public List<SimulationRun> getSimulations() {
         if (!isLoaded()) {
             load()

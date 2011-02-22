@@ -6,7 +6,10 @@ import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.parameter.Parameter
+import org.pillarone.riskanalytics.core.parameter.ParameterizationTag
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
+import org.pillarone.riskanalytics.core.parameter.comment.Tag
+import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowCommentDAO
 import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
 import org.pillarone.riskanalytics.core.parameterization.ParameterWriter
 import org.pillarone.riskanalytics.core.parameterization.validation.IParameterizationValidator
@@ -17,8 +20,10 @@ import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.util.PropertiesUtils
+import org.pillarone.riskanalytics.core.workflow.Status
 import org.springframework.transaction.TransactionStatus
 
 class Parameterization extends ModellingItem {
@@ -35,6 +40,7 @@ class Parameterization extends ModellingItem {
     Integer periodCount
     List<ParameterHolder> parameterHolders
     List<Comment> comments
+    List<Tag> tags
     List periodLabels
 
     boolean orderByPath = false
@@ -42,6 +48,9 @@ class Parameterization extends ModellingItem {
 
     List validationErrors
 
+    Status status
+    Long dealId
+    Date valuationDate
 
     public Parameterization(Map params) {
         this(params.remove("name").toString())
@@ -56,6 +65,8 @@ class Parameterization extends ModellingItem {
         versionNumber = new VersionNumber('1')
         parameterHolders = []
         comments = []
+        tags = []
+        status = Status.NONE
     }
 
     protected Object createDao() {
@@ -147,8 +158,13 @@ class Parameterization extends ModellingItem {
         dao.modelClassName = modelClass.name
         dao.creator = creator
         dao.lastUpdater = lastUpdater
+        dao.comment = comment
+        dao.status = status
+        dao.dealId = dealId
+        dao.valuationDate = valuationDate
         saveParameters(dao)
         saveComments(dao)
+        saveTags(dao)
     }
 
     protected void saveParameters(ParameterizationDAO dao) {
@@ -173,30 +189,92 @@ class Parameterization extends ModellingItem {
         }
     }
 
+    protected void saveTags(ParameterizationDAO dao) {
+        List tagsToRemove = []
+        for (ParameterizationTag tag in dao.tags) {
+            if (!tags.contains(tag.tag)) {
+                tagsToRemove << tag
+            }
+        }
+        for (ParameterizationTag tag in tagsToRemove) {
+            dao.removeFromTags(tag)
+
+        }
+        tagsToRemove.each {it.delete()}
+
+        for (Tag tag in tags) {
+            if (!dao.tags*.tag?.contains(tag)) {
+                dao.addToTags(new ParameterizationTag(tag: tag))
+            }
+        }
+    }
+
     protected void saveComments(ParameterizationDAO dao) {
         Iterator<Comment> iterator = comments.iterator()
         while (iterator.hasNext()) {
             Comment comment = iterator.next()
             if (comment.added) {
-                CommentDAO commentDAO = new CommentDAO(parameterization: dao)
-                comment.applyToDomainObject(commentDAO)
-                dao.addToComments(commentDAO)
-                comment.added = false
+                commentAdded(dao, comment)
             } else if (comment.updated) {
-                CommentDAO commentDAO = dao.comments.find { it.path == comment.path && it.periodIndex == comment.period }
-                if (commentDAO) {
-                    comment.applyToDomainObject(commentDAO)
-                    comment.updated = false
-                }
+                commentUpdated(dao, comment)
             } else if (comment.deleted) {
-                CommentDAO commentDAO = dao.comments.find { it.path == comment.path && it.periodIndex == comment.period }
-                if (commentDAO) {
-                    dao.removeFromComments(commentDAO)
-                    commentDAO.delete()
+                if (commentDeleted(dao, comment)) {
                     iterator.remove()
                 }
             }
         }
+    }
+
+
+
+    private void commentAdded(ParameterizationDAO dao, Comment comment) {
+        CommentDAO commentDAO = new CommentDAO(parameterization: dao)
+        comment.applyToDomainObject(commentDAO)
+        dao.addToComments(commentDAO)
+        comment.added = false
+    }
+
+    private void commentAdded(ParameterizationDAO dao, WorkflowComment comment) {
+        WorkflowCommentDAO commentDAO = new WorkflowCommentDAO(parameterization: dao)
+        comment.applyToDomainObject(commentDAO)
+        dao.addToIssues(commentDAO)
+        comment.added = false
+    }
+
+    private void commentUpdated(ParameterizationDAO dao, Comment comment) {
+        CommentDAO commentDAO = dao.comments.find { it.path == comment.path && it.periodIndex == comment.period }
+        if (commentDAO) {
+            comment.applyToDomainObject(commentDAO)
+            comment.updated = false
+        }
+    }
+
+    private void commentUpdated(ParameterizationDAO dao, WorkflowComment comment) {
+        WorkflowCommentDAO commentDAO = dao.issues.find { it.path == comment.path && it.periodIndex == comment.period }
+        if (commentDAO) {
+            comment.applyToDomainObject(commentDAO)
+            comment.updated = false
+        }
+    }
+
+    private boolean commentDeleted(ParameterizationDAO dao, Comment comment) {
+        CommentDAO commentDAO = dao.comments.find { it.path == comment.path && it.periodIndex == comment.period }
+        if (commentDAO) {
+            dao.removeFromComments(commentDAO)
+            commentDAO.delete()
+            return true
+        }
+        return false
+    }
+
+    private boolean commentDeleted(ParameterizationDAO dao, WorkflowComment comment) {
+        WorkflowCommentDAO commentDAO = dao.issues.find { it.path == comment.path && it.periodIndex == comment.period }
+        if (commentDAO) {
+            dao.removeFromIssues(commentDAO)
+            commentDAO.delete()
+            return true
+        }
+        return false
     }
 
     protected void mapFromDao(Object dao, boolean completeLoad) {
@@ -213,9 +291,14 @@ class Parameterization extends ModellingItem {
         modelClass = getClass().getClassLoader().loadClass(dao.modelClassName)
         creator = dao.creator
         lastUpdater = dao.lastUpdater
+        status = dao.status
+        dealId = dao.dealId
+        valuationDate = dao.valuationDate
+        comment = dao.comment
         if (completeLoad) {
             loadParameters(dao)
             loadComments(dao)
+            tags = dao.tags*.tag
         }
         LOG.info("Parameterization $name loaded in ${System.currentTimeMillis() - time}ms")
     }
@@ -233,6 +316,10 @@ class Parameterization extends ModellingItem {
 
         for (CommentDAO c in dao.comments) {
             comments << new Comment(c)
+        }
+
+        for (WorkflowCommentDAO c in dao.issues) {
+            comments << new WorkflowComment(c)
         }
     }
 
@@ -285,6 +372,27 @@ class Parameterization extends ModellingItem {
         return result.size() > 0
     }
 
+    public boolean isEditable() {
+        if (status != Status.NONE && status != Status.DATA_ENTRY) {
+            return false
+        }
+        return !isUsedInSimulation()
+    }
+
+    public List<String> getAllEditablePaths() {
+        List result = []
+        for (Comment comment in comments) {
+            if (comment instanceof WorkflowComment) {
+                result << comment.path
+            }
+        }
+        return result
+    }
+
+    public boolean newVersionAllowed() {
+        return status == Status.NONE || status == Status.DATA_ENTRY
+    }
+
     public List<SimulationRun> getSimulations() {
         if (!isLoaded()) {
             load()
@@ -326,6 +434,24 @@ class Parameterization extends ModellingItem {
         }
         comment.deleted = true
         comment.updated = false
+    }
+
+    public List<Tag> getTags() {
+        return tags
+    }
+
+    public void setTags(Set selectedTags) {
+        selectedTags.each {Tag tag ->
+            if (!tags.contains(tag))
+                tags << tag
+        }
+        List tagsToRemove = []
+        tags.each {Tag tag ->
+            if (!selectedTags.contains(tag))
+                tagsToRemove << tag
+        }
+        if (tagsToRemove.size() > 0)
+            tags.removeAll(tagsToRemove)
     }
 
     List getParameters(String path) {
@@ -381,6 +507,16 @@ class Parameterization extends ModellingItem {
 
     IConfigObjectWriter getWriter() {
         return new ParameterWriter()
+    }
+
+    int getSize(Class commentType) {
+        switch (commentType) {
+            case CommentDAO:
+                return CommentDAO.executeQuery("select count(*) from ${CommentDAO.class.name} as c where c.parameterization.name = ? and c.parameterization.itemVersion = ? and c.parameterization.modelClassName = ?", [name, versionNumber.toString(), modelClass.name])[0]
+            case WorkflowCommentDAO:
+                return WorkflowCommentDAO.executeQuery("select count(*) from ${WorkflowCommentDAO.class.name} as w where w.parameterization.name = ? and w.parameterization.itemVersion = ? and w.parameterization.modelClassName = ?", [name, versionNumber.toString(), modelClass.name])[0]
+        }
+        return 0
     }
 
 }

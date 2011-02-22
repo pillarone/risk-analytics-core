@@ -1,8 +1,11 @@
 package org.pillarone.riskanalytics.core.output
 
+import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
+
 public class FileOutput implements ICollectorOutputStrategy {
 
     String resultLocation
+    SimulationScope simulationScope
 
     public ICollectorOutputStrategy leftShift(List results) {
 
@@ -23,7 +26,7 @@ public class FileOutput implements ICollectorOutputStrategy {
     }
 
     private String getFileName(SingleValueResultPOJO result){
-        return "${resultLocation}${File.separator}${replaceChars(result.simulationRun.name)}.tsl"
+        return "${resultLocation}${File.separator}${replaceChars(simulationScope.simulation.name)}.tsl"
     }
 
     private String replaceChars(String s) {

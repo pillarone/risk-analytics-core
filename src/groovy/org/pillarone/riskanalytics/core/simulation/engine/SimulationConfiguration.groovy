@@ -8,6 +8,13 @@ import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
+import org.pillarone.riskanalytics.core.model.Model
+import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
+import org.pillarone.riskanalytics.core.output.CollectorFactory
+import org.pillarone.riskanalytics.core.output.PacketCollector
+import org.pillarone.riskanalytics.core.model.ModelHelper
+import org.pillarone.riskanalytics.core.output.ICollectingModeStrategy
+import org.pillarone.riskanalytics.core.output.CollectingModeFactory
 
 /**
  * The SimulationConfiguration is a descriptor for a runnable simulation. All runtime aspects e.g. numberOfIterations,
@@ -68,6 +75,55 @@ public class SimulationConfiguration implements Serializable, Cloneable {
 
     private void calculateTotalIterations() {
         simulation.numberOfIterations = simulationBlocks*.blockSize.sum()
+    }
+
+     /**
+     * Determines all possible path & field values for this simulation and persists them if they do not exist yet, because we do not have any DB access
+     * during a grid job.
+     * @param simulationConfiguration the simulation details
+     * @return a mapping cache filled with all necessary mappings for this simulation.
+     */
+    MappingCache createMappingCache(ResultConfiguration resultConfiguration) {
+        Model model = simulation.modelClass.newInstance()
+        model.init()
+
+        ParameterApplicator parameterApplicator = new ParameterApplicator(model: model, parameterization: simulation.parameterization)
+        parameterApplicator.init()
+        parameterApplicator.applyParameterForPeriod(0)
+
+        SimulationRunner runner = SimulationRunner.createRunner()
+        CollectorFactory collectorFactory = runner.currentScope.collectorFactory
+        List<PacketCollector> drillDownCollectors = resultConfiguration.getResolvedCollectors(model, collectorFactory)
+        List<String> drillDownPaths = getDrillDownPaths(drillDownCollectors)
+        Set paths = ModelHelper.getAllPossibleOutputPaths(model, drillDownPaths)
+
+        Set fields = ModelHelper.getAllPossibleFields(model)
+        MappingCache cache = new MappingCache()
+        cache.initCache(model)
+
+        for (String path in paths) {
+            cache.lookupPathDB(path)
+        }
+
+        for (String field in fields) {
+            cache.lookupField(field)
+        }
+
+        this.mappingCache = cache
+    }
+
+    private List<String> getDrillDownPaths(List<PacketCollector> collectors) {
+        List<String> paths = []
+        // todo: requires a proper refactoring as the core plugin itself knows nothing about the aggregate drill down collector
+        ICollectingModeStrategy drillDownCollector = CollectingModeFactory.getStrategy("AGGREGATED_DRILL_DOWN")
+        if (drillDownCollector != null) {
+            for (PacketCollector collector : collectors) {
+                if (collector.mode.class.equals(drillDownCollector.class)) {
+                    paths << collector.path
+                }
+            }
+        }
+        return paths
     }
 
 }

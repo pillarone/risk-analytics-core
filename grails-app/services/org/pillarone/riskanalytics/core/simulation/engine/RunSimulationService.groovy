@@ -51,7 +51,7 @@ public class RunSimulationService {
      * @return the result of the grid gain task
      */
     public SimulationHandler runSimulationOnGrid(SimulationConfiguration configuration, ResultConfiguration resultConfiguration) {
-        configuration.mappingCache = createMappingCache(configuration, resultConfiguration)
+        configuration.createMappingCache(resultConfiguration)
         configuration.prepareSimulationForGrid()
 
         SimulationTask task = new SimulationTask()
@@ -61,53 +61,5 @@ public class RunSimulationService {
         return handler
     }
 
-    /**
-     * Determines all possible path & field values for this simulation and persists them if they do not exist yet, because we do not have any DB access
-     * during a grid job.
-     * @param simulationConfiguration the simulation details
-     * @return a mapping cache filled with all necessary mappings for this simulation.
-     */
-    private MappingCache createMappingCache(SimulationConfiguration simulationConfiguration, ResultConfiguration resultConfiguration) {
-        Model model = simulationConfiguration.simulation.modelClass.newInstance()
-        model.init()
-
-        ParameterApplicator parameterApplicator = new ParameterApplicator(model: model, parameterization: simulationConfiguration.simulation.parameterization)
-        parameterApplicator.init()
-        parameterApplicator.applyParameterForPeriod(0)
-
-        SimulationRunner runner = SimulationRunner.createRunner()
-        CollectorFactory collectorFactory = runner.currentScope.collectorFactory
-        List<PacketCollector> drillDownCollectors = resultConfiguration.getResolvedCollectors(model, collectorFactory)
-        List<String> drillDownPaths = getDrillDownPaths(drillDownCollectors)
-        Set paths = ModelHelper.getAllPossibleOutputPaths(model, drillDownPaths)
-
-        Set fields = ModelHelper.getAllPossibleFields(model)
-        MappingCache cache = new MappingCache()
-        cache.initCache(model)
-
-        for (String path in paths) {
-            cache.lookupPathDB(path)
-        }
-
-        for (String field in fields) {
-            cache.lookupField(field)
-        }
-
-        return cache
-    }
-
-    private List<String> getDrillDownPaths(List<PacketCollector> collectors) {
-        List<String> paths = []
-        // todo: requires a proper refactoring as the core plugin itself knows nothing about the aggregate drill down collector
-        ICollectingModeStrategy drillDownCollector = CollectingModeFactory.getStrategy("AGGREGATED_DRILL_DOWN")
-        if (drillDownCollector != null) {
-            for (PacketCollector collector : collectors) {
-                if (collector.mode.class.equals(drillDownCollector.class)) {
-                    paths << collector.path
-                }
-            }
-        }
-        return paths
-    }
 
 }

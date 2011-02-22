@@ -18,6 +18,7 @@ import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.apache.commons.lang.builder.HashCodeBuilder
 import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
+import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationBlock
 
 /**
  * An abstract class which provides functionality to run model tests.
@@ -122,7 +123,12 @@ abstract class ModelTest extends GroovyTestCase {
     final void testModelRun() {
         runner = SimulationRunner.createRunner()
         ICollectorOutputStrategy output = getOutputStrategy()
-        runner.simulationConfiguration = new SimulationConfiguration(simulation: run, outputStrategy: output)
+        SimulationConfiguration configuration = new SimulationConfiguration(
+                simulation: run, outputStrategy: output,
+                simulationBlocks: [new SimulationBlock(0, getIterationCount(), 0)]
+        )
+        configuration.createMappingCache(run.template)
+        runner.simulationConfiguration = configuration
 
 
         runner.start()

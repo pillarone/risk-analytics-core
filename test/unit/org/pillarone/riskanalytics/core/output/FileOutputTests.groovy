@@ -6,6 +6,8 @@ import org.pillarone.riskanalytics.core.output.PathMapping
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.output.SingleValueResult
 import org.pillarone.riskanalytics.core.output.FileOutput
+import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
 class FileOutputTests extends GrailsUnitTestCase {
 
@@ -30,7 +32,7 @@ class FileOutputTests extends GrailsUnitTestCase {
 
         assertFalse "File does already exist. Fix setup", file.exists()
 
-        FileOutput output = new FileOutput(resultLocation: ".")
+        FileOutput output = new FileOutput(resultLocation: ".", simulationScope: new SimulationScope(simulation: new Simulation(result.simulationRun.name)))
 
         output << [result]
 
@@ -48,7 +50,7 @@ class FileOutputTests extends GrailsUnitTestCase {
         file = new File("new_Run_.tsl")
         assertFalse "File does already exist. Fix setup", file.exists()
 
-        FileOutput output = new FileOutput(resultLocation: ".")
+        FileOutput output = new FileOutput(resultLocation: ".", simulationScope: new SimulationScope(simulation: new Simulation(result.simulationRun.name)))
 
         output << [result]
 
@@ -63,7 +65,7 @@ class FileOutputTests extends GrailsUnitTestCase {
         result.field = new FieldMapping(fieldName: "field")
 
 
-        FileOutput output = new FileOutput(resultLocation: ".")
+        FileOutput output = new FileOutput(resultLocation: ".", simulationScope: new SimulationScope(simulation: new Simulation(result.simulationRun.name)))
 
         output << [result]
         assertEquals 2, lineCount

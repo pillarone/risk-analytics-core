@@ -12,6 +12,7 @@ import org.pillarone.riskanalytics.core.wiring.ITransmitter
 import org.pillarone.riskanalytics.core.wiring.WiringUtils
 import org.pillarone.riskanalytics.core.components.IterationStore
 import org.pillarone.riskanalytics.core.util.GroovyUtils
+import org.pillarone.riskanalytics.core.output.FileOutput
 
 public class InjectScopesAction implements Action {
 
@@ -34,6 +35,10 @@ public class InjectScopesAction implements Action {
                     injectScope "simulationScope", transmitter.receiver
                     injectScope "iterationScope", transmitter.receiver
                     injectScope "periodScope", transmitter.receiver
+
+                    if (transmitter.receiver.outputStrategy instanceof FileOutput) {
+                        injectScope "simulationScope", transmitter.receiver.outputStrategy
+                    }
                 }
             }
 
@@ -61,7 +66,7 @@ public class InjectScopesAction implements Action {
         }
     }
 
-    private void injectScope(String scopeName, Component component) {
+    private void injectScope(String scopeName, def component) {
         if (GroovyUtils.getProperties(component).keySet().contains(scopeName)) {
             component[scopeName] = this[scopeName]
         }

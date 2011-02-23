@@ -49,7 +49,11 @@ class ParameterizationDAO {
         valuationDate(nullable: true)
     }
 
-    static mapping = { comments(sort: "path", order: "asc") }
+    static mapping = {
+        comments(sort: "path", order: "asc")
+        creator lazy: false
+        lastUpdater lazy: false
+    }
 
     String toString() {
         "$name v$itemVersion"

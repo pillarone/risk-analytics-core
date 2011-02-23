@@ -26,4 +26,9 @@ public class ResultConfigurationDAO {
         creator nullable: true
         lastUpdater nullable: true
     }
+
+    static mapping = {
+        creator lazy: false
+        lastUpdater lazy: false
+    }
 }

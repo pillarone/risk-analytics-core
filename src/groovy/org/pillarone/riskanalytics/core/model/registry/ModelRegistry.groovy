@@ -76,7 +76,7 @@ class ModelRegistry {
 
     private void createDefaultStructure(Class modelClass) {
         StringBuilder builder = new StringBuilder()
-        builder.append("package ").append(modelClass.getPackage().name).append("\n").append("model = ").append(modelClasses.name).append("\n").append("company { }")
+        builder.append("package ").append(modelClass.getPackage().name).append("\n").append("model = ").append(modelClass.name).append("\n").append("company { }")
 
         ModelStructureDAO dao = new ModelStructureDAO()
         dao.name = modelClass.simpleName + "Structure"

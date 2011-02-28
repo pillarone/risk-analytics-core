@@ -74,4 +74,13 @@ class MultiDimensionalParameterHolder extends ParameterHolder implements IMarker
         }
         return referencePaths
     }
+
+    @Override
+    void clearCachedValues() {
+        if (value != null) {
+            value.simulationModel = null
+        }
+    }
+
+
 }

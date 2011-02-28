@@ -8,6 +8,11 @@ import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.simulation.engine.actions.*
+import org.pillarone.riskanalytics.core.wiring.WiringUtils
+import org.pillarone.riskanalytics.core.components.Component
+import org.pillarone.riskanalytics.core.wiring.ITransmitter
+import org.pillarone.riskanalytics.core.output.PacketCollector
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 /**
  * This is the main entity to run a simulation. To do this, create a runner object (SimulationRunner.createRunner()).
@@ -105,6 +110,7 @@ public class SimulationRunner {
             LOG.error this, t
             LOG.debug error.dump()
             currentScope.simulation.delete()
+            cleanup()
             return
         }
         if (simulationAction.isCancelled()) {
@@ -119,7 +125,7 @@ public class SimulationRunner {
         LOG.info "simulation took ${end - start} ms"
         simulationState = simulationAction.isStopped() ? SimulationState.STOPPED : SimulationState.FINISHED
         notifySimulationStateChanged(currentScope?.simulation, simulationState)
-
+        cleanup()
     }
 
     private void deleteCancelledSimulation() {
@@ -127,6 +133,7 @@ public class SimulationRunner {
             LOG.info "canceled simulation ${currentScope.simulation.name} will be deleted"
             currentScope.simulation.delete()
         }
+        cleanup()
     }
 
     /**
@@ -267,6 +274,46 @@ public class SimulationRunner {
 
     protected void notifySimulationStateChanged(Simulation simulation, SimulationState simulationState) {
         batchRunInfoService?.batchSimulationStateChanged(simulation, simulationState)
+    }
+
+    //cleanup
+
+    protected void cleanup() {
+        WiringUtils.forAllComponents(currentScope.model) {originName, Component component ->
+            clearScope "simulationScope", component
+            clearScope "iterationScope", component
+            clearScope "periodScope", component
+            component.clearPropertyCache()
+
+            component.allOutputTransmitter.each {ITransmitter transmitter ->
+                if (transmitter.receiver instanceof PacketCollector) {
+                    clearScope "simulationScope", transmitter.receiver
+                    clearScope "iterationScope", transmitter.receiver
+                    clearScope "periodScope", transmitter.receiver
+                    transmitter.receiver.clearPropertyCache()
+                }
+            }
+
+            clearStore(component)
+            currentScope.parameters.parameterHolders*.clearCachedValues()
+
+        }
+    }
+
+    private void clearStore(Component component) {
+        Set<String> propertyNames = GroovyUtils.getProperties(component).keySet()
+        if (propertyNames.contains('periodStore')) {
+            component.periodStore = null
+        }
+        if (propertyNames.contains('iterationStore')) {
+            component.iterationStore = null
+        }
+    }
+
+    private void clearScope(String scopeName, Component component) {
+        if (GroovyUtils.getProperties(component).keySet().contains(scopeName)) {
+            component[scopeName] = null
+        }
     }
 
 }

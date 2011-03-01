@@ -23,7 +23,7 @@ class MultiDimensionalParameterHolderTests extends GroovyTestCase {
         assertEquals 'reference not found due to wrong marker interface', [], parameterHolder.referencePaths(ITest2ComponentMarker, 'hierarchy output component')
         assertEquals 'reference not found due to wrong value', [], parameterHolder.referencePaths(ITestComponentMarker, '1.0')
     }
-    
+
     void testReferencePaths_CBTMDP() {
         ComboBoxTableMultiDimensionalParameter parameter = new ComboBoxTableMultiDimensionalParameter(
                 ['example output component', 'hierarchy output component'], ['component'], ITestComponentMarker
@@ -49,7 +49,7 @@ class MultiDimensionalParameterHolderTests extends GroovyTestCase {
         assertEquals 'reference not found due to wrong marker interface', [], parameterHolder.updateReferenceValues(ITest2ComponentMarker, 'hierarchy output component', 'flat output component')
         assertEquals 'reference not found due to wrong value', [], parameterHolder.updateReferenceValues(ITestComponentMarker, '1.0', '5.0')
     }
-    
+
     void testUpdateReferenceValues_CBTMDP() {
         ComboBoxTableMultiDimensionalParameter parameter = new ComboBoxTableMultiDimensionalParameter(
                 ['example output component', 'hierarchy output component'], ['component'], ITestComponentMarker
@@ -61,5 +61,15 @@ class MultiDimensionalParameterHolderTests extends GroovyTestCase {
         assertEquals 'correct modification example -> flat', 'output component', parameterHolder.getBusinessObject().getValueAt(1, 0)
         assertEquals 'reference not found due to wrong marker interface', [], parameterHolder.updateReferenceValues(ITest2ComponentMarker, 'hierarchy output component', 'flat output component')
         assertEquals 'reference not found due to wrong value', [], parameterHolder.updateReferenceValues(ITestComponentMarker, '1.0', '5.0')
+    }
+
+    void testClone() {
+        MultiDimensionalParameterHolder holder = ParameterHolderFactory.getHolder("europe:suisee", 0, new ComboBoxTableMultiDimensionalParameter(
+                ['example output component', 'hierarchy output component'], ['component'], ITestComponentMarker))
+
+        def clone = holder.clone()
+        assertFalse clone.added
+        assertFalse clone.modified
+        assertFalse clone.removed
     }
 }

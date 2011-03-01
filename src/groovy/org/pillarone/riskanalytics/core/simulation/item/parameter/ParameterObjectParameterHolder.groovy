@@ -102,7 +102,7 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
     }
 
     boolean hasParameterChanged() {
-        if (added) return false
+        if (added || removed) return false
 
         boolean result = modified
         if (!result) {

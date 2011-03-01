@@ -211,4 +211,21 @@ class ParameterObjectParameterHolderTests extends GroovyTestCase {
         assertEquals 2d, holder.classifierParameters.get("p3").businessObject
 
     }
+
+    void testHasParameterChanged() {
+        ParameterObjectParameterHolder holder = ParameterHolderFactory.getHolder("path", 0, ExampleParameterObjectClassifier.getStrategy(ExampleParameterObjectClassifier.TYPE0, ["a": 0, "b": 1]))
+
+        assertFalse holder.added
+        assertFalse holder.removed
+        assertFalse holder.hasParameterChanged()
+
+        holder.classifierParameters.entrySet().toList()[0].value.setValue(5)
+
+        assertTrue holder.hasParameterChanged()
+
+        holder.removed = true
+
+        assertFalse holder.hasParameterChanged()
+
+    }
 }

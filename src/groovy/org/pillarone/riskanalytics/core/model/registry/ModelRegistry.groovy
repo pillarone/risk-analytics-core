@@ -66,6 +66,7 @@ class ModelRegistry {
     private void createDefaultModelDao(Class modelClass) {
         ModelDAO dao = new ModelDAO()
         dao.name = modelClass.simpleName
+        dao.modelClassName = modelClass.name
         dao.srcCode = "//source code not available"
         dao.itemVersion = "1"
 
@@ -101,6 +102,10 @@ class ModelRegistry {
 
     Set<Class> getAllModelClasses() {
         return Collections.unmodifiableSet(modelClasses)
+    }
+
+    void clear() {
+        modelClasses.clear()
     }
 
     private void notifyListeners(Class newModelClass) {

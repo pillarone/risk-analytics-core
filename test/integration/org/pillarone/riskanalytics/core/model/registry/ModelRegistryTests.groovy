@@ -9,6 +9,10 @@ import org.pillarone.riskanalytics.core.ModelStructureDAO
 class ModelRegistryTests extends GroovyTestCase {
 
 
+    void setUp() {
+        ModelRegistry.instance.clear()
+    }
+
     void testReadFromDatabase() {
         FileImportService.importModelsIfNeeded(["Core"])
         ModelRegistry registry = ModelRegistry.instance

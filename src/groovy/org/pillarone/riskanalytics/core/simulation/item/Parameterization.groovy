@@ -25,6 +25,7 @@ import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.util.PropertiesUtils
 import org.pillarone.riskanalytics.core.workflow.Status
 import org.springframework.transaction.TransactionStatus
+import org.pillarone.riskanalytics.core.ModelDAO
 
 class Parameterization extends ModellingItem {
 
@@ -32,6 +33,7 @@ class Parameterization extends ModellingItem {
 
     String comment
     VersionNumber versionNumber
+    VersionNumber modelVersionNumber
     private ParameterizationDAO parameterizationDAO
     /**
      * This is the number of different periods available in this parameterization.
@@ -156,6 +158,9 @@ class Parameterization extends ModellingItem {
         dao.modificationDate = modificationDate
         dao.valid = valid
         dao.modelClassName = modelClass.name
+        if (modelVersionNumber != null) {
+            dao.model = ModelDAO.findByModelClassNameAndItemVersion(modelClass.name, modelVersionNumber.toString())
+        }
         dao.creator = creator
         dao.lastUpdater = lastUpdater
         dao.comment = comment
@@ -289,6 +294,9 @@ class Parameterization extends ModellingItem {
         modificationDate = dao.modificationDate
         valid = dao.valid
         modelClass = getClass().getClassLoader().loadClass(dao.modelClassName)
+        if (dao.model != null) {
+            modelVersionNumber = new VersionNumber(dao.model.itemVersion)
+        }
         creator = dao.creator
         lastUpdater = dao.lastUpdater
         status = dao.status
@@ -503,6 +511,11 @@ class Parameterization extends ModellingItem {
             return periodLabels[index]
         }
         return "P$index".toString()
+    }
+
+    void setModelClass(Class clazz) {
+        super.setModelClass(clazz)
+        modelVersionNumber = Model.getModelVersion(clazz)
     }
 
     IConfigObjectWriter getWriter() {

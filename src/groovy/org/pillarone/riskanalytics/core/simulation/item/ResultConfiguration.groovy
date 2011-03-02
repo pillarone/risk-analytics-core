@@ -3,11 +3,13 @@ package org.pillarone.riskanalytics.core.simulation.item
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.output.*
+import org.pillarone.riskanalytics.core.ModelDAO
 
 class ResultConfiguration extends ModellingItem {
 
     String comment
     VersionNumber versionNumber
+    VersionNumber modelVersionNumber
     List<PacketCollector> collectors
 
     public ResultConfiguration(String name) {
@@ -62,6 +64,9 @@ class ResultConfiguration extends ModellingItem {
         dao = dao as ResultConfigurationDAO
         name = dao.name
         modelClass = getClass().getClassLoader().loadClass(dao.modelClassName)
+        if (dao.model != null) {
+            modelVersionNumber = new VersionNumber(dao.model.itemVersion)
+        }
         comment = dao.comment
         versionNumber = new VersionNumber(dao.itemVersion)
         creationDate = dao.creationDate
@@ -82,6 +87,9 @@ class ResultConfiguration extends ModellingItem {
         dao = dao as ResultConfigurationDAO
         dao.name = name
         dao.modelClassName = modelClass.getName()
+        if (modelVersionNumber != null) {
+            dao.model = ModelDAO.findByModelClassNameAndItemVersion(modelClass.name, modelVersionNumber.toString())
+        }
         dao.comment = comment
         dao.itemVersion = versionNumber.toString()
         dao.creationDate = creationDate
@@ -113,6 +121,11 @@ class ResultConfiguration extends ModellingItem {
             }
         }
 
+    }
+
+    void setModelClass(Class clazz) {
+        super.setModelClass(clazz)
+        modelVersionNumber = Model.getModelVersion(clazz)
     }
 
     public boolean isUsedInSimulation() {

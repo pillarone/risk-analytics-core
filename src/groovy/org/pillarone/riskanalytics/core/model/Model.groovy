@@ -7,6 +7,7 @@ import org.pillarone.riskanalytics.core.components.PeriodStore
 import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
 import org.pillarone.riskanalytics.core.wiring.WireCategory
 import org.pillarone.riskanalytics.core.wiring.WiringUtils
+import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 
 abstract class Model {
 
@@ -166,5 +167,14 @@ abstract class Model {
 
     public String getDefaultResultConfiguration() {
         return null
+    }
+
+    public static VersionNumber getModelVersion(Class modelClass) {
+        String versionNumber = "1"
+        if (MigratableModel.isAssignableFrom(modelClass)) {
+            MigratableModel instance = modelClass.newInstance()
+            versionNumber = instance.version.toString()
+        }
+        return new VersionNumber(versionNumber)
     }
 }

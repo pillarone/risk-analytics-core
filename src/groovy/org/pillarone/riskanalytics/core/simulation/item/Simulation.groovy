@@ -5,13 +5,15 @@ import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.output.DeleteSimulationStrategy
+import org.pillarone.riskanalytics.core.ModelDAO
+import org.pillarone.riskanalytics.core.model.Model
 
 class Simulation extends ModellingItem {
 
     Parameterization parameterization
     ResultConfiguration template
     private ModelStructure structure // TODO (Sep 9, 2009, msh): implement as query
-    private VersionNumber modelVersionNumber // TODO (Sep 9, 2009, msh): use ModelItem
+    VersionNumber modelVersionNumber // TODO (Sep 9, 2009, msh): use ModelItem
 
     DateTime beginOfFirstPeriod
     int numberOfIterations
@@ -58,7 +60,9 @@ class Simulation extends ModellingItem {
         run.endTime = end
         run.iterations = numberOfIterations
         run.periodCount = periodCount
-        run.modelVersionNumber = modelVersionNumber.toString()
+        if (modelVersionNumber != null) {
+            run.usedModel = ModelDAO.findByModelClassNameAndItemVersion(modelClass.name, modelVersionNumber.toString())
+        }
         run.beginOfFirstPeriod = beginOfFirstPeriod
         run.creationDate = creationDate
         run.modificationDate = modificationDate
@@ -81,7 +85,9 @@ class Simulation extends ModellingItem {
         periodCount = run.periodCount
         start = run.startTime
         end = run.endTime
-        modelVersionNumber = new VersionNumber(run.modelVersionNumber)
+        if (run.usedModel != null) {
+            modelVersionNumber = new VersionNumber(run.usedModel.itemVersion)
+        }
         beginOfFirstPeriod = run.beginOfFirstPeriod
         creationDate = run.creationDate
         modificationDate = run.modificationDate
@@ -121,13 +127,9 @@ class Simulation extends ModellingItem {
         return results
     }
 
-    public VersionNumber getModelVersionNumber() {
-        // TODO (Sep 9, 2009, msh): get from ModelItem as soon as reference is present
-        return modelVersionNumber
-    }
-
-    public void setModelVersionNumber(VersionNumber versionNumber) {
-        modelVersionNumber = versionNumber
+    void setModelClass(Class clazz) {
+        super.setModelClass(clazz)
+        modelVersionNumber = Model.getModelVersion(clazz)
     }
 
 }

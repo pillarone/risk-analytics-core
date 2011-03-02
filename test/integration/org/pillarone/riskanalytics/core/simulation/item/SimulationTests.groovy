@@ -44,7 +44,6 @@ class SimulationTests extends GroovyTestCase {
         run.model = CoreModel.name
         run.periodCount = 1
         run.iterations = 10
-        run.modelVersionNumber = new VersionNumber("1").toString()
         Date end = new Date()
         run.startTime = start
         run.endTime = end
@@ -60,7 +59,6 @@ class SimulationTests extends GroovyTestCase {
         assertEquals "CoreStructure", simulation.structure.name
         assertEquals 1, simulation.periodCount
         assertEquals 10, simulation.numberOfIterations
-        assertEquals new VersionNumber("1"), simulation.modelVersionNumber
         assertSame CoreModel, simulation.modelClass
         assertEquals start, simulation.start
         assertEquals end, simulation.end
@@ -94,7 +92,6 @@ class SimulationTests extends GroovyTestCase {
         run1.model = CoreModel.name
         run1.periodCount = 1
         run1.iterations = 10
-        run1.modelVersionNumber = new VersionNumber("1").toString()
         run1.save()
 
         SimulationRun run2 = new SimulationRun()
@@ -104,7 +101,6 @@ class SimulationTests extends GroovyTestCase {
         run2.model = CoreModel.name
         run2.periodCount = 1
         run2.iterations = 10
-        run2.modelVersionNumber = new VersionNumber("1").toString()
         run2.save()
 
         PathMapping path = new PathMapping(pathName: "model:path").save()

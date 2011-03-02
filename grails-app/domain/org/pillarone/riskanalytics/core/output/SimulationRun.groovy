@@ -4,6 +4,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 import org.joda.time.DateTime
 import org.joda.time.contrib.hibernate.PersistentDateTime
 import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.pillarone.riskanalytics.core.ModelDAO
 
 class SimulationRun {
 
@@ -19,7 +20,7 @@ class SimulationRun {
     String comment
     Date startTime
     Date endTime
-    String modelVersionNumber // TODO (Sep 21, 2009, msh): why not reference a ModelDAO ?
+    ModelDAO usedModel
     DateTime beginOfFirstPeriod
     Date creationDate
     Date modificationDate
@@ -41,6 +42,7 @@ class SimulationRun {
         beginOfFirstPeriod nullable: true
         randomSeed nullable: true
         toBeDeleted nullable: true
+        usedModel nullable: true
         parameterization nullable: true
         resultConfiguration nullable: true
     }

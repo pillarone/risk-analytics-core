@@ -19,7 +19,6 @@ class CalculatorTests extends GroovyTestCase {
         run.model = CoreModel.name
         run.iterations = 3
         run.periodCount = 2
-        run.modelVersionNumber = '1'
         assertNotNull run.save()
 
         PathMapping path1 = new PathMapping(pathName: "path1").save()

@@ -152,9 +152,9 @@ abstract class FileImportService {
     static void importModelsIfNeeded(List modelNames) {
         String models = modelNames != null && !modelNames.empty ? modelNames.join(", ") : "all models"
         LOG.info "Importing files for ${models}"
-        new ParameterizationImportService().compareFilesAndWriteToDB(modelNames)
-        new ModelStructureImportService().compareFilesAndWriteToDB(modelNames)
         new ModelFileImportService().compareFilesAndWriteToDB(modelNames)
+        new ModelStructureImportService().compareFilesAndWriteToDB(modelNames)
+        new ParameterizationImportService().compareFilesAndWriteToDB(modelNames)
         new ResultConfigurationImportService().compareFilesAndWriteToDB(modelNames)
         ModelRegistry.instance.loadFromDatabase()
     }

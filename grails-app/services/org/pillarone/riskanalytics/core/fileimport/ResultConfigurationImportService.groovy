@@ -5,6 +5,9 @@ import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.output.CollectorInformation
 import org.pillarone.riskanalytics.core.output.PathMapping
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
+import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
+import org.pillarone.riskanalytics.core.output.PacketCollector
+import org.pillarone.riskanalytics.core.output.CollectingModeFactory
 
 public class ResultConfigurationImportService extends FileImportService {
 
@@ -22,8 +25,7 @@ public class ResultConfigurationImportService extends FileImportService {
     }
 
     protected boolean saveItemObject(String fileContent) {
-        ResultConfigurationDAO configuration = new ResultConfigurationDAO()
-        configuration.name = name
+        ResultConfiguration configuration = new ResultConfiguration(name)
         Class modelClass = configObject.model
         Map flatConfig = configObject.components.flatten()
         flatConfig.each {path, mode ->
@@ -33,14 +35,12 @@ public class ResultConfigurationImportService extends FileImportService {
                 pathMapping = new PathMapping(pathName: fixedPath)
                 saveDomainObject(pathMapping)
             }
-            configuration.addToCollectorInformation(new CollectorInformation(path: pathMapping, collectingStrategyIdentifier: mode))
+            configuration.collectors << new PacketCollector(path: pathMapping.pathName, mode: CollectingModeFactory.getStrategy(mode))
         }
 
-        configuration.itemVersion = "1"
-        configuration.modelClassName = modelClass.name
-        saveDomainObject(configuration)
+        configuration.modelClass = modelClass
 
-        return true
+        return configuration.save() != null
     }
 
     private def saveDomainObject(def domainObject) {

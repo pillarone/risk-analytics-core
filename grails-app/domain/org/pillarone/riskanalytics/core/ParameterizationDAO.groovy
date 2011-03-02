@@ -15,6 +15,7 @@ class ParameterizationDAO {
 
     String name
     String modelClassName
+    ModelDAO model
     String itemVersion
     Integer periodCount
 
@@ -40,6 +41,7 @@ class ParameterizationDAO {
     static constraints = {
         name()
         comment(nullable: true, blank: true)
+        model(nullable: true)
         periodLabels(nullable: true, blank: true, maxSize: 1000)
         creationDate nullable: true
         modificationDate nullable: true

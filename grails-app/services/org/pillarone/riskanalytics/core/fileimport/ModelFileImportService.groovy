@@ -7,6 +7,7 @@ import java.util.regex.Pattern
 import org.springframework.beans.factory.config.BeanDefinition
 import org.pillarone.riskanalytics.core.model.MigratableModel
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
+import org.pillarone.riskanalytics.core.model.Model
 
 /**
  * @author sebastian.cartier (at) intuitive-collaboration (dot) com
@@ -38,11 +39,7 @@ class ModelFileImportService extends FileImportService {
 
         modelClass = findModelClass()
 
-        versionNumber = "1"
-        if (MigratableModel.isAssignableFrom(modelClass)) {
-            MigratableModel instance = modelClass.newInstance()
-            versionNumber = instance.version.toString()
-        }
+        versionNumber = Model.getModelVersion(modelClass).toString()
 
         return fileName
     }

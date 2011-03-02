@@ -9,7 +9,7 @@ class DBCleanUpServiceTests extends GroovyTestCase {
     void testCleanUp() {
         int runCount = SimulationRun.count()
         int resultCount = SingleValueResult.count()
-        SimulationRun simulationRun = new SimulationRun(name: "testRun", model: "model", startTime: new Date(), modelVersionNumber: new VersionNumber("1").toString())
+        SimulationRun simulationRun = new SimulationRun(name: "testRun", model: "model", startTime: new Date())
         ParameterizationDAO params = new ParameterizationDAO()
         params.name = "name"
         params.modelClassName = "model"

@@ -85,7 +85,6 @@ class Parameterization extends ModellingItem {
         for (IParameterizationValidator validator in ValidatorRegistry.getValidators()) {
             errors.addAll(validator.validate(parameterHolders.findAll { !it.removed }))
         }
-        parameterHolders*.clearCachedValues()
 
         valid = errors.empty
         validationErrors = errors

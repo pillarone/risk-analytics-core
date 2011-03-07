@@ -23,6 +23,7 @@ class ModelItem extends ModellingItem {
         target.name = name
         target.itemVersion = versionNumber.toString()
         target.srcCode = srcCode
+        target.modelClassName = modelClass.name
     }
 
     protected void mapFromDao(def dao, boolean completeLoad) {
@@ -30,6 +31,7 @@ class ModelItem extends ModellingItem {
             versionNumber = new VersionNumber(dao.itemVersion)
             srcCode = dao.srcCode
             name = dao.name
+            modelClass = getClass().getClassLoader().loadClass(dao.modelClassName)
         }
     }
 

@@ -34,7 +34,7 @@ class BatchRunInfoService {
 
 
     public synchronized void batchSimulationStateChanged(Simulation simulation, SimulationState simulationState) {
-        BatchRunSimulationRun brsr = runningBatchSimulationRuns.find { it.simulationRun.id == simulation.simulationRun.id}
+        BatchRunSimulationRun brsr = runningBatchSimulationRuns.find { (it.simulationRun.name == simulation.name) && (it.simulationRun.model == simulation.modelClass.name)}
         if (!brsr) return
         brsr.simulationState = simulationState
         update(simulation, simulationState)

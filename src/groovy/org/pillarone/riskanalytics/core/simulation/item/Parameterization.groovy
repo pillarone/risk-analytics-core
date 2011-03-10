@@ -334,6 +334,13 @@ class Parameterization extends ModellingItem {
         return ParameterizationDAO.find(name, getModelClass()?.name, versionNumber.toString())
     }
 
+    @Override
+    void unload() {
+        super.unload()
+        parameterHolders?.clear()
+        comments?.clear()
+        tags?.clear()
+    }
 
     public getDao() {
         if (parameterizationDAO?.id == null) {

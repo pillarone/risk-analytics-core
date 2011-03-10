@@ -6,15 +6,15 @@ import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 
 public class ParameterizationHelper {
 
     static Parameterization createDefaultParameterization(Model model, int periodCount = 1) {
         Parameterization result = new Parameterization(model.class.simpleName - "Model" + "-Default")
         result.modelClass = model.class
-        Map parameterMap = getAllParameter(model)
         periodCount.times {index ->
-            List parameterList = parameterMap.collect {Map.Entry entry -> ParameterHolderFactory.getHolder(entry.key, index, entry.value) }
+            List parameterList = extractParameterHoldersFromModel(model, index)
             parameterList.each {
                 result.addParameter(it)
             }
@@ -22,6 +22,11 @@ public class ParameterizationHelper {
         result.periodCount = periodCount
         return result
     }
+
+    static List<ParameterHolder> extractParameterHoldersFromModel(Model model, int periodIndex) {
+        return getAllParameter(model).collect {Map.Entry entry -> ParameterHolderFactory.getHolder(entry.key, periodIndex, entry.value) }
+    }
+
 
     static Parameterization createParameterizationFromConfigObject(ConfigObject configObject, String paramName) {
         Model model = configObject.model.newInstance()

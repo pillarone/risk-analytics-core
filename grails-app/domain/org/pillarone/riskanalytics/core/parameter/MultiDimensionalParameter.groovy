@@ -130,10 +130,10 @@ class MultiDimensionalParameter extends Parameter {
      */
     public Object getParameterInstance() {
         if (parameterObject == null) {
-            Class clazz = this.getClass().getClassLoader().loadClass(className)
+            Class clazz = Thread.currentThread().contextClassLoader.loadClass(className)
             Class markerClass
             if (markerClassName != null) {
-                markerClass = this.getClass().getClassLoader().loadClass(markerClassName)
+                markerClass = Thread.currentThread().contextClassLoader.loadClass(markerClassName)
             }
             def mdpInstance = null
             switch (className) {

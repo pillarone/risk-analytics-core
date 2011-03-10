@@ -28,6 +28,7 @@ public class ModelMigrator {
             Parameterization parameterization = new Parameterization(dao.name)
             parameterization.versionNumber = new VersionNumber(dao.itemVersion)
             parameterization.modelClass = modelClass
+            parameterization.load(false)
 
 
             for (AbstractMigration migration in instance.getMigrationChain(parameterization.versionNumber, toVersion)) {

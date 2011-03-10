@@ -14,6 +14,7 @@ public class ParameterizationHelper {
         Parameterization result = new Parameterization(model.class.simpleName - "Model" + "-Default")
         result.modelClass = model.class
         periodCount.times {index ->
+            model.init()
             List parameterList = extractParameterHoldersFromModel(model, index)
             parameterList.each {
                 result.addParameter(it)
@@ -73,7 +74,6 @@ public class ParameterizationHelper {
 
     protected static Map getAllParameter(Model model) {
         def parameter = [:]
-        model.init()
         collectAllParameter(model, parameter)
         return parameter
     }

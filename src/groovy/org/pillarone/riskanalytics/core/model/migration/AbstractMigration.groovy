@@ -23,7 +23,7 @@ abstract class AbstractMigration {
     URL getOldModelJarURL() {
         String modelClassName = modelClass.simpleName
         String modelPackageName = StringUtils.uncapitalize(modelClassName.substring(0, modelClassName.length() - 5))
-        String url = "/models/${modelPackageName}/${from.toString()}.jar"
+        String url = "/models/${modelPackageName}/${modelClassName}-v${from.toString()}.jar"
         URL resource = getClass().getResource(url)
         if (resource == null) {
             throw new IllegalStateException("Migration jar not found at $url")

@@ -111,7 +111,12 @@ class MultiDimensionalParameter extends Parameter {
         if (parameterValue != null) {
             parameterValue.value = newValue
         } else {
-            addToMultiDimensionalParameterValues(new MultiDimensionalParameterValue(col: col, row: row, value: newValue))
+            //not using the map constructor syntax in domain objects increases performance
+            MultiDimensionalParameterValue multiDimensionalParameterValue = new MultiDimensionalParameterValue()
+            multiDimensionalParameterValue.col = col
+            multiDimensionalParameterValue.row = row
+            multiDimensionalParameterValue.value = newValue
+            addToMultiDimensionalParameterValues(multiDimensionalParameterValue)
         }
     }
 

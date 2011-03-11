@@ -2,7 +2,6 @@ package org.pillarone.riskanalytics.core.fileimport
 
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.pillarone.riskanalytics.core.output.CollectorInformation
 import org.pillarone.riskanalytics.core.output.PathMapping
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
@@ -25,22 +24,30 @@ public class ResultConfigurationImportService extends FileImportService {
     }
 
     protected boolean saveItemObject(String fileContent) {
+        List<PathMapping> pathCache = PathMapping.list()
         ResultConfiguration configuration = new ResultConfiguration(name)
         Class modelClass = configObject.model
         Map flatConfig = configObject.components.flatten()
         flatConfig.each {path, mode ->
             String fixedPath = (modelClass.simpleName - "Model") + ":" + path.replace(".", ":")
-            PathMapping pathMapping = PathMapping.findByPathName(fixedPath)
-            if (!pathMapping) {
-                pathMapping = new PathMapping(pathName: fixedPath)
-                saveDomainObject(pathMapping)
-            }
-            configuration.collectors << new PacketCollector(path: pathMapping.pathName, mode: CollectingModeFactory.getStrategy(mode))
+            configuration.collectors << new PacketCollector(path: getPathMapping(pathCache, fixedPath).pathName, mode: CollectingModeFactory.getStrategy(mode))
         }
-
+        pathCache.clear()
         configuration.modelClass = modelClass
 
         return configuration.save() != null
+    }
+
+    private PathMapping getPathMapping(List<PathMapping> cache, String name) {
+        PathMapping pathMapping = cache.find { it.pathName == name }
+        if (!pathMapping) {
+            pathMapping = PathMapping.findByPathName(name)
+        }
+        if (!pathMapping) {
+            pathMapping = new PathMapping(pathName: name)
+            saveDomainObject(pathMapping)
+        }
+        return pathMapping
     }
 
     private def saveDomainObject(def domainObject) {

@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.fileimport
 import org.pillarone.riskanalytics.core.ModelStructureDAO
 
 import org.pillarone.riskanalytics.core.output.ConfigObjectHolder
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 /**
  * @author stefan.kunz (at) intuitive-collaboration (dot) com
@@ -32,7 +33,9 @@ class ModelStructureImportService extends FileImportService {
     }
 
     public String prepare(URL file, String itemName) {
-        currentConfigObject = new ConfigSlurper().parse(readFromURL(file))
+        GroovyUtils.parseGroovyScript readFromURL(file), { ConfigObject config ->
+            currentConfigObject = config
+        }
         String name = itemName - ".groovy"
         if (currentConfigObject.containsKey('displayName')) {
             name = currentConfigObject.displayName

@@ -250,4 +250,16 @@ public class GroovyUtils {
         }
         return text != null ? text : key
     }
+
+    public static parseGroovyScript(String scriptContent, Closure c) {
+        ConfigSlurper configSlurper = new ConfigSlurper()
+        Script script = configSlurper.classLoader.parseClass(scriptContent).newInstance()
+
+        try {
+            ConfigObject configObject = configSlurper.parse(script)
+            c.call(configObject)
+        } finally {
+            GroovySystem.metaClassRegistry.removeMetaClass(script.class)
+        }
+    }
 }

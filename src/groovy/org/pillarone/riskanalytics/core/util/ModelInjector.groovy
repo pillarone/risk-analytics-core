@@ -52,7 +52,10 @@ abstract class ModelInjector {
         if (!file.exists()) {
             throw new FileNotFoundException(file.absolutePath)
         }
-        ConfigObject config = new ConfigSlurper().parse(file.toURL())
+        ConfigObject config
+        GroovyUtils.parseGroovyScript file.text, { ConfigObject conf ->
+            config = conf
+        }
         return config
     }
 

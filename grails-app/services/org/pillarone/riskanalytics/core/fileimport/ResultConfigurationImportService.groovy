@@ -7,6 +7,7 @@ import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.output.PacketCollector
 import org.pillarone.riskanalytics.core.output.CollectingModeFactory
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 public class ResultConfigurationImportService extends FileImportService {
 
@@ -59,7 +60,9 @@ public class ResultConfigurationImportService extends FileImportService {
     }
 
     public String prepare(URL file, String itemName) {
-        configObject = new ConfigSlurper().parse(readFromURL(file))
+        GroovyUtils.parseGroovyScript readFromURL(file), { ConfigObject config ->
+            configObject = config
+        }
         if (configObject.containsKey("displayName")) {
             name = configObject.displayName
         } else {

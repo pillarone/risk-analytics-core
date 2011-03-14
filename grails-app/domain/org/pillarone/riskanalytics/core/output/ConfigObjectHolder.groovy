@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.output
 
 import org.pillarone.riskanalytics.core.ModelStructureDAO
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 class ConfigObjectHolder {
 
@@ -17,7 +18,11 @@ class ConfigObjectHolder {
     }
 
     public ConfigObject asConfigObject() {
-        return new ConfigSlurper().parse(data)
+        ConfigObject result
+        GroovyUtils.parseGroovyScript data, { ConfigObject config ->
+            result = config
+        }
+        return result
     }
 
 }

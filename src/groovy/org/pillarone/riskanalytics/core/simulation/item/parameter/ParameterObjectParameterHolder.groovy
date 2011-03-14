@@ -17,7 +17,7 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
     public ParameterObjectParameterHolder(Parameter parameter) {
         super(parameter.path, parameter.periodIndex);
         classifierParameters = new HashMap<String, ParameterHolder>()
-        this.classifier = getClass().getClassLoader().loadClass(parameter.type.parameterType).valueOf(parameter.type.parameterValue)
+        this.classifier = Thread.currentThread().contextClassLoader.loadClass(parameter.type.parameterType).valueOf(parameter.type.parameterValue)
         for (ParameterEntry entry in parameter.parameterEntries) {
             def holder = ParameterHolderFactory.getHolder(entry.parameterEntryValue)
             classifierParameters.put(entry.parameterEntryKey, holder)

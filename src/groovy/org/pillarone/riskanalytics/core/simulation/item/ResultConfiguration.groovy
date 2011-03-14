@@ -99,6 +99,7 @@ class ResultConfiguration extends ModellingItem {
 
         Collection<CollectorInformation> currentCollectors = dao.collectorInformation
 
+        List<PathMapping> pathCache = PathMapping.list()
         for (PacketCollector collector in collectors) {
             CollectorInformation existingInformation = dao.collectorInformation.find {CollectorInformation info ->
                 info.path.pathName == collector.path
@@ -107,12 +108,13 @@ class ResultConfiguration extends ModellingItem {
                 existingInformation.collectingStrategyIdentifier = collector.mode.getIdentifier()
             } else {
                 dao.addToCollectorInformation(new CollectorInformation(
-                        path: getPathMapping(collector.path),
+                        path: getPathMapping(pathCache, collector.path),
                         collectingStrategyIdentifier: collector.mode.getIdentifier()
                 ))
             }
         }
 
+        pathCache.clear()
         //Clone list to prevent ConcurrentModificationException
         for (CollectorInformation info in currentCollectors?.toList()?.clone()) {
             if (!collectors*.path.contains(info.path.pathName)) {
@@ -177,8 +179,13 @@ class ResultConfiguration extends ModellingItem {
         return new ResultConfigurationWriter()
     }
 
-    private PathMapping getPathMapping(String path) {
-        PathMapping mapping = PathMapping.findByPathName(path)
+    private PathMapping getPathMapping(List<PathMapping> cache, String path) {
+        PathMapping mapping = cache.find { it.pathName == path}
+        if (mapping != null) {
+            return mapping
+
+        }
+        mapping = PathMapping.findByPathName(path)
         if (!mapping) {
             mapping = new PathMapping(pathName: path)
             if (!mapping.save()) {

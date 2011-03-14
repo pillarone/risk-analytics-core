@@ -111,7 +111,12 @@ class MultiDimensionalParameter extends Parameter {
         if (parameterValue != null) {
             parameterValue.value = newValue
         } else {
-            addToMultiDimensionalParameterValues(new MultiDimensionalParameterValue(col: col, row: row, value: newValue))
+            //not using the map constructor syntax in domain objects increases performance
+            MultiDimensionalParameterValue multiDimensionalParameterValue = new MultiDimensionalParameterValue()
+            multiDimensionalParameterValue.col = col
+            multiDimensionalParameterValue.row = row
+            multiDimensionalParameterValue.value = newValue
+            addToMultiDimensionalParameterValues(multiDimensionalParameterValue)
         }
     }
 
@@ -130,10 +135,10 @@ class MultiDimensionalParameter extends Parameter {
      */
     public Object getParameterInstance() {
         if (parameterObject == null) {
-            Class clazz = this.getClass().getClassLoader().loadClass(className)
+            Class clazz = Thread.currentThread().contextClassLoader.loadClass(className)
             Class markerClass
             if (markerClassName != null) {
-                markerClass = this.getClass().getClassLoader().loadClass(markerClassName)
+                markerClass = Thread.currentThread().contextClassLoader.loadClass(markerClassName)
             }
             def mdpInstance = null
             switch (className) {

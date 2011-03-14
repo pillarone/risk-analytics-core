@@ -14,6 +14,7 @@ class ExampleInputOutputComponent extends Component implements InitializingCompo
     PacketList<Packet> outValue = new PacketList<Packet>()
     PacketList<Packet> inValue = new PacketList<Packet>()
     ExampleParameterObject parmParameterObject = ExampleParameterObjectClassifier.TYPE0.getParameterObject(["a": 0d, "b": 1d])
+    ExampleParameterObject parmNewParameterObject = ExampleParameterObjectClassifier.TYPE0.getParameterObject(["a": 0d, "b": 1d])
 
     def injectedScope
 

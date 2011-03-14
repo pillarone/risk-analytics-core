@@ -3,16 +3,16 @@ package org.pillarone.riskanalytics.core.simulation.engine
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.batch.BatchRunInfoService
+import org.pillarone.riskanalytics.core.components.Component
+import org.pillarone.riskanalytics.core.output.PacketCollector
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
+import org.pillarone.riskanalytics.core.util.GroovyUtils
+import org.pillarone.riskanalytics.core.wiring.ITransmitter
+import org.pillarone.riskanalytics.core.wiring.WiringUtils
 import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.simulation.engine.actions.*
-import org.pillarone.riskanalytics.core.wiring.WiringUtils
-import org.pillarone.riskanalytics.core.components.Component
-import org.pillarone.riskanalytics.core.wiring.ITransmitter
-import org.pillarone.riskanalytics.core.output.PacketCollector
-import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 /**
  * This is the main entity to run a simulation. To do this, create a runner object (SimulationRunner.createRunner()).
@@ -109,8 +109,7 @@ public class SimulationRunner {
             )
             LOG.error this, t
             LOG.debug error.dump()
-            currentScope.simulation.delete()
-            cleanup()
+            deleteFailedSimulation()
             return
         }
         if (simulationAction.isCancelled()) {
@@ -125,6 +124,16 @@ public class SimulationRunner {
         LOG.info "simulation took ${end - start} ms"
         simulationState = simulationAction.isStopped() ? SimulationState.STOPPED : SimulationState.FINISHED
         notifySimulationStateChanged(currentScope?.simulation, simulationState)
+        cleanup()
+    }
+
+    private void deleteFailedSimulation() {
+        try {
+            LOG.info "failed simulation ${currentScope.simulation.name} will be deleted"
+            currentScope.simulation.delete()
+        } catch (Exception ex) {
+            //todo ask sku if deletion of failed batch simulation is desired
+        }
         cleanup()
     }
 

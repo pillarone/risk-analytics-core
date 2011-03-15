@@ -18,6 +18,7 @@ import org.pillarone.riskanalytics.core.simulation.engine.RunSimulationService
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationRunner
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
+import org.joda.time.DateTime
 
 class BatchRunService {
 
@@ -136,7 +137,7 @@ class BatchRunService {
 
 
     public List<BatchRun> getActiveBatchRuns() {
-        return BatchRun.executeQuery("from org.pillarone.riskanalytics.core.BatchRun as b where b.executed = :executed and b.executionTime <= :cDate order by b.executionTime asc ", ["cDate": new Date(), "executed": false])
+        return BatchRun.executeQuery("from org.pillarone.riskanalytics.core.BatchRun as b where b.executed = :executed and b.executionTime <= :cDate order by b.executionTime asc ", ["cDate": new DateTime(), "executed": false])
     }
 
     public List<BatchRun> getAllBatchRuns() {
@@ -198,7 +199,7 @@ class RunnerRegistry implements ActionListener {
             simulationRunner = item["runner"]
             SimulationConfiguration configuration = item["configuration"]
             RunSimulationService.getService().runSimulation(simulationRunner, configuration)
-            LOG.info "executing a simulation ${configuration.simulation.name} at ${new Date()}"
+            LOG.info "executing a simulation ${configuration.simulation.name} at ${new DateTime()}"
         }
         return simulationRunner
     }

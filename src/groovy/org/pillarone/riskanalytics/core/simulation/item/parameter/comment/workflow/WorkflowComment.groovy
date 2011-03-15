@@ -4,6 +4,7 @@ import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.parameter.comment.workflow.IssueStatus
 import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowCommentDAO
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
+import org.joda.time.DateTime
 
 class WorkflowComment extends Comment {
 

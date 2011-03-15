@@ -8,6 +8,8 @@ import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowCommentDAO
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.workflow.Status
+import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
 
 class ParameterizationDAO {
 
@@ -21,8 +23,8 @@ class ParameterizationDAO {
 
     String comment
     String periodLabels
-    Date creationDate
-    Date modificationDate
+    DateTime creationDate
+    DateTime modificationDate
     Person creator
     Person lastUpdater
     boolean valid
@@ -30,7 +32,7 @@ class ParameterizationDAO {
     Status status
 
     Long dealId
-    Date valuationDate
+    DateTime valuationDate
 
     javax.sql.DataSource dataSource
 
@@ -55,6 +57,9 @@ class ParameterizationDAO {
         comments(sort: "path", order: "asc")
         creator lazy: false
         lastUpdater lazy: false
+        creationDate type: DateTimeMillisUserType
+        modificationDate type: DateTimeMillisUserType
+        valuationDate type: DateTimeMillisUserType
     }
 
     String toString() {

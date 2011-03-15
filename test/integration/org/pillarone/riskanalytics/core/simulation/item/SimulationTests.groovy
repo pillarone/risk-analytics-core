@@ -7,6 +7,7 @@ import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
 import org.pillarone.riskanalytics.core.workflow.Status
 import org.pillarone.riskanalytics.core.output.*
+import org.joda.time.DateTime
 
 class SimulationTests extends GroovyTestCase {
 
@@ -36,7 +37,7 @@ class SimulationTests extends GroovyTestCase {
     }
 
     void testLoad() {
-        Date start = new Date()
+        DateTime start = new DateTime()
         SimulationRun run = new SimulationRun()
         run.name = "simulation"
         run.parameterization = createParameterization()
@@ -44,7 +45,7 @@ class SimulationTests extends GroovyTestCase {
         run.model = CoreModel.name
         run.periodCount = 1
         run.iterations = 10
-        Date end = new Date()
+        DateTime end = new DateTime()
         run.startTime = start
         run.endTime = end
         run.save()
@@ -141,7 +142,7 @@ class SimulationTests extends GroovyTestCase {
 
         BatchRun batchRun = new BatchRun()
         batchRun.name = "Test"
-        batchRun.executionTime = new Date()
+        batchRun.executionTime = new DateTime()
         batchRun.save()
 
         BatchRun batch = BatchRun.findByName("Test")

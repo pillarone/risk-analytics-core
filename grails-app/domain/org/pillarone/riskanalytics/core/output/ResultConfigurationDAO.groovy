@@ -2,6 +2,8 @@ package org.pillarone.riskanalytics.core.output
 
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.ModelDAO
+import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
+import org.joda.time.DateTime
 
 public class ResultConfigurationDAO {
 
@@ -11,8 +13,8 @@ public class ResultConfigurationDAO {
     ModelDAO model
     String itemVersion
 
-    Date creationDate
-    Date modificationDate
+    DateTime creationDate
+    DateTime modificationDate
     Person creator
     Person lastUpdater
 
@@ -32,5 +34,7 @@ public class ResultConfigurationDAO {
     static mapping = {
         creator lazy: false
         lastUpdater lazy: false
+        creationDate type: DateTimeMillisUserType
+        modificationDate type: DateTimeMillisUserType
     }
 }

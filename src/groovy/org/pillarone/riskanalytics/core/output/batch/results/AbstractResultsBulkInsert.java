@@ -16,7 +16,6 @@ import java.util.List;
 public abstract class AbstractResultsBulkInsert extends AbstractBulkInsert {
 
     void addResults(List<SingleValueResultPOJO> results) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         List values = new ArrayList(7);
         for (SingleValueResultPOJO result : results) {
             values.add(getSimulationRunId());
@@ -31,7 +30,7 @@ public abstract class AbstractResultsBulkInsert extends AbstractBulkInsert {
                 values.add(null);
             }
             else {
-                values.add(simpleDateFormat.format(result.getDate()));
+                values.add(result.getDate().getMillis());
             }
             writeResult(values);
             values.clear();

@@ -4,6 +4,7 @@ import org.apache.log4j.Logger
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.user.UserManagement
 import org.springframework.transaction.TransactionStatus
+import org.joda.time.DateTime
 
 abstract class ModellingItem {
     final static Logger LOG = Logger.getLogger(ModellingItem)
@@ -11,8 +12,8 @@ abstract class ModellingItem {
     String name
     Class modelClass
 
-    Date creationDate
-    Date modificationDate
+    DateTime creationDate
+    DateTime modificationDate
 
     Person creator
     Person lastUpdater
@@ -110,7 +111,7 @@ abstract class ModellingItem {
     }
 
     protected void setChangeUserInfo() {
-        Date date = new Date()
+        DateTime date = new DateTime()
         Person currentUser = UserManagement.getCurrentUser()
         if (creationDate == null) {
             creationDate = date
@@ -123,7 +124,7 @@ abstract class ModellingItem {
 
     public void updateChangeUserAndDate() {
         if (this.properties.keySet().contains("modificationDate")) {
-            this.modificationDate = new Date()
+            this.modificationDate = new DateTime()
         }
     }
 

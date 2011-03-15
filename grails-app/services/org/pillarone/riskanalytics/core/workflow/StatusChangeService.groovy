@@ -12,6 +12,7 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Commen
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
 import org.pillarone.riskanalytics.core.user.UserManagement
 import static org.pillarone.riskanalytics.core.workflow.Status.*
+import org.joda.time.DateTime
 
 class StatusChangeService {
 
@@ -101,7 +102,7 @@ class StatusChangeService {
 
     private void audit(Status from, Status to, Parameterization fromParameterization, Parameterization toParameterization) {
         AuditLog auditLog = new AuditLog(fromStatus: from, toStatus: to, fromParameterization: fromParameterization?.dao, toParameterization: toParameterization.dao)
-        auditLog.date = new Date()
+        auditLog.date = new DateTime()
         auditLog.person = UserManagement.getCurrentUser()
         if (!auditLog.save(flush: true)) {
             LOG.error "Error saving audit log: ${auditLog.errors}"

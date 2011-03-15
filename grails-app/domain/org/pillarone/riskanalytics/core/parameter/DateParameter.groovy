@@ -11,7 +11,6 @@ class DateParameter extends Parameter {
         DateParameter
     }
 
-
     static mapping = {
         dateValue type: DateTimeMillisUserType
     }

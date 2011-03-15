@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.parameterization;
 
+import org.joda.time.DateTime;
 import org.pillarone.riskanalytics.core.components.ComponentUtils;
 import org.pillarone.riskanalytics.core.model.Model;
 import org.pillarone.riskanalytics.core.util.CloneSupport;
@@ -188,6 +189,7 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable {
 
         object = (object == null && values.get(column).size() > 0) ? values.get(column).get(0) : new Double(0);
         if (object instanceof Date) return ((Date) object).clone();
+        if (object instanceof DateTime) return new DateTime(((DateTime) object).getMillis());
         if (object instanceof String) return object;
         if (object instanceof Integer) return new Integer(0);
         return new Double(0);

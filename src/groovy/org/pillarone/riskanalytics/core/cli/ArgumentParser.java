@@ -5,6 +5,7 @@ import groovy.util.ConfigSlurper;
 import org.apache.commons.cli.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.joda.time.DateTime;
 import org.pillarone.riskanalytics.core.output.DBOutput;
 import org.pillarone.riskanalytics.core.output.FileOutput;
 import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy;
@@ -15,7 +16,6 @@ import org.pillarone.riskanalytics.core.simulation.item.*;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 public class ArgumentParser {
@@ -88,7 +88,7 @@ public class ArgumentParser {
     public Simulation createSimulation(CommandLine commandLine) throws Exception {
         final boolean force = commandLine.hasOption(FORCE_OPTION);
 
-        String simulationName = "CLI " + new Date().toString();
+        String simulationName = "CLI " + new DateTime().toString();
         if (commandLine.hasOption(SIMULATION_NAME_OPTION)) {
             simulationName = commandLine.getOptionValue(SIMULATION_NAME_OPTION);
         }

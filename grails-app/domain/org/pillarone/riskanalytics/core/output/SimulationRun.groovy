@@ -5,6 +5,7 @@ import org.joda.time.DateTime
 import org.joda.time.contrib.hibernate.PersistentDateTime
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.ModelDAO
+import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
 
 class SimulationRun {
 
@@ -18,12 +19,12 @@ class SimulationRun {
     Boolean toBeDeleted = false
 
     String comment
-    Date startTime
-    Date endTime
+    DateTime startTime
+    DateTime endTime
     ModelDAO usedModel
     DateTime beginOfFirstPeriod
-    Date creationDate
-    Date modificationDate
+    DateTime creationDate
+    DateTime modificationDate
 
     // more to come here
 
@@ -48,7 +49,11 @@ class SimulationRun {
     }
 
     static mapping = {
-        beginOfFirstPeriod type: PersistentDateTime
+        beginOfFirstPeriod type: DateTimeMillisUserType
+        startTime type: DateTimeMillisUserType
+        endTime type: DateTimeMillisUserType
+        creationDate type: DateTimeMillisUserType
+        modificationDate type: DateTimeMillisUserType
     }
 
     public boolean equals(Object obj) {

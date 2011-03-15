@@ -22,13 +22,11 @@ class Simulation extends ModellingItem {
      */
     int periodCount
     Integer randomSeed
-    volatile Date start
-    volatile Date end
+    volatile DateTime start
+    volatile DateTime end
 
     String comment
 
-    Date creationDate
-    Date modificationDate
 
     private SimulationRun run
 

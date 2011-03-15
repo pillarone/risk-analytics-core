@@ -4,6 +4,7 @@ import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.output.*
 import org.pillarone.riskanalytics.core.ModelDAO
+import org.joda.time.DateTime
 
 class ResultConfiguration extends ModellingItem {
 

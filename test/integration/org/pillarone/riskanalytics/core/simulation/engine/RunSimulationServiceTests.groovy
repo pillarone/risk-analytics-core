@@ -15,6 +15,7 @@ import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
+import org.joda.time.DateTime
 
 class RunSimulationServiceTests extends GrailsUnitTestCase {
 
@@ -43,7 +44,7 @@ class RunSimulationServiceTests extends GrailsUnitTestCase {
         resultConfig.load()
 
 
-        Simulation run = new Simulation("Core_${new Date().toString()}")
+        Simulation run = new Simulation("Core_${new DateTime().toString()}")
         run.parameterization = parameter
         run.template = resultConfig
         run.modelClass = CoreModel

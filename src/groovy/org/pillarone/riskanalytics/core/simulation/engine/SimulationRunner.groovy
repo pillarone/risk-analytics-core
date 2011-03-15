@@ -13,6 +13,7 @@ import org.pillarone.riskanalytics.core.wiring.ITransmitter
 import org.pillarone.riskanalytics.core.wiring.WiringUtils
 import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.simulation.engine.actions.*
+import org.joda.time.DateTime
 
 /**
  * This is the main entity to run a simulation. To do this, create a runner object (SimulationRunner.createRunner()).
@@ -61,7 +62,7 @@ public class SimulationRunner {
         notifySimulationStateChanged(currentScope?.simulation, simulationState)
         LOG.debug "start simulation"
         start = System.currentTimeMillis()
-        Date startDate = new Date(start)
+        DateTime startDate = new DateTime(start)
         currentScope?.simulation?.start = startDate
         try {
             for (Action action in preSimulationActions) {
@@ -118,7 +119,7 @@ public class SimulationRunner {
         }
         LOG.debug "end simulation"
         long end = System.currentTimeMillis()
-        currentScope?.simulation?.end = new Date(end)
+        currentScope?.simulation?.end = new DateTime(end)
         currentScope?.simulation?.save()
 
         LOG.info "simulation took ${end - start} ms"
@@ -177,13 +178,13 @@ public class SimulationRunner {
     }
 
 
-    Date getEstimatedSimulationEnd() {
+    DateTime getEstimatedSimulationEnd() {
         int progress = currentScope.getProgress()
         if (progress > 0 && simulationState == SimulationState.RUNNING) {
             long now = System.currentTimeMillis()
             long onePercentTime = (now - start) / progress
             long estimatedEnd = now + (onePercentTime * (100 - progress))
-            return new Date(estimatedEnd)
+            return new DateTime(estimatedEnd)
         } else if (simulationState == SimulationState.POST_SIMULATION_CALCULATIONS) {
             CalculatorAction action = postSimulationActions.find { it instanceof CalculatorAction }
             return action?.calculator?.estimatedEnd

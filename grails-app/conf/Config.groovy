@@ -1,6 +1,5 @@
 import org.pillarone.riskanalytics.core.output.batch.results.SQLServerBulkInsert
 import org.pillarone.riskanalytics.core.output.batch.results.MysqlBulkInsert
-import org.pillarone.riskanalytics.core.output.batch.results.DerbyBulkInsert
 import org.pillarone.riskanalytics.core.output.batch.calculations.MysqlCalculationsBulkInsert
 import grails.plugins.springsecurity.SecurityConfigType
 
@@ -104,18 +103,6 @@ environments {
         ]
     }
 
-    standalone {
-        resultBulkInsert = DerbyBulkInsert
-        maxIterations = 10000
-        models = ["CapitalEagleModel", "DependencyModel", "DynamicCapitalEagleModel", "MultiLineReinsuranceModel", "TwoLobDependencyModel", "PodraModel"]
-        keyFiguresToCalculate = [
-                'stdev': true,
-                'percentile': [0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0],
-                'var': [99, 99.5],
-                'tvar': [99, 99.5],
-                'pdf': 200
-        ]
-    }
 }
 
 grails {

@@ -4,6 +4,7 @@ import org.pillarone.riskanalytics.core.output.CollectorMapping
 import org.pillarone.riskanalytics.core.output.FieldMapping
 import org.pillarone.riskanalytics.core.output.PathMapping
 import org.pillarone.riskanalytics.core.output.SingleValueResult
+import org.joda.time.DateTime
 
 class GenericBulkInsert extends AbstractResultsBulkInsert {
 
@@ -20,7 +21,7 @@ class GenericBulkInsert extends AbstractResultsBulkInsert {
             result.value = Double.parseDouble(values[6])
             result.valueIndex = Integer.parseInt(values[7])
             if (values[8] != "null") {
-                result.date = Date.parse(values[8])
+                result.date = new DateTime(values[8] as long)
             }
             result.save()
         }

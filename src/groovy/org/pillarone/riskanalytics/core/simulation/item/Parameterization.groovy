@@ -26,6 +26,7 @@ import org.pillarone.riskanalytics.core.util.PropertiesUtils
 import org.pillarone.riskanalytics.core.workflow.Status
 import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.ModelDAO
+import org.joda.time.DateTime
 
 class Parameterization extends ModellingItem {
 
@@ -52,7 +53,7 @@ class Parameterization extends ModellingItem {
 
     Status status
     Long dealId
-    Date valuationDate
+    DateTime valuationDate
 
     public Parameterization(Map params) {
         this(params.remove("name").toString())

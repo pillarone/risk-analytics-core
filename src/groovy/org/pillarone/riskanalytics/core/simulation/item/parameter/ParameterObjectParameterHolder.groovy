@@ -83,11 +83,7 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
             if (oldEntry != null && oldEntry.businessObject.class.name == entry.value.class.name) {
                 holder = classifierParameters.get(entry.key)
             } else {
-                Object entryValue = entry.value
-                if (entryValue instanceof AbstractMultiDimensionalParameter) {
-                    entryValue = entryValue.clone()
-                }
-                holder = ParameterHolderFactory.getHolder(path + ":$entry.key", periodIndex, entryValue)
+                holder = ParameterHolderFactory.getHolder(path + ":$entry.key", periodIndex, entry.value)
             }
             newClassifierParameters.put(entry.key, holder)
         }

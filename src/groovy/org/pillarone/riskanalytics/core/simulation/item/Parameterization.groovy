@@ -1,7 +1,10 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
-import java.text.SimpleDateFormat
 import org.apache.commons.lang.builder.HashCodeBuilder
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.format.DateTimeFormatter
+import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.output.SimulationRun
@@ -25,8 +28,6 @@ import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.util.PropertiesUtils
 import org.pillarone.riskanalytics.core.workflow.Status
 import org.springframework.transaction.TransactionStatus
-import org.pillarone.riskanalytics.core.ModelDAO
-import org.joda.time.DateTime
 
 class Parameterization extends ModellingItem {
 
@@ -126,7 +127,7 @@ class Parameterization extends ModellingItem {
             ParameterApplicator applicator = new ParameterApplicator(model: model, parameterization: this)
             applicator.init()
             applicator.applyParameterForPeriod(0)
-            SimpleDateFormat dateFormat = new SimpleDateFormat(PERIOD_DATE_FORMAT)
+            DateTimeFormatter formatter = DateTimeFormat.forPattern(PERIOD_DATE_FORMAT)
             IPeriodCounter counter = model.createPeriodCounter(null)
             if (counter == null) {
                 return null
@@ -134,7 +135,7 @@ class Parameterization extends ModellingItem {
             List result = []
             if (counter instanceof ILimitedPeriodCounter) {
                 for (int i = 0; i < counter.periodCount(); i++) {
-                    result << dateFormat.format(counter.getCurrentPeriodStart().toDate())
+                    result << formatter.print(counter.currentPeriodStart)
                     counter.next()
                 }
             }

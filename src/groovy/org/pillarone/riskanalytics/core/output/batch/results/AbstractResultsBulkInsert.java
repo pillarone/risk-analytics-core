@@ -6,7 +6,6 @@ import org.pillarone.riskanalytics.core.output.SingleValueResultPOJO;
 import org.pillarone.riskanalytics.core.output.batch.AbstractBulkInsert;
 import org.pillarone.riskanalytics.core.util.GroovyUtils;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 

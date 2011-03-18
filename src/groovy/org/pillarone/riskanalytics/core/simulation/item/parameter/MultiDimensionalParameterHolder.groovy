@@ -40,7 +40,7 @@ class MultiDimensionalParameterHolder extends ParameterHolder implements IMarker
 
     public MultiDimensionalParameterHolder clone() {
         MultiDimensionalParameterHolder holder = (MultiDimensionalParameterHolder) super.clone();
-        holder.value = (AbstractMultiDimensionalParameter) value.clone()
+        holder.@value = (AbstractMultiDimensionalParameter) value.clone()
         return holder
     }
 
@@ -74,4 +74,13 @@ class MultiDimensionalParameterHolder extends ParameterHolder implements IMarker
         }
         return referencePaths
     }
+
+    @Override
+    void clearCachedValues() {
+        if (value != null) {
+            value.simulationModel = null
+        }
+    }
+
+
 }

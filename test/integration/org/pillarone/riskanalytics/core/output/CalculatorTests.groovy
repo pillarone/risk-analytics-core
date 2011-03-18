@@ -23,7 +23,6 @@ class CalculatorTests extends GroovyTestCase {
         run.model = CoreModel.name
         run.iterations = 3
         run.periodCount = 2
-        run.modelVersionNumber = '1'
         assertNotNull run.save()
         resultWriter = new ResultWriter(run.id)
 

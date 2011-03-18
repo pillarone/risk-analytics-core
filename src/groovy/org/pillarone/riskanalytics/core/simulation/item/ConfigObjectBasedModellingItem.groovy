@@ -5,6 +5,7 @@ import org.pillarone.riskanalytics.core.output.ConfigObjectHolder
 import org.pillarone.riskanalytics.core.simulation.item.ModellingItem
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 abstract class ConfigObjectBasedModellingItem extends ModellingItem {
 
@@ -40,7 +41,7 @@ abstract class ConfigObjectBasedModellingItem extends ModellingItem {
         getWriter().write(data, new BufferedWriter(stringWriter))
         String stringData = stringWriter.toString()
 
-        new ConfigSlurper().parse(stringData)
+        GroovyUtils.parseGroovyScript stringData, { }
 
         return stringData
     }
@@ -87,7 +88,9 @@ abstract class ConfigObjectBasedModellingItem extends ModellingItem {
 
     protected void mapFromDao(def source, boolean completeLoad) {
         if (source) {
-            data = new ConfigSlurper().parse(source.stringData.data)
+            GroovyUtils.parseGroovyScript source.stringData.data, { ConfigObject config ->
+                data = config
+            }
             comment = source.comment
             FileImportService.spreadRanges(data)
         }

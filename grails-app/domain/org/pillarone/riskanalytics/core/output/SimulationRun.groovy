@@ -4,6 +4,8 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 import org.joda.time.DateTime
 import org.joda.time.contrib.hibernate.PersistentDateTime
 import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.pillarone.riskanalytics.core.ModelDAO
+import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
 
 class SimulationRun {
 
@@ -17,12 +19,12 @@ class SimulationRun {
     Boolean toBeDeleted = false
 
     String comment
-    Date startTime
-    Date endTime
-    String modelVersionNumber // TODO (Sep 21, 2009, msh): why not reference a ModelDAO ?
+    DateTime startTime
+    DateTime endTime
+    ModelDAO usedModel
     DateTime beginOfFirstPeriod
-    Date creationDate
-    Date modificationDate
+    DateTime creationDate
+    DateTime modificationDate
 
     // more to come here
 
@@ -41,12 +43,17 @@ class SimulationRun {
         beginOfFirstPeriod nullable: true
         randomSeed nullable: true
         toBeDeleted nullable: true
+        usedModel nullable: true
         parameterization nullable: true
         resultConfiguration nullable: true
     }
 
     static mapping = {
-        beginOfFirstPeriod type: PersistentDateTime
+        beginOfFirstPeriod type: DateTimeMillisUserType
+        startTime type: DateTimeMillisUserType
+        endTime type: DateTimeMillisUserType
+        creationDate type: DateTimeMillisUserType
+        modificationDate type: DateTimeMillisUserType
     }
 
     public boolean equals(Object obj) {

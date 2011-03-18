@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.fileimport
 
 import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.joda.time.DateTime
 
 class ParameterizationImportServiceTests extends GroovyTestCase {
 
@@ -39,7 +40,7 @@ class ParameterizationImportServiceTests extends GroovyTestCase {
         assertEquals comments[0].periodIndex, 0
         assertEquals comments[0].comment, "comment text"
         assertNull comments[0].user
-        assertEquals comments[0].timeStamp, new Date(1285144738000)
+        assertEquals comments[0].timeStamp, new DateTime(1285144738000)
         List tags = comments[0].tags as List
         assertEquals tags.size(), 1
         assertEquals tags[0].tag.name, "FIXED"

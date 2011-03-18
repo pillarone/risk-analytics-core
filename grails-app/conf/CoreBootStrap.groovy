@@ -95,10 +95,9 @@ class CoreBootStrap {
             def unfinishedSimulations = SimulationRun.findAllByEndTime(null)
             unfinishedSimulations.each {SimulationRun simulationRun ->
                 try {
-                    BatchRunSimulationRun brsr = BatchRunSimulationRun.findBySimulationRun(simulationRun)
-                    if (brsr)
-                        brsr.delete()
-                    simulationRun.delete()
+                    BatchRunSimulationRun batchRunSimulationRun = BatchRunSimulationRun.findBySimulationRun(simulationRun)
+                    if (!batchRunSimulationRun)
+                        simulationRun.delete()
                 } catch (Exception ex) {
                     ex.printStackTrace()
                 }

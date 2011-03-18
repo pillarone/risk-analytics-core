@@ -21,7 +21,7 @@ class ResultService implements IResultService {
             result << new ParameterizationInfo(
                     parameterizationId: dao.id, name: dao.name, version: dao.itemVersion,
                     comment: dao.comment, user: dao.lastUpdater?.username, status: dao.status,
-                    valuationDate: dao.valuationDate
+                    valuationDate: dao.valuationDate.toDate()
             )
         }
         return result
@@ -107,7 +107,7 @@ class ResultService implements IResultService {
             SimulationInfo info = new SimulationInfo()
             info.simulationId = run.id
             info.name = run.name
-            info.runDate = run.startTime
+            info.runDate = run.startTime?.toDate()
             info.user = "" //TODO
             info.iterationCount = run.iterations
             info.resultTemplateName = run.resultConfiguration.name

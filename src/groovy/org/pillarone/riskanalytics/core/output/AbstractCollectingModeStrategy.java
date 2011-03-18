@@ -2,12 +2,11 @@ package org.pillarone.riskanalytics.core.output;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.joda.time.DateTime;
 import org.pillarone.riskanalytics.core.packets.Packet;
-import org.pillarone.riskanalytics.core.packets.PacketList;
 import org.pillarone.riskanalytics.core.simulation.engine.PeriodScope;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -48,14 +47,14 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
      * @param periodScope
      * @return date property of packet if SingleValueCollectingModeStrategy used or beginning of current period
      */
-    private Date getDate(Packet packet, PeriodScope periodScope) {
-        Date date = null;
+    private DateTime getDate(Packet packet, PeriodScope periodScope) {
+        DateTime date = null;
         if (packetCollector.getMode() instanceof SingleValueCollectingModeStrategy
                 && packet != null && packet.getDate() != null) {
-            date = packet.getDate().toDate();
+            date = packet.getDate();
         }
         else if (periodScope.getPeriodCounter() != null) {
-            date = periodScope.getCurrentPeriodStartDate().toDate();
+            date = periodScope.getCurrentPeriodStartDate();
         }
         return date;
     }
@@ -66,7 +65,7 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
      * The key of the value map is the field name.
      * If a value is infinite or NaN a log statement is created and the packet ignored.
      */
-    private List<SingleValueResultPOJO> createSingleValueResults(Map<String, Number> valueMap, int valueIndex, int period, Date date) {
+    private List<SingleValueResultPOJO> createSingleValueResults(Map<String, Number> valueMap, int valueIndex, int period, DateTime date) {
         List<SingleValueResultPOJO> results = new ArrayList(valueMap.size());
         int iteration = packetCollector.getSimulationScope().getIterationScope().getCurrentIteration();
         PathMapping path = packetCollector.getSimulationScope().getMappingCache().lookupPath(packetCollector.getPath());

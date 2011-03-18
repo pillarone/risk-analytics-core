@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.simulation.engine.grid;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.gridgain.grid.*;
+import org.joda.time.DateTime;
 import org.pillarone.riskanalytics.core.batch.BatchRunInfoService;
 import org.pillarone.riskanalytics.core.output.Calculator;
 import org.pillarone.riskanalytics.core.output.PathMapping;
@@ -55,7 +56,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
 
         currentState = SimulationState.INITIALIZING;
         time = System.currentTimeMillis();
-        simulationConfiguration.getSimulation().setStart(new Date());
+        simulationConfiguration.getSimulation().setStart(new DateTime());
 
         resultTransferListener = new ResultTransferListener(this);
 
@@ -204,7 +205,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         BatchRunInfoService.getService().batchSimulationStateChanged(simulation, currentState);
         calculator.calculate();
 
-        simulation.setEnd(new Date());
+        simulation.setEnd(new DateTime());
         simulation.save();
         currentState = stopped ? SimulationState.STOPPED : SimulationState.FINISHED;
         LOG.info("Task completed in " + (System.currentTimeMillis() - time) + "ms");
@@ -259,13 +260,13 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         }
     }
 
-    public Date getEstimatedSimulationEnd() {
+    public DateTime getEstimatedSimulationEnd() {
         int progress = getProgress();
         if (progress > 0 && currentState == SimulationState.RUNNING) {
             long now = System.currentTimeMillis();
             long onePercentTime = (now - time) / progress;
             long estimatedEnd = now + (onePercentTime * (100 - progress));
-            return new Date(estimatedEnd);
+            return new DateTime(estimatedEnd);
         } else if (currentState == SimulationState.POST_SIMULATION_CALCULATIONS) {
             return calculator.getEstimatedEnd();
         }

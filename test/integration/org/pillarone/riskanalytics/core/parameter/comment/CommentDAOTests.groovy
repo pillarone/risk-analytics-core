@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.parameter.comment
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.workflow.Status
+import org.joda.time.DateTime
 
 class CommentDAOTests extends GroovyTestCase {
 
@@ -27,7 +28,7 @@ class CommentDAOTests extends GroovyTestCase {
         comment.parameterization = parameterization
         comment.path = "path"
         comment.periodIndex = 0
-        comment.timeStamp = new Date()
+        comment.timeStamp = new DateTime()
         comment.comment = "text"
 
         comment.addToTags(new CommentTag(tag: tag))

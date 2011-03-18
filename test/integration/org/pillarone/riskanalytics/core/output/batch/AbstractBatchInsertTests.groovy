@@ -3,7 +3,6 @@ package org.pillarone.riskanalytics.core.output.batch
 import grails.test.GrailsUnitTestCase
 import grails.util.Environment
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
-import org.pillarone.riskanalytics.core.output.batch.results.DerbyBulkInsert
 import org.pillarone.riskanalytics.core.output.batch.results.GenericBulkInsert
 import org.pillarone.riskanalytics.core.output.batch.results.MysqlBulkInsert
 import org.pillarone.riskanalytics.core.output.batch.results.AbstractResultsBulkInsert
@@ -35,8 +34,6 @@ class AbstractBatchInsertTests extends GrailsUnitTestCase {
         switchEnvironment "mysql"
         assertEquals "MysqlBatchInsert expected in environment ${Environment.getCurrent().name}", MysqlBulkInsert, AbstractResultsBulkInsert.getBulkInsertInstance().class
 
-        switchEnvironment "standalone"
-        assertEquals "DerbyBatchInsert expected in environment ${Environment.getCurrent().name}", DerbyBulkInsert, AbstractResultsBulkInsert.getBulkInsertInstance().class
     }
 
     private def switchEnvironment(Environment env) {

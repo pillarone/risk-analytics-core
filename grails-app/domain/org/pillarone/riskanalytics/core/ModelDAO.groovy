@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core
 class ModelDAO {
 
     String name
+    String modelClassName
     String srcCode
     String itemVersion
 

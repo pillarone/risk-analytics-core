@@ -1,6 +1,8 @@
 package org.pillarone.riskanalytics.core.output
 
 import org.hibernate.FetchMode
+import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
 
 class SingleValueResult {
 
@@ -12,21 +14,22 @@ class SingleValueResult {
     FieldMapping field
     int valueIndex
     Double value
-    Date date
+    DateTime date
 
     static constraints = {
         period min: 0
         iteration min: 0
         path()
         value()
-        collector nullable:true
-        field nullable:true
-        date nullable:true
+        collector nullable: true
+        field nullable: true
+        date nullable: true
     }
 
     static mapping = {
         id generator: 'identity'
         path lazy: false, fetchMode: FetchMode.JOIN
+        date type: DateTimeMillisUserType
     }
 
     String toString() {

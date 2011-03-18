@@ -4,6 +4,7 @@ import org.pillarone.riskanalytics.core.ParameterizationDAO
 
 import org.pillarone.riskanalytics.core.parameterization.ParameterizationHelper
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 public class ParameterizationImportService extends FileImportService {
 
@@ -26,7 +27,9 @@ public class ParameterizationImportService extends FileImportService {
     }
 
     public String prepare(URL file, String itemName) {
-        currentConfigObject = new ConfigSlurper().parse(readFromURL(file))
+        GroovyUtils.parseGroovyScript readFromURL(file), { ConfigObject config ->
+            currentConfigObject = config
+        }
         String name = itemName - ".groovy"
         if (currentConfigObject.containsKey('displayName')) {
             name = currentConfigObject.displayName

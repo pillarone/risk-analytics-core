@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.parameterization;
 
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -181,6 +183,7 @@ public class MatrixMultiDimensionalParameter extends AbstractMultiDimensionalPar
     public static Object generateValue(List list, int index) {
         Object o = list.get(index);
         if (o instanceof Date) return ((Date) o).clone();
+        if (o instanceof DateTime) return new DateTime(((DateTime) o).getMillis());
         if (o instanceof String) return o;
         if (o instanceof Integer) return new Integer(0);
         return new Double(0);

@@ -60,9 +60,13 @@ public class ComboBoxMatrixMultiDimensionalParameter extends MatrixMultiDimensio
 
     public void setSimulationModel(Model simulationModel) {
         super.setSimulationModel(simulationModel);
-        List<Component> components = simulationModel.getMarkedComponents(markerClass);
-        for (Component component : components) {
-            comboBoxValues.put(component.getNormalizedName(), component);
+        if (simulationModel != null) {
+            List<Component> components = simulationModel.getMarkedComponents(markerClass);
+            for (Component component : components) {
+                comboBoxValues.put(component.getNormalizedName(), component);
+            }
+        } else {
+            comboBoxValues.clear();
         }
     }
 

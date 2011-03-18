@@ -2,13 +2,15 @@ package org.pillarone.riskanalytics.core.parameter.comment.workflow
 
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.user.Person
+import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
 
 class WorkflowCommentDAO {
 
     ParameterizationDAO parameterization
     String path
     int periodIndex
-    Date timeStamp
+    DateTime timeStamp
     String comment
     Person user
     IssueStatus status
@@ -21,5 +23,9 @@ class WorkflowCommentDAO {
 
     String toString() {
         "$path P$periodIndex: $comment"
+    }
+
+    static mapping = {
+        timeStamp type: DateTimeMillisUserType
     }
 }

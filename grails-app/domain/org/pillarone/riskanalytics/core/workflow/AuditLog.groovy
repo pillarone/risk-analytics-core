@@ -2,6 +2,8 @@ package org.pillarone.riskanalytics.core.workflow
 
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.user.Person
+import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
 
 class AuditLog {
 
@@ -11,7 +13,7 @@ class AuditLog {
     Status fromStatus
     Status toStatus
 
-    Date date
+    DateTime date
     Person person
 
     static constraints = {
@@ -21,5 +23,9 @@ class AuditLog {
 
     String toString() {
         "${toParameterization.name}: ${fromStatus.displayName} -> ${toStatus.displayName}"
+    }
+
+    static mapping = {
+        date type: DateTimeMillisUserType
     }
 }

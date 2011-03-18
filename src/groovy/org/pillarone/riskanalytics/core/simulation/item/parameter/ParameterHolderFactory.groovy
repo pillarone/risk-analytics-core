@@ -47,7 +47,7 @@ class ParameterHolderFactory {
     }
 
     public static ParameterHolder getHolder(String path, int periodIndex, AbstractMultiDimensionalParameter value) {
-        return new MultiDimensionalParameterHolder(path, periodIndex, value)
+        return new MultiDimensionalParameterHolder(path, periodIndex, value.clone())
     }
 
     public static ParameterHolder getHolder(Parameter parameter) {

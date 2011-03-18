@@ -8,6 +8,8 @@ import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowCommentDAO
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.workflow.Status
+import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
 
 class ParameterizationDAO {
 
@@ -15,13 +17,14 @@ class ParameterizationDAO {
 
     String name
     String modelClassName
+    ModelDAO model
     String itemVersion
     Integer periodCount
 
     String comment
     String periodLabels
-    Date creationDate
-    Date modificationDate
+    DateTime creationDate
+    DateTime modificationDate
     Person creator
     Person lastUpdater
     boolean valid
@@ -29,7 +32,7 @@ class ParameterizationDAO {
     Status status
 
     Long dealId
-    Date valuationDate
+    DateTime valuationDate
 
     javax.sql.DataSource dataSource
 
@@ -40,6 +43,7 @@ class ParameterizationDAO {
     static constraints = {
         name()
         comment(nullable: true, blank: true)
+        model(nullable: true)
         periodLabels(nullable: true, blank: true, maxSize: 1000)
         creationDate nullable: true
         modificationDate nullable: true
@@ -49,7 +53,14 @@ class ParameterizationDAO {
         valuationDate(nullable: true)
     }
 
-    static mapping = { comments(sort: "path", order: "asc") }
+    static mapping = {
+        comments(sort: "path", order: "asc")
+        creator lazy: false
+        lastUpdater lazy: false
+        creationDate type: DateTimeMillisUserType
+        modificationDate type: DateTimeMillisUserType
+        valuationDate type: DateTimeMillisUserType
+    }
 
     String toString() {
         "$name v$itemVersion"

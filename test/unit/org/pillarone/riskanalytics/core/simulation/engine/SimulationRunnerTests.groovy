@@ -14,6 +14,7 @@ import org.pillarone.riskanalytics.core.simulation.engine.actions.PeriodAction
 import org.pillarone.riskanalytics.core.simulation.engine.actions.SimulationAction
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.simulation.item.ModellingItem
+import org.pillarone.riskanalytics.core.example.model.EmptyModel
 
 class SimulationRunnerTests extends GrailsUnitTestCase {
 
@@ -40,7 +41,7 @@ class SimulationRunnerTests extends GrailsUnitTestCase {
 
         PeriodScope periodScope = new PeriodScope()
         IterationScope iterationScope = new IterationScope(periodScope: periodScope, numberOfPeriods: 2)
-        SimulationScope simulationScope = new SimulationScope(iterationScope: iterationScope, numberOfIterations: 2)
+        SimulationScope simulationScope = new SimulationScope(iterationScope: iterationScope, numberOfIterations: 2, model: new EmptyModel())
 
         Action periodAction = new PeriodAction(periodScope: periodScope)
         Action iterationAction = new IterationAction(iterationScope: iterationScope, periodAction: periodAction)
@@ -110,7 +111,7 @@ class SimulationRunnerTests extends GrailsUnitTestCase {
         transactionStub.demand.withTransaction(3..3) {
             Closure c ->
             //don't throw an exception when withTransaction is used from to load/delete data
-            if(c.delegate instanceof ModellingItem) return
+            if (c.delegate instanceof ModellingItem) return
             throw new Exception()
         }
         deletionServiceStub.demand.getInstance(1..1) {
@@ -125,7 +126,7 @@ class SimulationRunnerTests extends GrailsUnitTestCase {
 
         PeriodScope periodScope = new PeriodScope()
         IterationScope iterationScope = new IterationScope(periodScope: periodScope, numberOfPeriods: 2)
-        SimulationScope simulationScope = new SimulationScope(iterationScope: iterationScope, numberOfIterations: 10, simulation: new Simulation("simulation"))
+        SimulationScope simulationScope = new SimulationScope(iterationScope: iterationScope, numberOfIterations: 10, simulation: new Simulation("simulation"), model: new EmptyModel())
 
         PeriodAction periodAction = [perform: {throw new Exception()}] as PeriodAction
         Action iterationAction = new IterationAction(iterationScope: iterationScope, periodAction: periodAction)

@@ -3,11 +3,14 @@ package org.pillarone.riskanalytics.core.simulation.item
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.output.*
+import org.pillarone.riskanalytics.core.ModelDAO
+import org.joda.time.DateTime
 
 class ResultConfiguration extends ModellingItem {
 
     String comment
     VersionNumber versionNumber
+    VersionNumber modelVersionNumber
     List<PacketCollector> collectors
 
     public ResultConfiguration(String name) {
@@ -59,6 +62,9 @@ class ResultConfiguration extends ModellingItem {
         dao = dao as ResultConfigurationDAO
         name = dao.name
         modelClass = getClass().getClassLoader().loadClass(dao.modelClassName)
+        if (dao.model != null) {
+            modelVersionNumber = new VersionNumber(dao.model.itemVersion)
+        }
         comment = dao.comment
         versionNumber = new VersionNumber(dao.itemVersion)
         creationDate = dao.creationDate
@@ -78,6 +84,9 @@ class ResultConfiguration extends ModellingItem {
         dao = dao as ResultConfigurationDAO
         dao.name = name
         dao.modelClassName = modelClass.getName()
+        if (modelVersionNumber != null) {
+            dao.model = ModelDAO.findByModelClassNameAndItemVersion(modelClass.name, modelVersionNumber.toString())
+        }
         dao.comment = comment
         dao.itemVersion = versionNumber.toString()
         dao.creationDate = creationDate
@@ -87,6 +96,7 @@ class ResultConfiguration extends ModellingItem {
 
         Collection<CollectorInformation> currentCollectors = dao.collectorInformation
 
+        List<PathMapping> pathCache = PathMapping.list()
         for (PacketCollector collector in collectors) {
             CollectorInformation existingInformation = dao.collectorInformation.find {CollectorInformation info ->
                 info.path.pathName == collector.path
@@ -95,12 +105,13 @@ class ResultConfiguration extends ModellingItem {
                 existingInformation.collectingStrategyIdentifier = collector.mode.getIdentifier()
             } else {
                 dao.addToCollectorInformation(new CollectorInformation(
-                        path: getPathMapping(collector.path),
+                        path: getPathMapping(pathCache, collector.path),
                         collectingStrategyIdentifier: collector.mode.getIdentifier()
                 ))
             }
         }
 
+        pathCache.clear()
         //Clone list to prevent ConcurrentModificationException
         for (CollectorInformation info in currentCollectors?.toList()?.clone()) {
             if (!collectors*.path.contains(info.path.pathName)) {
@@ -109,6 +120,11 @@ class ResultConfiguration extends ModellingItem {
             }
         }
 
+    }
+
+    void setModelClass(Class clazz) {
+        super.setModelClass(clazz)
+        modelVersionNumber = Model.getModelVersion(clazz)
     }
 
     public boolean isUsedInSimulation() {
@@ -160,8 +176,13 @@ class ResultConfiguration extends ModellingItem {
         return new ResultConfigurationWriter()
     }
 
-    private PathMapping getPathMapping(String path) {
-        PathMapping mapping = PathMapping.findByPathName(path)
+    private PathMapping getPathMapping(List<PathMapping> cache, String path) {
+        PathMapping mapping = cache.find { it.pathName == path}
+        if (mapping != null) {
+            return mapping
+
+        }
+        mapping = PathMapping.findByPathName(path)
         if (!mapping) {
             mapping = new PathMapping(pathName: path)
             if (!mapping.save()) {

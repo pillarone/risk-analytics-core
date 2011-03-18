@@ -70,7 +70,7 @@ class ResultServiceTests extends GroovyTestCase {
         parameterization1.periodCount = 1
         parameterization1.comment = "comment 1"
         parameterization1.status = Status.IN_REVIEW
-        parameterization1.valuationDate = new DateTime(2010, 1, 1, 0, 0, 0, 0).toDate()
+        parameterization1.valuationDate = new DateTime(2010, 1, 1, 0, 0, 0, 0)
         parameterization1.save()
 
         Parameterization parameterization2 = new Parameterization("test2")
@@ -79,7 +79,7 @@ class ResultServiceTests extends GroovyTestCase {
         parameterization2.periodCount = 1
         parameterization2.comment = "comment 2"
         parameterization2.status = Status.IN_PRODUCTION
-        parameterization2.valuationDate = new DateTime(2011, 1, 1, 0, 0, 0, 0).toDate()
+        parameterization2.valuationDate = new DateTime(2011, 1, 1, 0, 0, 0, 0)
         parameterization2.save()
 
         Parameterization parameterization3 = new Parameterization("test2")
@@ -95,14 +95,14 @@ class ResultServiceTests extends GroovyTestCase {
         assertEquals parameterization1.name, info.name
         assertEquals parameterization1.comment, info.comment
         assertEquals parameterization1.versionNumber.toString(), info.version
-        assertEquals parameterization1.valuationDate, info.valuationDate
+        assertEquals parameterization1.valuationDate, new DateTime(info.valuationDate.time)
         assertEquals parameterization1.status, info.status
 
         info = infos.find { it.parameterizationId == parameterization2.id}
         assertEquals parameterization2.name, info.name
         assertEquals parameterization2.comment, info.comment
         assertEquals parameterization2.versionNumber.toString(), info.version
-        assertEquals parameterization2.valuationDate, info.valuationDate
+        assertEquals parameterization2.valuationDate, new DateTime(info.valuationDate.time)
         assertEquals parameterization2.status, info.status
     }
 

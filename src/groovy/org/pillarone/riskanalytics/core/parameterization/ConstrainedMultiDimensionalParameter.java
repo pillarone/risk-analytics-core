@@ -34,16 +34,20 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
 
     public void setSimulationModel(Model simulationModel) {
         this.simulationModel = simulationModel;
-        for (int i = 0; i < getValueColumnCount(); i++) {
-            final Class columnType = constraints.getColumnType(i);
-            if (IComponentMarker.class.isAssignableFrom(columnType)) {
-                Map<String, Component> result = new HashMap<String, Component>();
-                List<Component> componentsOfType = simulationModel.getMarkedComponents(columnType);
-                for (Component component : componentsOfType) {
-                    result.put(normalizeName(component.getName()), component);
+        if (simulationModel != null) {
+            for (int i = 0; i < getValueColumnCount(); i++) {
+                final Class columnType = constraints.getColumnType(i);
+                if (IComponentMarker.class.isAssignableFrom(columnType)) {
+                    Map<String, Component> result = new HashMap<String, Component>();
+                    List<Component> componentsOfType = simulationModel.getMarkedComponents(columnType);
+                    for (Component component : componentsOfType) {
+                        result.put(normalizeName(component.getName()), component);
+                    }
+                    comboBoxValues.put(i, result);
                 }
-                comboBoxValues.put(i, result);
             }
+        } else {
+            comboBoxValues.clear();
         }
     }
 

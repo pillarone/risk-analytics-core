@@ -70,4 +70,8 @@ abstract class AbstractParameterObjectClassifier implements IParameterObjectClas
         builder.append(")")
         return builder.toString()
     }
+
+    String getTypeName() {
+        typeName
+    }
 }

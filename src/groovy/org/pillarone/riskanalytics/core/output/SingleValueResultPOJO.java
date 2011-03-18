@@ -1,6 +1,6 @@
 package org.pillarone.riskanalytics.core.output;
 
-import java.util.Date;
+import org.joda.time.DateTime;
 
 /**
  * Data class which transports a single result from a collecting mode strategy to an output strategy.
@@ -18,7 +18,7 @@ public class SingleValueResultPOJO {
     private FieldMapping field;
     private int valueIndex;
     private Double value;
-    private Date date;
+    private DateTime date;
 
     public CollectorMapping getCollector() {
         return collector;
@@ -84,11 +84,11 @@ public class SingleValueResultPOJO {
         this.valueIndex = valueIndex;
     }
 
-    public Date getDate() {
+    public DateTime getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(DateTime date) {
         this.date = date;
     }
 }

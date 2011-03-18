@@ -6,6 +6,8 @@ import java.text.MessageFormat
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 
 /**
  *  This class contains methods which are easy/short to implement in Groovy, but unreadable in Java.
@@ -13,6 +15,8 @@ import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
  * @author stefan.kunz (at) intuitive-collaboration (dot) com
  */
 public class GroovyUtils {
+
+    private static Log LOG = LogFactory.getLog(GroovyUtils)
 
     static GroovyShell shell
 
@@ -249,5 +253,21 @@ public class GroovyUtils {
             }
         }
         return text != null ? text : key
+    }
+
+    public static parseGroovyScript(String scriptContent, Closure c) {
+        ConfigSlurper configSlurper = new ConfigSlurper()
+        Script script = configSlurper.classLoader.parseClass(scriptContent).newInstance()
+
+        try {
+            ConfigObject configObject = configSlurper.parse(script)
+            c.call(configObject)
+        } finally {
+            try {
+                GroovySystem.metaClassRegistry.removeMetaClass(script.class)
+            } catch (Exception e) {
+                LOG.error "Failed to remove meta class of script after using config slurper - possible memory leak."
+            }
+        }
     }
 }

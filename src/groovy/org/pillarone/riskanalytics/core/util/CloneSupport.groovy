@@ -33,6 +33,10 @@ abstract class CloneSupport {
         new Double(object.doubleValue())
     }
 
+    private static def doClone(BigDecimal object) {
+        object.doubleValue()
+    }
+
     private static def doClone(Short object) {
         new Short(object.shortValue())
     }

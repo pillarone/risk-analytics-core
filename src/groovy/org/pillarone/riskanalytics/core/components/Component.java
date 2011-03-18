@@ -166,6 +166,12 @@ abstract public class Component implements Cloneable {
         return propertyCache;
     }
 
+    public void clearPropertyCache() {
+        if (propertyCache != null) {
+            propertyCache.clear();
+        }
+    }
+
 // renamed method from get... to all... as getXY() results in a property xY in the properties map of the component.
 
     // each access to component.properties calls the method to evaluate the property value

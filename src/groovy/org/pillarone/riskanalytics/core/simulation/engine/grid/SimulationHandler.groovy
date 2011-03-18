@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.simulation.engine.grid
 import org.gridgain.grid.GridTaskFuture
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
+import org.joda.time.DateTime
 
 
 class SimulationHandler {
@@ -36,7 +37,7 @@ class SimulationHandler {
         return simulationTask.getSimulationErrors()
     }
 
-    Date getEstimatedSimulationEnd() {
+    DateTime getEstimatedSimulationEnd() {
         return simulationTask.getEstimatedSimulationEnd()
     }
 }

@@ -9,6 +9,7 @@ import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.util.ConfigObjectUtils
 import org.joda.time.DateTimeZone
+import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 
 abstract class FileImportService {
 
@@ -151,10 +152,11 @@ abstract class FileImportService {
     static void importModelsIfNeeded(List modelNames) {
         String models = modelNames != null && !modelNames.empty ? modelNames.join(", ") : "all models"
         LOG.info "Importing files for ${models}"
-        new ParameterizationImportService().compareFilesAndWriteToDB(modelNames)
-        new ModelStructureImportService().compareFilesAndWriteToDB(modelNames)
         new ModelFileImportService().compareFilesAndWriteToDB(modelNames)
+        new ModelStructureImportService().compareFilesAndWriteToDB(modelNames)
+        new ParameterizationImportService().compareFilesAndWriteToDB(modelNames)
         new ResultConfigurationImportService().compareFilesAndWriteToDB(modelNames)
+        ModelRegistry.instance.loadFromDatabase()
     }
 
     String getModelClassName() {

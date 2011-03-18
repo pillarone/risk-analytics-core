@@ -16,4 +16,4 @@ components {
         }
     }
 }
-comments = ["[path:'Core:exampleInputOutputComponent:parmParameterObject', period:0, lastChange:new java.util.Date(1285144738000),user:null, comment: 'comment text', tags:(['FIXED'] as Set)]"]
+comments = ["[path:'Core:exampleInputOutputComponent:parmParameterObject', period:0, lastChange:new org.joda.time.DateTime(1285144738000),user:null, comment: 'comment text', tags:(['FIXED'] as Set)]"]

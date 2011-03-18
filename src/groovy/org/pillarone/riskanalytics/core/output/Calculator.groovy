@@ -8,6 +8,7 @@ import org.pillarone.riskanalytics.core.dataaccess.ResultAccessor
 import org.pillarone.riskanalytics.core.output.batch.calculations.AbstractCalculationsBulkInsert
 import org.pillarone.riskanalytics.core.util.MathUtils
 import org.pillarone.riskanalytics.core.dataaccess.ResultDescriptor
+import org.joda.time.DateTime
 
 class Calculator {
 
@@ -47,14 +48,14 @@ class Calculator {
         return (int) ((double) completedCalculations / (double) totalCalculations * 100d)
     }
 
-    Date getEstimatedEnd() {
+    DateTime getEstimatedEnd() {
         if (startTime == null || completedCalculations == 0) {
             return null
         }
 
         long now = System.currentTimeMillis()
         long timeForOneKeyFigure = (now - startTime) / completedCalculations
-        return new Date(now + (totalCalculations - completedCalculations) * timeForOneKeyFigure)
+        return new DateTime(now + (totalCalculations - completedCalculations) * timeForOneKeyFigure)
     }
 
     void calculate() {

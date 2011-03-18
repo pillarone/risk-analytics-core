@@ -28,10 +28,10 @@ class ParameterizationHelperTests extends GroovyTestCase {
 
     void testGetAllParameter() {
         CoreModel model = new CoreModel()
-
+        model.init()
         Map parameter = ParameterizationHelper.getAllParameter(model)
 
-        assertEquals 1, parameter.size()
+        assertEquals 2, parameter.size()
 
         assertSame model.exampleInputOutputComponent.parmParameterObject, parameter["exampleInputOutputComponent:parmParameterObject"]
     }
@@ -40,20 +40,20 @@ class ParameterizationHelperTests extends GroovyTestCase {
         int initialParameterCount = Parameter.count()
         CoreModel model = new CoreModel()
         Parameterization parameterization = ParameterizationHelper.createDefaultParameterization(model)
-        assertEquals 1, parameterization.parameters.size()
+        assertEquals 2, parameterization.parameters.size()
 
         parameterization.save()
-        assertEquals initialParameterCount + 4, Parameter.count()
+        assertEquals initialParameterCount + 8, Parameter.count()
     }
 
     void testCreateDefaultParameterizationForMultiplePeriods() {
         int initialParameterCount = Parameter.count()
         CoreModel model = new CoreModel()
         Parameterization parameterization = ParameterizationHelper.createDefaultParameterization(model, 3)
-        assertEquals 3, parameterization.parameters.size()
+        assertEquals 6, parameterization.parameters.size()
 
         parameterization.save()
-        assertEquals initialParameterCount + 12, Parameter.count()
+        assertEquals initialParameterCount + 24, Parameter.count()
     }
 
     void testCreateParameterizationFromConfigObject() {

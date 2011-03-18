@@ -7,6 +7,7 @@ import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.simulation.item.SimulationTests
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
+import org.joda.time.DateTime
 
 /**
  * @author fouad jaada
@@ -17,7 +18,7 @@ public class BatchRunTests extends SimulationTests {
     public void testAddSimulationRun() {
         BatchRun batchRun = new BatchRun()
         batchRun.name = "Test"
-        batchRun.executionTime = new Date()
+        batchRun.executionTime = new DateTime()
         batchRun.save()
 
         BatchRun batch = BatchRun.findByName("Test")
@@ -64,7 +65,7 @@ public class BatchRunTests extends SimulationTests {
 
         BatchRun batchRun = new BatchRun()
         batchRun.name = "Test"
-        batchRun.executionTime = new Date()
+        batchRun.executionTime = new DateTime()
         batchRun.save()
 
         BatchRun batch = BatchRun.findByName("Test")
@@ -89,7 +90,7 @@ public class BatchRunTests extends SimulationTests {
 
         BatchRun batchRun = new BatchRun()
         batchRun.name = "Test1"
-        batchRun.executionTime = cal.getTime()
+        batchRun.executionTime = new DateTime(cal.time.time)
         batchRun.save()
 
         BatchRun batch = BatchRun.findByName("Test1")
@@ -120,7 +121,7 @@ public class BatchRunTests extends SimulationTests {
         cal.add(Calendar.DAY_OF_MONTH, 1)
         BatchRun batchRun2 = new BatchRun()
         batchRun2.name = "Test2"
-        batchRun2.executionTime = cal.getTime()
+        batchRun2.executionTime = new DateTime(cal.time.time)
         batchRun2.save()
 
         batchRuns = BatchRunner.getService().getActiveBatchRuns()
@@ -131,7 +132,7 @@ public class BatchRunTests extends SimulationTests {
         cal.add(Calendar.DAY_OF_MONTH, 2)
         BatchRun batchRun3 = new BatchRun()
         batchRun3.name = "Test3"
-        batchRun3.executionTime = cal.getTime()
+        batchRun3.executionTime = new DateTime(cal.time.time)
         batchRun3.save()
 
         batchRuns = BatchRunner.getService().getActiveBatchRuns()

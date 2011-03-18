@@ -5,12 +5,13 @@ import org.pillarone.riskanalytics.core.parameter.comment.CommentTag
 import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.user.UserManagement
+import org.joda.time.DateTime
 
 class Comment implements Cloneable {
 
     String path
     int period
-    Date lastChange
+    DateTime lastChange
     Person user
     protected String comment
     private Set<Tag> tags = new HashSet()
@@ -96,7 +97,7 @@ class Comment implements Cloneable {
 
     protected void updateChangeInfo() {
         user = UserManagement.getCurrentUser()
-        lastChange = new Date()
+        lastChange = new DateTime()
     }
 
     void applyToDomainObject(CommentDAO dao) {
@@ -131,7 +132,7 @@ class Comment implements Cloneable {
         char c = (char) 92
         StringBuilder sb = new StringBuilder("\"\"[")
         String newComment = replaceCharacters(comment)
-        sb.append("path:'${path}', period:${period}, lastChange:new Date(${lastChange.getTime()}),user:null, comment: ${c}\"${c}\"${c}\"${newComment}${c}\"${c}\"${c}\"")
+        sb.append("path:'${path}', period:${period}, lastChange:new org.joda.time.DateTime(${lastChange.millis}),user:null, comment: ${c}\"${c}\"${c}\"${newComment}${c}\"${c}\"${c}\"")
         if (tags && !tags.isEmpty()) {
             sb.append(", tags:([")
             tags.eachWithIndex {Tag tag, int index ->
@@ -153,10 +154,10 @@ class Comment implements Cloneable {
         newComment = newComment.replace('"', '&rdquo;')
         return newComment
     }
-    
+
     public Comment clone() {
         Comment clone = (Comment) super.clone()
-        clone.lastChange = (Date) lastChange.clone()
+        clone.lastChange = (DateTime) new DateTime(lastChange.millis)
         clone.tags = (Set) tags.clone()
 
         clone.added = false

@@ -1,7 +1,10 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
-import java.text.SimpleDateFormat
 import org.apache.commons.lang.builder.HashCodeBuilder
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.format.DateTimeFormatter
+import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.output.SimulationRun
@@ -32,6 +35,7 @@ class Parameterization extends ModellingItem {
 
     String comment
     VersionNumber versionNumber
+    VersionNumber modelVersionNumber
     private ParameterizationDAO parameterizationDAO
     /**
      * This is the number of different periods available in this parameterization.
@@ -50,7 +54,7 @@ class Parameterization extends ModellingItem {
 
     Status status
     Long dealId
-    Date valuationDate
+    DateTime valuationDate
 
     public Parameterization(Map params) {
         this(params.remove("name").toString())
@@ -83,7 +87,6 @@ class Parameterization extends ModellingItem {
         for (IParameterizationValidator validator in ValidatorRegistry.getValidators()) {
             errors.addAll(validator.validate(parameterHolders.findAll { !it.removed }))
         }
-        parameterHolders*.clearCachedValues()
 
         valid = errors.empty
         validationErrors = errors
@@ -124,7 +127,7 @@ class Parameterization extends ModellingItem {
             ParameterApplicator applicator = new ParameterApplicator(model: model, parameterization: this)
             applicator.init()
             applicator.applyParameterForPeriod(0)
-            SimpleDateFormat dateFormat = new SimpleDateFormat(PERIOD_DATE_FORMAT)
+            DateTimeFormatter formatter = DateTimeFormat.forPattern(PERIOD_DATE_FORMAT)
             IPeriodCounter counter = model.createPeriodCounter(null)
             if (counter == null) {
                 return null
@@ -132,7 +135,7 @@ class Parameterization extends ModellingItem {
             List result = []
             if (counter instanceof ILimitedPeriodCounter) {
                 for (int i = 0; i < counter.periodCount(); i++) {
-                    result << dateFormat.format(counter.getCurrentPeriodStart().toDate())
+                    result << formatter.print(counter.currentPeriodStart)
                     counter.next()
                 }
             }
@@ -156,6 +159,9 @@ class Parameterization extends ModellingItem {
         dao.modificationDate = modificationDate
         dao.valid = valid
         dao.modelClassName = modelClass.name
+        if (modelVersionNumber != null) {
+            dao.model = ModelDAO.findByModelClassNameAndItemVersion(modelClass.name, modelVersionNumber.toString())
+        }
         dao.creator = creator
         dao.lastUpdater = lastUpdater
         dao.comment = comment
@@ -289,6 +295,9 @@ class Parameterization extends ModellingItem {
         modificationDate = dao.modificationDate
         valid = dao.valid
         modelClass = getClass().getClassLoader().loadClass(dao.modelClassName)
+        if (dao.model != null) {
+            modelVersionNumber = new VersionNumber(dao.model.itemVersion)
+        }
         creator = dao.creator
         lastUpdater = dao.lastUpdater
         status = dao.status
@@ -327,6 +336,13 @@ class Parameterization extends ModellingItem {
         return ParameterizationDAO.find(name, getModelClass()?.name, versionNumber.toString())
     }
 
+    @Override
+    void unload() {
+        super.unload()
+        parameterHolders?.clear()
+        comments?.clear()
+        tags?.clear()
+    }
 
     public getDao() {
         if (parameterizationDAO?.id == null) {
@@ -503,6 +519,11 @@ class Parameterization extends ModellingItem {
             return periodLabels[index]
         }
         return "P$index".toString()
+    }
+
+    void setModelClass(Class clazz) {
+        super.setModelClass(clazz)
+        modelVersionNumber = Model.getModelVersion(clazz)
     }
 
     IConfigObjectWriter getWriter() {

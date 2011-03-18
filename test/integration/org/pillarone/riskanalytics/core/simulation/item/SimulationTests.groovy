@@ -7,6 +7,7 @@ import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
 import org.pillarone.riskanalytics.core.workflow.Status
 import org.pillarone.riskanalytics.core.output.*
+import org.joda.time.DateTime
 
 class SimulationTests extends GroovyTestCase {
 
@@ -36,7 +37,7 @@ class SimulationTests extends GroovyTestCase {
     }
 
     void testLoad() {
-        Date start = new Date()
+        DateTime start = new DateTime()
         SimulationRun run = new SimulationRun()
         run.name = "simulation"
         run.parameterization = createParameterization()
@@ -44,8 +45,7 @@ class SimulationTests extends GroovyTestCase {
         run.model = CoreModel.name
         run.periodCount = 1
         run.iterations = 10
-        run.modelVersionNumber = new VersionNumber("1").toString()
-        Date end = new Date()
+        DateTime end = new DateTime()
         run.startTime = start
         run.endTime = end
         run.save()
@@ -60,7 +60,6 @@ class SimulationTests extends GroovyTestCase {
         assertEquals "CoreStructure", simulation.structure.name
         assertEquals 1, simulation.periodCount
         assertEquals 10, simulation.numberOfIterations
-        assertEquals new VersionNumber("1"), simulation.modelVersionNumber
         assertSame CoreModel, simulation.modelClass
         assertEquals start, simulation.start
         assertEquals end, simulation.end
@@ -94,7 +93,6 @@ class SimulationTests extends GroovyTestCase {
         run1.model = CoreModel.name
         run1.periodCount = 1
         run1.iterations = 10
-        run1.modelVersionNumber = new VersionNumber("1").toString()
         run1.save()
 
         SimulationRun run2 = new SimulationRun()
@@ -104,7 +102,6 @@ class SimulationTests extends GroovyTestCase {
         run2.model = CoreModel.name
         run2.periodCount = 1
         run2.iterations = 10
-        run2.modelVersionNumber = new VersionNumber("1").toString()
         run2.save()
 
         PathMapping path = new PathMapping(pathName: "model:path").save()
@@ -145,7 +142,7 @@ class SimulationTests extends GroovyTestCase {
 
         BatchRun batchRun = new BatchRun()
         batchRun.name = "Test"
-        batchRun.executionTime = new Date()
+        batchRun.executionTime = new DateTime()
         batchRun.save()
 
         BatchRun batch = BatchRun.findByName("Test")

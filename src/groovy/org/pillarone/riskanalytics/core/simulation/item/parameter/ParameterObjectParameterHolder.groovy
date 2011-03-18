@@ -10,9 +10,6 @@ import org.pillarone.riskanalytics.core.parameterization.AbstractMultiDimensiona
 
 class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerValueAccessor {
 
-    //Needed to create the object required during simulation
-    private IParameterObject businessObject
-
     //Sufficient for the UI (faster to instantiate)
     IParameterObjectClassifier classifier
     Map<String, ParameterHolder> classifierParameters
@@ -20,7 +17,7 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
     public ParameterObjectParameterHolder(Parameter parameter) {
         super(parameter.path, parameter.periodIndex);
         classifierParameters = new HashMap<String, ParameterHolder>()
-        this.classifier = getClass().getClassLoader().loadClass(parameter.type.parameterType).valueOf(parameter.type.parameterValue)
+        this.classifier = Thread.currentThread().contextClassLoader.loadClass(parameter.type.parameterType).valueOf(parameter.type.parameterValue)
         for (ParameterEntry entry in parameter.parameterEntries) {
             def holder = ParameterHolderFactory.getHolder(entry.parameterEntryValue)
             classifierParameters.put(entry.parameterEntryKey, holder)
@@ -30,7 +27,6 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
     public ParameterObjectParameterHolder(String path, int periodIndex, IParameterObject value) {
         super(path, periodIndex);
         classifierParameters = new HashMap<String, ParameterHolder>()
-        this.businessObject = value;
         this.classifier = value.type
         for (Map.Entry entry in value.parameters) {
             classifierParameters.put(entry.key, ParameterHolderFactory.getHolder(path + ":$entry.key", periodIndex, entry.value))
@@ -38,10 +34,7 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
     }
 
     IParameterObject getBusinessObject() {
-        if (businessObject == null) {
-            businessObject = classifier.getParameterObject(getParameterMap())
-        }
-        return businessObject
+        return classifier.getParameterObject(getParameterMap())
     }
 
     Map getParameterMap() {
@@ -90,11 +83,7 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
             if (oldEntry != null && oldEntry.businessObject.class.name == entry.value.class.name) {
                 holder = classifierParameters.get(entry.key)
             } else {
-                Object entryValue = entry.value
-                if (entryValue instanceof AbstractMultiDimensionalParameter) {
-                    entryValue = entryValue.clone()
-                }
-                holder = ParameterHolderFactory.getHolder(path + ":$entry.key", periodIndex, entryValue)
+                holder = ParameterHolderFactory.getHolder(path + ":$entry.key", periodIndex, entry.value)
             }
             newClassifierParameters.put(entry.key, holder)
         }
@@ -102,7 +91,7 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
     }
 
     boolean hasParameterChanged() {
-        if (added) return false
+        if (added || removed) return false
 
         boolean result = modified
         if (!result) {
@@ -122,7 +111,6 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
     }
 
     public void clearCachedValues() {
-        businessObject = null
         for (ParameterHolder p in classifierParameters.values()) {
             p.clearCachedValues()
         }

@@ -1,16 +1,13 @@
+import grails.plugins.springsecurity.SpringSecurityService
 import grails.util.Environment
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.pillarone.riskanalytics.core.fileimport.FileImportService
-import org.springframework.transaction.TransactionStatus
-import org.pillarone.riskanalytics.core.ParameterizationDAO
-import org.pillarone.riskanalytics.core.user.Authority
-import org.pillarone.riskanalytics.core.user.Person
-import org.pillarone.riskanalytics.core.user.UserSettings
-import org.pillarone.riskanalytics.core.user.UserManagement
-import grails.plugins.springsecurity.SpringSecurityService
-import org.pillarone.riskanalytics.core.user.PersonAuthority
-import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.joda.time.DateTimeZone
+import org.pillarone.riskanalytics.core.BatchRunSimulationRun
+import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.pillarone.riskanalytics.core.fileimport.FileImportService
+import org.pillarone.riskanalytics.core.output.SimulationRun
+import org.springframework.transaction.TransactionStatus
+import org.pillarone.riskanalytics.core.user.*
 
 class CoreBootStrap {
 
@@ -19,7 +16,7 @@ class CoreBootStrap {
     def init = {servletContext ->
 
         /** Setting the default time zone to UTC avoids problems in multi user context with different time zones
-         *  and switches off daylight saving capabilities and possible related problems.   */
+         *  and switches off daylight saving capabilities and possible related problems.      */
         DateTimeZone.setDefault(DateTimeZone.UTC)
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
 
@@ -75,12 +72,15 @@ class CoreBootStrap {
             def unfinishedSimulations = SimulationRun.findAllByEndTime(null)
             unfinishedSimulations.each {SimulationRun simulationRun ->
                 try {
-                    simulationRun.delete()
+                    BatchRunSimulationRun batchRunSimulationRun = BatchRunSimulationRun.findBySimulationRun(simulationRun)
+                    if (!batchRunSimulationRun)
+                        simulationRun.delete()
                 } catch (Exception ex) {
                     ex.printStackTrace()
                 }
             }
         }
+
 
         if (Environment.current == Environment.TEST) {
             return

@@ -31,7 +31,7 @@ class TestMultiPhaseComponent extends MultiPhaseComponent {
         setTransmitterPhaseOutput outOrangePhase2, PHASE2
     }
 
-    protected void doCalculation(String phase) {
+    void doCalculation(String phase) {
         if (phase.equals(PHASE1)) {
             outApplePhase1.addAll inApplePhase1
             outOrangePhase1.addAll inOrangePhase1

@@ -44,7 +44,13 @@
 
 
     <target name="compile" depends="init" description="--> Compiles a Grails application">
-        <grails command="compile" jvmargs="-Xmx1024m -XX:MaxPermSize=512m -Dtools.jar=../jre1.5.0_11/lib/tools.jar"/>
+        <exec executable="${grails}" failonerror="true" resolveexecutable="true">
+            <arg value="compile"/>
+            <arg value="--non-interactive"/>
+            <env key="GRAILS_HOME" value="${GRAILS_HOME}"/>
+            <env key="JAVA_OPTS"
+                 value="-Xmx1024m -XX:MaxPermSize=512m -Duser.language=en"/>
+        </exec>
     </target>
 
 
@@ -66,7 +72,8 @@
         </copy>
     </target>
 
-    <target name="release-plugin" depends="clean, compile" description="Releases the plugin in our P1 plugin repository.">
+    <target name="release-plugin" depends="clean, compile"
+            description="Releases the plugin in our P1 plugin repository.">
         <exec executable="${grails}" failonerror="true" resolveexecutable="true">
             <arg value="deploy-plugin"/>
             <arg value="--repository=pillarone"/>

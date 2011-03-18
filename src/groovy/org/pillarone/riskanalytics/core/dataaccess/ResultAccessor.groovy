@@ -28,7 +28,8 @@ class ResultAccessor {
         def result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, pathName, collectorName, fieldName, PostSimulationCalculation.MEAN)
         if (result != null) {
             return result.result
-        } else {
+        }
+        else {
             def res = SingleValueResult.executeQuery("SELECT AVG(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
                     " WHERE s.path.pathName = ? AND " +
                     "s.collector.collectorName = ? AND " +
@@ -87,11 +88,13 @@ class ResultAccessor {
         def result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, path, collectorName, fieldName, PostSimulationCalculation.STDEV)
         if (result != null) {
             return result.result
-        } else {
+        }
+        else {
             double[] ultimates = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
             if (ultimates.size() > 0) {
                 return MathUtils.calculateStandardDeviation(ultimates)
-            } else {
+            }
+            else {
                 return null
             }
         }
@@ -137,34 +140,52 @@ class ResultAccessor {
         return rank == 0 ? values[0] : values[--index]       // -1 as array index starts with 0
     }
 
-    static Double getPercentile(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName, String fieldName, Double percentile) {
-        def result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, path, collectorName, fieldName, PostSimulationCalculation.PERCENTILE, percentile)
+
+    static Double getPercentile(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName, String fieldName, Double severity,
+                                QuantilePerspective perspective) {
+        def result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, path, collectorName, fieldName, perspective.getPercentileAsString(), severity)
         if (result != null) {
             return result.result
-        } else {
+        }
+        else {
             double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
-            return MathUtils.calculatePercentile(values, percentile)
+            return MathUtils.calculatePercentile(values, severity, perspective)
         }
     }
 
-    static Double getVar(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName, String fieldName, Double percentile) {
-        def result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, path, collectorName, fieldName, PostSimulationCalculation.VAR, percentile)
+    static Double getPercentile(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName, String fieldName, Double severity) {
+        return getPercentile(simulationRun, periodIndex, path, collectorName, fieldName, severity, QuantilePerspective.LOSS)
+    }
+
+    static Double getVar(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName, String fieldName, Double severity) {
+        return getVar(simulationRun, periodIndex, path, collectorName, fieldName, severity, QuantilePerspective.LOSS)
+    }
+
+    static Double getVar(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName, String fieldName, Double severity,
+                         QuantilePerspective perspective) {
+        def result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, path, collectorName, fieldName, perspective.getVarAsString(), severity)
         if (result != null) {
             return result.result
-        } else {
+        }
+        else {
             double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
-            return MathUtils.calculateVar(values, percentile)
+            return MathUtils.calculateVar(values, severity, perspective)
         }
     }
 
+    static Double getTvar(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName, String fieldName, Double severity) {
+        return getTvar(simulationRun, periodIndex, path, collectorName, fieldName, severity, QuantilePerspective.LOSS)
+    }
 
-    static Double getTvar(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName, String fieldName, Double percentile) {
-        def result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, path, collectorName, fieldName, PostSimulationCalculation.TVAR, percentile)
+    static Double getTvar(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName, String fieldName,
+                          Double severity, QuantilePerspective perspective) {
+        def result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, path, collectorName, fieldName, perspective.getTvarAsString(), severity)
         if (result != null) {
             return result.result
-        } else {
+        }
+        else {
             double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
-            return MathUtils.calculateTvar(values, percentile)
+            return MathUtils.calculateTvar(values, severity, perspective)
         }
     }
 
@@ -186,7 +207,8 @@ class ResultAccessor {
                     "s.collector.id = ? AND " +
                     "s.field.id = ? AND " +
                     "s.simulationRun.id = ? group by s.iteration order by sum(value) asc ", [pathId, period, collectorId, fieldId, simulationRun.id])
-        } else {
+        }
+        else {
             SingleValueResult.executeQuery("SELECT value FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
                     " WHERE s.path.id = ? AND " +
                     "s.period = ? AND " +

@@ -104,7 +104,7 @@ public class SimulationRunner {
             )
             LOG.error this, t
             LOG.debug error.dump()
-            currentScope.simulation.delete()
+            deleteFailedSimulation()
             return
         }
         if (simulationAction.isCancelled()) {
@@ -120,6 +120,15 @@ public class SimulationRunner {
         simulationState = simulationAction.isStopped() ? SimulationState.STOPPED : SimulationState.FINISHED
         notifySimulationStateChanged(currentScope?.simulation, simulationState)
 
+    }
+
+    private void deleteFailedSimulation() {
+        try {
+            LOG.info "failed simulation ${currentScope.simulation.name} will be deleted"
+            currentScope.simulation.delete()
+        } catch (Exception ex) {
+            LOG.error "failed delete simulation ${currentScope.simulation.name} : ${ex.toString()}"
+        }
     }
 
     private void deleteCancelledSimulation() {

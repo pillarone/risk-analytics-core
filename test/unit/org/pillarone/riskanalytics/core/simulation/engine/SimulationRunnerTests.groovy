@@ -3,9 +3,7 @@ package org.pillarone.riskanalytics.core.simulation.engine
 import grails.test.GrailsUnitTestCase
 import groovy.mock.interceptor.StubFor
 import org.apache.commons.logging.LogFactory
-import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.output.DeleteSimulationService
-import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.engine.actions.Action
@@ -13,7 +11,6 @@ import org.pillarone.riskanalytics.core.simulation.engine.actions.IterationActio
 import org.pillarone.riskanalytics.core.simulation.engine.actions.PeriodAction
 import org.pillarone.riskanalytics.core.simulation.engine.actions.SimulationAction
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
-import org.pillarone.riskanalytics.core.simulation.item.ModellingItem
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 
 class SimulationRunnerTests extends GrailsUnitTestCase {
@@ -51,7 +48,7 @@ class SimulationRunnerTests extends GrailsUnitTestCase {
         Action postSimulationAction = [perform: {LogFactory.getLog(Action).debug "performing postSimulationAction"}] as Action
 
 
-        SimulationRunner runner = new SimulationRunner(currentScope: simulationScope)
+        SimulationRunner runner = getSimulationRunner(simulationScope)
         runner.preSimulationActions << preSimulationAction
         runner.simulationAction = simulationAction
         runner.postSimulationActions << postSimulationAction
@@ -77,7 +74,7 @@ class SimulationRunnerTests extends GrailsUnitTestCase {
         Action preSimulationAction = [perform: {LogFactory.getLog(Action).debug "performing preSimulationAction"}] as Action
         Action postSimulationAction = [perform: {postSimulationActionCalled = true}] as Action
 
-        SimulationRunner runner = new SimulationRunner(currentScope: simulationScope)
+        SimulationRunner runner = getSimulationRunner(simulationScope)
         runner.preSimulationActions << preSimulationAction
         runner.simulationAction = simulationAction
         runner.postSimulationActions << postSimulationAction
@@ -103,6 +100,13 @@ class SimulationRunnerTests extends GrailsUnitTestCase {
         assertNotNull "no simulationaction defined", runner.simulationAction
         assertNotNull "no iterationaction defined", runner.simulationAction.iterationAction
         assertNotNull "no periodaction defined", runner.simulationAction.iterationAction.periodAction
+
+    }
+
+    SimulationRunner getSimulationRunner(SimulationScope simulationScope) {
+        SimulationRunner runner = new SimulationRunner(currentScope: simulationScope)
+        runner.metaClass.notifySimulationStateChanged = {Simulation simulation, SimulationState simulationState ->}
+        return runner
 
     }
     //TODO create similar test for grid configuration

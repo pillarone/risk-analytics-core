@@ -5,13 +5,11 @@ import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.batch.BatchRunInfoService
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.output.PacketCollector
-import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.util.GroovyUtils
 import org.pillarone.riskanalytics.core.wiring.ITransmitter
 import org.pillarone.riskanalytics.core.wiring.WiringUtils
-import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.simulation.engine.actions.*
 import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper
 import java.util.concurrent.atomic.AtomicInteger
@@ -52,8 +50,8 @@ public class SimulationRunner {
 
     private int threadCount;
     private static AtomicInteger messageCount;
-    private static Object lockObj=new Object();
-    private static final int WAIT_TIMEOUT=30000;
+    private static Object lockObj = new Object();
+    private static final int WAIT_TIMEOUT = 30000;
 
     /**
      * Starting a simulation run by performing the
@@ -65,9 +63,9 @@ public class SimulationRunner {
      * Any exception occuring during the simulation is caught and the error object will be initialized.
      */
     public void start() {
-        synchronized (lockObj){
-            if (messageCount==null){
-                messageCount=new AtomicInteger(0);
+        synchronized (lockObj) {
+            if (messageCount == null) {
+                messageCount = new AtomicInteger(0);
             }
         }
         simulationState = SimulationState.INITIALIZING
@@ -76,6 +74,7 @@ public class SimulationRunner {
         start = System.currentTimeMillis()
         DateTime startDate = new DateTime(start)
         currentScope?.simulation?.start = startDate
+        notifySimulationStateChanged(currentScope?.simulation, SimulationState.INITIALIZING)
         try {
             for (Action action in preSimulationActions) {
                 if (!performAction(action, null)) {
@@ -95,7 +94,7 @@ public class SimulationRunner {
                 }
             }
 
-            LOG.info("Finished Initialization of Thread "+Thread.currentThread().getId());
+            LOG.info("Finished Initialization of Thread " + Thread.currentThread().getId());
 
             long initializationTime = System.currentTimeMillis() - start
             LOG.info "Initialization completed in ${initializationTime}ms"
@@ -182,6 +181,7 @@ public class SimulationRunner {
             }
             if (newState != null) {
                 simulationState = newState
+                notifySimulationStateChanged(currentScope?.simulation, newState)
             }
         }
         action.perform()
@@ -293,11 +293,13 @@ public class SimulationRunner {
     }
 
     protected void notifySimulationStateChanged(Simulation simulation, SimulationState simulationState) {
-        batchRunInfoService?.batchSimulationStateChanged(simulation, simulationState)
+        if (!batchRunInfoService)
+            batchRunInfoService = BatchRunInfoService.getService()
+        batchRunInfoService.batchSimulationStateChanged(simulation, simulationState)
     }
 
-    public void setJobCount(int jobCount){
-        threadCount=jobCount;
+    public void setJobCount(int jobCount) {
+        threadCount = jobCount;
     }
 
     //cleanup

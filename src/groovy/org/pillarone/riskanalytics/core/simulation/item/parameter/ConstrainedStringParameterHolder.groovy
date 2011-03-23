@@ -43,6 +43,11 @@ class ConstrainedStringParameterHolder extends ParameterHolder implements IMarke
         return holder
     }
 
+    @Override
+    void clearCachedValues() {
+        value.selectedComponent = null
+    }
+
     List<String> referencePaths(Class markerInterface, String refValue) {
         List<String> paths = new ArrayList()
         if (markerInterface.is(value.markerClass) && ComponentUtils.getNormalizedName(value.stringValue).equals(refValue)) {

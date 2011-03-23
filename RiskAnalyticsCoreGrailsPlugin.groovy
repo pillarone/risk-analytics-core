@@ -19,14 +19,14 @@ import org.pillarone.riskanalytics.core.remoting.impl.ResultService
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.3-BETA-2.2-kti"
+    def version = "1.3-BETA-2.4-kti"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.4 > *"
     // the other plugins this plugin depends on
     def dependsOn = [
             "backgroundThread": "1.3",
             "jodaTime": "0.5",
-            "quartz": "0.4.1",
+            "quartz": "0.4.2",
             "springSecurityCore": "1.0.1",
             "mavenPublisher": "0.7.5"
     ]

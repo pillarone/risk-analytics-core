@@ -28,6 +28,7 @@ import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.util.PropertiesUtils
 import org.pillarone.riskanalytics.core.workflow.Status
 import org.springframework.transaction.TransactionStatus
+import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 
 class Parameterization extends ModellingItem {
 
@@ -294,7 +295,7 @@ class Parameterization extends ModellingItem {
         creationDate = dao.creationDate
         modificationDate = dao.modificationDate
         valid = dao.valid
-        modelClass = getClass().getClassLoader().loadClass(dao.modelClassName)
+        modelClass = ModelRegistry.instance.getModelClass(dao.modelClassName)
         if (dao.model != null) {
             modelVersionNumber = new VersionNumber(dao.model.itemVersion)
         }

@@ -63,15 +63,25 @@ class ModelRegistry {
         }
     }
 
-    private void createDefaultModelDao(Class modelClass) {
-        ModelDAO dao = new ModelDAO()
-        dao.name = modelClass.simpleName
-        dao.modelClassName = modelClass.name
-        dao.srcCode = "//source code not available"
-        dao.itemVersion = "1"
+    Class getModelClass(String className) {
+        Class modelClass = modelClasses.find { it.name == className }
+        if (modelClass == null) {
+            modelClass = Thread.currentThread().contextClassLoader.loadClass(className)
+        }
+        return modelClass
+    }
 
-        if (!dao.save()) {
-            throw new ModelRegistryException("Could not create default model dao for $modelClass.simpleName" + dao.errors.toString())
+    private void createDefaultModelDao(Class modelClass) {
+        ModelDAO.withTransaction { status ->
+            ModelDAO dao = new ModelDAO()
+            dao.name = modelClass.simpleName
+            dao.modelClassName = modelClass.name
+            dao.srcCode = "//source code not available"
+            dao.itemVersion = "1"
+
+            if (!dao.save()) {
+                throw new ModelRegistryException("Could not create default model dao for $modelClass.simpleName" + dao.errors.toString())
+            }
         }
     }
 
@@ -79,16 +89,18 @@ class ModelRegistry {
         StringBuilder builder = new StringBuilder()
         builder.append("package ").append(modelClass.getPackage().name).append("\n").append("model = ").append(modelClass.name).append("\n").append("company { }")
 
-        ModelStructureDAO dao = new ModelStructureDAO()
-        dao.name = modelClass.simpleName + "Structure"
-        dao.modelClassName = modelClass.name
-        dao.stringData = new ConfigObjectHolder()
-        dao.stringData.data = builder.toString()
-        dao.stringData.save()
-        dao.itemVersion = "1"
+        ModelStructureDAO.withTransaction { status ->
+            ModelStructureDAO dao = new ModelStructureDAO()
+            dao.name = modelClass.simpleName + "Structure"
+            dao.modelClassName = modelClass.name
+            dao.stringData = new ConfigObjectHolder()
+            dao.stringData.data = builder.toString()
+            dao.stringData.save()
+            dao.itemVersion = "1"
 
-        if (!dao.save()) {
-            throw new ModelRegistryException("Could not create default structure for $modelClass.simpleName" + dao.errors.toString())
+            if (!dao.save()) {
+                throw new ModelRegistryException("Could not create default structure for $modelClass.simpleName" + dao.errors.toString())
+            }
         }
     }
 

@@ -7,6 +7,7 @@ import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.output.DeleteSimulationStrategy
 import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.model.Model
+import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 
 class Simulation extends ModellingItem {
 
@@ -70,7 +71,7 @@ class Simulation extends ModellingItem {
     protected void mapFromDao(def source, boolean completeLoad) {
         SimulationRun run = source as SimulationRun
         comment = run.comment
-        modelClass = this.class.classLoader.loadClass(run.model)
+        modelClass = ModelRegistry.instance.getModelClass(run.model)
         Parameterization parameterization = new Parameterization(run.parameterization.name)
         parameterization.versionNumber = new VersionNumber(run.parameterization.itemVersion)
         parameterization.modelClass = modelClass

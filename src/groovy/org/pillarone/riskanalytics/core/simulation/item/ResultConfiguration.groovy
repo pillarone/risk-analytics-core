@@ -5,6 +5,7 @@ import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.output.*
 import org.pillarone.riskanalytics.core.ModelDAO
 import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 
 class ResultConfiguration extends ModellingItem {
 
@@ -61,7 +62,7 @@ class ResultConfiguration extends ModellingItem {
     protected void mapFromDao(Object dao, boolean completeLoad) {
         dao = dao as ResultConfigurationDAO
         name = dao.name
-        modelClass = getClass().getClassLoader().loadClass(dao.modelClassName)
+        modelClass = ModelRegistry.instance.getModelClass(dao.modelClassName)
         if (dao.model != null) {
             modelVersionNumber = new VersionNumber(dao.model.itemVersion)
         }

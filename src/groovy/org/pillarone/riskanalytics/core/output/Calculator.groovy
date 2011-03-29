@@ -35,7 +35,8 @@ class Calculator {
         keyFigures.entrySet().each {Map.Entry entry ->
             if (entry.value instanceof List) {
                 keyFigureCount += entry.value.size()
-            } else {
+            }
+            else {
                 keyFigureCount++
             }
         }
@@ -93,19 +94,35 @@ class Calculator {
                 def percentiles = keyFigures.get(PostSimulationCalculation.PERCENTILE)
                 def vars = keyFigures.get(PostSimulationCalculation.VAR)
                 def tvars = keyFigures.get(PostSimulationCalculation.TVAR)
+                def percentilesProfit = keyFigures.get(PostSimulationCalculation.PERCENTILE_PROFIT)
+                def varsProfit = keyFigures.get(PostSimulationCalculation.VAR_PROFIT)
+                def tvarsProfit = keyFigures.get(PostSimulationCalculation.TVAR_PROFIT)
                 def pdf = keyFigures.get(PostSimulationCalculation.PDF)
                 percentiles?.each {double p ->
-                    calculatePercentile(periodIndex, path, collector, field, values, p)
+                    calculatePercentile(periodIndex, path, collector, field, values, p, QuantilePerspective.LOSS)
                     completedCalculations++
                 }
                 vars?.each {double p ->
-                    calculateVar(periodIndex, path, collector, field, values, p, avg)
+                    calculateVar(periodIndex, path, collector, field, values, p, avg, QuantilePerspective.LOSS)
                     completedCalculations++
                 }
                 tvars?.each {double p ->
-                    calculateTvar(periodIndex, path, collector, field, values, p)
+                    calculateTvar(periodIndex, path, collector, field, values, p, QuantilePerspective.LOSS)
                     completedCalculations++
                 }
+                percentilesProfit?.each {double p ->
+                    calculatePercentile(periodIndex, path, collector, field, values, p, QuantilePerspective.PROFIT)
+                    completedCalculations++
+                }
+                varsProfit?.each {double p ->
+                    calculateVar(periodIndex, path, collector, field, values, p, avg, QuantilePerspective.PROFIT)
+                    completedCalculations++
+                }
+                tvarsProfit?.each {double p ->
+                    calculateTvar(periodIndex, path, collector, field, values, p, QuantilePerspective.PROFIT)
+                    completedCalculations++
+                }
+
                 if (pdf) {
                     calculatePDF(periodIndex, path, collector, field, values, pdf)
                 }
@@ -138,14 +155,14 @@ class Calculator {
         LOG.debug("Calculated stdev ($pathId, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
     }
 
-    private void calculatePercentile(int periodIndex, long pathId, long collectorId, long fieldId, double[] results, double percentile) {
+    private void calculatePercentile(int periodIndex, long pathId, long collectorId, long fieldId, double[] results, double severity, QuantilePerspective perspective) {
         long time = System.currentTimeMillis()
 
-        BigDecimal p = MathUtils.calculatePercentileOfSortedValues(results, percentile)
-        bulkInsert.addResults(periodIndex, PostSimulationCalculation.PERCENTILE, percentile, pathId, fieldId, collectorId, p)
+        BigDecimal p = MathUtils.calculatePercentileOfSortedValues(results, severity, perspective)
+        bulkInsert.addResults(periodIndex, perspective.getPercentileAsString(), severity, pathId, fieldId, collectorId, p)
 
 
-        LOG.debug("Calculated percentile $percentile ($pathId, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
+        LOG.debug("Calculated percentile $severity ($pathId, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
     }
 
     private void calculatePDF(int periodIndex, long pathId, long collectorId, long fieldId, double[] results, def pdf) {
@@ -160,25 +177,26 @@ class Calculator {
     }
 
 
-    private void calculateVar(int periodIndex, long pathId, long collectorId, long fieldId, double[] results, double percentile, double mean) {
+    private void calculateVar(int periodIndex, long pathId, long collectorId, long fieldId, double[] results, double severity, double mean,
+                              QuantilePerspective perspective) {
         long time = System.currentTimeMillis()
 
-        BigDecimal var = MathUtils.calculateVarOfSortedValues(results, percentile, mean)
-        bulkInsert.addResults(periodIndex, PostSimulationCalculation.VAR, percentile, pathId, fieldId, collectorId, var)
+        BigDecimal var = MathUtils.calculateVarOfSortedValues(results, severity, mean, perspective)
+        bulkInsert.addResults(periodIndex, perspective.getVarAsString(), severity, pathId, fieldId, collectorId, var)
 
 
-        LOG.debug("Calculated var $percentile ($pathId, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
+        LOG.debug("Calculated var $severity ($pathId, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
     }
 
-    private void calculateTvar(int periodIndex, long pathId, long collectorId, long fieldId, double[] results, double percentile) {
+    private void calculateTvar(int periodIndex, long pathId, long collectorId, long fieldId, double[] results, double severity,
+                               QuantilePerspective perspective) {
         long time = System.currentTimeMillis()
 
-        BigDecimal tvar = MathUtils.calculateTvarOfSortedValues(results, percentile)
-        bulkInsert.addResults(periodIndex, PostSimulationCalculation.TVAR, percentile, pathId, fieldId, collectorId, tvar)
+        BigDecimal tvar = MathUtils.calculateTvarOfSortedValues(results, severity, perspective)
+        bulkInsert.addResults(periodIndex, perspective.getTvarAsString(), severity, pathId, fieldId, collectorId, tvar)
 
 
-        LOG.debug("Calculated tvar $percentile ($pathId, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
+        LOG.debug("Calculated tvar $severity ($pathId, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
     }
-
 
 }

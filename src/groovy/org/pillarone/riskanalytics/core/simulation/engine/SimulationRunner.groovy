@@ -133,7 +133,7 @@ public class SimulationRunner {
             LOG.info "failed simulation ${currentScope.simulation.name} will be deleted"
             currentScope.simulation.delete()
         } catch (Exception ex) {
-            //todo ask sku if deletion of failed batch simulation is desired
+            LOG.error "failed deleting simulation ${currentScope.simulation.name}", ex
         }
         cleanup()
     }

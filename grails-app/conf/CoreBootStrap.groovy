@@ -16,7 +16,7 @@ class CoreBootStrap {
     def init = {servletContext ->
 
         /** Setting the default time zone to UTC avoids problems in multi user context with different time zones
-         *  and switches off daylight saving capabilities and possible related problems.                        */
+         *  and switches off daylight saving capabilities and possible related problems.      */
         DateTimeZone.setDefault(DateTimeZone.UTC)
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
 
@@ -79,7 +79,6 @@ class CoreBootStrap {
 
             }
         }
-        //todo ask sku if deletion of failed batch simulation is desired
         //delete all unfinished simulations
         SimulationRun.withTransaction {status ->
             def unfinishedSimulations = SimulationRun.findAllByEndTime(null)

@@ -22,6 +22,9 @@ environments {
                 'percentile': [0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0],
                 'var': [99, 99.5],
                 'tvar': [99, 99.5],
+                'percentileProfitFunction': [0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0],
+                'varProfitFunction': [99, 99.5],
+                'tvarProfitFunction': [99, 99.5],
                 'pdf': 200
         ]
     }
@@ -34,6 +37,9 @@ environments {
                 'percentile': [0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0],
                 'var': [99, 99.5],
                 'tvar': [99, 99.5],
+                'percentileProfitFunction': [0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0],
+                'varProfitFunction': [99, 99.5],
+                'tvarProfitFunction': [99, 99.5],
                 'pdf': 200
         ]
     }
@@ -45,6 +51,9 @@ environments {
                 'percentile': [0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0],
                 'var': [99, 99.5],
                 'tvar': [99, 99.5],
+                'percentileProfitFunction': [0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0],
+                'varProfitFunction': [99, 99.5],
+                'tvarProfitFunction': [99, 99.5],
         ]
         log4j = {
             info 'org.pillarone.riskanalytics.core.output',
@@ -83,6 +92,9 @@ environments {
                 'percentile': [0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0],
                 'var': [99, 99.5],
                 'tvar': [99, 99.5],
+                'percentileProfitFunction': [0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0],
+                'varProfitFunction': [99, 99.5],
+                'tvarProfitFunction': [99, 99.5],
                 'pdf': 200
         ]
     }
@@ -99,6 +111,9 @@ environments {
                 'percentile': [0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0],
                 'var': [99, 99.5],
                 'tvar': [99, 99.5],
+                'percentileProfitFunction': [0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0],
+                'varProfitFunction': [99, 99.5],
+                'tvarProfitFunction': [99, 99.5],
                 'pdf': 200
         ]
     }

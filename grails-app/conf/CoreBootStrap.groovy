@@ -19,7 +19,7 @@ class CoreBootStrap {
     def init = {servletContext ->
 
         /** Setting the default time zone to UTC avoids problems in multi user context with different time zones
-         *  and switches off daylight saving capabilities and possible related problems.   */
+         *  and switches off daylight saving capabilities and possible related problems.      */
         DateTimeZone.setDefault(DateTimeZone.UTC)
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
 

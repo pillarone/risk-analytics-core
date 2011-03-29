@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.util
 
 import umontreal.iro.lecuyer.rng.F2NL607
+import org.pillarone.riskanalytics.core.output.QuantilePerspective
 
 /**
  * @author jessika.walter (at) intuitive-collaboration (dot) com
@@ -20,17 +21,36 @@ class MathUtilsTests extends GroovyTestCase {
         assertEquals 20, MathUtils.calculatePercentile((double[]) [0, 10, 20], 90)
     }
 
-
     void testVar() {
         assertEquals 0, MathUtils.calculateVar((double[]) [0, 10, 20], 50)
         assertEquals 10, MathUtils.calculateVar((double[]) [0, 10, 20], 90)
     }
 
     void testTvar() {
-        assertEquals 5, MathUtils.calculateTvar((double[]) [0, 10, 20], 50)
-        assertEquals 5, MathUtils.calculateTvar((double[]) [0, 10, 20], 25)
-        assertEquals 10, MathUtils.calculateTvar((double[]) [0, 10, 20], 90)
-        assertEquals 10, MathUtils.calculateTvar((double[]) [0, 10, 20], 100)
+        assertEquals 10, MathUtils.calculateTvar((double[]) [0, 10, 20], 50)
+        assertEquals 30/2.25-10, MathUtils.calculateTvar((double[]) [0, 10, 20], 25), 1E-8
+        assertEquals 20/0.3-10, MathUtils.calculateTvar((double[]) [0, 10, 20], 90), 1E-8
+        assertEquals Double.NaN, MathUtils.calculateTvar((double[]) [0, 10, 20], 100)
+    }
+
+    void testPercentileProfit() {
+        assertEquals 0, MathUtils.calculatePercentile((double[]) [0, -10, -20], 0, QuantilePerspective.PROFIT)
+        assertEquals(-10d, MathUtils.calculatePercentile((double[]) [0, -10, -20], 50, QuantilePerspective.PROFIT))
+        assertEquals(-20, MathUtils.calculatePercentile((double[]) [0, -10, -20], 100, QuantilePerspective.PROFIT))
+        assertEquals(-18.33333333, MathUtils.calculatePercentile((double[]) [0, -10,-20], 75, QuantilePerspective.PROFIT),1E-8)
+        assertEquals(-20, MathUtils.calculatePercentile((double[]) [0, -10, -20], 90, QuantilePerspective.PROFIT))
+    }
+
+    void testVarProfit() {
+        assertEquals 0, MathUtils.calculateVar((double[]) [0, -10, -20], 50, QuantilePerspective.PROFIT)
+        assertEquals(-10, MathUtils.calculateVar((double[]) [0, -10, -20], 90, QuantilePerspective.PROFIT))
+    }
+
+    void testTvarProfit() {
+        assertEquals(-10, MathUtils.calculateTvar((double[]) [0, -10, -20], 50, QuantilePerspective.PROFIT))
+        assertEquals(- (30/2.25-10), MathUtils.calculateTvar((double[]) [0, -10, -20], 25, QuantilePerspective.PROFIT), 1E-8)
+        assertEquals(-(20/0.3-10), MathUtils.calculateTvar((double[]) [0, -10, -20], 90, QuantilePerspective.PROFIT), 1E-8)
+        assertEquals Double.NaN, MathUtils.calculateTvar((double[]) [0, -10, -20], 100, QuantilePerspective.PROFIT)
     }
 
     static List linearSeed = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]

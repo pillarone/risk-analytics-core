@@ -1,7 +1,9 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
+import java.util.concurrent.atomic.AtomicInteger
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.batch.BatchRunInfoService
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.output.PacketCollector
@@ -11,9 +13,6 @@ import org.pillarone.riskanalytics.core.util.GroovyUtils
 import org.pillarone.riskanalytics.core.wiring.ITransmitter
 import org.pillarone.riskanalytics.core.wiring.WiringUtils
 import org.pillarone.riskanalytics.core.simulation.engine.actions.*
-import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper
-import java.util.concurrent.atomic.AtomicInteger
-import org.joda.time.DateTime
 
 /**
  * This is the main entity to run a simulation. To do this, create a runner object (SimulationRunner.createRunner()).
@@ -147,7 +146,16 @@ public class SimulationRunner {
         cleanup()
     }
 
-    //TODO: still necessary
+    private void deleteFailedSimulation() {
+        try {
+            LOG.info "failed simulation ${currentScope.simulation.name} will be deleted"
+            currentScope.simulation.delete()
+        } catch (Exception ex) {
+            LOG.error "failed deleting simulation ${currentScope.simulation.name}", ex
+        }
+        cleanup()
+    }
+
     private void deleteCancelledSimulation() {
         if (simulationAction.isCancelled()) {
             LOG.info "canceled simulation ${currentScope.simulation.name} will be deleted"

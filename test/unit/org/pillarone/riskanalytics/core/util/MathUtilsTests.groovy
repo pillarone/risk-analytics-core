@@ -17,7 +17,7 @@ class MathUtilsTests extends GroovyTestCase {
         assertEquals 0, MathUtils.calculatePercentile((double[]) [0, 10, 20], 0)
         assertEquals 10, MathUtils.calculatePercentile((double[]) [0, 10, 20], 50)
         assertEquals 20, MathUtils.calculatePercentile((double[]) [0, 10, 20], 100)
-        assertEquals 18.33333333, MathUtils.calculatePercentile((double[]) [0, 10, 20], 75),1E-8
+        assertEquals 18.33333333, MathUtils.calculatePercentile((double[]) [0, 10, 20], 75), 1E-8
         assertEquals 20, MathUtils.calculatePercentile((double[]) [0, 10, 20], 90)
     }
 
@@ -28,8 +28,8 @@ class MathUtilsTests extends GroovyTestCase {
 
     void testTvar() {
         assertEquals 10, MathUtils.calculateTvar((double[]) [0, 10, 20], 50)
-        assertEquals 30/2.25-10, MathUtils.calculateTvar((double[]) [0, 10, 20], 25), 1E-8
-        assertEquals 20/0.3-10, MathUtils.calculateTvar((double[]) [0, 10, 20], 90), 1E-8
+        assertEquals 30 / 2.25 - 10, MathUtils.calculateTvar((double[]) [0, 10, 20], 25), 1E-8
+        assertEquals 20 / 0.3 - 10, MathUtils.calculateTvar((double[]) [0, 10, 20], 90), 1E-8
         assertEquals Double.NaN, MathUtils.calculateTvar((double[]) [0, 10, 20], 100)
     }
 
@@ -37,19 +37,19 @@ class MathUtilsTests extends GroovyTestCase {
         assertEquals 0, MathUtils.calculatePercentile((double[]) [0, -10, -20], 0, QuantilePerspective.PROFIT)
         assertEquals(-10d, MathUtils.calculatePercentile((double[]) [0, -10, -20], 50, QuantilePerspective.PROFIT))
         assertEquals(-20, MathUtils.calculatePercentile((double[]) [0, -10, -20], 100, QuantilePerspective.PROFIT))
-        assertEquals(-18.33333333, MathUtils.calculatePercentile((double[]) [0, -10,-20], 75, QuantilePerspective.PROFIT),1E-8)
+        assertEquals(-18.33333333, MathUtils.calculatePercentile((double[]) [0, -10, -20], 75, QuantilePerspective.PROFIT), 1E-8)
         assertEquals(-20, MathUtils.calculatePercentile((double[]) [0, -10, -20], 90, QuantilePerspective.PROFIT))
     }
 
     void testVarProfit() {
-        assertEquals 0, MathUtils.calculateVar((double[]) [0, -10, -20], 50, QuantilePerspective.PROFIT)
-        assertEquals(-10, MathUtils.calculateVar((double[]) [0, -10, -20], 90, QuantilePerspective.PROFIT))
+        assertEquals(-0d, MathUtils.calculateVar((double[]) [0, -10, -20], 50, QuantilePerspective.PROFIT))
+        assertEquals(10, MathUtils.calculateVar((double[]) [0, -10, -20], 90, QuantilePerspective.PROFIT))
     }
 
     void testTvarProfit() {
-        assertEquals(-10, MathUtils.calculateTvar((double[]) [0, -10, -20], 50, QuantilePerspective.PROFIT))
-        assertEquals(- (30/2.25-10), MathUtils.calculateTvar((double[]) [0, -10, -20], 25, QuantilePerspective.PROFIT), 1E-8)
-        assertEquals(-(20/0.3-10), MathUtils.calculateTvar((double[]) [0, -10, -20], 90, QuantilePerspective.PROFIT), 1E-8)
+        assertEquals(10, MathUtils.calculateTvar((double[]) [0, -10, -20], 50, QuantilePerspective.PROFIT))
+        assertEquals((30 / 2.25 - 10), MathUtils.calculateTvar((double[]) [0, -10, -20], 25, QuantilePerspective.PROFIT), 1E-8)
+        assertEquals((20 / 0.3 - 10), MathUtils.calculateTvar((double[]) [0, -10, -20], 90, QuantilePerspective.PROFIT), 1E-8)
         assertEquals Double.NaN, MathUtils.calculateTvar((double[]) [0, -10, -20], 100, QuantilePerspective.PROFIT)
     }
 
@@ -108,7 +108,7 @@ class MathUtilsTests extends GroovyTestCase {
 
     private def toGString(String arg) {
 
-        def str ="""\
+        def str = """\
           ${ getToken(arg)}
         """
         return str
@@ -117,9 +117,9 @@ class MathUtilsTests extends GroovyTestCase {
     private String getToken(String arg) {
         StringBuilder sb = new StringBuilder()
 
-        StringTokenizer st = new StringTokenizer(arg,"]", true)
-        while(st.hasMoreElements()){
-              sb.append(st.nextElement()+"\n")
+        StringTokenizer st = new StringTokenizer(arg, "]", true)
+        while (st.hasMoreElements()) {
+            sb.append(st.nextElement() + "\n")
         }
         println sb
         return sb

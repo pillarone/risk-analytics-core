@@ -6,11 +6,19 @@ import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.pillarone.riskanalytics.core.model.migration.AbstractMigration
 import org.pillarone.riskanalytics.core.model.migration.MigrationUtils
 import org.pillarone.riskanalytics.core.model.Model
-import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObject
 import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObjectClassifier
+import org.pillarone.riskanalytics.core.example.migration.RemoveParamMigrationComponent
 
 
 class MigratableCoreModel extends CoreModel implements MigratableModel {
+
+    RemoveParamMigrationComponent composite
+
+    @Override
+    void initComponents() {
+        super.initComponents()    //To change body of overridden methods use File | Settings | File Templates.
+        composite = new RemoveParamMigrationComponent()
+    }
 
     VersionNumber getVersion() {
         return new VersionNumber("2")

@@ -33,6 +33,6 @@ class ModelMigratorTests extends GroovyTestCase {
         old.modelClass = MigratableCoreModel
         old.load()
 
-        assertEquals 4, old.parameterHolders.size()
+        assertEquals 6, old.parameterHolders.size()
     }
 }

@@ -14,6 +14,7 @@ import org.pillarone.riskanalytics.core.util.GrailsConfigValidator
 import org.springframework.remoting.rmi.RmiProxyFactoryBean
 import org.springframework.remoting.rmi.RmiServiceExporter
 import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
+import org.pillarone.riskanalytics.core.example.migration.TestConstrainedTable
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
@@ -110,6 +111,7 @@ Persistence & Simulation engine.
         CollectingModeFactory.registerStrategy(new AggregatedCollectingModeStrategy())
 
         ConstraintsFactory.registerConstraint(new SimpleConstraint())
+        ConstraintsFactory.registerConstraint(new TestConstrainedTable())
     }
 
     def onChange = {event ->

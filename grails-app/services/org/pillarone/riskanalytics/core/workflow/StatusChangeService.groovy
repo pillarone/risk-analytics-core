@@ -13,8 +13,12 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workfl
 import org.pillarone.riskanalytics.core.user.UserManagement
 import static org.pillarone.riskanalytics.core.workflow.Status.*
 import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.remoting.ITransactionService
+import org.pillarone.riskanalytics.core.remoting.impl.RemotingUtils
 
 class StatusChangeService {
+
+    private ITransactionService service = RemotingUtils.getTransactionService()
 
     private static Log LOG = LogFactory.getLog(StatusChangeService)
 
@@ -31,7 +35,7 @@ class StatusChangeService {
                     parameterization.status = Status.REJECTED
                     parameterization.save()
                 } else if (parameterization.status == NONE) {
-                    ParameterizationDAO dao = ParameterizationDAO.findByNameAndItemVersionLike(parameterization.name, "R%")
+                    ParameterizationDAO dao = ParameterizationDAO.findByDealIdAndIdNotEqual(parameterization.dealId, parameterization.id)
                     if (dao != null) {
                         throw new WorkflowException(parameterization.name, DATA_ENTRY, "Parameterization is already in workflow.")
                     }
@@ -72,7 +76,8 @@ class StatusChangeService {
     //TODO: re-use MIF
 
     private Parameterization incrementVersion(Parameterization item, boolean newR) {
-        Parameterization newItem = new Parameterization(item.name)
+        String parameterizationName = newR ? getTransactionName(item.dealId) : item.name
+        Parameterization newItem = new Parameterization(parameterizationName)
 
         List newParameters = ParameterizationHelper.copyParameters(item.parameters)
         newParameters.each {
@@ -139,6 +144,10 @@ class StatusChangeService {
                 }
                 break;
         }
+    }
+
+    private String getTransactionName(long dealId) {
+        service.allTransactions.find { it.dealId == dealId }.name
     }
 }
 

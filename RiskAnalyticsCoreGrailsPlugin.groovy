@@ -18,7 +18,7 @@ import org.pillarone.riskanalytics.core.example.migration.TestConstrainedTable
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.3"
+    def version = "1.4-ALPHA-1"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.4 > *"
     // the other plugins this plugin depends on

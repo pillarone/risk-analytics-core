@@ -8,16 +8,19 @@ import org.pillarone.riskanalytics.core.model.migration.MigrationUtils
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObjectClassifier
 import org.pillarone.riskanalytics.core.example.migration.RemoveParamMigrationComponent
+import org.pillarone.riskanalytics.core.example.migration.DynamicMigrationComponent
 
 
 class MigratableCoreModel extends CoreModel implements MigratableModel {
 
     RemoveParamMigrationComponent composite
+    DynamicMigrationComponent dynamic
 
     @Override
     void initComponents() {
         super.initComponents()    //To change body of overridden methods use File | Settings | File Templates.
         composite = new RemoveParamMigrationComponent()
+        dynamic = new DynamicMigrationComponent()
     }
 
     VersionNumber getVersion() {

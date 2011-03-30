@@ -45,6 +45,7 @@ class TestParameterObjectType extends AbstractParameterObjectClassifier {
     }
 
     static IParameterObject getStrategy(TestParameterObjectType type, Map parameters) {
-        new TestConstrainedTableStrategy(table : (ConstrainedMultiDimensionalParameter) parameters['table'])
+        new TestConstrainedTableStrategy(table : (ConstrainedMultiDimensionalParameter) parameters['table'],
+                                         mode : parameters['mode'])
     }
 }

@@ -2,23 +2,22 @@ package org.pillarone.riskanalytics.core.example.migration
 
 import org.pillarone.riskanalytics.core.parameterization.IParameterObject
 import org.pillarone.riskanalytics.core.parameterization.IParameterObjectClassifier
-import org.pillarone.riskanalytics.core.parameterization.ConstrainedMultiDimensionalParameter
 
 /**
  * @author stefan.kunz (at) intuitive-collaboration (dot) com
  */
-class TestConstrainedTableStrategy implements IParameterObject {
+class EnabledOptionalComponentStrategy implements IParameterObject {
 
-    ConstrainedMultiDimensionalParameter table = TestConstrainedTable.getDefault()
-    ResultViewMode mode = ResultViewMode.INCREMENTAL
+    TimeMode timeMode = TimeMode.PERIOD
+    IParameterObject strategy = TestParameterObjectType.getDefault()
     
     IParameterObjectClassifier getType() {
-        TestConstraintsTableType.THREE_COLUMNS
+        OptionalComponentType.ENABLED
     }
 
     Map getParameters() {
-        [table : table,
-         mode : mode]
+        [timeMode : timeMode,
+         strategy : strategy]
     }
 
 }

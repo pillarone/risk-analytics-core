@@ -1,10 +1,10 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
 import org.apache.log4j.Logger
+import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.user.UserManagement
 import org.springframework.transaction.TransactionStatus
-import org.joda.time.DateTime
 
 abstract class ModellingItem {
     final static Logger LOG = Logger.getLogger(ModellingItem)
@@ -147,7 +147,7 @@ abstract class ModellingItem {
                 def dao = getDao()
                 if (dao != null && deleteDaoImpl(dao)) {
                     result = true
-                    LOG.info  "${this.getClass().simpleName} $name deleted"
+                    LOG.info "${this.getClass().simpleName} $name deleted"
                 } else {
                     logErrors(dao)
                 }
@@ -216,6 +216,14 @@ abstract class ModellingItem {
         if (newDao) {
             this.id = newDao.id
         }
+    }
+
+    public boolean isUsedInSimulation() {
+        return false
+    }
+
+    public List getSimulations() {
+        return []
     }
 
 }

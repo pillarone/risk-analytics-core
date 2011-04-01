@@ -14,7 +14,10 @@ class RemoveParamMigrationComponent extends Component {
     PacketList<TestPacket> outResults2 = new PacketList<TestPacket>(TestPacket)
     PacketList<TestPacket> outResults3 = new PacketList<TestPacket>(TestPacket)
 
-    TimeMode parmTimeMode = TimeMode.PERIOD
+    /*
+    Simulated migration: parmTimeMode removed
+     */
+//    TimeMode parmTimeMode = TimeMode.PERIOD
     IParameterObject parmStrategy = TestParameterObjectType.getDefault()
 
     @Override protected void doCalculation() {

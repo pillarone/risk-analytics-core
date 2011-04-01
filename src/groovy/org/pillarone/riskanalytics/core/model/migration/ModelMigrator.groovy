@@ -60,7 +60,7 @@ public class ModelMigrator {
             parameterization.load()
         }
 
-        ParameterApplicator applicator = new ParameterApplicator(model: oldModel, parameterization: parameterization)
+        ParameterApplicator applicator = new ModelMigrationParameterApplicator(model: oldModel, parameterization: parameterization)
         applicator.init()
         applicator.applyParameterForPeriod(periodIndex)
 

@@ -9,7 +9,7 @@ class EnumParameterHolder extends ParameterHolder {
 
     public EnumParameterHolder(Parameter parameter) {
         super(parameter.path, parameter.periodIndex);
-        this.value = Enum.valueOf(getClass().getClassLoader().loadClass(parameter.parameterType), parameter.parameterValue)
+        this.value = Enum.valueOf(Thread.currentThread().contextClassLoader.loadClass(parameter.parameterType), parameter.parameterValue)
     }
 
     public EnumParameterHolder(String path, int periodIndex, Enum value) {

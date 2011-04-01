@@ -9,6 +9,10 @@ class ResourceBundleRegistry {
 
     private static Map<String, Set<String>> bundles = [:]
 
+    static String RESOURCE = "RESOURCE"
+    static String VALIDATION = "VALIDATION"
+    static String HELP = "HELP"
+
     static synchronized void addBundle(String key, String bundleName) {
         Set<String> typeBundles = getBundles(key)
         typeBundles.add(bundleName)

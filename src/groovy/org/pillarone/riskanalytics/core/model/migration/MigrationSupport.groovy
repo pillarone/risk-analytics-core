@@ -4,6 +4,8 @@ import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.pillarone.riskanalytics.core.parameterization.IParameterObjectClassifier
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.parameterization.AbstractParameterObjectClassifier
+import org.pillarone.riskanalytics.core.parameterization.ConstrainedMultiDimensionalParameter
+import org.pillarone.riskanalytics.core.parameterization.IMultiDimensionalConstraints
 
 
 abstract class MigrationSupport extends AbstractMigration {
@@ -41,6 +43,15 @@ abstract class MigrationSupport extends AbstractMigration {
 
     }
 
+    protected void removeColumnFromConstraint(Class constraintClass, int index) {
+        findMultiDimensionalParametersByConstraints(currentTarget, constraintClass.newInstance())*.removeColumnAt(index)
+    }
+
+    protected List<ConstrainedMultiDimensionalParameter> findMultiDimensionalParametersByConstraints(Model model, IMultiDimensionalConstraints constraints) {
+        ConstrainedMultiDimensionalParameterCollector collector = new ConstrainedMultiDimensionalParameterCollector(constraints)
+        model.accept(collector)
+        return collector.result
+    }
 
     protected ClassLoader getOldModelClassLoader() {
         currentSource.getClass().getClassLoader()

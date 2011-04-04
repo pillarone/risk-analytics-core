@@ -9,6 +9,8 @@ import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObjectClassifier
 import org.pillarone.riskanalytics.core.example.migration.RemoveParamMigrationComponent
 import org.pillarone.riskanalytics.core.example.migration.DynamicMigrationComponent
+import org.pillarone.riskanalytics.core.model.migration.MigrationSupport
+import org.pillarone.riskanalytics.core.example.migration.TestConstrainedTable
 
 
 class MigratableCoreModel extends CoreModel implements MigratableModel {
@@ -31,14 +33,15 @@ class MigratableCoreModel extends CoreModel implements MigratableModel {
         MigrationUtils.getMigrationChain([new Migration_v1_v2()], from, to)
     }
 
-    private static class Migration_v1_v2 extends AbstractMigration {
+    private static class Migration_v1_v2 extends MigrationSupport {
 
         Migration_v1_v2() {
             super(new VersionNumber("1"), new VersionNumber("2"), MigratableCoreModel)
         }
 
         @Override
-        void migrateParameterization(Model source, Model target) {
+        void doMigrateParameterization(Model source, Model target) {
+            removeColumnFromConstraint(TestConstrainedTable, 1)
         }
 
     }

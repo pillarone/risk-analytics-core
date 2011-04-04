@@ -10,7 +10,7 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolde
 import org.pillarone.riskanalytics.core.example.migration.TestConstraintsTableType
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjectParameterHolder
 import org.pillarone.riskanalytics.core.example.migration.ResultViewMode
-import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
+import org.pillarone.riskanalytics.core.simulation.item.parameter.MultiDimensionalParameterHolder
 
 class ModelMigratorTests extends GroovyTestCase {
 
@@ -45,6 +45,9 @@ class ModelMigratorTests extends GroovyTestCase {
         ParameterObjectParameterHolder parmStrategy = old.parameterHolders.find { it.path == "composite:parmStrategy" }
         assertEquals 2, parmStrategy.classifierParameters.size()
 
+        MultiDimensionalParameterHolder table = parmStrategy.classifierParameters.get("table")
+        assertEquals 3, table.businessObject.valueColumnCount
+
         ModelMigrator migrator = new ModelMigrator(MigratableCoreModel)
         migrator.migrateParameterizations()
 
@@ -53,5 +56,8 @@ class ModelMigratorTests extends GroovyTestCase {
         assertNull old.parameterHolders.find { it.path == "composite:parmTimeMode" }
         parmStrategy = old.parameterHolders.find { it.path == "composite:parmStrategy" }
         assertEquals 1, parmStrategy.classifierParameters.size()
+
+        table = parmStrategy.classifierParameters.get("table")
+        assertEquals 2, table.businessObject.valueColumnCount
     }
 }

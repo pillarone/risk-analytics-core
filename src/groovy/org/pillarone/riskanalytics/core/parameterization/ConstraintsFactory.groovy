@@ -25,6 +25,18 @@ class ConstraintsFactory {
     }
 
     static IMultiDimensionalConstraints getConstraints(String name) {
-        return constraints.get(name)
+        return loadConstraint(name)
+    }
+
+    protected static IMultiDimensionalConstraints loadConstraint(String name) {
+        IMultiDimensionalConstraints constraint = constraints.get(name)
+        if (constraint != null) {
+            //workaround for migration
+            Class clazz = Thread.currentThread().contextClassLoader.loadClass(constraint.class.name)
+            if (clazz != constraint.class) {
+                return clazz.newInstance()
+            }
+        }
+        return constraint
     }
 }

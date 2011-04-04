@@ -44,6 +44,13 @@ abstract class Model {
         }
     }
 
+    void accept(IModelVisitor visitor) {
+        visitor.visitModel(this)
+        for(Component component in allComponents) {
+            component.accept(visitor)
+        }
+    }
+
     /**
      *  Wires the model and its ComposedComponents. Furthermore the
      *  validateWiring() of all components in allComponent is executed.

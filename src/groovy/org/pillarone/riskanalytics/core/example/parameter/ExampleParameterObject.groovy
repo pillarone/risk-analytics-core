@@ -4,8 +4,9 @@ import org.pillarone.riskanalytics.core.parameterization.IParameterObject
 import org.pillarone.riskanalytics.core.parameterization.IParameterObjectClassifier
 import org.pillarone.riskanalytics.core.components.InitializingComponent
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
+import org.pillarone.riskanalytics.core.parameterization.AbstractParameterObject
 
-class ExampleParameterObject implements IParameterObject, InitializingComponent {
+class ExampleParameterObject extends AbstractParameterObject implements InitializingComponent {
 
     Map parameters
     IParameterObjectClassifier classifier

@@ -102,7 +102,7 @@ class ResultAccessor {
 
     static Double getNthOrderStatistic(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName,
                                        String fieldName, double percentage, CompareOperator compareOperator) {
-        double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
+        double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName, true) as double[]
         double lowestPercentage = 100d / values.size()
         if ((compareOperator.equals(CompareOperator.LESS_THAN) && percentage <= lowestPercentage)
                 || compareOperator.equals(CompareOperator.GREATER_THAN) && percentage == 100) {
@@ -196,6 +196,23 @@ class ResultAccessor {
                 "s.collector.collectorName = ? AND " +
                 "s.field.fieldName = ? AND " +
                 "s.simulationRun.id = ? ORDER BY value", [pathName, periodIndex, collectorName, fieldName, simulationRun.id])
+    }
+
+    static List getValuesSorted(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName,
+                                String fieldName, boolean aggregateSingle) {
+        if (aggregateSingle) {
+            CollectorMapping collectorMapping = CollectorMapping.findByCollectorName(SingleValueCollectingModeStrategy.IDENTIFIER)
+            if (collectorName.equals(collectorMapping?.collectorName)) {
+                return SingleValueResult.executeQuery("SELECT sum(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
+                    " WHERE s.path.pathName = ? AND " +
+                    "s.period = ? AND " +
+                    "s.collector.collectorName = ? AND " +
+                    "s.field.fieldName = ? AND " +
+                    "s.simulationRun.id = ? GROUP BY s.iteration ORDER BY sum(value) asc ",
+                        [pathName, periodIndex, collectorName, fieldName, simulationRun.id])
+            }
+        }
+        return getValuesSorted(simulationRun, periodIndex, pathName, collectorName, fieldName)
     }
 
     static List getValuesSorted(SimulationRun simulationRun, int period, long pathId, long collectorId, long fieldId, long singleCollectorId) {

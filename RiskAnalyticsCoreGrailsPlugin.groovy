@@ -18,7 +18,7 @@ import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.4-ALPHA-1.3"
+    def version = "1.4-ALPHA-1.4"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.7 > *"
     // the other plugins this plugin depends on
@@ -26,7 +26,7 @@ class RiskAnalyticsCoreGrailsPlugin {
             "backgroundThread": "1.3",
             "jodaTime": "0.5",
             "quartz": "0.4.2",
-            "springSecurityCore": "1.0.1",
+            "springSecurityCore": "1.1.2",
             "mavenPublisher": "0.7.5"
     ]
     // resources that are excluded from plugin packaging

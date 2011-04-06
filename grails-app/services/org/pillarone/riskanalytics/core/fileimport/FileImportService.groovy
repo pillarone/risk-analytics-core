@@ -24,7 +24,7 @@ abstract class FileImportService {
     abstract String prepare(URL file, String itemName)
 
     /** Setting the default time zone to UTC avoids problems in multi user context with different time zones
-     *  and switches off daylight saving capabilities and possible related problems. */
+     *  and switches off daylight saving capabilities and possible related problems.  */
     DateTimeZone utc = DateTimeZone.setDefault(DateTimeZone.UTC)
 
     public int compareFilesAndWriteToDB(List modelNames = null) {
@@ -150,12 +150,14 @@ abstract class FileImportService {
 
 
     static void importModelsIfNeeded(List modelNames) {
-        String models = modelNames != null && !modelNames.empty ? modelNames.join(", ") : "all models"
-        LOG.info "Importing files for ${models}"
-        new ModelFileImportService().compareFilesAndWriteToDB(modelNames)
-        new ModelStructureImportService().compareFilesAndWriteToDB(modelNames)
-        new ParameterizationImportService().compareFilesAndWriteToDB(modelNames)
-        new ResultConfigurationImportService().compareFilesAndWriteToDB(modelNames)
+        if (!Boolean.getBoolean("skipImport")) {
+            String models = modelNames != null && !modelNames.empty ? modelNames.join(", ") : "all models"
+            LOG.info "Importing files for ${models}"
+            new ModelFileImportService().compareFilesAndWriteToDB(modelNames)
+            new ModelStructureImportService().compareFilesAndWriteToDB(modelNames)
+            new ParameterizationImportService().compareFilesAndWriteToDB(modelNames)
+            new ResultConfigurationImportService().compareFilesAndWriteToDB(modelNames)
+        }
         ModelRegistry.instance.loadFromDatabase()
     }
 

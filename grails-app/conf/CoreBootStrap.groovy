@@ -116,11 +116,9 @@ class CoreBootStrap {
         if (modelFilter) {
             models = modelFilter.collect {it - "Model"}
         }
-        if (!Boolean.getBoolean("skipImport")) {
             ParameterizationDAO.withTransaction {TransactionStatus status ->
                 FileImportService.importModelsIfNeeded(models)
             }
-        }
     }
 
     def destroy = {

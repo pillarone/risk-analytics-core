@@ -73,7 +73,10 @@ public class ModelMigrator {
         Thread currentThread = Thread.currentThread()
         ClassLoader current = currentThread.contextClassLoader
         currentThread.contextClassLoader = cl
-        closure.call()
-        currentThread.contextClassLoader = current
+        try {
+            closure.call()
+        } finally {
+            currentThread.contextClassLoader = current
+        }
     }
 }

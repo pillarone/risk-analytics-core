@@ -56,7 +56,7 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
                 values = new ArrayList<IterationValue>();
                 singleResults.put(descriptor, values);
             }
-            values.add(new IterationValue(result.value, result.date != null ? result.date.getTime() : 0));
+            values.add(new IterationValue(result.value, result.date != null ? result.date.millis : 0));
             resultCount++;
         }
 

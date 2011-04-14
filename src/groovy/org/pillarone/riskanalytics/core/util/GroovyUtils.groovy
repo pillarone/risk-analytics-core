@@ -3,11 +3,11 @@ package org.pillarone.riskanalytics.core.util
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import java.text.MessageFormat
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
-import org.apache.commons.logging.Log
-import org.apache.commons.logging.LogFactory
 
 /**
  *  This class contains methods which are easy/short to implement in Groovy, but unreadable in Java.
@@ -232,7 +232,7 @@ public class GroovyUtils {
 
     static Set getBundles(Locale locale) {
         def resourceBundle = []
-        def resources = ResourceBundleRegistry.getValidationBundles()
+        def resources = ResourceBundleRegistry.getBundles(ResourceBundleRegistry.VALIDATION)
         for (String bundleName in resources) {
             resourceBundle << ResourceBundle.getBundle(bundleName, locale)
         }

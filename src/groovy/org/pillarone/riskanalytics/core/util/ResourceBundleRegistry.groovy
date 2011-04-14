@@ -7,22 +7,23 @@ package org.pillarone.riskanalytics.core.util
 
 class ResourceBundleRegistry {
 
-    private static Set<String> resourceBundles = new HashSet<String>()
-    private static Set<String> validationBundles = new HashSet<String>()
+    private static Map<String, Set<String>> bundles = [:]
 
-    static void addResourceBundle(String bundleName) {
-        resourceBundles.add(bundleName)
+    static String RESOURCE = "RESOURCE"
+    static String VALIDATION = "VALIDATION"
+    static String HELP = "HELP"
+
+    static synchronized void addBundle(String key, String bundleName) {
+        Set<String> typeBundles = getBundles(key)
+        typeBundles.add(bundleName)
     }
 
-    static Set<String> getResourceBundles() {
-        return resourceBundles
-    }
-
-    static void addValidationBundle(String bundleName) {
-        validationBundles.add(bundleName)
-    }
-
-    static Set<String> getValidationBundles() {
-        return validationBundles
+    public static Set<String> getBundles(String key) {
+        Set<String> typeBundles = bundles.get(key)
+        if (!typeBundles) {
+            typeBundles = new HashSet<String>()
+            bundles.put(key, typeBundles)
+        }
+        return typeBundles
     }
 }

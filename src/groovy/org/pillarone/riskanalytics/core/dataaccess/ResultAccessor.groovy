@@ -42,23 +42,53 @@ class ResultAccessor {
 
 
     static Double getMin(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
-        def res = SingleValueResult.executeQuery("SELECT MIN(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
+        if (isSingleCollector(collectorName)) {
+            String query ="SELECT sum(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
                 " WHERE s.path.pathName = ? AND " +
                 "s.collector.collectorName = ? AND " +
                 "s.field.fieldName = ? AND " +
                 "s.period = ? AND " +
-                "s.simulationRun.id = ?", [pathName, collectorName, fieldName, periodIndex, simulationRun.id])
-        return res[0]
+                "s.simulationRun.id = ? " +
+                "GROUP BY s.iteration " +
+                "ORDER BY sum(value) asc"
+            def res = SingleValueResult.executeQuery(query, [pathName, collectorName, fieldName, periodIndex, simulationRun.id], [max:1])
+            return res[0]
+        }
+        else {
+            String query ="SELECT MIN(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
+                " WHERE s.path.pathName = ? AND " +
+                "s.collector.collectorName = ? AND " +
+                "s.field.fieldName = ? AND " +
+                "s.period = ? AND " +
+                "s.simulationRun.id = ?"
+            def res = SingleValueResult.executeQuery(query, [pathName, collectorName, fieldName, periodIndex, simulationRun.id])
+            return res[0]
+        }
     }
 
     static Double getMax(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
-        def res = SingleValueResult.executeQuery("SELECT MAX(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
+        if (isSingleCollector(collectorName)) {
+            String query ="SELECT sum(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
                 " WHERE s.path.pathName = ? AND " +
                 "s.collector.collectorName = ? AND " +
                 "s.field.fieldName = ? AND " +
                 "s.period = ? AND " +
-                "s.simulationRun.id = ?", [pathName, collectorName, fieldName, periodIndex, simulationRun.id])
-        return res[0]
+                "s.simulationRun.id = ? " +
+                "GROUP BY s.iteration " +
+                "ORDER BY sum(value) desc"
+            def res = SingleValueResult.executeQuery(query, [pathName, collectorName, fieldName, periodIndex, simulationRun.id], [max:1])
+            return res[0]
+        }
+        else {
+            String query ="SELECT MAX(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
+                " WHERE s.path.pathName = ? AND " +
+                "s.collector.collectorName = ? AND " +
+                "s.field.fieldName = ? AND " +
+                "s.period = ? AND " +
+                "s.simulationRun.id = ?"
+            def res = SingleValueResult.executeQuery(query, [pathName, collectorName, fieldName, periodIndex, simulationRun.id])
+            return res[0]
+        }
     }
 
 
@@ -101,8 +131,8 @@ class ResultAccessor {
     }
 
     static Double getNthOrderStatistic(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName,
-                                       String fieldName, double percentage, CompareOperator compareOperator) {
-        double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName, true) as double[]
+                                       String fieldName, double percentage, CompareOperator compareOperator, boolean singleValuesCollected) {
+        double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName, singleValuesCollected) as double[]
         double lowestPercentage = 100d / values.size()
         if ((compareOperator.equals(CompareOperator.LESS_THAN) && percentage <= lowestPercentage)
                 || compareOperator.equals(CompareOperator.GREATER_THAN) && percentage == 100) {
@@ -148,7 +178,7 @@ class ResultAccessor {
             return result.result
         }
         else {
-            double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
+            double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName, true) as double[]
             return MathUtils.calculatePercentile(values, severity, perspective)
         }
     }
@@ -200,17 +230,14 @@ class ResultAccessor {
 
     static List getValuesSorted(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName,
                                 String fieldName, boolean aggregateSingle) {
-        if (aggregateSingle) {
-            CollectorMapping collectorMapping = CollectorMapping.findByCollectorName(SingleValueCollectingModeStrategy.IDENTIFIER)
-            if (collectorName.equals(collectorMapping?.collectorName)) {
-                return SingleValueResult.executeQuery("SELECT sum(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
-                    " WHERE s.path.pathName = ? AND " +
-                    "s.period = ? AND " +
-                    "s.collector.collectorName = ? AND " +
-                    "s.field.fieldName = ? AND " +
-                    "s.simulationRun.id = ? GROUP BY s.iteration ORDER BY sum(value) asc ",
-                        [pathName, periodIndex, collectorName, fieldName, simulationRun.id])
-            }
+        if (aggregateSingle && isSingleCollector(collectorName)) {
+            return SingleValueResult.executeQuery("SELECT sum(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
+                " WHERE s.path.pathName = ? AND " +
+                "s.period = ? AND " +
+                "s.collector.collectorName = ? AND " +
+                "s.field.fieldName = ? AND " +
+                "s.simulationRun.id = ? GROUP BY s.iteration ORDER BY sum(value) asc ",
+                    [pathName, periodIndex, collectorName, fieldName, simulationRun.id])
         }
         return getValuesSorted(simulationRun, periodIndex, pathName, collectorName, fieldName)
     }
@@ -334,5 +361,11 @@ class ResultAccessor {
             return null
         }
         return res[0][1]
+    }
+
+
+    static boolean isSingleCollector(String collectorName) {
+        CollectorMapping collectorMapping = CollectorMapping.findByCollectorName(SingleValueCollectingModeStrategy.IDENTIFIER)
+        return collectorName.equals(collectorMapping?.collectorName)
     }
 }

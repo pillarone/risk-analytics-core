@@ -8,6 +8,7 @@ import org.pillarone.riskanalytics.core.parameterization.ConstrainedMultiDimensi
 import org.pillarone.riskanalytics.core.parameterization.IMultiDimensionalConstraints
 import org.pillarone.riskanalytics.core.util.GroovyUtils
 import java.util.Map.Entry
+import org.pillarone.riskanalytics.core.model.ModelPath
 
 
 class ConstrainedMultiDimensionalParameterCollector implements IModelVisitor {
@@ -22,7 +23,7 @@ class ConstrainedMultiDimensionalParameterCollector implements IModelVisitor {
     void visitModel(Model model) {
     }
 
-    void visitComponent(Component component) {
+    void visitComponent(Component component, ModelPath path) {
         for (Entry<String, Object> entry in GroovyUtils.getProperties(component).entrySet()) {
             if (entry.key.startsWith("parm")) {
                 checkValue(entry.value)
@@ -30,7 +31,7 @@ class ConstrainedMultiDimensionalParameterCollector implements IModelVisitor {
         }
     }
 
-    void visitParameterObject(IParameterObject parameterObject) {
+    void visitParameterObject(IParameterObject parameterObject, ModelPath path) {
         for (Entry<String, Object> entry in parameterObject.parameters) {
             checkValue(entry.value)
         }

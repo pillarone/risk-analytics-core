@@ -46,8 +46,9 @@ abstract class Model {
 
     void accept(IModelVisitor visitor) {
         visitor.visitModel(this)
-        for(Component component in allComponents) {
-            component.accept(visitor)
+        for (Component component in allComponents) {
+            ModelPath path = new ModelPath()
+            component.accept(visitor, path.append(new ModelPathComponent(component.name, component.class)))
         }
     }
 

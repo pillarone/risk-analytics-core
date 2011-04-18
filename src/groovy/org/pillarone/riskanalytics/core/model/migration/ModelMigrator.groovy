@@ -53,20 +53,21 @@ public class ModelMigrator {
     }
 
     protected Model createModel(Parameterization parameterization, int periodIndex, ClassLoader loader) {
-        Model oldModel = null
+        Model model = null
         doWithContextClassLoader loader, {
-            oldModel = (Model) Class.forName(modelClass.getName(), true, loader).newInstance()
-            oldModel.init()
+            model = (Model) Class.forName(modelClass.getName(), true, loader).newInstance()
+            model.init()
+            model.injectComponentNames()
             parameterization.load()
 
-            ParameterApplicator applicator = new ModelMigrationParameterApplicator(model: oldModel, parameterization: parameterization)
+            ParameterApplicator applicator = new ModelMigrationParameterApplicator(model: model, parameterization: parameterization)
             applicator.init()
             applicator.applyParameterForPeriod(periodIndex)
 
             parameterization.unload()
         }
 
-        return oldModel
+        return model
     }
 
     public static void doWithContextClassLoader(ClassLoader cl, Closure closure) {

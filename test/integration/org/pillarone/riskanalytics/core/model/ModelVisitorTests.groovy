@@ -19,6 +19,7 @@ class ModelVisitorTests extends GroovyTestCase {
 
         model = new CoreModel()
         model.init()
+        model.injectComponentNames()
 
         ParameterApplicator applicator = new ParameterApplicator(parameterization: parameterization, model: model)
         applicator.init()
@@ -42,16 +43,18 @@ class ModelVisitorTests extends GroovyTestCase {
         List<Model> calledForModel = []
         List<IParameterObject> calledForParameterObject = []
 
-        void visitComponent(Component component) {
+        void visitComponent(Component component, ModelPath path) {
             calledForComponent << component
+            println path
         }
 
         void visitModel(Model model) {
             calledForModel << model
         }
 
-        void visitParameterObject(IParameterObject parameterObject) {
+        void visitParameterObject(IParameterObject parameterObject, ModelPath path) {
             calledForParameterObject << parameterObject
+            println path
         }
 
     }

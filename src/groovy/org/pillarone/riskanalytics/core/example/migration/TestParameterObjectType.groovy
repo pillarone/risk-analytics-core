@@ -12,7 +12,7 @@ class TestParameterObjectType extends AbstractParameterObjectClassifier {
 
     public static final TestParameterObjectType NESTED_CONSTRAINTS_TABLE = new TestParameterObjectType(
             "nested constraints table", "NESTED_CONSTRAINTS_TABLE", [
-            constraintTable: TestConstraintsTableType.getStrategy(TestConstraintsTableType.THREE_COLUMNS,
+            constraintTable: TestConstraintsTableType.getStrategy(TestConstraintsTableType.TWO_COLUMNS,
                     ['table': TestConstrainedTable.getDefault()]),
             mode: ResultViewMode.INCREMENTAL])
 

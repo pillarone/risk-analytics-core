@@ -12,6 +12,7 @@ import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import models.core.parameterApplicator.ParameterApplicatorModel
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjectParameterHolder
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 
 class ParameterApplicatorTests extends GrailsUnitTestCase {
 
@@ -32,11 +33,12 @@ class ParameterApplicatorTests extends GrailsUnitTestCase {
         def value = ExampleParameterObjectClassifier.TYPE0.getParameterObject(ExampleParameterObjectClassifier.TYPE0.parameters)
 
         ParameterApplicator applicator = new ParameterApplicator()
-        ApplicableParameter parameter = applicator.createApplicableParameter(m, path, value)
+        ApplicableParameter parameter = applicator.createApplicableParameter(m, ParameterHolderFactory.getHolder(path, 0, value))
 
         assertSame m.exampleInputOutputComponent, parameter.component
         assertEquals "parmParameterObject", parameter.parameterPropertyName
-        assertSame value, parameter.parameterValue
+        assertSame value.type, parameter.parameterValue.type
+        assertEquals value.parameters, parameter.parameterValue.parameters
 
     }
 
@@ -96,6 +98,7 @@ class ParameterApplicatorTests extends GrailsUnitTestCase {
     }
 
     //TODO msp: create better test model
+
     void testApplyParameter() {
 
         Parameterization parameter = getParameterization(new File("src/java/models/core/CoreParameters.groovy"))

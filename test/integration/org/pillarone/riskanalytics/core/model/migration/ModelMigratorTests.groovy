@@ -39,6 +39,8 @@ comments=[]
 
     """
 
+    ClassLoader modelMigrationClassLoader
+
     void setUp() {
         new ModelFileImportService().compareFilesAndWriteToDB(["MigratableCore"])
         new ModelStructureImportService().compareFilesAndWriteToDB(["MigratableCore"])
@@ -46,7 +48,7 @@ comments=[]
 
         ConfigSlurper slurper = new ConfigSlurper()
 
-        ModelMigrationClassLoader modelMigrationClassLoader = new ModelMigrationClassLoader([new Migration_v1_v2().oldModelJarURL] as URL[], Thread.currentThread().contextClassLoader)
+        modelMigrationClassLoader = new ModelMigrationClassLoader([new Migration_v1_v2().oldModelJarURL] as URL[], Thread.currentThread().contextClassLoader)
         modelMigrationClassLoader.loadClass("models.migratableCore.MigratableCoreModel")
 
         slurper.classLoader = new GroovyClassLoader(modelMigrationClassLoader)
@@ -64,12 +66,15 @@ comments=[]
     void testOldModel() {
         Parameterization old = new Parameterization("MigratableCoreParams")
         old.modelClass = MigratableCoreModel
-        old.load()
+        ModelMigrator.doWithContextClassLoader modelMigrationClassLoader, {
+            old.load()
+        }
 
         assertEquals 6, old.parameterHolders.size() //as saved above
         assertNotNull old.parameterHolders.find { it.path == "composite:parmTimeMode" }
         ParameterObjectParameterHolder parmStrategy = old.parameterHolders.find { it.path == "composite:parmStrategy" }
         assertEquals 2, parmStrategy.classifierParameters.size()
+        assertEquals "THREE_COLUMNS", parmStrategy.classifier.typeName
 
         MultiDimensionalParameterHolder table = parmStrategy.classifierParameters.get("table")
         assertEquals 3, table.businessObject.valueColumnCount
@@ -81,6 +86,7 @@ comments=[]
         assertEquals 5, old.parameterHolders.size() //composite:parmTimeMode should have been removed
         assertNull old.parameterHolders.find { it.path == "composite:parmTimeMode" }
         parmStrategy = old.parameterHolders.find { it.path == "composite:parmStrategy" }
+        assertEquals "TWO_COLUMNS", parmStrategy.classifier.typeName
         assertEquals 1, parmStrategy.classifierParameters.size()
 
         table = parmStrategy.classifierParameters.get("table")

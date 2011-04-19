@@ -16,7 +16,7 @@ class TestConstrainedTableStrategy extends AbstractParameterObject{
 //    ResultViewMode mode = ResultViewMode.INCREMENTAL
 
     IParameterObjectClassifier getType() {
-        TestConstraintsTableType.THREE_COLUMNS
+        TestConstraintsTableType.TWO_COLUMNS
     }
 
     Map getParameters() {

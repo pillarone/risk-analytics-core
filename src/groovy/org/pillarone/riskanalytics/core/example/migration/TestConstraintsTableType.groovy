@@ -10,11 +10,11 @@ import org.pillarone.riskanalytics.core.parameterization.ConstrainedMultiDimensi
  */
 class TestConstraintsTableType extends AbstractParameterObjectClassifier {
 
-    public static final TestConstraintsTableType THREE_COLUMNS = new TestConstraintsTableType('three columns', 'THREE_COLUMNS',
+    public static final TestConstraintsTableType TWO_COLUMNS = new TestConstraintsTableType('two columns', 'TWO_COLUMNS',
         [table : TestConstrainedTable.getDefault()]
     )
 
-    public static final all = [THREE_COLUMNS]
+    public static final all = [TWO_COLUMNS]
 
     protected static Map types = [:]
 

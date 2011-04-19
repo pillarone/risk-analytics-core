@@ -11,6 +11,7 @@ import org.pillarone.riskanalytics.core.example.migration.RemoveParamMigrationCo
 import org.pillarone.riskanalytics.core.example.migration.DynamicMigrationComponent
 import org.pillarone.riskanalytics.core.model.migration.MigrationSupport
 import org.pillarone.riskanalytics.core.example.migration.TestConstrainedTable
+import org.pillarone.riskanalytics.core.example.migration.TestConstraintsTableType
 
 
 class MigratableCoreModel extends CoreModel implements MigratableModel {
@@ -41,6 +42,7 @@ class MigratableCoreModel extends CoreModel implements MigratableModel {
 
         @Override
         void doMigrateParameterization(Model source, Model target) {
+            renameClassifier(TestConstraintsTableType, "THREE_COLUMNS", "TWO_COLUMNS")
             removeColumnFromConstraint(TestConstrainedTable, 1)
         }
 

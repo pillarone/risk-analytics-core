@@ -6,6 +6,7 @@ import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.parameterization.AbstractParameterObjectClassifier
 import org.pillarone.riskanalytics.core.parameterization.ConstrainedMultiDimensionalParameter
 import org.pillarone.riskanalytics.core.parameterization.IMultiDimensionalConstraints
+import org.pillarone.riskanalytics.core.model.ModelPathComponent
 
 
 abstract class MigrationSupport extends AbstractMigration {
@@ -51,6 +52,23 @@ abstract class MigrationSupport extends AbstractMigration {
         ConstrainedMultiDimensionalParameterCollector collector = new ConstrainedMultiDimensionalParameterCollector(constraints)
         model.accept(collector)
         return collector.result
+    }
+
+    protected void renameClassifier(Class classifier, String oldName, String newName) {
+        ClassifierCollector classifierCollector = new ClassifierCollector(classifier, oldName)
+        currentSource.accept(classifierCollector)
+
+        for (ClassifierCollector.ResultPair result in classifierCollector.result) {
+            def currentComponent = currentTarget
+            ModelPathComponent lastComponent = result.path.pathComponents[0]
+            for (int i = 0; i < result.path.pathComponents.size() - 1; i++) {
+                currentComponent = currentComponent.getProperty(lastComponent.name)
+                lastComponent = result.path.pathComponents[i + 1]
+            }
+
+            AbstractParameterObjectClassifier newClassifier = getNewModelClassLoader().loadClass(classifier.name)."$newName"
+            currentComponent[lastComponent.name] = newClassifier.getParameterObject(result.classifierParameters)
+        }
     }
 
     protected ClassLoader getOldModelClassLoader() {

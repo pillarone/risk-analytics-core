@@ -107,14 +107,13 @@ class Parameterization extends ModellingItem {
             setChangeUserInfo()
             mapToDao(daoToBeSaved)
 
-            notifyItemSaved()
-
             if (!daoToBeSaved.save(flush: true)) logErrors(daoToBeSaved)
 
             changed = false
             dao = daoToBeSaved
             result = daoToBeSaved.id
             id = daoToBeSaved.id
+            notifyItemSaved()
         }
 
         return result
@@ -231,6 +230,13 @@ class Parameterization extends ModellingItem {
         }
     }
 
+    public boolean commentHasChanged() {
+        for (Comment comment: comments) {
+            if (comment.added || comment.updated || comment.deleted)
+                return true
+        }
+        return false
+    }
 
 
     private void commentAdded(ParameterizationDAO dao, Comment comment) {
@@ -440,6 +446,7 @@ class Parameterization extends ModellingItem {
     void addComment(Comment comment) {
         comments << comment
         comment.added = true
+        notifyItemChanged()
     }
 
     void removeComment(Comment comment) {
@@ -450,6 +457,7 @@ class Parameterization extends ModellingItem {
         }
         comment.deleted = true
         comment.updated = false
+        notifyItemChanged()
     }
 
     public List<Tag> getTags() {

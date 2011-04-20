@@ -178,13 +178,15 @@ abstract class ModellingItem {
         itemChangedListener.clear()
     }
 
-    protected void notifyItemChanged() {
+    //fja: changed to public, it will be by edit a comment belonging to used item
+
+    public void notifyItemChanged() {
         itemChangedListener.each {
             it.itemChanged(this)
         }
     }
 
-    protected void notifyItemSaved() {
+    public void notifyItemSaved() {
         itemChangedListener.each {
             it.itemSaved(this)
         }

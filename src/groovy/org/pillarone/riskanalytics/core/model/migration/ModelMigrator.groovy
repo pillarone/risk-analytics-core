@@ -31,7 +31,7 @@ public class ModelMigrator {
             parameterization.load(false)
 
 
-            for (AbstractMigration migration in instance.getMigrationChain(parameterization.versionNumber, toVersion)) {
+            for (AbstractMigration migration in instance.getMigrationChain(parameterization.modelVersionNumber, toVersion)) {
                 List<ParameterHolder> newParameters = []
                 for (int periodIndex = 0; periodIndex < parameterization.periodCount; periodIndex++) {
                     currentModelClassLoader = new ModelMigrationClassLoader([migration.oldModelJarURL] as URL[], Thread.currentThread().getContextClassLoader())

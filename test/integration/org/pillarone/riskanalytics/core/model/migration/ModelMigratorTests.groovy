@@ -9,6 +9,8 @@ import org.pillarone.riskanalytics.core.parameterization.ParameterizationHelper
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.parameter.MultiDimensionalParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjectParameterHolder
+import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
+import org.pillarone.riskanalytics.core.ModelDAO
 
 class ModelMigratorTests extends GroovyTestCase {
 
@@ -43,6 +45,16 @@ comments=[]
 
     void setUp() {
         new ModelFileImportService().compareFilesAndWriteToDB(["MigratableCore"])
+
+        ModelDAO v2 = ModelDAO.findByModelClassName(MigratableCoreModel.name)
+
+        ModelDAO v1 = new ModelDAO()
+        v1.modelClassName = v2.modelClassName
+        v1.itemVersion = "1"
+        v1.srcCode = v2.srcCode
+        v1.name = v2.name
+        v1.save()
+
         new ModelStructureImportService().compareFilesAndWriteToDB(["MigratableCore"])
         new ResultConfigurationImportService().compareFilesAndWriteToDB(["MigratableCore"])
 
@@ -57,6 +69,7 @@ comments=[]
         try {
             ConfigObject configObject = slurper.parse(script)
             Parameterization parameterization = ParameterizationHelper.createParameterizationFromConfigObject(configObject, "MigratableCoreParams")
+            parameterization.modelVersionNumber = new VersionNumber("1")
             parameterization.save()
         } finally {
             GroovySystem.metaClassRegistry.removeMetaClass(script.class)

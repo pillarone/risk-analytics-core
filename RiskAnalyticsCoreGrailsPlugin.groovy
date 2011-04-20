@@ -20,7 +20,7 @@ import org.pillarone.riskanalytics.core.util.GrailsConfigValidator
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.4-ALPHA-1.8"
+    def version = "1.4-ALPHA-2"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.7 > *"
     // the other plugins this plugin depends on

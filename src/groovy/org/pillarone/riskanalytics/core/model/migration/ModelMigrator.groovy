@@ -8,8 +8,12 @@ import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
 import org.pillarone.riskanalytics.core.model.MigratableModel
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.parameterization.ParameterizationHelper
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 
 public class ModelMigrator {
+
+    private static Log LOG = LogFactory.getLog(ModelMigrator)
 
     Class<? extends MigratableModel> modelClass
     VersionNumber toVersion
@@ -22,6 +26,9 @@ public class ModelMigrator {
     }
 
     public void migrateParameterizations() {
+
+        LOG.info "Starting migration of ${modelClass.simpleName} to version ${toVersion}"
+
         for (ParameterizationDAO dao in ParameterizationDAO.findAllByModelClassName(modelClass.name)) {
             MigratableModel instance = modelClass.newInstance()
 
@@ -30,6 +37,12 @@ public class ModelMigrator {
             parameterization.modelClass = modelClass
             parameterization.load(false)
 
+            if (parameterization.modelVersionNumber == toVersion) {
+                LOG.info "${parameterization.name} v${parameterization.versionNumber} (current model version: ${parameterization.modelVersionNumber}) already up to date - skipping migration"
+                continue
+            }
+
+            LOG.info "Migrating ${parameterization.name} v${parameterization.versionNumber} (current model version: ${parameterization.modelVersionNumber})"
 
             for (AbstractMigration migration in instance.getMigrationChain(parameterization.modelVersionNumber, toVersion)) {
                 List<ParameterHolder> newParameters = []
@@ -47,8 +60,12 @@ public class ModelMigrator {
                 newParameters.each { parameterization.addParameter(it) }
                 parameterization.modelVersionNumber = migration.to
                 parameterization.save()
+
+                LOG.info "Migrated ${parameterization.name} v${parameterization.versionNumber} to ${migration.to}"
+
             }
 
+            LOG.info "Migration of ${parameterization.name} v${parameterization.versionNumber} completed."
         }
     }
 

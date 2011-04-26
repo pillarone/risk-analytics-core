@@ -5,21 +5,31 @@ import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.workflow.Status
 
-class CommentDAOTests extends GroovyTestCase {
+/**
+ * @author fouad.jaada@intuitive-collaboration.com
+ */
+class ParameterizationCommentDAOTests extends GroovyTestCase {
 
-    void testSaveDelete() {
+    ParameterizationDAO parameterization
 
-        int tagCount = Tag.count()
-        int commentCount = CommentDAO.count()
-        int commentTagCount = CommentTag.count()
 
-        ParameterizationDAO parameterization = new ParameterizationDAO()
+    @Override
+    protected void setUp() {
+        parameterization = new ParameterizationDAO()
         parameterization.name = "test"
         parameterization.modelClassName = EmptyModel.name
         parameterization.itemVersion = "1"
         parameterization.periodCount = 1
         parameterization.status = Status.NONE
         assertNotNull parameterization.save()
+    }
+
+
+
+    void testSaveDeleteP14NCommentDAO() {
+        int tagCount = Tag.count()
+        int commentCount = CommentDAO.count()
+        int commentTagCount = CommentTag.count()
 
         Tag tag = new Tag(name: 'tag').save()
         assertNotNull tag

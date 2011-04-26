@@ -1,14 +1,16 @@
 package org.pillarone.riskanalytics.core.simulation.item.parameter.comment
 
-import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 import org.pillarone.riskanalytics.core.parameter.comment.CommentTag
+import org.pillarone.riskanalytics.core.parameter.comment.ResultCommentDAO
 import org.pillarone.riskanalytics.core.parameter.comment.Tag
 
-
-class CommentTests extends GroovyTestCase {
+/**
+ * @author fouad.jaada@intuitive-collaboration.com
+ */
+class ResultCommentTests extends GroovyTestCase {
 
     void testConstructor() {
-        CommentDAO dao = new CommentDAO(path: "path", periodIndex: 0, comment: "text")
+        ResultCommentDAO dao = new ResultCommentDAO(path: "path", periodIndex: 0, comment: "text")
 
         Comment comment = new Comment(dao)
 
@@ -64,7 +66,7 @@ class CommentTests extends GroovyTestCase {
         comment.text = "text"
         comment.addTag(new Tag(name: "x"))
 
-        CommentDAO dao = new CommentDAO()
+        ResultCommentDAO dao = new ResultCommentDAO()
         comment.applyToDomainObject(dao)
 
         assertEquals "path", dao.path
@@ -82,7 +84,7 @@ class CommentTests extends GroovyTestCase {
         comment.removeTag(new Tag(name: "x"))
         comment.removeTag(new Tag(name: "y"))
 
-        dao = new CommentDAO()
+        dao = new ResultCommentDAO()
         dao.addToTags(new CommentTag(tag: new Tag(name: "z")))
 
         comment.applyToDomainObject(dao)

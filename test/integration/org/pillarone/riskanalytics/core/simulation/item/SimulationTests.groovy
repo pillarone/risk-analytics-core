@@ -1,13 +1,15 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
 import models.core.CoreModel
+import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.BatchRun
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
+import org.pillarone.riskanalytics.core.parameter.comment.ResultCommentDAO
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 import org.pillarone.riskanalytics.core.workflow.Status
 import org.pillarone.riskanalytics.core.output.*
-import org.joda.time.DateTime
 
 class SimulationTests extends GroovyTestCase {
 
@@ -165,6 +167,42 @@ class SimulationTests extends GroovyTestCase {
         deleteSimulationService.deleteAllMarkedSimulations()
         assertNull SimulationRun.findByToBeDeleted(true)
     }
+
+    void testAddRemoveComment() {
+        Simulation simulation = createSimulation("Tests")
+        simulation.periodCount = 1
+        simulation.modelClass = EmptyModel
+
+        int initialCount = ResultCommentDAO.count()
+
+        Comment newComment = new Comment("path", 0)
+        newComment.text = "text"
+
+        simulation.addComment(newComment)
+        simulation.removeComment(newComment)
+
+        simulation.save()
+
+        assertEquals 0, simulation.comments.size()
+        assertEquals 0, simulation.getSize(null)
+        assertEquals initialCount, ResultCommentDAO.count()
+
+        simulation.addComment(newComment)
+
+        simulation.save()
+
+        assertEquals 1, simulation.comments.size()
+        assertEquals initialCount + 1, simulation.getSize(null)
+        assertEquals initialCount + 1, ResultCommentDAO.count()
+
+        simulation.removeComment(newComment)
+
+        simulation.save()
+
+        assertEquals 0, simulation.comments.size()
+        assertEquals initialCount, ResultCommentDAO.count()
+    }
+
 
     private Simulation createSimulation(String simulationName) {
         createParameterization()

@@ -2,9 +2,9 @@ package org.pillarone.riskanalytics.core.output
 
 import org.apache.commons.lang.builder.HashCodeBuilder
 import org.joda.time.DateTime
-import org.joda.time.contrib.hibernate.PersistentDateTime
-import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.ModelDAO
+import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.pillarone.riskanalytics.core.parameter.comment.ResultCommentDAO
 import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
 
 class SimulationRun {
@@ -33,6 +33,8 @@ class SimulationRun {
 
     static transients = ['deleteSimulationService', 'dataSource']
 
+    static hasMany = [comments: ResultCommentDAO]
+
     static constraints = {
         name unique: 'model'
         comment(nullable: true, maxSize: 512)
@@ -49,6 +51,7 @@ class SimulationRun {
     }
 
     static mapping = {
+        comments(sort: "path", order: "asc")
         beginOfFirstPeriod type: DateTimeMillisUserType
         startTime type: DateTimeMillisUserType
         endTime type: DateTimeMillisUserType

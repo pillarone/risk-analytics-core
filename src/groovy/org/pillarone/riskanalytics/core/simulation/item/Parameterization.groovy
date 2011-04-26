@@ -11,6 +11,7 @@ import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.ParameterizationTag
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
+import org.pillarone.riskanalytics.core.parameter.comment.ParameterizationCommentDAO
 import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowCommentDAO
 import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
@@ -29,7 +30,7 @@ import org.pillarone.riskanalytics.core.util.PropertiesUtils
 import org.pillarone.riskanalytics.core.workflow.Status
 import org.springframework.transaction.TransactionStatus
 
-class Parameterization extends ModellingItem {
+class Parameterization extends CommentableItem {
 
     public static final String PERIOD_DATE_FORMAT = "yyyy-MM-dd"
 
@@ -43,7 +44,6 @@ class Parameterization extends ModellingItem {
      */
     Integer periodCount
     List<ParameterHolder> parameterHolders
-    List<Comment> comments
     List<Tag> tags
     List periodLabels
 
@@ -68,7 +68,6 @@ class Parameterization extends ModellingItem {
         setName(name)
         versionNumber = new VersionNumber('1')
         parameterHolders = []
-        comments = []
         tags = []
         status = Status.NONE
     }
@@ -214,54 +213,14 @@ class Parameterization extends ModellingItem {
         }
     }
 
-    protected void saveComments(ParameterizationDAO dao) {
-        Iterator<Comment> iterator = comments.iterator()
-        while (iterator.hasNext()) {
-            Comment comment = iterator.next()
-            if (comment.added) {
-                commentAdded(dao, comment)
-            } else if (comment.updated) {
-                commentUpdated(dao, comment)
-            } else if (comment.deleted) {
-                if (commentDeleted(dao, comment)) {
-                    iterator.remove()
-                }
-            }
-        }
-    }
-
-    public boolean commentHasChanged() {
-        for (Comment comment: comments) {
-            if (comment.added || comment.updated || comment.deleted)
-                return true
-        }
-        return false
-    }
-
-
-    private void commentAdded(ParameterizationDAO dao, Comment comment) {
-        CommentDAO commentDAO = new CommentDAO(parameterization: dao)
-        comment.applyToDomainObject(commentDAO)
-        dao.addToComments(commentDAO)
-        comment.added = false
-    }
-
-    private void commentAdded(ParameterizationDAO dao, WorkflowComment comment) {
+    protected void commentAdded(ParameterizationDAO dao, WorkflowComment comment) {
         WorkflowCommentDAO commentDAO = new WorkflowCommentDAO(parameterization: dao)
         comment.applyToDomainObject(commentDAO)
         dao.addToIssues(commentDAO)
         comment.added = false
     }
 
-    private void commentUpdated(ParameterizationDAO dao, Comment comment) {
-        CommentDAO commentDAO = dao.comments.find { it.path == comment.path && it.periodIndex == comment.period }
-        if (commentDAO) {
-            comment.applyToDomainObject(commentDAO)
-            comment.updated = false
-        }
-    }
-
-    private void commentUpdated(ParameterizationDAO dao, WorkflowComment comment) {
+    protected void commentUpdated(ParameterizationDAO dao, WorkflowComment comment) {
         WorkflowCommentDAO commentDAO = dao.issues.find { it.path == comment.path && it.periodIndex == comment.period }
         if (commentDAO) {
             comment.applyToDomainObject(commentDAO)
@@ -269,17 +228,7 @@ class Parameterization extends ModellingItem {
         }
     }
 
-    private boolean commentDeleted(ParameterizationDAO dao, Comment comment) {
-        CommentDAO commentDAO = dao.comments.find { it.path == comment.path && it.periodIndex == comment.period }
-        if (commentDAO) {
-            dao.removeFromComments(commentDAO)
-            commentDAO.delete()
-            return true
-        }
-        return false
-    }
-
-    private boolean commentDeleted(ParameterizationDAO dao, WorkflowComment comment) {
+    protected boolean commentDeleted(ParameterizationDAO dao, WorkflowComment comment) {
         WorkflowCommentDAO commentDAO = dao.issues.find { it.path == comment.path && it.periodIndex == comment.period }
         if (commentDAO) {
             dao.removeFromIssues(commentDAO)
@@ -287,6 +236,10 @@ class Parameterization extends ModellingItem {
             return true
         }
         return false
+    }
+
+    CommentDAO getItemCommentDAO(def dao) {
+        return new ParameterizationCommentDAO(parameterization: dao)
     }
 
     protected void mapFromDao(Object dao, boolean completeLoad) {
@@ -329,7 +282,7 @@ class Parameterization extends ModellingItem {
     private void loadComments(ParameterizationDAO dao) {
         comments = []
 
-        for (CommentDAO c in dao.comments) {
+        for (ParameterizationCommentDAO c in dao.comments) {
             comments << new Comment(c)
         }
 
@@ -443,22 +396,6 @@ class Parameterization extends ModellingItem {
         parameter.modified = false
     }
 
-    void addComment(Comment comment) {
-        comments << comment
-        comment.added = true
-        notifyItemChanged()
-    }
-
-    void removeComment(Comment comment) {
-        if (comment.added) {
-            comments.remove(comment)
-            comment.deleted = true
-            return
-        }
-        comment.deleted = true
-        comment.updated = false
-        notifyItemChanged()
-    }
 
     public List<Tag> getTags() {
         return tags
@@ -540,8 +477,8 @@ class Parameterization extends ModellingItem {
 
     int getSize(Class commentType) {
         switch (commentType) {
-            case CommentDAO:
-                return CommentDAO.executeQuery("select count(*) from ${CommentDAO.class.name} as c where c.parameterization.name = ? and c.parameterization.itemVersion = ? and c.parameterization.modelClassName = ?", [name, versionNumber.toString(), modelClass.name])[0]
+            case ParameterizationCommentDAO:
+                return ParameterizationCommentDAO.executeQuery("select count(*) from ${ParameterizationCommentDAO.class.name} as c where c.parameterization.name = ? and c.parameterization.itemVersion = ? and c.parameterization.modelClassName = ?", [name, versionNumber.toString(), modelClass.name])[0]
             case WorkflowCommentDAO:
                 return WorkflowCommentDAO.executeQuery("select count(*) from ${WorkflowCommentDAO.class.name} as w where w.parameterization.name = ? and w.parameterization.itemVersion = ? and w.parameterization.modelClassName = ?", [name, versionNumber.toString(), modelClass.name])[0]
         }

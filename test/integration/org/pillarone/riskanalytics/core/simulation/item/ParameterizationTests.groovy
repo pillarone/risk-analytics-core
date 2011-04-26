@@ -8,6 +8,7 @@ import org.pillarone.riskanalytics.core.fileimport.ParameterizationImportService
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.StringParameter
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
+import org.pillarone.riskanalytics.core.parameter.comment.ParameterizationCommentDAO
 import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowCommentDAO
 import org.pillarone.riskanalytics.core.parameterization.validation.TestValidationService
 import org.pillarone.riskanalytics.core.parameterization.validation.ValidatorRegistry
@@ -157,21 +158,22 @@ class ParameterizationTests extends GroovyTestCase {
         parameterization.save()
 
         assertEquals 0, parameterization.comments.size()
-        assertEquals initialCount, CommentDAO.count()
+        assertEquals initialCount, ParameterizationCommentDAO.count()
 
         parameterization.addComment(newComment)
 
         parameterization.save()
 
         assertEquals 1, parameterization.comments.size()
-        assertEquals initialCount + 1, CommentDAO.count()
+        assertEquals 1, parameterization.getSize(ParameterizationCommentDAO)
+        assertEquals initialCount + 1, ParameterizationCommentDAO.count()
 
         parameterization.removeComment(newComment)
 
         parameterization.save()
 
         assertEquals 0, parameterization.comments.size()
-        assertEquals initialCount, CommentDAO.count()
+        assertEquals initialCount, ParameterizationCommentDAO.count()
     }
 
 
@@ -241,7 +243,7 @@ class ParameterizationTests extends GroovyTestCase {
         parameterization.periodCount = 1
         parameterization.modelClass = EmptyModel
 
-        int initialCount = CommentDAO.count()
+        int initialCount = ParameterizationCommentDAO.count()
 
         Comment comment = new Comment("path", 0)
         comment.text = "text"
@@ -250,14 +252,14 @@ class ParameterizationTests extends GroovyTestCase {
         parameterization.save()
 
         assertEquals 1, parameterization.comments.size()
-        assertEquals initialCount + 1, CommentDAO.count()
+        assertEquals initialCount + 1, ParameterizationCommentDAO.count()
 
         comment.text = "newValue"
 
         parameterization.save()
 
         assertEquals 1, parameterization.comments.size()
-        assertEquals initialCount + 1, CommentDAO.count()
+        assertEquals initialCount + 1, ParameterizationCommentDAO.count()
 
         parameterization.load()
         assertEquals 1, parameterization.comments.size()

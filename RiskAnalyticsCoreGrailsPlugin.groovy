@@ -2,8 +2,7 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pillarone.riskanalytics.core.util.GrailsConfigValidator
 import org.pillarone.riskanalytics.core.output.batch.results.GenericBulkInsert as GenericResultBulkInsert
 import org.pillarone.riskanalytics.core.output.batch.calculations.GenericBulkInsert as GenericCalculationBulkInsert
-import org.pillarone.riskanalytics.core.parameterization.SimpleConstraint
-import org.pillarone.riskanalytics.core.parameterization.ConstraintsFactory
+import org.pillarone.riskanalytics.core.example.migration.TestConstrainedTable
 import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
 import org.pillarone.riskanalytics.core.output.CollectingModeFactory
 import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
@@ -16,18 +15,20 @@ import org.springframework.remoting.rmi.RmiServiceExporter
 import org.pillarone.riskanalytics.core.remoting.IResultService
 import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
 import org.pillarone.riskanalytics.core.remoting.impl.ResultService
+import org.pillarone.riskanalytics.core.parameterization.ConstraintsFactory
+import org.pillarone.riskanalytics.core.parameterization.SimpleConstraint
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.3-kti"
+    def version = "1.4-ALPHA-2.5-kti"
     // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "1.3.4 > *"
+    def grailsVersion = "1.3.7 > *"
     // the other plugins this plugin depends on
     def dependsOn = [
             "backgroundThread": "1.3",
             "jodaTime": "0.5",
             "quartz": "0.4.2",
-            "springSecurityCore": "1.0.1",
+            "springSecurityCore": "1.1.2",
             "mavenPublisher": "0.7.5"
     ]
     // resources that are excluded from plugin packaging
@@ -127,6 +128,7 @@ Persistence & Simulation engine.
         CollectingModeFactory.registerStrategy(new AggregatedCollectingModeStrategy())
 
         ConstraintsFactory.registerConstraint(new SimpleConstraint())
+        ConstraintsFactory.registerConstraint(new TestConstrainedTable())
     }
 
     def onChange = {event ->

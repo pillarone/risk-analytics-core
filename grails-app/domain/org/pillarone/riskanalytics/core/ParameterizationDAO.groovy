@@ -2,14 +2,14 @@ package org.pillarone.riskanalytics.core
 
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.ParameterizationTag
-import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
+import org.pillarone.riskanalytics.core.parameter.comment.ParameterizationCommentDAO
 import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowCommentDAO
+import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.workflow.Status
-import org.joda.time.DateTime
-import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
 
 class ParameterizationDAO {
 
@@ -36,7 +36,7 @@ class ParameterizationDAO {
 
     javax.sql.DataSource dataSource
 
-    static hasMany = [parameters: Parameter, comments: CommentDAO, issues: WorkflowCommentDAO, tags: ParameterizationTag]
+    static hasMany = [parameters: Parameter, comments: ParameterizationCommentDAO, issues: WorkflowCommentDAO, tags: ParameterizationTag]
     static transients = ['dataSource']
 
 

@@ -9,6 +9,8 @@ import static org.junit.Assert.*
 import org.pillarone.riskanalytics.core.parameterization.IParameterObjectClassifier
 import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObjectClassifier
 import org.pillarone.riskanalytics.core.parameterization.AbstractParameterObjectClassifier
+import org.pillarone.riskanalytics.core.example.migration.TestConstrainedTable
+import org.pillarone.riskanalytics.core.parameterization.AbstractMultiDimensionalParameter
 
 
 class MigrationSupportTests extends GroovyTestCase {
@@ -51,6 +53,16 @@ class MigrationSupportImpl extends MigrationSupport {
 
         assertSame newClassifier.getClass()."${type.typeName}", newClassifier
         //***
+
+
+        //*** test if removeColumnFromConstraint works for empty mdps
+        ConstrainedMultiDimensionalParameterCollector collector = new ConstrainedMultiDimensionalParameterCollector(TestConstrainedTable.newInstance())
+        target.accept(collector)
+        AbstractMultiDimensionalParameter mdp = collector.result[0]
+        mdp.values = [[]]
+        assertEquals 0, mdp.valueRowCount
+
+        removeColumnFromConstraint(TestConstrainedTable, 1)
     }
 
 }

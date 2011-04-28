@@ -135,8 +135,8 @@ abstract class ResultAccessor {
     }
 
     static Double getNthOrderStatistic(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName,
-                                       String fieldName, double percentage, CompareOperator compareOperator) {
-        double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
+                                       String fieldName, double percentage, CompareOperator compareOperator, boolean singleValuesCollected) {
+        double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName, singleValuesCollected) as double[]
         double lowestPercentage = 100d / values.size()
         if ((compareOperator.equals(CompareOperator.LESS_THAN) && percentage <= lowestPercentage)
                 || compareOperator.equals(CompareOperator.GREATER_THAN) && percentage == 100) {
@@ -182,7 +182,7 @@ abstract class ResultAccessor {
             return result.result
         }
         else {
-            double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
+            double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName, true) as double[]
             return MathUtils.calculatePercentile(values, severity, perspective)
         }
     }
@@ -221,11 +221,11 @@ abstract class ResultAccessor {
         }
     }
 
-    static List getValuesSorted(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
+    static List getValuesSorted(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName, boolean aggregateSingle = false) {
         return getValuesSorted(simulationRun, periodIndex, getPathId(pathName, simulationRun.id), CollectorMapping.findByCollectorName(collectorName).id, getFieldId(fieldName, simulationRun.id));
     }
 
-    static List getValuesSorted(SimulationRun simulationRun, int period, long pathId, long collectorId, long fieldId, long singleCollectorId = -1) {
+    static List getValuesSorted(SimulationRun simulationRun, int period, long pathId, long collectorId, long fieldId, long singleCollectorId = -1, boolean aggregateSingle = false) {
         //TODO: handle single values
         //delegate to java class -> performance improvement in PSC
         return IterationFileAccessor.getValuesSorted(simulationRun.id, period, pathId, collectorId, fieldId)
@@ -490,6 +490,11 @@ abstract class ResultAccessor {
             }
         }
         return result
+    }
+
+     static boolean isSingleCollector(String collectorName) {
+        CollectorMapping collectorMapping = CollectorMapping.findByCollectorName(SingleValueCollectingModeStrategy.IDENTIFIER)
+        return collectorName.equals(collectorMapping?.collectorName)
     }
 
 }

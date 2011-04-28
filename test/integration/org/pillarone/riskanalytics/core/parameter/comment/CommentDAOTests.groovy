@@ -1,9 +1,9 @@
 package org.pillarone.riskanalytics.core.parameter.comment
 
+import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.workflow.Status
-import org.joda.time.DateTime
 
 class CommentDAOTests extends GroovyTestCase {
 
@@ -24,7 +24,7 @@ class CommentDAOTests extends GroovyTestCase {
         Tag tag = new Tag(name: 'tag').save()
         assertNotNull tag
 
-        CommentDAO comment = new CommentDAO()
+        ParameterizationCommentDAO comment = new ParameterizationCommentDAO()
         comment.parameterization = parameterization
         comment.path = "path"
         comment.periodIndex = 0
@@ -36,13 +36,13 @@ class CommentDAOTests extends GroovyTestCase {
         assertNotNull comment.save()
 
         assertEquals tagCount + 1, Tag.count()
-        assertEquals commentCount + 1, CommentDAO.count()
+        assertEquals commentCount + 1, ParameterizationCommentDAO.count()
         assertEquals commentTagCount + 1, CommentTag.count()
 
         comment.delete()
 
         assertEquals tagCount + 1, Tag.count()
-        assertEquals commentCount, CommentDAO.count()
+        assertEquals commentCount, ParameterizationCommentDAO.count()
         assertEquals commentTagCount, CommentTag.count()
 
     }

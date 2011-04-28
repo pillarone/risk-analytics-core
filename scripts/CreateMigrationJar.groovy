@@ -10,8 +10,10 @@ target(main: "Creates a jar file of the current model class files for migration"
     String[] arguments = args.split()
 
     String modelClassName = arguments[0]
-    String[] packagesToInclude = arguments[1].split(",")
+    String[] packagesToInclude = arguments[1].split(":")
 
+    //workaround for GRAILS-7367
+    ant.copy(toDir: classesDir, file: "./web-app/WEB-INF/applicationContext.xml", verbose: true)
     ApplicationContext ctx = GrailsUtil.bootstrapGrailsFromClassPath();
     GrailsApplication app = (GrailsApplication) ctx.getBean(GrailsApplication.APPLICATION_ID);
     ClassLoader cl = app.classLoader
@@ -24,9 +26,17 @@ target(main: "Creates a jar file of the current model class files for migration"
     String jarTarget = "./src/java/${modelClass.getPackage().name.replace('.' as char, '/' as char)}"
     ant.mkdir(dir: jarTarget)
 
-    ant.jar(destfile: "${jarTarget}/${modelClass.simpleName}-v${version}.jar",
-            basedir: classesDir, includes: packagesToInclude.collect { it.replace('.' as char, '/' as char) + "/**/*"}.join(" "))
+    String tempDirectory = "${projectWorkDir}/migration"
+    File tempFile = new File(tempDirectory)
+    tempFile.mkdirs()
 
+    ant.copydir(src: classesDir, dest: tempDirectory)
+    ant.copydir(src: pluginClassesDir, dest: tempDirectory)
+
+    ant.jar(destfile: "${jarTarget}/${modelClass.simpleName}-v${version}.jar",
+            basedir: tempDirectory, includes: packagesToInclude.collect { it.replace('.' as char, '/' as char) + "/**/*"}.join(" "))
+
+    tempFile.deleteDir()
 }
 
 setDefaultTarget(main)

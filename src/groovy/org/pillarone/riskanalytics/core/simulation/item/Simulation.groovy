@@ -1,15 +1,18 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
 import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.pillarone.riskanalytics.core.model.Model
+import org.pillarone.riskanalytics.core.output.DeleteSimulationStrategy
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.output.SimulationRun
-import org.pillarone.riskanalytics.core.output.DeleteSimulationStrategy
-import org.pillarone.riskanalytics.core.ModelDAO
-import org.pillarone.riskanalytics.core.model.Model
+import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
+import org.pillarone.riskanalytics.core.parameter.comment.ResultCommentDAO
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 
-class Simulation extends ModellingItem {
+class Simulation extends CommentableItem {
 
     Parameterization parameterization
     ResultConfiguration template
@@ -66,6 +69,7 @@ class Simulation extends ModellingItem {
         run.creationDate = creationDate
         run.modificationDate = modificationDate
         run.randomSeed = randomSeed
+        saveComments(run)
     }
 
     protected void mapFromDao(def source, boolean completeLoad) {
@@ -91,6 +95,18 @@ class Simulation extends ModellingItem {
         creationDate = run.creationDate
         modificationDate = run.modificationDate
         randomSeed = run.randomSeed
+        if (completeLoad) {
+            loadComments(run)
+        }
+    }
+
+    private void loadComments(SimulationRun dao) {
+        comments = []
+
+        for (ResultCommentDAO c in dao.comments) {
+            comments << new Comment(c)
+        }
+
     }
 
     /**
@@ -129,6 +145,15 @@ class Simulation extends ModellingItem {
     void setModelClass(Class clazz) {
         super.setModelClass(clazz)
         modelVersionNumber = Model.getModelVersion(clazz)
+    }
+
+    CommentDAO getItemCommentDAO(def dao) {
+        return new ResultCommentDAO(simulationRun: dao)
+    }
+
+    int getSize(Class commentType) {
+        return ResultCommentDAO.executeQuery("select count(*) from ${ResultCommentDAO.class.name} as r where r.simulationRun.name = ? and  r.simulationRun.model = ?", [name, modelClass.name])[0]
+
     }
 
 }

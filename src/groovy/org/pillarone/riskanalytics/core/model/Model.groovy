@@ -44,6 +44,14 @@ abstract class Model {
         }
     }
 
+    void accept(IModelVisitor visitor) {
+        visitor.visitModel(this)
+        for (Component component in allComponents) {
+            ModelPath path = new ModelPath()
+            component.accept(visitor, path.append(new ModelPathComponent(component.name, component.class)))
+        }
+    }
+
     /**
      *  Wires the model and its ComposedComponents. Furthermore the
      *  validateWiring() of all components in allComponent is executed.

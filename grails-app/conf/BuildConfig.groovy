@@ -19,7 +19,7 @@ grails.project.dependency.resolution = {
         runtime ":joda-time:0.5"
         runtime ":maven-publisher:0.7.5"
         runtime ":quartz:0.4.2"
-        runtime ":spring-security-core:1.0.1"
+        runtime ":spring-security-core:1.1.2"
         runtime ":tomcat:1.3.7"
 
         test ":code-coverage:1.1.7"

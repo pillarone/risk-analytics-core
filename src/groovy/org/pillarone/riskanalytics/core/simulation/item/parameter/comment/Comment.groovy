@@ -1,11 +1,11 @@
 package org.pillarone.riskanalytics.core.simulation.item.parameter.comment
 
+import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 import org.pillarone.riskanalytics.core.parameter.comment.CommentTag
 import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.user.UserManagement
-import org.joda.time.DateTime
 
 class Comment implements Cloneable {
 

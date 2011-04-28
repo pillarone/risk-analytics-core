@@ -144,9 +144,10 @@ public class MathUtils {
     /**
      * Implementation of Hyndman-Fan quantile estimator as given by
      * Kim & Hardy: "Quantifying and correcting the bias in estimated risk measures"
+     *
      * @param sortedValues
      * @param severity
-     * @param perspective distinction between random loss and random profit
+     * @param perspective  distinction between random loss and random profit
      * @return
      */
 
@@ -195,7 +196,14 @@ public class MathUtils {
     }
 
     public static double calculateVarOfSortedValues(double[] sortedValues, double severity, double mean, QuantilePerspective perspective) {
-        return calculatePercentileOfSortedValues(sortedValues, severity, perspective) - mean;
+        switch (perspective) {
+            case LOSS:
+                return calculatePercentileOfSortedValues(sortedValues, severity, perspective) - mean;
+            case PROFIT:
+                return -(calculatePercentileOfSortedValues(sortedValues, severity, perspective) - mean);
+            default:
+                throw new IllegalArgumentException("percentile is calculated for loss or profit distribution: specify accordingly!");
+        }
     }
 
     public static double calculateVar(double[] values, double severity, double mean) {
@@ -240,24 +248,25 @@ public class MathUtils {
     public static double calculateTvarOfSortedValues(double[] sortedValues, double severity, QuantilePerspective perspective) {
         severity = severity / 100d;
         int size = sortedValues.length;
-        int index = (int) Math.floor(size*severity);
+        int index = (int) Math.floor(size * severity);
         double sum = 0;
+        double conditionalMean;
         switch (perspective) {
             case LOSS:
                 for (int i = index; i < size; i++) {
                     sum += sortedValues[i];
                 }
-                break;
+                conditionalMean = sum / (size * (1 - severity));
+                return conditionalMean - (calculateSum(sortedValues) / (double) size);
             case PROFIT:
                 for (int i = index; i < size; i++) {
                     sum += sortedValues[size - (i + 1)];
                 }
-                break;
+                conditionalMean = sum / (size * (1 - severity));
+                return -(conditionalMean - (calculateSum(sortedValues) / (double) size));
             default:
                 throw new IllegalArgumentException("TVaR is calculated for loss or profit distribution: specify accordingly!");
         }
-        double mean = sum / (size*(1-severity));
-        return mean - (calculateSum(sortedValues) / (double) size);
     }
 
     public static double calculateStandardDeviation(double[] values) {

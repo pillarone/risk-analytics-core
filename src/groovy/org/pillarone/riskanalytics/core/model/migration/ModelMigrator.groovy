@@ -8,8 +8,12 @@ import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
 import org.pillarone.riskanalytics.core.model.MigratableModel
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.parameterization.ParameterizationHelper
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 
 public class ModelMigrator {
+
+    private static Log LOG = LogFactory.getLog(ModelMigrator)
 
     Class<? extends MigratableModel> modelClass
     VersionNumber toVersion
@@ -22,6 +26,9 @@ public class ModelMigrator {
     }
 
     public void migrateParameterizations() {
+
+        LOG.info "Starting migration of ${modelClass.simpleName} to version ${toVersion}"
+
         for (ParameterizationDAO dao in ParameterizationDAO.findAllByModelClassName(modelClass.name)) {
             MigratableModel instance = modelClass.newInstance()
 
@@ -30,50 +37,68 @@ public class ModelMigrator {
             parameterization.modelClass = modelClass
             parameterization.load(false)
 
+            if (parameterization.modelVersionNumber == toVersion) {
+                LOG.info "${parameterization.name} v${parameterization.versionNumber} (current model version: ${parameterization.modelVersionNumber}) already up to date - skipping migration"
+                continue
+            }
 
-            for (AbstractMigration migration in instance.getMigrationChain(parameterization.versionNumber, toVersion)) {
-                List<ParameterHolder> newParameters = []
-                for (int periodIndex = 0; periodIndex < parameterization.periodCount; periodIndex++) {
-                    currentModelClassLoader = new ModelMigrationClassLoader([migration.oldModelJarURL] as URL[], Thread.currentThread().getContextClassLoader())
-                    Model oldModel = createModel(parameterization, periodIndex, currentModelClassLoader)
-                    Model newModel = createModel(parameterization, periodIndex, Thread.currentThread().contextClassLoader)
+            LOG.info "Migrating ${parameterization.name} v${parameterization.versionNumber} (current model version: ${parameterization.modelVersionNumber})"
 
-                    migration.migrateParameterization(oldModel, newModel)
-                    newParameters.addAll(ParameterizationHelper.extractParameterHoldersFromModel(newModel, periodIndex))
+            try {
+                for (AbstractMigration migration in instance.getMigrationChain(parameterization.modelVersionNumber, toVersion)) {
+                    List<ParameterHolder> newParameters = []
+                    for (int periodIndex = 0; periodIndex < parameterization.periodCount; periodIndex++) {
+                        currentModelClassLoader = new ModelMigrationClassLoader([migration.oldModelJarURL] as URL[], Thread.currentThread().getContextClassLoader())
+                        Model oldModel = createModel(parameterization, periodIndex, currentModelClassLoader)
+                        Model newModel = createModel(parameterization, periodIndex, Thread.currentThread().contextClassLoader)
+
+                        migration.migrateParameterization(oldModel, newModel)
+                        newParameters.addAll(ParameterizationHelper.extractParameterHoldersFromModel(newModel, periodIndex))
+                    }
+
+                    parameterization.load()
+                    parameterization.parameterHolders*.removed = true
+                    newParameters.each { parameterization.addParameter(it) }
+                    parameterization.modelVersionNumber = migration.to
+                    parameterization.save()
+
+                    LOG.info "Migrated ${parameterization.name} v${parameterization.versionNumber} to ${migration.to}"
+
                 }
-
-                parameterization.load()
-                parameterization.parameterHolders*.removed = true
-                newParameters.each { parameterization.addParameter(it) }
-                parameterization.modelVersionNumber = migration.to
-                parameterization.save()
+                LOG.info "Migration of ${parameterization.name} v${parameterization.versionNumber} completed."
+            } catch (Exception e) {
+                LOG.error "Migration of ${parameterization.name} v${parameterization.versionNumber} failed.", e
             }
 
         }
     }
 
     protected Model createModel(Parameterization parameterization, int periodIndex, ClassLoader loader) {
-        Model oldModel = (Model) Class.forName(modelClass.getName(), true, loader).newInstance()
-        oldModel.init()
-
+        Model model = null
         doWithContextClassLoader loader, {
+            model = (Model) Class.forName(modelClass.getName(), true, loader).newInstance()
+            model.init()
+            model.injectComponentNames()
             parameterization.load()
+
+            ParameterApplicator applicator = new ModelMigrationParameterApplicator(model: model, parameterization: parameterization)
+            applicator.init()
+            applicator.applyParameterForPeriod(periodIndex)
+
+            parameterization.unload()
         }
 
-        ParameterApplicator applicator = new ParameterApplicator(model: oldModel, parameterization: parameterization)
-        applicator.init()
-        applicator.applyParameterForPeriod(periodIndex)
-
-        parameterization.unload()
-
-        return oldModel
+        return model
     }
 
     public static void doWithContextClassLoader(ClassLoader cl, Closure closure) {
         Thread currentThread = Thread.currentThread()
         ClassLoader current = currentThread.contextClassLoader
         currentThread.contextClassLoader = cl
-        closure.call()
-        currentThread.contextClassLoader = current
+        try {
+            closure.call()
+        } finally {
+            currentThread.contextClassLoader = current
+        }
     }
 }

@@ -1,5 +1,8 @@
 package org.pillarone.riskanalytics.core.components;
 
+import org.pillarone.riskanalytics.core.model.IModelVisitor;
+import org.pillarone.riskanalytics.core.model.ModelPath;
+import org.pillarone.riskanalytics.core.model.ModelPathComponent;
 import org.pillarone.riskanalytics.core.wiring.ITransmitter;
 import org.pillarone.riskanalytics.core.wiring.SilentTransmitter;
 import org.pillarone.riskanalytics.core.wiring.WiringUtils;
@@ -33,6 +36,13 @@ abstract public class ComposedComponent extends Component {
         resetOutputTransmitters();
     }
 
+    @Override
+    public void accept(IModelVisitor visitor, ModelPath path) {
+        super.accept(visitor, path);
+        for (Component component : allSubComponents()) {
+            component.accept(visitor, path.append(new ModelPathComponent(component.getName(), component.getClass())));
+        }
+    }
 
     /**
      * Reset outputReplicationTransmitter because they are not used as inputTransmitter anywhere !

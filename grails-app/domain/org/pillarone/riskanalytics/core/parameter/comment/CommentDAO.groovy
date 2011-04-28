@@ -1,20 +1,15 @@
 package org.pillarone.riskanalytics.core.parameter.comment
 
-import org.pillarone.riskanalytics.core.ParameterizationDAO
-import org.pillarone.riskanalytics.core.user.Person
-import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
 import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
+import org.pillarone.riskanalytics.core.user.Person
 
 class CommentDAO {
-
-    ParameterizationDAO parameterization
     String path
     int periodIndex
     DateTime timeStamp
     String comment
     Person user
-
-    static belongsTo = ParameterizationDAO
 
     static hasMany = [tags: CommentTag]
 

@@ -7,6 +7,7 @@ import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
 import static org.pillarone.riskanalytics.core.workflow.Status.*
+import org.pillarone.riskanalytics.core.remoting.impl.RemotingUtils
 
 class StatusChangeServiceTests extends GroovyTestCase {
 
@@ -16,12 +17,14 @@ class StatusChangeServiceTests extends GroovyTestCase {
         Parameterization parameterization = new Parameterization("name")
         parameterization.modelClass = EmptyModel
         parameterization.periodCount = 0
+        parameterization.dealId = 1
         parameterization.save()
 
         Parameterization newParameterization = statusChangeService.changeStatus(parameterization, DATA_ENTRY)
         assertNotSame newParameterization, parameterization
 
         assertEquals NONE, parameterization.status
+        assertEquals RemotingUtils.transactionService.allTransactions.find {it.dealId == newParameterization.dealId}.name, newParameterization.name
 
         assertEquals DATA_ENTRY, newParameterization.status
         assertEquals "R1", newParameterization.versionNumber.toString()
@@ -31,12 +34,14 @@ class StatusChangeServiceTests extends GroovyTestCase {
         Parameterization existingParameterization = new Parameterization("name")
         existingParameterization.modelClass = EmptyModel
         existingParameterization.periodCount = 0
+        existingParameterization.dealId = 1
         existingParameterization.versionNumber = new VersionNumber("R1")
         existingParameterization.save()
 
         Parameterization parameterization = new Parameterization("name")
         parameterization.modelClass = EmptyModel
         parameterization.periodCount = 0
+        parameterization.dealId = 1
         parameterization.save()
 
         shouldFail(WorkflowException, { statusChangeService.changeStatus(parameterization, DATA_ENTRY)})
@@ -232,5 +237,22 @@ class StatusChangeServiceTests extends GroovyTestCase {
         parameterization.save()
 
         shouldFail(WorkflowException, { statusChangeService.changeStatus(parameterization, IN_PRODUCTION) })
+    }
+
+    void testNewVersion() {
+        Parameterization parameterization = new Parameterization("name")
+        parameterization.status = IN_PRODUCTION
+        parameterization.versionNumber = new VersionNumber("R1")
+        parameterization.dealId = 1
+        parameterization.modelClass = EmptyModel
+        parameterization.periodCount = 0
+        parameterization.save()
+
+        Parameterization newParameterization = statusChangeService.changeStatus(parameterization, DATA_ENTRY)
+        assertEquals parameterization.name, newParameterization.name
+        assertEquals parameterization.dealId, newParameterization.dealId
+
+        assertEquals "R2", newParameterization.versionNumber.toString()
+        assertEquals DATA_ENTRY, newParameterization.status
     }
 }

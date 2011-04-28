@@ -57,13 +57,16 @@ public class ParameterApplicator {
             parameterPerPeriod << []
         }
         parameterization.parameterHolders.each {ParameterHolder p ->
-            parameterPerPeriod[p.periodIndex] << createApplicableParameter(model, p.path, p.getBusinessObject())
+            parameterPerPeriod[p.periodIndex] << createApplicableParameter(model, p)
         }
 
         return parameterPerPeriod
     }
 
-    protected ApplicableParameter createApplicableParameter(Model model, String path, def parameterValue) {
+    protected ApplicableParameter createApplicableParameter(Model model, ParameterHolder parameterHolder) {
+        String path = parameterHolder.path
+        def parameterValue = parameterHolder.businessObject
+
         def pathElements = path.split("\\:")
         def component = model
         pathElements[0..-2].each {propertyName ->

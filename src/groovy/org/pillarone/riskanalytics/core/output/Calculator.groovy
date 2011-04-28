@@ -3,7 +3,6 @@ package org.pillarone.riskanalytics.core.output
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.jfree.data.statistics.HistogramDataset
 import org.pillarone.riskanalytics.core.dataaccess.ResultAccessor
 import org.pillarone.riskanalytics.core.output.batch.calculations.AbstractCalculationsBulkInsert
 import org.pillarone.riskanalytics.core.util.MathUtils
@@ -178,8 +177,8 @@ class Calculator {
 
     private void calculatePDF(int periodIndex, long pathId, long collectorId, long fieldId, double[] results, def pdf) {
         long time = System.currentTimeMillis()
-        HistogramDataset data = new KiloHistogramDataset()
-        Map pdfData = data.createPdfData(results, run, pdf)
+        PdfFromSample data = new PdfFromSample()
+        Map pdfData = data.createPdfData(results, pdf)
         pdfData.each {BigDecimal k, v ->
             bulkInsert.addResults(periodIndex, PostSimulationCalculation.PDF, k, pathId, fieldId, collectorId, v)
         }

@@ -1,7 +1,12 @@
 package org.pillarone.riskanalytics.core.components;
 
 import org.codehaus.groovy.runtime.DefaultGroovyMethods;
+import org.pillarone.riskanalytics.core.model.IModelVisitor;
+import org.pillarone.riskanalytics.core.model.ModelPath;
+import org.pillarone.riskanalytics.core.model.ModelPathComponent;
 import org.pillarone.riskanalytics.core.packets.PacketList;
+import org.pillarone.riskanalytics.core.parameterization.IParameterObject;
+import org.pillarone.riskanalytics.core.util.GroovyUtils;
 import org.pillarone.riskanalytics.core.wiring.ITransmitter;
 
 import java.lang.reflect.Field;
@@ -53,6 +58,17 @@ abstract public class Component implements Cloneable {
         doCalculation();
         publishResults();
         reset();
+    }
+
+    public void accept(IModelVisitor visitor, ModelPath path) {
+        visitor.visitComponent(this, path);
+        for (Map.Entry<String, Object> property : GroovyUtils.getProperties(this).entrySet()) {
+            Object propertyValue = property.getValue();
+            if (property.getKey().startsWith("parm") && propertyValue instanceof IParameterObject) {
+                IParameterObject parameterObject = (IParameterObject) propertyValue;
+                parameterObject.accept(visitor, path.append(new ModelPathComponent(property.getKey(), parameterObject.getType().getClass())));
+            }
+        }
     }
 
     /**

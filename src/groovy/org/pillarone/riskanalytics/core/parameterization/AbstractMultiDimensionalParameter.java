@@ -34,6 +34,19 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable, Se
         }
     }
 
+    public boolean isEmpty() {
+        if(values.size() == 0) {
+            return true;
+        }
+        for(List list : values) {
+            if(!list.isEmpty()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 
     public int getColumnCount() {
         return getValueColumnCount() + getTitleColumnCount();
@@ -82,7 +95,7 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable, Se
     }
 
     public List getValues() {
-        return valuesConverted ? values.get(0) : values;
+        return valuesConverted && !values.isEmpty() /* should not happen.. PMO-1556 */ ? values.get(0) : values;
     }
 
     public void addColumnAt(int columnIndex) {

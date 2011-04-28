@@ -134,7 +134,8 @@ class MultiDimensionalParameter extends Parameter {
      * for performance reasons.
      */
     public Object getParameterInstance() {
-        if (parameterObject == null) {
+        //TODO: check how this affects performance
+//        if (parameterObject == null) {
             Class clazz = Thread.currentThread().contextClassLoader.loadClass(className)
             Class markerClass
             if (markerClassName != null) {
@@ -162,7 +163,7 @@ class MultiDimensionalParameter extends Parameter {
                     break;
             }
             parameterObject = mdpInstance
-        }
+//        }
         return parameterObject
     }
 

@@ -44,28 +44,32 @@ public class ModelMigrator {
 
             LOG.info "Migrating ${parameterization.name} v${parameterization.versionNumber} (current model version: ${parameterization.modelVersionNumber})"
 
-            for (AbstractMigration migration in instance.getMigrationChain(parameterization.modelVersionNumber, toVersion)) {
-                List<ParameterHolder> newParameters = []
-                for (int periodIndex = 0; periodIndex < parameterization.periodCount; periodIndex++) {
-                    currentModelClassLoader = new ModelMigrationClassLoader([migration.oldModelJarURL] as URL[], Thread.currentThread().getContextClassLoader())
-                    Model oldModel = createModel(parameterization, periodIndex, currentModelClassLoader)
-                    Model newModel = createModel(parameterization, periodIndex, Thread.currentThread().contextClassLoader)
+            try {
+                for (AbstractMigration migration in instance.getMigrationChain(parameterization.modelVersionNumber, toVersion)) {
+                    List<ParameterHolder> newParameters = []
+                    for (int periodIndex = 0; periodIndex < parameterization.periodCount; periodIndex++) {
+                        currentModelClassLoader = new ModelMigrationClassLoader([migration.oldModelJarURL] as URL[], Thread.currentThread().getContextClassLoader())
+                        Model oldModel = createModel(parameterization, periodIndex, currentModelClassLoader)
+                        Model newModel = createModel(parameterization, periodIndex, Thread.currentThread().contextClassLoader)
 
-                    migration.migrateParameterization(oldModel, newModel)
-                    newParameters.addAll(ParameterizationHelper.extractParameterHoldersFromModel(newModel, periodIndex))
+                        migration.migrateParameterization(oldModel, newModel)
+                        newParameters.addAll(ParameterizationHelper.extractParameterHoldersFromModel(newModel, periodIndex))
+                    }
+
+                    parameterization.load()
+                    parameterization.parameterHolders*.removed = true
+                    newParameters.each { parameterization.addParameter(it) }
+                    parameterization.modelVersionNumber = migration.to
+                    parameterization.save()
+
+                    LOG.info "Migrated ${parameterization.name} v${parameterization.versionNumber} to ${migration.to}"
+
                 }
-
-                parameterization.load()
-                parameterization.parameterHolders*.removed = true
-                newParameters.each { parameterization.addParameter(it) }
-                parameterization.modelVersionNumber = migration.to
-                parameterization.save()
-
-                LOG.info "Migrated ${parameterization.name} v${parameterization.versionNumber} to ${migration.to}"
-
+                LOG.info "Migration of ${parameterization.name} v${parameterization.versionNumber} completed."
+            } catch (Exception e) {
+                LOG.error "Migration of ${parameterization.name} v${parameterization.versionNumber} failed.", e
             }
 
-            LOG.info "Migration of ${parameterization.name} v${parameterization.versionNumber} completed."
         }
     }
 

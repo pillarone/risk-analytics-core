@@ -45,7 +45,11 @@ abstract class MigrationSupport extends AbstractMigration {
     }
 
     protected void removeColumnFromConstraint(Class constraintClass, int index) {
-        findMultiDimensionalParametersByConstraints(currentTarget, constraintClass.newInstance())*.removeColumnAt(index)
+        for (ConstrainedMultiDimensionalParameter mdp in findMultiDimensionalParametersByConstraints(currentTarget, constraintClass.newInstance())) {
+            if (!mdp.isEmpty()) {
+                mdp.removeColumnAt(index)
+            }
+        }
     }
 
     protected List<ConstrainedMultiDimensionalParameter> findMultiDimensionalParametersByConstraints(Model model, IMultiDimensionalConstraints constraints) {

@@ -82,6 +82,10 @@ public class ContinuousPeriodCounter implements IPeriodCounter {
         return period
     }
 
+    boolean belongsToCurrentPeriod(DateTime date) {
+        return belongsToPeriod(date) == periodCount
+    }
+
     DateTime startOfPeriod(DateTime date) {
         return getPeriodStart(belongsToPeriod(date))
     }

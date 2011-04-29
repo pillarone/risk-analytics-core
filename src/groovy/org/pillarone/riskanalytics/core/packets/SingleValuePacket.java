@@ -14,6 +14,10 @@ public class SingleValuePacket extends Packet {
     public SingleValuePacket() {
     }
 
+    public SingleValuePacket(double value) {
+        this.value = value;
+    }
+
     public SingleValuePacket(SingleValuePacket original) {
         super(original);
         this.setValue(original.value);

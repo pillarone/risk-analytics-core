@@ -113,6 +113,31 @@ class ValuationDatePeriodCounterTests extends GroovyTestCase {
         shouldFail(AfterSimulationEndException, { periodCounter.belongsToPeriod(new DateTime(2011,1,3,0,0,0,0))})
     }
 
+    void testBelongsToCurrentPeriod() {
+        assertTrue  "2009-01-01 in first", periodCounter.belongsToCurrentPeriod(date20090101)
+        assertFalse "2009-03-25 in first", periodCounter.belongsToCurrentPeriod(date20090325)
+        assertFalse "2009-09-09 in first", periodCounter.belongsToCurrentPeriod(date20090909)
+        assertFalse "2010-01-01 in first", periodCounter.belongsToCurrentPeriod(date20100101)
+        assertFalse "2011-01-01 in first", periodCounter.belongsToCurrentPeriod(date20110101)
+
+        periodCounter.next()
+
+        assertFalse "2009-01-01 in second", periodCounter.belongsToCurrentPeriod(date20090101)
+        assertTrue  "2009-03-25 in second", periodCounter.belongsToCurrentPeriod(date20090325)
+        assertFalse "2009-09-09 in second", periodCounter.belongsToCurrentPeriod(date20090909)
+        assertFalse "2010-01-01 in second", periodCounter.belongsToCurrentPeriod(date20100101)
+        assertFalse "2011-01-01 in second", periodCounter.belongsToCurrentPeriod(date20110101)
+
+        periodCounter.next()
+
+        assertFalse "2009-01-01 in third", periodCounter.belongsToCurrentPeriod(date20090101)
+        assertFalse "2009-03-25 in third", periodCounter.belongsToCurrentPeriod(date20090325)
+        assertTrue  "2009-09-09 in third", periodCounter.belongsToCurrentPeriod(date20090909)
+        assertTrue  "2010-01-01 in third", periodCounter.belongsToCurrentPeriod(date20100101)
+        assertTrue  "2011-01-01 in third", periodCounter.belongsToCurrentPeriod(date20110101)
+        assertFalse "2011-01-02 in third", periodCounter.belongsToCurrentPeriod(date20110102)
+    }
+
     void testStartOfPeriod() {
         assertEquals "period 2 for 2010-01-01", date20090909, periodCounter.startOfPeriod(date20100101)
         assertEquals "period 2 for 2010-03-31", date20090909, periodCounter.startOfPeriod(date20100331)

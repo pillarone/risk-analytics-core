@@ -49,6 +49,8 @@ public interface IPeriodCounter {
      */
     int belongsToPeriod(DateTime date) throws BeforeSimulationStartException, AfterSimulationEndException
 
+    boolean belongsToCurrentPeriod(DateTime date)
+
     DateTime startOfFirstPeriod()
     DateTime endOfLastPeriod()
 

@@ -5,11 +5,11 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.joda.time.DateTimeZone
 import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.util.ConfigObjectUtils
-import org.joda.time.DateTimeZone
-import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 
 abstract class FileImportService {
 
@@ -24,7 +24,7 @@ abstract class FileImportService {
     abstract String prepare(URL file, String itemName)
 
     /** Setting the default time zone to UTC avoids problems in multi user context with different time zones
-     *  and switches off daylight saving capabilities and possible related problems. */
+     *  and switches off daylight saving capabilities and possible related problems.   */
     DateTimeZone utc = DateTimeZone.setDefault(DateTimeZone.UTC)
 
     public int compareFilesAndWriteToDB(List modelNames = null) {
@@ -86,7 +86,7 @@ abstract class FileImportService {
         return matchingFiles
     }
 
-    protected boolean importFile(URL url) {
+    public boolean importFile(URL url) {
         LOG.debug("importing ${url.toExternalForm()}")
         boolean success = false
         String urlString = url.toExternalForm()

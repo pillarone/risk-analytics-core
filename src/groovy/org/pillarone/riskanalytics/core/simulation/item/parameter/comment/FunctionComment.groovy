@@ -15,6 +15,10 @@ class FunctionComment extends Comment {
         function = commentDAO.function
     }
 
+    public FunctionComment(CommentDAO commentDAO) {
+        super(commentDAO)
+    }
+
     public FunctionComment(String path, int period, String function) {
         super(path, period)
         this.function = function

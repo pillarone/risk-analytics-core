@@ -9,7 +9,7 @@ import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 import org.pillarone.riskanalytics.core.parameter.comment.ResultCommentDAO
-import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.FunctionComment
 
 class Simulation extends CommentableItem {
 
@@ -103,7 +103,7 @@ class Simulation extends CommentableItem {
         comments = []
 
         for (ResultCommentDAO c in dao.comments) {
-            comments << new Comment(c)
+            comments << new FunctionComment(c)
         }
 
     }

@@ -151,6 +151,9 @@ class ParameterizationTests extends GroovyTestCase {
 
         Comment newComment = new Comment("path", 0)
         newComment.text = "text"
+        newComment.addFile("file1")
+        newComment.addFile("file1")
+        assertTrue newComment.getFiles().size() == 1
 
         parameterization.addComment(newComment)
         parameterization.removeComment(newComment)

@@ -15,6 +15,7 @@ class Comment implements Cloneable {
     Person user
     protected String comment
     private Set<Tag> tags = new HashSet()
+    Set<String> files = new HashSet<String>()
 
     boolean added = false
     boolean updated = false
@@ -30,6 +31,9 @@ class Comment implements Cloneable {
         comment = commentDAO.comment
         if (commentDAO.tags?.size() > 0) {
             tags.addAll(commentDAO.tags?.tag)
+        }
+        if (commentDAO.files) {
+            files.addAll(commentDAO.files.split(","))
         }
     }
 
@@ -57,6 +61,18 @@ class Comment implements Cloneable {
 
     public List<Tag> getTags() {
         return tags.toList()
+    }
+
+    public void addFile(String file) {
+        files.add(file)
+    }
+
+    public void removeFile(String file) {
+        files.remove(file)
+    }
+
+    public void clearFiles() {
+        files.clear()
     }
 
     public void setTags(Set selectedTags) {
@@ -124,7 +140,7 @@ class Comment implements Cloneable {
                 dao.addToTags(new CommentTag(tag: tag))
             }
         }
-
+        dao.files = files ? files.join(",") : ""
     }
 
     public String toConfigObject() {
@@ -159,6 +175,7 @@ class Comment implements Cloneable {
         Comment clone = (Comment) super.clone()
         clone.lastChange = (DateTime) new DateTime(lastChange.millis)
         clone.tags = (Set) tags.clone()
+        clone.files = (Set) files.clone()
 
         clone.added = false
         clone.updated = false

@@ -18,8 +18,6 @@ import org.pillarone.riskanalytics.core.remoting.impl.RemotingUtils
 
 class StatusChangeService {
 
-    private ITransactionService service = RemotingUtils.getTransactionService()
-
     private static Log LOG = LogFactory.getLog(StatusChangeService)
 
     public static StatusChangeService getService() {
@@ -147,6 +145,7 @@ class StatusChangeService {
     }
 
     private String getTransactionName(long dealId) {
+        ITransactionService service = RemotingUtils.getTransactionService()
         service.allTransactions.find { it.dealId == dealId }.name
     }
 }

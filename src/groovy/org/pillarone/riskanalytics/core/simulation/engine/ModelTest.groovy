@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
+import org.apache.commons.lang.builder.HashCodeBuilder
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.joda.time.DateTime
@@ -7,17 +8,15 @@ import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.fileimport.ModelStructureImportService
 import org.pillarone.riskanalytics.core.fileimport.ParameterizationImportService
 import org.pillarone.riskanalytics.core.fileimport.ResultConfigurationImportService
-import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.output.FileOutput
-import org.pillarone.riskanalytics.core.util.MathUtils
-import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
-import org.pillarone.riskanalytics.core.simulation.item.Simulation
+import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
+import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
-import org.apache.commons.lang.builder.HashCodeBuilder
-import org.joda.time.DateTimeZone
+import org.pillarone.riskanalytics.core.util.MathUtils
 
 /**
  * An abstract class which provides functionality to run model tests.
@@ -187,10 +186,11 @@ abstract class ModelTest extends GroovyTestCase {
             String[] info = line.split()
             int iteration = Integer.parseInt(info[0])
             int period = Integer.parseInt(info[1])
-            String path = info[2]
-            String field = info[3]
-            double value = Double.parseDouble(info[4])
-            referenceResults.put(createKey(iteration, period, path, field), value)
+            int valueIndex = Integer.parseInt(info[2])
+            String path = info[3]
+            String field = info[4]
+            double value = Double.parseDouble(info[5])
+            referenceResults.put(createKey(iteration, period, valueIndex, path, field), value)
         }
 
         List resultLines = result.readLines()
@@ -203,10 +203,11 @@ abstract class ModelTest extends GroovyTestCase {
             String[] info = line.split()
             int iteration = Integer.parseInt(info[0])
             int period = Integer.parseInt(info[1])
-            String path = info[2]
-            String field = info[3]
-            double value = Double.parseDouble(info[4])
-            int key = createKey(iteration, period, path, field)
+            int valueIndex = Integer.parseInt(info[2])
+            String path = info[3]
+            String field = info[4]
+            double value = Double.parseDouble(info[5])
+            int key = createKey(iteration, period, valueIndex, path, field)
             def expectedResult = referenceResults.remove(key)
             assertNotNull "No result found for I$iteration P$period $path $field", expectedResult
             assertEquals("Different value at I$iteration P$period $path $field", expectedResult, value, EPSILON)
@@ -216,9 +217,9 @@ abstract class ModelTest extends GroovyTestCase {
 
     }
 
-    private int createKey(int iteration, int period, String path, String field) {
+    private int createKey(int iteration, int period, int valueIndex, String path, String field) {
         HashCodeBuilder builder = new HashCodeBuilder()
-        builder.append(iteration).append(period).append(path).append(field)
+        builder.append(iteration).append(period).append(valueIndex).append(path).append(field)
         return builder.toHashCode()
     }
 }

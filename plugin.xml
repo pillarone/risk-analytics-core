@@ -1,83 +1,84 @@
-<plugin name='risk-analytics-core' version='1.4-ALPHA-2.8.1' grailsVersion='1.3.7 &gt; *'>
-    <author>Intuitive Collaboration AG</author>
-    <authorEmail>info@pillarone.org</authorEmail>
-    <title>RiskAnalytics core</title>
-    <description>\
-        Persistence &amp; Simulation engine.
-    </description>
-    <documentation>http://www.pillarone.org</documentation>
-    <resources>
-        <resource>BuildConfig</resource>
-        <resource>Config</resource>
-        <resource>CoreBootStrap</resource>
-        <resource>DataSource</resource>
-        <resource>UrlMappings</resource>
-        <resource>AuthorityController</resource>
-        <resource>LoginController</resource>
-        <resource>LogoutController</resource>
-        <resource>PersonAuthorityController</resource>
-        <resource>PersonController</resource>
-        <resource>org.pillarone.riskanalytics.core.BatchRun</resource>
-        <resource>org.pillarone.riskanalytics.core.BatchRunSimulationRun</resource>
-        <resource>org.pillarone.riskanalytics.core.ModelDAO</resource>
-        <resource>org.pillarone.riskanalytics.core.ModelStructureDAO</resource>
-        <resource>org.pillarone.riskanalytics.core.ParameterizationDAO</resource>
-        <resource>org.pillarone.riskanalytics.core.output.CollectorInformation</resource>
-        <resource>org.pillarone.riskanalytics.core.output.CollectorMapping</resource>
-        <resource>org.pillarone.riskanalytics.core.output.ConfigObjectHolder</resource>
-        <resource>org.pillarone.riskanalytics.core.output.FieldMapping</resource>
-        <resource>org.pillarone.riskanalytics.core.output.PathMapping</resource>
-        <resource>org.pillarone.riskanalytics.core.output.PostSimulationCalculation</resource>
-        <resource>org.pillarone.riskanalytics.core.output.ResultConfigurationDAO</resource>
-        <resource>org.pillarone.riskanalytics.core.output.SimulationRun</resource>
-        <resource>org.pillarone.riskanalytics.core.output.SingleValueResult</resource>
-        <resource>org.pillarone.riskanalytics.core.output.SymbolicValueResult</resource>
-        <resource>org.pillarone.riskanalytics.core.parameter.BooleanParameter</resource>
-        <resource>org.pillarone.riskanalytics.core.parameter.ConstrainedStringParameter</resource>
-        <resource>org.pillarone.riskanalytics.core.parameter.DateParameter</resource>
-        <resource>org.pillarone.riskanalytics.core.parameter.DoubleParameter</resource>
-        <resource>org.pillarone.riskanalytics.core.parameter.EnumParameter</resource>
-        <resource>org.pillarone.riskanalytics.core.parameter.IntegerParameter</resource>
-        <resource>org.pillarone.riskanalytics.core.parameter.MultiDimensionalParameter</resource>
-        <resource>org.pillarone.riskanalytics.core.parameter.MultiDimensionalParameterTitle</resource>
-        <resource>org.pillarone.riskanalytics.core.parameter.MultiDimensionalParameterValue</resource>
-        <resource>org.pillarone.riskanalytics.core.parameter.Parameter</resource>
-        <resource>org.pillarone.riskanalytics.core.parameter.ParameterEntry</resource>
-        <resource>org.pillarone.riskanalytics.core.parameter.ParameterObjectParameter</resource>
-        <resource>org.pillarone.riskanalytics.core.parameter.ParameterizationTag</resource>
-        <resource>org.pillarone.riskanalytics.core.parameter.StringParameter</resource>
-        <resource>org.pillarone.riskanalytics.core.parameter.comment.CommentDAO</resource>
-        <resource>org.pillarone.riskanalytics.core.parameter.comment.CommentTag</resource>
-        <resource>org.pillarone.riskanalytics.core.parameter.comment.Tag</resource>
-        <resource>org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowCommentDAO</resource>
-        <resource>org.pillarone.riskanalytics.core.test.DateTimeMillisUserTypeTest</resource>
-        <resource>org.pillarone.riskanalytics.core.user.Authority</resource>
-        <resource>org.pillarone.riskanalytics.core.user.Person</resource>
-        <resource>org.pillarone.riskanalytics.core.user.PersonAuthority</resource>
-        <resource>org.pillarone.riskanalytics.core.user.UserSettings</resource>
-        <resource>org.pillarone.riskanalytics.core.workflow.AuditLog</resource>
-        <resource>DBCleanUpJob</resource>
-        <resource>org.pillarone.riskanalytics.core.output.batch.BatchRunner</resource>
-        <resource>org.pillarone.riskanalytics.core.batch.BatchRunInfoService</resource>
-        <resource>org.pillarone.riskanalytics.core.batch.BatchRunService</resource>
-        <resource>org.pillarone.riskanalytics.core.fileimport.FileImportService</resource>
-        <resource>org.pillarone.riskanalytics.core.fileimport.ModelFileImportService</resource>
-        <resource>org.pillarone.riskanalytics.core.fileimport.ModelStructureImportService</resource>
-        <resource>org.pillarone.riskanalytics.core.fileimport.ParameterizationImportService</resource>
-        <resource>org.pillarone.riskanalytics.core.fileimport.ResultConfigurationImportService</resource>
-        <resource>org.pillarone.riskanalytics.core.output.DBCleanUpService</resource>
-        <resource>org.pillarone.riskanalytics.core.output.DeleteSimulationService</resource>
-        <resource>org.pillarone.riskanalytics.core.parameterization.validation.AbstractParameterValidationService
-        </resource>
-        <resource>org.pillarone.riskanalytics.core.simulation.engine.RunSimulationService</resource>
-        <resource>org.pillarone.riskanalytics.core.workflow.StatusChangeService</resource>
-    </resources>
-    <dependencies>
-        <plugin name='backgroundThread' version='1.3'/>
-        <plugin name='jodaTime' version='0.5'/>
-        <plugin name='quartz' version='0.4.2'/>
-        <plugin name='springSecurityCore' version='1.1.2'/>
-        <plugin name='mavenPublisher' version='0.7.5'/>
-    </dependencies>
-    <behavior/>
+<plugin name='risk-analytics-core' version='1.4-ALPHA-2.9' grailsVersion='1.3.7 &gt; *'>
+  <author>Intuitive Collaboration AG</author>
+  <authorEmail>info@pillarone.org</authorEmail>
+  <title>RiskAnalytics core</title>
+  <description>\
+Persistence &amp; Simulation engine.
+</description>
+  <documentation>http://www.pillarone.org</documentation>
+  <resources>
+    <resource>BuildConfig</resource>
+    <resource>Config</resource>
+    <resource>CoreBootStrap</resource>
+    <resource>DataSource</resource>
+    <resource>UrlMappings</resource>
+    <resource>AuthorityController</resource>
+    <resource>LoginController</resource>
+    <resource>LogoutController</resource>
+    <resource>PersonAuthorityController</resource>
+    <resource>PersonController</resource>
+    <resource>org.pillarone.riskanalytics.core.BatchRun</resource>
+    <resource>org.pillarone.riskanalytics.core.BatchRunSimulationRun</resource>
+    <resource>org.pillarone.riskanalytics.core.ModelDAO</resource>
+    <resource>org.pillarone.riskanalytics.core.ModelStructureDAO</resource>
+    <resource>org.pillarone.riskanalytics.core.ParameterizationDAO</resource>
+    <resource>org.pillarone.riskanalytics.core.output.CollectorInformation</resource>
+    <resource>org.pillarone.riskanalytics.core.output.CollectorMapping</resource>
+    <resource>org.pillarone.riskanalytics.core.output.ConfigObjectHolder</resource>
+    <resource>org.pillarone.riskanalytics.core.output.FieldMapping</resource>
+    <resource>org.pillarone.riskanalytics.core.output.PathMapping</resource>
+    <resource>org.pillarone.riskanalytics.core.output.PostSimulationCalculation</resource>
+    <resource>org.pillarone.riskanalytics.core.output.ResultConfigurationDAO</resource>
+    <resource>org.pillarone.riskanalytics.core.output.SimulationRun</resource>
+    <resource>org.pillarone.riskanalytics.core.output.SingleValueResult</resource>
+    <resource>org.pillarone.riskanalytics.core.output.SymbolicValueResult</resource>
+    <resource>org.pillarone.riskanalytics.core.parameter.BooleanParameter</resource>
+    <resource>org.pillarone.riskanalytics.core.parameter.ConstrainedStringParameter</resource>
+    <resource>org.pillarone.riskanalytics.core.parameter.DateParameter</resource>
+    <resource>org.pillarone.riskanalytics.core.parameter.DoubleParameter</resource>
+    <resource>org.pillarone.riskanalytics.core.parameter.EnumParameter</resource>
+    <resource>org.pillarone.riskanalytics.core.parameter.IntegerParameter</resource>
+    <resource>org.pillarone.riskanalytics.core.parameter.MultiDimensionalParameter</resource>
+    <resource>org.pillarone.riskanalytics.core.parameter.MultiDimensionalParameterTitle</resource>
+    <resource>org.pillarone.riskanalytics.core.parameter.MultiDimensionalParameterValue</resource>
+    <resource>org.pillarone.riskanalytics.core.parameter.Parameter</resource>
+    <resource>org.pillarone.riskanalytics.core.parameter.ParameterEntry</resource>
+    <resource>org.pillarone.riskanalytics.core.parameter.ParameterObjectParameter</resource>
+    <resource>org.pillarone.riskanalytics.core.parameter.ParameterizationTag</resource>
+    <resource>org.pillarone.riskanalytics.core.parameter.StringParameter</resource>
+    <resource>org.pillarone.riskanalytics.core.parameter.comment.CommentDAO</resource>
+    <resource>org.pillarone.riskanalytics.core.parameter.comment.CommentTag</resource>
+    <resource>org.pillarone.riskanalytics.core.parameter.comment.ParameterizationCommentDAO</resource>
+    <resource>org.pillarone.riskanalytics.core.parameter.comment.ResultCommentDAO</resource>
+    <resource>org.pillarone.riskanalytics.core.parameter.comment.Tag</resource>
+    <resource>org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowCommentDAO</resource>
+    <resource>org.pillarone.riskanalytics.core.test.DateTimeMillisUserTypeTest</resource>
+    <resource>org.pillarone.riskanalytics.core.user.Authority</resource>
+    <resource>org.pillarone.riskanalytics.core.user.Person</resource>
+    <resource>org.pillarone.riskanalytics.core.user.PersonAuthority</resource>
+    <resource>org.pillarone.riskanalytics.core.user.UserSettings</resource>
+    <resource>org.pillarone.riskanalytics.core.workflow.AuditLog</resource>
+    <resource>DBCleanUpJob</resource>
+    <resource>org.pillarone.riskanalytics.core.output.batch.BatchRunner</resource>
+    <resource>org.pillarone.riskanalytics.core.batch.BatchRunInfoService</resource>
+    <resource>org.pillarone.riskanalytics.core.batch.BatchRunService</resource>
+    <resource>org.pillarone.riskanalytics.core.fileimport.FileImportService</resource>
+    <resource>org.pillarone.riskanalytics.core.fileimport.ModelFileImportService</resource>
+    <resource>org.pillarone.riskanalytics.core.fileimport.ModelStructureImportService</resource>
+    <resource>org.pillarone.riskanalytics.core.fileimport.ParameterizationImportService</resource>
+    <resource>org.pillarone.riskanalytics.core.fileimport.ResultConfigurationImportService</resource>
+    <resource>org.pillarone.riskanalytics.core.output.DBCleanUpService</resource>
+    <resource>org.pillarone.riskanalytics.core.output.DeleteSimulationService</resource>
+    <resource>org.pillarone.riskanalytics.core.parameterization.validation.AbstractParameterValidationService</resource>
+    <resource>org.pillarone.riskanalytics.core.simulation.engine.RunSimulationService</resource>
+    <resource>org.pillarone.riskanalytics.core.workflow.StatusChangeService</resource>
+  </resources>
+  <dependencies>
+    <plugin name='backgroundThread' version='1.3' />
+    <plugin name='jodaTime' version='0.5' />
+    <plugin name='quartz' version='0.4.2' />
+    <plugin name='springSecurityCore' version='1.1.2' />
+    <plugin name='mavenPublisher' version='0.7.5' />
+  </dependencies>
+  <behavior />
 </plugin>

@@ -5,14 +5,16 @@ import org.pillarone.riskanalytics.core.util.GroovyUtils;
 import java.util.Collection;
 import java.util.Locale;
 
-public abstract class ParameterValidationError {
+public abstract class ParameterValidation {
 
     protected final Collection args;
     protected final String msg;
     private String path;
+    private ValidationType validationType;
     private int periodIndex;
 
-    public ParameterValidationError(String message, Collection arguments) {
+    public ParameterValidation(ValidationType validationType, String message, Collection arguments) {
+        this.validationType = validationType;
         this.msg = message;
         this.args = arguments;
     }
@@ -39,6 +41,14 @@ public abstract class ParameterValidationError {
 
     public void setPeriodIndex(int periodIndex) {
         this.periodIndex = periodIndex;
+    }
+
+    public ValidationType getValidationType() {
+        return validationType;
+    }
+
+    public void setValidationType(ValidationType validationType) {
+        this.validationType = validationType;
     }
 
     public String getLocalizedMessage(Locale locale) {

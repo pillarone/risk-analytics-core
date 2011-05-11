@@ -1,9 +1,10 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
-import org.apache.commons.lang.builder.HashCodeBuilder
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
+
+import org.apache.commons.lang.builder.HashCodeBuilder
 import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.model.Model
@@ -17,7 +18,8 @@ import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowComme
 import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
 import org.pillarone.riskanalytics.core.parameterization.ParameterWriter
 import org.pillarone.riskanalytics.core.parameterization.validation.IParameterizationValidator
-import org.pillarone.riskanalytics.core.parameterization.validation.ParameterValidationError
+import org.pillarone.riskanalytics.core.parameterization.validation.ParameterValidation
+import org.pillarone.riskanalytics.core.parameterization.validation.ValidationType
 import org.pillarone.riskanalytics.core.parameterization.validation.ValidatorRegistry
 import org.pillarone.riskanalytics.core.simulation.ILimitedPeriodCounter
 import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
@@ -82,12 +84,12 @@ class Parameterization extends CommentableItem {
 
     void validate() {
         valid = false
-        List<ParameterValidationError> errors = []
+        List<ParameterValidation> errors = []
         for (IParameterizationValidator validator in ValidatorRegistry.getValidators()) {
             errors.addAll(validator.validate(parameterHolders.findAll { !it.removed }))
         }
 
-        valid = errors.empty
+        valid = errors.empty || errors.every {ParameterValidation validation -> validation.validationType != ValidationType.ERROR}
         validationErrors = errors
     }
 

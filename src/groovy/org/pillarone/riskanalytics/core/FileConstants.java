@@ -10,6 +10,7 @@ public class FileConstants {
     public static final String LOG_DIRECTORY;
     public static final String TEMP_FILE_DIRECTORY;
     public static final String EXTERNAL_DATABASE_DIRECTORY;
+    public static final String COMMENT_FILE_DIRECTORY;
 
     static {
         String baseDir = System.getProperty("p1.temp");
@@ -39,5 +40,12 @@ public class FileConstants {
         file = new File(EXTERNAL_DATABASE_DIRECTORY);
         file.mkdirs();
         assert file.exists();
+
+
+        COMMENT_FILE_DIRECTORY = BASE_DATA_DIRECTORY + File.separatorChar + "commentFiles";
+        file = new File(COMMENT_FILE_DIRECTORY);
+        file.mkdirs();
+        assert file.exists();
+
     }
 }

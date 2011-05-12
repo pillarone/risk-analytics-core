@@ -1,11 +1,13 @@
 package org.pillarone.riskanalytics.core.simulation.item.parameter.comment
 
 import org.joda.time.DateTime
+
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 import org.pillarone.riskanalytics.core.parameter.comment.CommentTag
 import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.user.UserManagement
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 class Comment implements Cloneable {
 
@@ -56,6 +58,7 @@ class Comment implements Cloneable {
             }
             addTag(tag)
         }
+        files = commentMap['files']
         lastChange = commentMap['lastChange']
     }
 
@@ -149,15 +152,8 @@ class Comment implements Cloneable {
         StringBuilder sb = new StringBuilder("\"\"[")
         String newComment = replaceCharacters(comment)
         sb.append("path:'${path}', period:${period}, lastChange:new org.joda.time.DateTime(${lastChange.millis}),user:null, comment: ${c}\"${c}\"${c}\"${newComment}${c}\"${c}\"${c}\"")
-        if (tags && !tags.isEmpty()) {
-            sb.append(", tags:([")
-            tags.eachWithIndex {Tag tag, int index ->
-                sb.append("'" + tag.name + "'")
-                if (index != tags.size() - 1)
-                    sb.append(",")
-            }
-            sb.append("] as Set)")
-        }
+        if (tags && !tags.isEmpty()) sb.append(", " + GroovyUtils.toString("tags", tags*.name))
+        if (files && !files.isEmpty()) sb.append(", " + GroovyUtils.toString("files", files as List))
         sb.append("]\"\"")
         return sb.toString()
     }

@@ -24,6 +24,9 @@ abstract public class Component implements Cloneable {
     private List<PacketList> outChannels = new ArrayList<PacketList>();
     private int transmitCount = 0;
 
+    /** this constant is used for annotating PacketList */
+    protected final static Integer N = Integer.MAX_VALUE; 
+
     abstract protected void doCalculation();
 
     public List<ITransmitter> getAllInputTransmitter() {

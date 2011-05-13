@@ -73,7 +73,6 @@ public class SimulationRunner {
         start = System.currentTimeMillis()
         DateTime startDate = new DateTime(start)
         currentScope?.simulation?.start = startDate
-        notifySimulationStateChanged(currentScope?.simulation, SimulationState.INITIALIZING)
         try {
             for (Action action in preSimulationActions) {
                 if (!performAction(action, null)) {
@@ -97,7 +96,6 @@ public class SimulationRunner {
 
             long initializationTime = System.currentTimeMillis() - start
             LOG.info "Initialization completed in ${initializationTime}ms"
-            notifySimulationStateChanged(currentScope?.simulation, SimulationState.RUNNING)
 
             boolean shouldReturn = false
             if (!performAction(simulationAction, SimulationState.RUNNING)) {
@@ -120,7 +118,6 @@ public class SimulationRunner {
 
         } catch (Throwable t) {
             messageCount.set(0);
-            notifySimulationStateChanged(currentScope?.simulation, SimulationState.ERROR)
             simulationState = SimulationState.ERROR
             error = new SimulationError(
                     simulationRunID: currentScope.simulation?.id,
@@ -142,7 +139,6 @@ public class SimulationRunner {
 
         LOG.info "simulation took ${end - start} ms"
         simulationState = simulationAction.isStopped() ? SimulationState.STOPPED : SimulationState.FINISHED
-        notifySimulationStateChanged(currentScope?.simulation, simulationState)
         cleanup()
     }
 
@@ -159,7 +155,6 @@ public class SimulationRunner {
     private void deleteCancelledSimulation() {
         if (simulationAction.isCancelled()) {
             LOG.info "canceled simulation ${currentScope.simulation.name} will be deleted"
-//            currentScope.simulation.delete()
         }
         cleanup()
     }
@@ -189,7 +184,6 @@ public class SimulationRunner {
             }
             if (newState != null) {
                 simulationState = newState
-                notifySimulationStateChanged(currentScope?.simulation, newState)
             }
         }
         action.perform()
@@ -266,7 +260,6 @@ public class SimulationRunner {
         IterationAction iterationAction = new IterationAction(periodAction: periodAction, iterationScope: iterationScope)
         SimulationAction simulationAction = new SimulationAction(iterationAction: iterationAction, simulationScope: simulationScope)
 
-        Action calculatorAction = new CalculatorAction(simulationScope: simulationScope)
         Action finishOutputAction = new FinishOutputAction(simulationScope: simulationScope)
 
         SimulationRunner runner = new SimulationRunner()

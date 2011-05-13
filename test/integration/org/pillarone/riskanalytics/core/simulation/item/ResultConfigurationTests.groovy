@@ -2,12 +2,7 @@ package org.pillarone.riskanalytics.core.simulation.item
 
 import models.core.CoreModel
 import org.pillarone.riskanalytics.core.fileimport.ResultConfigurationImportService
-import org.pillarone.riskanalytics.core.output.CollectorInformation
-import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
-import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
-import org.pillarone.riskanalytics.core.output.CollectingModeFactory
-import org.pillarone.riskanalytics.core.output.PacketCollector
-import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
+import org.pillarone.riskanalytics.core.output.*
 
 class ResultConfigurationTests extends GroovyTestCase {
 
@@ -16,6 +11,7 @@ class ResultConfigurationTests extends GroovyTestCase {
 
         String configName = "CoreResultConfiguration"
         ResultConfiguration configuration = new ResultConfiguration(configName)
+        configuration.modelClass = CoreModel
         configuration.load()
 
         assertEquals CoreModel.name, configuration.modelClass.name
@@ -140,6 +136,7 @@ class ResultConfigurationTests extends GroovyTestCase {
 
         String configName = "CoreResultConfiguration"
         ResultConfiguration configuration = new ResultConfiguration(configName)
+        configuration.modelClass = CoreModel
         configuration.load()
 
         ConfigObject configObject = configuration.toConfigObject()

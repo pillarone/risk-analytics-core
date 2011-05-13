@@ -91,12 +91,14 @@ abstract class ModelTest extends GroovyTestCase {
         assertNotNull parameter
 
         Parameterization parameterization = new Parameterization(parameter.name)
+        parameterization.modelClass = getModelClass()
         parameterization.load()
 
         def resultConfig = ResultConfigurationDAO.findByName(getResultConfigurationDisplayName())
         assertNotNull resultConfig
 
         ResultConfiguration resultConfiguration = new ResultConfiguration(resultConfig.name)
+        resultConfiguration.modelClass = getModelClass()
         resultConfiguration.load()
 
         Class modelClass = getModelClass()

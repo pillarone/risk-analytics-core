@@ -1,9 +1,9 @@
 package org.pillarone.riskanalytics.core.output
 
-import org.pillarone.riskanalytics.core.user.Person
+import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
-import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.user.Person
 
 public class ResultConfigurationDAO {
 
@@ -36,5 +36,18 @@ public class ResultConfigurationDAO {
         lastUpdater lazy: false
         creationDate type: DateTimeMillisUserType
         modificationDate type: DateTimeMillisUserType
+    }
+
+    /**
+     * Returns a persisted ResultConfigurationDAO.
+     * A parameterization can be uniquely identified by Name, Model & Version.
+     */
+    static ResultConfigurationDAO find(String name, String modelClassName, String versionNumber) {
+        def criteria = ResultConfigurationDAO.createCriteria()
+        return criteria.get {
+            eq('name', name)
+            eq('itemVersion', versionNumber)
+            eq('modelClassName', modelClassName)
+        }
     }
 }

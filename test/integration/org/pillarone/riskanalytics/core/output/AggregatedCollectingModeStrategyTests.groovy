@@ -14,6 +14,7 @@ import org.pillarone.riskanalytics.core.fileimport.ParameterizationImportService
 import org.pillarone.riskanalytics.core.fileimport.ResultConfigurationImportService
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
+import models.core.CoreModel
 
 class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
 
@@ -36,6 +37,7 @@ class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
         parameterization.load()
 
         ResultConfiguration resultConfiguration = new ResultConfiguration("CoreResultConfiguration")
+        resultConfiguration.modelClass = CoreModel
         resultConfiguration.load()
 
         run = new Simulation("name")

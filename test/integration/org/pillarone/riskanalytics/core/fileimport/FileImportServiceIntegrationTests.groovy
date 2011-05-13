@@ -6,6 +6,8 @@ import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.ModelStructureDAO
 import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
+import models.migratableCore.MigratableCoreModel
+import models.core.CoreModel
 
 class FileImportServiceIntegrationTests extends GroovyTestCase {
 
@@ -19,6 +21,7 @@ class FileImportServiceIntegrationTests extends GroovyTestCase {
         assertNotNull dao.model
 
         Parameterization parameterization = new Parameterization("CoreParameters")
+        parameterization.modelClass = CoreModel
         parameterization.load()
 
         assertEquals "1", parameterization.modelVersionNumber.toString()
@@ -27,6 +30,7 @@ class FileImportServiceIntegrationTests extends GroovyTestCase {
         assertNotNull dao2.model
 
         ResultConfiguration resultConfiguration = new ResultConfiguration("CoreResultConfiguration")
+        resultConfiguration.modelClass = CoreModel
         resultConfiguration.load()
 
         assertEquals "1", resultConfiguration.modelVersionNumber.toString()
@@ -38,6 +42,7 @@ class FileImportServiceIntegrationTests extends GroovyTestCase {
         assertNotNull dao.model
 
         Parameterization parameterization = new Parameterization("MigratableCoreParameters")
+        parameterization.modelClass = MigratableCoreModel
         parameterization.load()
 
         assertEquals "2", parameterization.modelVersionNumber.toString()
@@ -46,6 +51,7 @@ class FileImportServiceIntegrationTests extends GroovyTestCase {
         assertNotNull dao2.model
 
         ResultConfiguration resultConfiguration = new ResultConfiguration("MigratableCoreResultConfiguration")
+        resultConfiguration.modelClass = MigratableCoreModel
         resultConfiguration.load()
 
         assertEquals "2", resultConfiguration.modelVersionNumber.toString()

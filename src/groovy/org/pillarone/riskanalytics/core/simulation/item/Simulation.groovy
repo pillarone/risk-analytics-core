@@ -57,7 +57,7 @@ class Simulation extends CommentableItem {
         run.comment = comment
         run.model = getModelClass()?.name
         run.parameterization = ParameterizationDAO.find(parameterization.name, run.model, parameterization.versionNumber.toString())
-        run.resultConfiguration = ResultConfigurationDAO.findByNameAndItemVersion(template.name, template.versionNumber.toString())
+        run.resultConfiguration = ResultConfigurationDAO.find(template.name, run.model, template.versionNumber.toString())
         run.startTime = start
         run.endTime = end
         run.iterations = numberOfIterations
@@ -82,6 +82,7 @@ class Simulation extends CommentableItem {
         this.parameterization = parameterization
         ResultConfiguration resultConfiguration = new ResultConfiguration(run.resultConfiguration.name)
         resultConfiguration.versionNumber = new VersionNumber(run.resultConfiguration.itemVersion)
+        resultConfiguration.modelClass = modelClass
         template = resultConfiguration
         structure = ModelStructure.getStructureForModel(modelClass)
         numberOfIterations = run.iterations

@@ -44,6 +44,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
     private boolean stopped, cancelled;
 
     private ResultTransferListener resultTransferListener;
+    private List<UUID> jobIds = new ArrayList<UUID>();
 
     public final Map<? extends GridJob, GridNode> map(List<GridNode> subgrid,
                                                       SimulationConfiguration simulationConfiguration)
@@ -79,7 +80,10 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         }
 
         for (int i = 0; i < Math.min(cpuCount, simulationBlocks.size()); i++) {
-            jobs.add(new SimulationJob(configurations.get(i), grid.localNode().getId()));
+            UUID jobId = UUID.randomUUID();
+            SimulationJob job = new SimulationJob(configurations.get(i), jobId, grid.localNode().id());
+            jobIds.add(jobId);
+            jobs.add(job);
             LOG.info("Created a new job with block count " + configurations.get(i).getSimulationBlocks().size());
         }
 
@@ -111,46 +115,6 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
 
         return jobsToNodes;
     }
-
-    /*protected Collection<? extends GridJob> split(int gridSize, SimulationConfiguration simulationConfiguration) {
-        currentState = SimulationState.INITIALIZING;
-        time = System.currentTimeMillis();
-        simulationConfiguration.getSimulation().setStart(new Date());
-
-        resultTransferListener = new ResultTransferListener(this);
-
-        Grid grid = GridHelper.getGrid();
-        int cpuCount = getTotalProcessorCount(grid);
-
-        List<SimulationBlock> simulationBlocks = generateBlocks(SIMULATION_BLOCK_SIZE, simulationConfiguration.getSimulation().getNumberOfIterations());
-
-        LOG.info("Number of generated blocks: " + simulationBlocks.size());
-        List<SimulationJob> jobs = new ArrayList<SimulationJob>();
-        List<SimulationConfiguration> configurations = new ArrayList<SimulationConfiguration>(cpuCount);
-
-        for (int i = 0; i < cpuCount; i++) {
-            SimulationConfiguration newConfiguration = simulationConfiguration.clone();
-            configurations.add(newConfiguration);
-        }
-
-        for (int i = 0; i < simulationBlocks.size(); i++) {
-            configurations.get(i % cpuCount).addSimulationBlock(simulationBlocks.get(i));
-        }
-
-        for (int i = 0; i < Math.min(cpuCount, simulationBlocks.size()); i++) {
-            jobs.add(new SimulationJob(configurations.get(i), grid.localNode().getId()));
-            LOG.info("Created a new job with block count " + configurations.get(i).getSimulationBlocks().size());
-        }
-
-        resultWriter = new ResultWriter((Long) simulationConfiguration.getSimulation().id);
-        //grid.addMessageListener(this);
-        grid.listen(resultTransferListener);
-
-        this.simulationConfiguration = simulationConfiguration;
-        currentState = SimulationState.RUNNING;
-        totalJobs = jobs.size();
-        return jobs;
-    }*/
 
     @SuppressWarnings({"ThrowableInstanceNeverThrown"})
     public Object reduce(List<GridJobResult> gridJobResults) {
@@ -189,14 +153,12 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
             }
         }
         resultWriter.close();
-        Grid grid = GridHelper.getGrid();
-        //grid.removeMessageListener(this);
         resultTransferListener.removeListener();
 
         if (error || cancelled) {
+            BatchRunInfoService.getService().batchSimulationStateChanged(simulation, currentState);
             simulation.delete();
             currentState = error ? SimulationState.ERROR : SimulationState.CANCELED;
-            BatchRunInfoService.getService().batchSimulationStateChanged(simulation, currentState);
             return false;
         }
         LOG.info("Received " + messageCount + " messages. Sent " + totalMessageCount + " messages.");
@@ -214,8 +176,11 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
     }
 
     public synchronized void onMessage(UUID uuid, Object serializable) {
-        messageCount.incrementAndGet();
         ResultTransferObject result = (ResultTransferObject) serializable;
+        if (!jobIds.contains(result.getJobIdentifier())) {
+            return;
+        }
+        messageCount.incrementAndGet();
         ResultDescriptor rd = result.getResultDescriptor();
         //TODO: should be done before simulation start
         PathMapping pm = simulationConfiguration.getMappingCache().lookupPathDB(rd.getPath());

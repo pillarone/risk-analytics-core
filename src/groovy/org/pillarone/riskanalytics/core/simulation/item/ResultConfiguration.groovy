@@ -40,14 +40,7 @@ class ResultConfiguration extends ModellingItem {
     }
 
     protected ResultConfigurationDAO loadFromDB() {
-        def criteria = ResultConfigurationDAO.createCriteria()
-        def results = criteria.list {
-            eq('name', name)
-            eq('itemVersion', versionNumber.toString())
-            if (getModelClass() != null)
-                eq('modelClassName', getModelClass().name)
-        }
-        return results.size() > 0 ? results.get(0) : null
+        return ResultConfigurationDAO.find(name, modelClass.name, versionNumber.toString())
     }
 
     /**

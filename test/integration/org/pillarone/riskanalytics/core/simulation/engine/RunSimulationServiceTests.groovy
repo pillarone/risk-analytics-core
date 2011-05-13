@@ -42,9 +42,11 @@ class RunSimulationServiceTests extends GrailsUnitTestCase {
         new ModelStructureImportService().compareFilesAndWriteToDB(["CoreStructure"])
 
         def parameter = new Parameterization('CoreParameters')
+        parameter.modelClass = CoreModel
         parameter.load()
 
         def resultConfig = new ResultConfiguration('CoreResultConfiguration')
+        resultConfig.modelClass = CoreModel
         resultConfig.load()
 
 

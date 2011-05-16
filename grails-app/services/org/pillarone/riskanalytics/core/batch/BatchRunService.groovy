@@ -190,7 +190,7 @@ class RunnerRegistry implements ActionListener {
         } else if (simulationHandler.simulationState == SimulationState.FINISHED || simulationHandler.simulationState == SimulationState.ERROR) {
             simulationHandler = pollAndRun()
             if (!simulationHandler) {
-                timer.stop()
+                stop()
                 LOG.info "no simulation to execute "
             }
         }
@@ -206,6 +206,10 @@ class RunnerRegistry implements ActionListener {
             LOG.info "executing a simulation ${configuration.simulation.name} at ${new DateTime()}"
         }
         return simulationHandler
+    }
+
+    void stop() {
+        timer.stop()
     }
 
 //    protected void notifySimulationStart(SimulationHandler simulationHandler) {

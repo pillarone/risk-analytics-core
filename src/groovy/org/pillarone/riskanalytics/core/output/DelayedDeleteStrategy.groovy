@@ -11,7 +11,7 @@ class DelayedDeleteStrategy extends DeleteSimulationStrategy {
 
     void deleteSimulation(SimulationRun simulationRun) {
         new File(GridHelper.getResultLocation(simulationRun.id)).deleteDir()
-        simulationRun.deleteSimulationService.deleteSimulation(simulationRun)
+        DeleteSimulationService.instance.deleteSimulation(simulationRun)
         LOG.info "Simulation ${simulationRun.name} is marked as deleted"
     }
 

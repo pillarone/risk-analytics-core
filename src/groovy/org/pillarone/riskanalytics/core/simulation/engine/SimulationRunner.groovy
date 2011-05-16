@@ -145,7 +145,6 @@ public class SimulationRunner {
     private void deleteFailedSimulation() {
         try {
             LOG.info "failed simulation ${currentScope.simulation.name} will be deleted"
-            currentScope.simulation.delete()
         } catch (Exception ex) {
             LOG.error "failed deleting simulation ${currentScope.simulation.name}", ex
         }

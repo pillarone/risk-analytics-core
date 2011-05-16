@@ -6,6 +6,7 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pillarone.riskanalytics.core.BatchRunSimulationRun
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
+import org.pillarone.riskanalytics.core.output.SimulationRun
 
 /**
  * @author fouad.jaada@intuitive-collaboration.com
@@ -50,7 +51,7 @@ class BatchRunInfoService {
 
 
     private BatchRunSimulationRun update(Simulation simulation, SimulationState simulationState) {
-        BatchRunSimulationRun batchRunSimulationRun = BatchRunSimulationRun.findBySimulationRun(simulation.simulationRun)
+        BatchRunSimulationRun batchRunSimulationRun = BatchRunSimulationRun.findBySimulationRun(SimulationRun.get(simulation.id))
         batchRunSimulationRun.simulationState = simulationState
         batchRunSimulationRun.save()
     }

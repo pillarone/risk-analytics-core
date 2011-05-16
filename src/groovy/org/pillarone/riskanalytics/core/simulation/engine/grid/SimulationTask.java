@@ -49,13 +49,14 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
     public final Map<? extends GridJob, GridNode> map(List<GridNode> subgrid,
                                                       SimulationConfiguration simulationConfiguration)
             throws GridException {
+        this.simulationConfiguration = simulationConfiguration;
 
         INodeMappingStrategy strategy = AbstractNodeMappingStrategy.getStrategy();
         List<GridNode> nodes = new ArrayList<GridNode>(strategy.filterNodes(subgrid));
         Map<SimulationJob, GridNode> jobsToNodes = new HashMap<SimulationJob, GridNode>(nodes.size());
         HashMap<Integer, List<SimulationJob>> jobCountPerGrid = new HashMap<Integer, List<SimulationJob>>();
 
-        currentState = SimulationState.INITIALIZING;
+        setSimulationState(SimulationState.INITIALIZING);
         time = System.currentTimeMillis();
         simulationConfiguration.getSimulation().setStart(new DateTime());
 
@@ -91,8 +92,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         //grid.addMessageListener(this);
         grid.listen(resultTransferListener);
 
-        this.simulationConfiguration = simulationConfiguration;
-        currentState = SimulationState.RUNNING;
+        setSimulationState(SimulationState.RUNNING);
         totalJobs = jobs.size();
 
         for (int i = 0; i < jobs.size(); i++) {
@@ -158,18 +158,18 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         if (error || cancelled) {
             BatchRunInfoService.getService().batchSimulationStateChanged(simulation, currentState);
             simulation.delete();
-            currentState = error ? SimulationState.ERROR : SimulationState.CANCELED;
+            setSimulationState(error ? SimulationState.ERROR : SimulationState.CANCELED);
             return false;
         }
         LOG.info("Received " + messageCount + " messages. Sent " + totalMessageCount + " messages.");
         calculator = new Calculator(simulation.getSimulationRun());
-        currentState = SimulationState.POST_SIMULATION_CALCULATIONS;
+        setSimulationState(SimulationState.POST_SIMULATION_CALCULATIONS);
         BatchRunInfoService.getService().batchSimulationStateChanged(simulation, currentState);
         calculator.calculate();
 
         simulation.setEnd(new DateTime());
         simulation.save();
-        currentState = stopped ? SimulationState.STOPPED : SimulationState.FINISHED;
+        setSimulationState(stopped ? SimulationState.STOPPED : SimulationState.FINISHED);
         LOG.info("Task completed in " + (System.currentTimeMillis() - time) + "ms");
         BatchRunInfoService.getService().batchSimulationStateChanged(simulation, currentState);
         return true;
@@ -192,6 +192,11 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
 
     public SimulationState getSimulationState() {
         return currentState;
+    }
+
+    protected void setSimulationState(SimulationState simulationState) {
+        this.currentState = simulationState;
+        BatchRunInfoService.getService().batchSimulationStateChanged(getSimulation(), currentState);
     }
 
     public Simulation getSimulation() {

@@ -23,6 +23,9 @@ abstract public class Component implements Cloneable {
     private List<PacketList> inChannels = new ArrayList<PacketList>();
     private List<PacketList> outChannels = new ArrayList<PacketList>();
     private int transmitCount = 0;
+    // todo(mwy): how to make sure that only classes derived of IComponentMarker are part of the list?
+    private List<Class> markerList = new ArrayList<Class>();
+    private boolean markerListInitialized = false;
 
     /** this constant is used for annotating PacketList */
     protected final static Integer N = Integer.MAX_VALUE; 
@@ -58,6 +61,8 @@ abstract public class Component implements Cloneable {
     }
 
     protected void execute() {
+        // todo(msp): where is the correct place to fill the marker list?
+        lazyFillMarkerList();
         doCalculation();
         publishResults();
         reset();
@@ -119,6 +124,21 @@ abstract public class Component implements Cloneable {
                 }
             }
         }
+    }
+
+    private void lazyFillMarkerList() {
+        if (!markerListInitialized) {
+            markerListInitialized = true;
+            for (Class intf : this.getClass().getInterfaces()) {
+                if (IComponentMarker.class.isAssignableFrom(intf)) {
+                    markerList.add(intf);
+                }
+            }
+        }
+    }
+
+    public List<Class> getMarkerClasses() {
+        return markerList;
     }
 
     protected void publishResults() {

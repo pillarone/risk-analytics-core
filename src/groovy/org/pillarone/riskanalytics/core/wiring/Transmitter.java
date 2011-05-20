@@ -27,7 +27,8 @@ public class Transmitter implements ITransmitter {
 
     /**
      * Transmits the packets to the receiver, setting their sender and senderChannelName equal to the values
-     * of the corresponding properties of the Transmitter.
+     * of the corresponding properties of the Transmitter. Furthermore the markers map is filled according to
+     * the implemented IComponentMarker interfaces of the sender component.
      */
     public void transmit() {
         if (isTransmitted()) { // TODO (msh): check case of retransmission and delete flag if unneccessary
@@ -36,6 +37,9 @@ public class Transmitter implements ITransmitter {
         for (Object packet : source) {
             ((Packet) packet).setSender(sender);
             ((Packet) packet).setSenderChannelName(senderChannelName);
+            for (Class marker : sender.getMarkerClasses()) {
+                ((Packet) packet).markers.put(marker, sender);
+            }
         }
         target.addAll(source);
         setTransmitted(true);

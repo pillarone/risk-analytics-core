@@ -12,6 +12,8 @@ public class Packet implements Cloneable, Comparable {
     public Component sender;
     public String senderChannelName;
 
+    public Map<Class, Component> markers = new HashMap<Class, Component>();
+
     public UUID id;
 
     /**

@@ -24,10 +24,10 @@ abstract class BatchRunTest extends ModelTest {
 
         int totalWait = 0
 
-        while(!batchRun.executed) {
+        while (!batchRun.executed) {
             sleep 2000
             totalWait += 2000
-            if(totalWait > 60000) {
+            if (totalWait > 60000) {
                 throw new RuntimeException("Batch run did not finish.")
             }
             batchRun.refresh()

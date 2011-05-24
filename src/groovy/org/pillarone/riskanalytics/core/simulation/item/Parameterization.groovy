@@ -1,10 +1,9 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
+import org.apache.commons.lang.builder.HashCodeBuilder
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
-
-import org.apache.commons.lang.builder.HashCodeBuilder
 import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.model.Model
@@ -32,7 +31,7 @@ import org.pillarone.riskanalytics.core.util.PropertiesUtils
 import org.pillarone.riskanalytics.core.workflow.Status
 import org.springframework.transaction.TransactionStatus
 
-class Parameterization extends CommentableItem {
+class Parameterization extends ParametrizedItem {
 
     public static final String PERIOD_DATE_FORMAT = "yyyy-MM-dd"
 
@@ -168,31 +167,21 @@ class Parameterization extends CommentableItem {
         dao.status = status
         dao.dealId = dealId
         dao.valuationDate = valuationDate
-        saveParameters(dao)
+        saveParameters(parameterHolders, dao.parameters, dao)
         saveComments(dao)
         saveTags(dao)
     }
 
-    protected void saveParameters(ParameterizationDAO dao) {
-        Iterator<ParameterHolder> iterator = parameterHolders.iterator()
-        while (iterator.hasNext()) {
-            ParameterHolder parameterHolder = iterator.next()
-            if (parameterHolder.hasParameterChanged()) {
-                Parameter parameter = dao.parameters.find { it.path == parameterHolder.path && it.periodIndex == parameterHolder.periodIndex }
-                parameterHolder.applyToDomainObject(parameter)
-                parameterHolder.modified = false
-            } else if (parameterHolder.added) {
-                Parameter newParameter = parameterHolder.createEmptyParameter()
-                parameterHolder.applyToDomainObject(newParameter)
-                dao.addToParameters(newParameter)
-                parameterHolder.added = false
-            } else if (parameterHolder.removed) {
-                Parameter parameter = dao.parameters.find { it.path == parameterHolder.path && it.periodIndex == parameterHolder.periodIndex }
-                dao.removeFromParameters(parameter)
-                parameter.delete()
-                iterator.remove()
-            }
-        }
+    @Override
+    protected void addToDao(Parameter parameter, Object dao) {
+        dao = dao as ParameterizationDAO
+        dao.addToParameters(parameter)
+    }
+
+    @Override
+    protected void removeFromDao(Parameter parameter, Object dao) {
+        dao = dao as ParameterizationDAO
+        dao.removeFromParameters(parameter)
     }
 
     protected void saveTags(ParameterizationDAO dao) {
@@ -266,19 +255,11 @@ class Parameterization extends CommentableItem {
         valuationDate = dao.valuationDate
         comment = dao.comment
         if (completeLoad) {
-            loadParameters(dao)
+            loadParameters(parameterHolders, dao.parameters)
             loadComments(dao)
             tags = dao.tags*.tag
         }
         LOG.info("Parameterization $name loaded in ${System.currentTimeMillis() - time}ms")
-    }
-
-    private void loadParameters(ParameterizationDAO dao) {
-        parameterHolders = []
-
-        for (Parameter p in dao.parameters) {
-            parameterHolders << ParameterHolderFactory.getHolder(p)
-        }
     }
 
     private void loadComments(ParameterizationDAO dao) {

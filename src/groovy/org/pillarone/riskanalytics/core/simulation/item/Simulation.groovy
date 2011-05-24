@@ -7,11 +7,13 @@ import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.output.DeleteSimulationStrategy
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.output.SimulationRun
+import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 import org.pillarone.riskanalytics.core.parameter.comment.ResultCommentDAO
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.FunctionComment
 
-class Simulation extends CommentableItem {
+class Simulation extends ParametrizedItem {
 
     Parameterization parameterization
     ResultConfiguration template
@@ -29,6 +31,8 @@ class Simulation extends CommentableItem {
     volatile DateTime end
 
     String comment
+
+    List<ParameterHolder> runtimeParameters = []
 
 
     private SimulationRun run
@@ -69,6 +73,8 @@ class Simulation extends CommentableItem {
         run.modificationDate = modificationDate
         run.randomSeed = randomSeed
         saveComments(run)
+        saveParameters(runtimeParameters, run.runtimeParameters, run)
+        println()
     }
 
     protected void mapFromDao(def source, boolean completeLoad) {
@@ -96,7 +102,34 @@ class Simulation extends CommentableItem {
         randomSeed = run.randomSeed
         if (completeLoad) {
             loadComments(run)
+            loadParameters(runtimeParameters, run.runtimeParameters)
         }
+    }
+
+    @Override
+    protected void addToDao(Parameter parameter, Object dao) {
+        dao = dao as SimulationRun
+        dao.addToRuntimeParameters(parameter)
+    }
+
+    @Override
+    protected void removeFromDao(Parameter parameter, Object dao) {
+        dao = dao as SimulationRun
+        dao.removeFromRuntimeParameters(parameter)
+    }
+
+    void addParameter(ParameterHolder parameter) {
+        runtimeParameters << parameter
+        parameter.added = true
+    }
+
+    void removeParameter(ParameterHolder parameter) {
+        if (parameter.added) {
+            runtimeParameters.remove(parameter)
+            return
+        }
+        parameter.removed = true
+        parameter.modified = false
     }
 
     private void loadComments(SimulationRun dao) {

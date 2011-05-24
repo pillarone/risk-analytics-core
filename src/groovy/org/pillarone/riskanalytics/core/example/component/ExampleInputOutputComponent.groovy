@@ -21,6 +21,8 @@ class ExampleInputOutputComponent extends Component implements InitializingCompo
     int globalInt
     String globalString
 
+    Integer runtimeInt
+
     protected void doCalculation() {
 
     }

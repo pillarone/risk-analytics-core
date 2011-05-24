@@ -1,17 +1,20 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
-import org.joda.time.DateTime
-
 import models.core.CoreModel
+import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.BatchRun
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
+import org.pillarone.riskanalytics.core.parameter.IntegerParameter
+import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.comment.ResultCommentDAO
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.FunctionComment
 import org.pillarone.riskanalytics.core.workflow.Status
 import org.pillarone.riskanalytics.core.output.*
+import org.pillarone.riskanalytics.core.simulation.item.parameter.IntegerParameterHolder
 
 class SimulationTests extends GroovyTestCase {
 
@@ -52,6 +55,7 @@ class SimulationTests extends GroovyTestCase {
         DateTime end = new DateTime()
         run.startTime = start
         run.endTime = end
+        run.addToRuntimeParameters(new IntegerParameter(path: "path", periodIndex: 1, integerValue: 50))
         run.save()
 
         Simulation simulation = new Simulation("simulation")
@@ -69,6 +73,13 @@ class SimulationTests extends GroovyTestCase {
         assertEquals end, simulation.end
         assertEquals run.id, simulation.dao.id
 
+        assertEquals 1, simulation.runtimeParameters.size()
+
+        IntegerParameterHolder holder = simulation.runtimeParameters[0]
+        assertEquals "path", holder.path
+        assertEquals 1, holder.periodIndex
+        assertEquals 50, holder.businessObject
+
         assertNotNull simulation.modelClass
         assertEquals simulation.modelClass, simulation.parameterization.modelClass
     }
@@ -76,6 +87,9 @@ class SimulationTests extends GroovyTestCase {
     void testSave() {
         createParameterization()
         createResultConfiguration()
+
+        int parameterCount = Parameter.count()
+
         Simulation simulation = new Simulation("newSimulation")
         simulation.parameterization = new Parameterization("params")
         simulation.template = new ResultConfiguration("template")
@@ -84,7 +98,13 @@ class SimulationTests extends GroovyTestCase {
 
         assertNull "modelClass missing. Simulation should not be saved", simulation.save()
         simulation.modelClass = CoreModel
+
+        simulation.addParameter(ParameterHolderFactory.getHolder("path", 0, 1))
+        simulation.addParameter(ParameterHolderFactory.getHolder("path2", 0, "string"))
+
         assertNotNull "Simulation complete, should be saved", simulation.save()
+
+        assertEquals parameterCount + 2, Parameter.count()
     }
 
     void testDelete() {

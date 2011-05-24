@@ -6,6 +6,7 @@ import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.parameter.comment.ResultCommentDAO
 import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
+import org.pillarone.riskanalytics.core.parameter.Parameter
 
 class SimulationRun {
 
@@ -33,7 +34,7 @@ class SimulationRun {
 
     static transients = ['deleteSimulationService', 'dataSource']
 
-    static hasMany = [comments: ResultCommentDAO]
+    static hasMany = [comments: ResultCommentDAO, runtimeParameters: Parameter]
 
     static constraints = {
         name unique: 'model'

@@ -11,7 +11,7 @@ class InjectRuntimeParameterActionTests extends GroovyTestCase {
         CoreModel model = new CoreModel()
         model.init()
 
-        assertNull model.exampleInputOutputComponent.runtimeInt
+        assertEquals(1, model.exampleInputOutputComponent.runtimeInt)
 
         Simulation simulation = new Simulation("Test")
         simulation.addParameter(ParameterHolderFactory.getHolder("runtimeInt", 0, 99))

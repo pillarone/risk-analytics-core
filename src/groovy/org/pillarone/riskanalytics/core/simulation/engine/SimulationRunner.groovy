@@ -261,6 +261,7 @@ public class SimulationRunner {
         runner.preSimulationActions << prepareStructure
         runner.preSimulationActions << injectResourceParams
         runner.preSimulationActions << applyGlobalParams
+        runner.preSimulationActions << runtimeParams
         runner.preSimulationActions << wireModel
         runner.preSimulationActions << periodCounter
         runner.preSimulationActions << injectScopes

@@ -33,8 +33,16 @@ class StatusChangeService {
                     parameterization.status = Status.REJECTED
                     parameterization.save()
                 } else if (parameterization.status == NONE) {
-                    ParameterizationDAO dao = ParameterizationDAO.findByDealIdAndIdNotEqual(parameterization.dealId, parameterization.id)
-                    if (dao != null) {
+                    HibernateCriteriaBuilder criteria = ParameterizationDAO.createCriteria()
+                    List<ParameterizationDAO> p14nsInWorkflow = criteria.list {
+                        and {
+                            eq("dealId", parameterization.dealId)
+                            ne("id", parameterization.dealId)
+                            ne("status", org.pillarone.riskanalytics.core.workflow.Status.NONE)
+                        }
+                    }
+
+                    if (! p14nsInWorkflow.isEmpty()) {
                         throw new WorkflowException(parameterization.name, DATA_ENTRY, "Parameterization is already in workflow.")
                     }
                 }

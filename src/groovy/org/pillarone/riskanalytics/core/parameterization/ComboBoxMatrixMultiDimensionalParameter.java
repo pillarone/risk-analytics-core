@@ -70,6 +70,29 @@ public class ComboBoxMatrixMultiDimensionalParameter extends MatrixMultiDimensio
         }
     }
 
+    public List getRowObjects() {
+        List result = new ArrayList();
+        if (valuesConverted) {
+            for (Object o : getValues()) {
+                if (!(o instanceof String && ((String) o).length() == 0)) {
+                    result.add(comboBoxValues.get(o));
+                }
+            }
+        } else {
+            for (Object o : getValues()) {
+                List l = new ArrayList();
+                for (Object obj : (List) o) {
+                    if (!(o instanceof String && ((String) o).length() == 0)) {
+                        l.add(comboBoxValues.get(obj));
+                    }
+
+                }
+                result.add(l);
+            }
+        }
+        return result;
+    }
+
     public void validateValues() {
         int i = 0;
         for (Object value : columnTitles) {

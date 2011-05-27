@@ -15,6 +15,7 @@ import org.pillarone.riskanalytics.core.util.GrailsConfigValidator
 import org.springframework.remoting.rmi.RmiProxyFactoryBean
 import org.springframework.remoting.rmi.RmiServiceExporter
 import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
+import org.joda.time.DateTimeZone
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
@@ -91,6 +92,12 @@ Persistence & Simulation engine.
     }
 
     def doWithApplicationContext = {applicationContext ->
+
+        /** Setting the default time zone to UTC avoids problems in multi user context with different time zones
+         *  and switches off daylight saving capabilities and possible related problems.       */
+        DateTimeZone.setDefault(DateTimeZone.UTC)
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
+
         //Checks at startup if certain config options required for the core are set and sets defaults otherwise
         ConfigObject grailsConfig = ConfigurationHolder.config
         def standardCalculatorOutput = [

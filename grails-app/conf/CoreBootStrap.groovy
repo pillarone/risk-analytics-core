@@ -1,7 +1,6 @@
 import grails.plugins.springsecurity.SpringSecurityService
 import grails.util.Environment
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.joda.time.DateTimeZone
 import org.pillarone.riskanalytics.core.BatchRunSimulationRun
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
@@ -14,11 +13,6 @@ class CoreBootStrap {
     SpringSecurityService authenticateService
 
     def init = {servletContext ->
-
-        /** Setting the default time zone to UTC avoids problems in multi user context with different time zones
-         *  and switches off daylight saving capabilities and possible related problems.      */
-        DateTimeZone.setDefault(DateTimeZone.UTC)
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
 
         authenticateService = UserManagement.getSpringSecurityService()
 

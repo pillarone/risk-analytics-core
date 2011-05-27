@@ -8,13 +8,17 @@ class IntegerParameterHolder extends ParameterHolder {
     private int value;
 
     public IntegerParameterHolder(Parameter parameter) {
-        super(parameter.path, parameter.periodIndex);
-        this.value = parameter.integerValue
+        super(parameter);
     }
 
     public IntegerParameterHolder(String path, int periodIndex, int value) {
         super(path, periodIndex);
         this.value = value;
+    }
+
+    @Override
+    void setParameter(Parameter parameter) {
+        this.value = parameter.integerValue
     }
 
     Integer getBusinessObject() {

@@ -5,21 +5,23 @@ import org.pillarone.riskanalytics.core.parameterization.AbstractMultiDimensiona
 import org.pillarone.riskanalytics.core.parameter.MultiDimensionalParameter
 import org.pillarone.riskanalytics.core.parameterization.ConstrainedMultiDimensionalParameter
 import org.pillarone.riskanalytics.core.parameterization.ComboBoxTableMultiDimensionalParameter
-import org.joda.time.DateTime
-import org.pillarone.riskanalytics.core.parameterization.IMultiDimensionalConstraints
 
 class MultiDimensionalParameterHolder extends ParameterHolder implements IMarkerValueAccessor {
 
     private AbstractMultiDimensionalParameter value;
 
     public MultiDimensionalParameterHolder(Parameter parameter) {
-        super(parameter.path, parameter.periodIndex);
-        this.value = parameter.parameterInstance
+        super(parameter);
     }
 
     public MultiDimensionalParameterHolder(String path, int periodIndex, AbstractMultiDimensionalParameter value) {
         super(path, periodIndex);
         this.value = value;
+    }
+
+    @Override
+    void setParameter(Parameter parameter) {
+        this.value = parameter.parameterInstance
     }
 
     AbstractMultiDimensionalParameter getBusinessObject() {

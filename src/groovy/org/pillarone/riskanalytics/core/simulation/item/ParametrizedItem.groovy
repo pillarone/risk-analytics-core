@@ -11,10 +11,17 @@ abstract class ParametrizedItem extends CommentableItem {
     }
 
     protected void loadParameters(List<ParameterHolder> parameterHolders, Collection<Parameter> parameters) {
+        List<ParameterHolder> existingHolders = parameterHolders.clone()
         parameterHolders.clear()
 
         for (Parameter p in parameters) {
-            parameterHolders << ParameterHolderFactory.getHolder(p)
+            final ParameterHolder existingParameterHolder = existingHolders.find { it.path == p.path && it.periodIndex == p.periodIndex}
+            if (existingParameterHolder != null) {
+                existingParameterHolder.setParameter(p)
+                parameterHolders << existingParameterHolder
+            } else {
+                parameterHolders << ParameterHolderFactory.getHolder(p)
+            }
         }
     }
 

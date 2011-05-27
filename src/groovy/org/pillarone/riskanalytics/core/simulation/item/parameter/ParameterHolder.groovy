@@ -11,6 +11,11 @@ abstract class ParameterHolder implements Cloneable{
     boolean added
     boolean removed
 
+    public ParameterHolder(Parameter parameter) {
+        this(parameter.path, parameter.periodIndex)
+        setParameter(parameter)
+    }
+
     public ParameterHolder(String path, int periodIndex) {
         this.path = path
         this.periodIndex = periodIndex
@@ -18,6 +23,8 @@ abstract class ParameterHolder implements Cloneable{
         this.added = false
         this.removed = false
     }
+
+    abstract void setParameter(Parameter parameter)
 
     abstract Object getBusinessObject()
 

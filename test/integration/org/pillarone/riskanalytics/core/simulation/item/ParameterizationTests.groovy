@@ -16,6 +16,8 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.StringParamete
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
 import org.pillarone.riskanalytics.core.workflow.Status
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 
 class ParameterizationTests extends GroovyTestCase {
 
@@ -456,6 +458,7 @@ class ParameterizationTests extends GroovyTestCase {
         parameterization.save()
 
         assertEquals Status.NONE, parameterization.status
+
         assertTrue parameterization.isEditable()
 
         parameterization.status = Status.DATA_ENTRY
@@ -469,6 +472,25 @@ class ParameterizationTests extends GroovyTestCase {
 
         parameterization.status = Status.IN_PRODUCTION
         assertFalse parameterization.isEditable()
+    }
+
+    void testSafeReload() {
+        Parameterization parameterization = new Parameterization("test", CoreModel)
+        final ParameterHolder holder = ParameterHolderFactory.getHolder("testSafeReload", 0, 1)
+        parameterization.addParameter(holder)
+        parameterization.save()
+        parameterization.load()
+
+        Parameter parameter = Parameter.findByPath("testSafeReload")
+        parameter.integerValue = 2
+        parameter.save()
+
+        parameterization.load()
+
+        assertEquals(1, parameterization.parameterHolders.size())
+        assertSame(holder, parameterization.parameterHolders[0])
+        assertEquals(2, holder.businessObject)
+
     }
 
 

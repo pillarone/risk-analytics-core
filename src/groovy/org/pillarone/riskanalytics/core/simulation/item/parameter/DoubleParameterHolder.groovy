@@ -8,13 +8,17 @@ class DoubleParameterHolder extends ParameterHolder {
     private double value;
 
     public DoubleParameterHolder(Parameter parameter) {
-        super(parameter.path, parameter.periodIndex);
-        this.value = parameter.doubleValue
+        super(parameter);
     }
 
     public DoubleParameterHolder(String path, int periodIndex, double value) {
         super(path, periodIndex);
         this.value = value;
+    }
+
+    @Override
+    void setParameter(Parameter parameter) {
+        this.value = parameter.doubleValue
     }
 
     Double getBusinessObject() {

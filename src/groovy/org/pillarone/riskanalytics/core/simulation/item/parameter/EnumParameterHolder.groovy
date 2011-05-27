@@ -8,13 +8,17 @@ class EnumParameterHolder extends ParameterHolder {
     private Enum value
 
     public EnumParameterHolder(Parameter parameter) {
-        super(parameter.path, parameter.periodIndex);
-        this.value = Enum.valueOf(Thread.currentThread().contextClassLoader.loadClass(parameter.parameterType), parameter.parameterValue)
+        super(parameter);
     }
 
     public EnumParameterHolder(String path, int periodIndex, Enum value) {
         super(path, periodIndex);
         this.value = value;
+    }
+
+    @Override
+    void setParameter(Parameter parameter) {
+        this.value = Enum.valueOf(Thread.currentThread().contextClassLoader.loadClass(parameter.parameterType), parameter.parameterValue)
     }
 
     Enum getBusinessObject() {

@@ -8,13 +8,17 @@ class BooleanParameterHolder extends ParameterHolder {
     private boolean value;
 
     public BooleanParameterHolder(Parameter parameter) {
-        super(parameter.path, parameter.periodIndex);
-        this.value = parameter.booleanValue
+        super(parameter);
     }
 
     public BooleanParameterHolder(String path, int periodIndex, boolean value) {
         super(path, periodIndex);
         this.value = value;
+    }
+
+    @Override
+    void setParameter(Parameter parameter) {
+        this.value = parameter.booleanValue
     }
 
     Boolean getBusinessObject() {

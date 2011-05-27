@@ -65,7 +65,7 @@ class ParameterHolderFactory {
             case EnumParameter:
                 return createEnumHolder(parameter)
             case ParameterObjectParameter:
-                return createParamaterObjectHolder(parameter)
+                return createParameterObjectHolder(parameter)
             case MultiDimensionalParameter:
                 return createMultiDimensionalParameterHolder(parameter)
             case DateParameter:
@@ -104,7 +104,7 @@ class ParameterHolderFactory {
         return new EnumParameterHolder(parameter)
     }
 
-    private static ParameterHolder createParamaterObjectHolder(Parameter parameter) {
+    private static ParameterHolder createParameterObjectHolder(Parameter parameter) {
         return new ParameterObjectParameterHolder(parameter)
     }
 

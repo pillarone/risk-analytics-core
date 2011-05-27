@@ -9,13 +9,17 @@ class DateParameterHolder extends ParameterHolder {
     private DateTime value;
 
     public DateParameterHolder(Parameter parameter) {
-        super(parameter.path, parameter.periodIndex);
-        this.value = parameter.dateValue
+        super(parameter);
     }
 
     public DateParameterHolder(String path, int periodIndex, DateTime value) {
         super(path, periodIndex);
         this.value = value;
+    }
+
+    @Override
+    void setParameter(Parameter parameter) {
+        this.value = parameter.dateValue
     }
 
     DateTime getBusinessObject() {

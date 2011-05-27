@@ -71,6 +71,12 @@ class Parameterization extends ParametrizedItem {
         parameterHolders = []
         tags = []
         status = Status.NONE
+        periodCount = 1
+    }
+
+    public Parameterization(String name, Class modelClass) {
+        this(name)
+        this.modelClass = modelClass
     }
 
     protected Object createDao() {

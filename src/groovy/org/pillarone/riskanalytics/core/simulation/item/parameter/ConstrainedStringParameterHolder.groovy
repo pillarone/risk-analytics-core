@@ -10,13 +10,17 @@ class ConstrainedStringParameterHolder extends ParameterHolder implements IMarke
     private ConstrainedString value;
 
     public ConstrainedStringParameterHolder(Parameter parameter) {
-        super(parameter.path, parameter.periodIndex);
-        this.value = new ConstrainedString(getClass().getClassLoader().loadClass(parameter.markerClass), parameter.parameterValue)
+        super(parameter);
     }
 
     public ConstrainedStringParameterHolder(String path, int periodIndex, ConstrainedString value) {
         super(path, periodIndex);
         this.value = value;
+    }
+
+    @Override
+    void setParameter(Parameter parameter) {
+        this.value = new ConstrainedString(getClass().getClassLoader().loadClass(parameter.markerClass), parameter.parameterValue)
     }
 
     ConstrainedString getBusinessObject() {

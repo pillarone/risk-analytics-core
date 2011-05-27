@@ -38,7 +38,7 @@ class StatusChangeService {
                     List<ParameterizationDAO> p14nsInWorkflow = criteria.list {
                         and {
                             eq("dealId", parameterization.dealId)
-                            ne("id", parameterization.dealId)
+                            ne("id", parameterization.id)
                             ne("status", org.pillarone.riskanalytics.core.workflow.Status.NONE)
                         }
                     }

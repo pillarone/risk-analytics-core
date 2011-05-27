@@ -15,6 +15,7 @@ import static org.pillarone.riskanalytics.core.workflow.Status.*
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.remoting.ITransactionService
 import org.pillarone.riskanalytics.core.remoting.impl.RemotingUtils
+import grails.orm.HibernateCriteriaBuilder
 
 class StatusChangeService {
 

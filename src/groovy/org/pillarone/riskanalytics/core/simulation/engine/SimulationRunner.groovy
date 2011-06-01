@@ -10,9 +10,8 @@ import org.pillarone.riskanalytics.core.output.PacketCollector
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.util.GroovyUtils
-import org.pillarone.riskanalytics.core.wiring.ITransmitter
-import org.pillarone.riskanalytics.core.wiring.WiringUtils
 import org.pillarone.riskanalytics.core.simulation.engine.actions.*
+import org.pillarone.riskanalytics.core.wiring.*
 
 /**
  * This is the main entity to run a simulation. To do this, create a runner object (SimulationRunner.createRunner()).
@@ -52,6 +51,10 @@ public class SimulationRunner {
     private static Object lockObj = new Object();
     private static final int WAIT_TIMEOUT = 30000;
 
+    private IPacketListener packetListener;
+
+    List<Action> removeActions = new ArrayList<Action>();
+
     /**
      * Starting a simulation run by performing the
      *
@@ -80,6 +83,10 @@ public class SimulationRunner {
                     return
                 }
             }
+            if (packetListener != null) {
+                packetListener.initComponentCache(currentScope.model);
+            }
+
             messageCount.incrementAndGet();
             LOG.info("Thread count:" + threadCount + " current:" + messageCount.get());
             synchronized (lockObj) {
@@ -228,6 +235,12 @@ public class SimulationRunner {
         simulationAction.iterationAction.periodAction.model = currentScope.model
 
         currentScope.mappingCache = configuration.mappingCache
+        this.packetListener = configuration.packetListener;
+        if (packetListener != null) {
+            this.preSimulationActions.removeAll(removeActions);
+            WireCategory.setPacketListener(packetListener);
+            PortReplicatorCategory.setPacketListener(packetListener);
+        }
     }
 
     /**
@@ -281,6 +294,8 @@ public class SimulationRunner {
         runner.postSimulationActions << finishOutputAction
 
         runner.currentScope = simulationScope
+        runner.removeActions.add(prepareStructure);
+        runner.removeActions.add(injectResourceParams);
         return runner
     }
 

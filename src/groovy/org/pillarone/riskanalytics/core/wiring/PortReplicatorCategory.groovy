@@ -13,6 +13,19 @@ import org.pillarone.riskanalytics.core.util.GroovyUtils
 class PortReplicatorCategory {
     static final Logger LOG = Logger.getLogger(PortReplicatorCategory)
 
+    private static ThreadLocal<IPacketListener> packetListener = new ThreadLocal<IPacketListener>() {
+
+        @Override
+        protected IPacketListener initialValue() {
+            return null;
+        }
+
+    };
+
+    public static void setPacketListener(IPacketListener packetListener) {
+        this.packetListener.set(packetListener);
+    }
+
     static void doSetProperty(Component receiver, String targetPropertyName, Object sender) {
         // guarded clause to check that only input - input channels are wired
         if (!targetPropertyName.startsWith("in") && !targetPropertyName.startsWith("out")) {
@@ -50,6 +63,9 @@ class PortReplicatorCategory {
                 throw new UnsupportedOperationException("Only port of subcomponents can be replicated")
             }
             ITransmitter transmitter = new Transmitter(source, sourceProperty, receiver, targetProperty)
+            if (packetListener.get() != null) {
+                transmitter = new TraceableTransmitter(transmitter, packetListener.get());
+            }
             receiver.allInputTransmitter << transmitter
             source.allInputReplicationTransmitter << transmitter
         }
@@ -66,6 +82,9 @@ class PortReplicatorCategory {
                 throw new UnsupportedOperationException("Only port of subcomponents can be replicated")
             }
             ITransmitter transmitter = new SilentTransmitter(source, sourceProperty, receiver, targetProperty)
+            if (packetListener.get() != null) {
+                transmitter = new TraceableTransmitter(transmitter, packetListener.get());
+            }
             source.allOutputTransmitter << transmitter
             receiver.allOutputReplicationTransmitter << transmitter
         }

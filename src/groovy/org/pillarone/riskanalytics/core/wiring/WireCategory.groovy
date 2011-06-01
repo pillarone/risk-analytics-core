@@ -9,6 +9,19 @@ class WireCategory {
 
     static final Logger LOG = Logger.getLogger(PortReplicatorCategory)
 
+    private static ThreadLocal<IPacketListener> packetListener = new ThreadLocal<IPacketListener>() {
+
+        @Override
+        protected IPacketListener initialValue() {
+            return null;
+        }
+
+    };
+
+    public static void setPacketListener(IPacketListener packetListener){
+        this.packetListener.set(packetListener);
+    }
+
     static void doSetProperty(Component target, String targetPropertyName, Object sender) {
         // guarded clause to check that only input input channels are wired
         if (!targetPropertyName.startsWith("in")) {
@@ -25,6 +38,9 @@ class WireCategory {
             throw new IllegalArgumentException("Wiring only allowed with same types for input and output")
         }
         Transmitter transmitter = createTransmitter(sourceProperty, source, targetProperty, target)
+        if (packetListener.get()!=null){
+            transmitter=new TraceableTransmitter(transmitter,packetListener.get());
+        }
         target.allInputTransmitter << transmitter
         source.allOutputTransmitter << transmitter
     }

@@ -78,7 +78,7 @@ public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensiona
                     }
 
                 }
-                result.add(l);
+                result.addAll(l);
             }
         }
         return result;

@@ -4,7 +4,7 @@ import org.pillarone.riskanalytics.core.model.IModelVisitor;
 import org.pillarone.riskanalytics.core.model.ModelPath;
 import org.pillarone.riskanalytics.core.model.ModelPathComponent;
 import org.pillarone.riskanalytics.core.wiring.ITransmitter;
-import org.pillarone.riskanalytics.core.wiring.SilentTransmitter;
+import org.pillarone.riskanalytics.core.wiring.Transmitter;
 import org.pillarone.riskanalytics.core.wiring.WiringUtils;
 
 import java.util.ArrayList;
@@ -14,14 +14,14 @@ import java.util.List;
 abstract public class ComposedComponent extends Component {
 
     private List<ITransmitter> allInputReplicationTransmitter = new ArrayList<ITransmitter>();
-    private List<SilentTransmitter> allOutputReplicationTransmitter = new ArrayList<SilentTransmitter>();
+    private List<Transmitter> allOutputReplicationTransmitter = new ArrayList<Transmitter>();
 
 
     public List<ITransmitter> getAllInputReplicationTransmitter() {
         return allInputReplicationTransmitter;
     }
 
-    public List<SilentTransmitter> getAllOutputReplicationTransmitter() {
+    public List<Transmitter> getAllOutputReplicationTransmitter() {
         return allOutputReplicationTransmitter;
     }
 

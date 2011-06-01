@@ -15,6 +15,7 @@ import org.pillarone.riskanalytics.core.output.PacketCollector
 import org.pillarone.riskanalytics.core.model.ModelHelper
 import org.pillarone.riskanalytics.core.output.ICollectingModeStrategy
 import org.pillarone.riskanalytics.core.output.CollectingModeFactory
+import org.pillarone.riskanalytics.core.wiring.IPacketListener
 
 /**
  * The SimulationConfiguration is a descriptor for a runnable simulation. All runtime aspects e.g. numberOfIterations,
@@ -29,6 +30,7 @@ public class SimulationConfiguration implements Serializable, Cloneable {
     ICollectorOutputStrategy outputStrategy
     MappingCache mappingCache
     List<SimulationBlock> simulationBlocks = []
+    IPacketListener packetListener;
 
     private static Log LOG = LogFactory.getLog(SimulationConfiguration)
 

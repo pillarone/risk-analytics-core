@@ -35,14 +35,10 @@ public class Transmitter implements ITransmitter {
         if (isTransmitted()) { // TODO (msh): check case of retransmission and delete flag if unneccessary
             throw new IllegalStateException("No retransmission allowed: " + this);
         }
-        for (Object packet : source) {
-            ((Packet) packet).setSender(sender);
-            ((Packet) packet).setSenderChannelName(senderChannelName);
-            for (Class marker : sender.getMarkerClasses()) {
-                ((Packet) packet).addMarker(marker, (IComponentMarker) sender);
-            }
-        }
-        target.addAll(source);
+
+        setMarkers();
+        filterSource();
+        
         setTransmitted(true);
         if (LOG.isDebugEnabled() && source.size() > 1) {
             StringBuffer buffer = new StringBuffer();
@@ -65,6 +61,25 @@ public class Transmitter implements ITransmitter {
 
     protected void notifyReceiver() {
         receiver.notifyTransmitted(this);
+    }
+
+    protected void notifyReceiver(Transmitter transmitter){
+        receiver.notifyTransmitted(transmitter);
+    }
+
+
+    protected void setMarkers() {
+        for (Object packet : source) {
+            ((Packet) packet).setSender(sender);
+            ((Packet) packet).setSenderChannelName(senderChannelName);
+            for (Class marker : sender.getMarkerClasses()) {
+                ((Packet) packet).addMarker(marker, (IComponentMarker) sender);
+            }
+        }
+    }
+
+    protected void filterSource() {
+        target.addAll(source);
     }
 
     public boolean isTransmitted() {

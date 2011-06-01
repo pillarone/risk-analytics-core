@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.packets;
 
 import org.joda.time.DateTime;
 import org.pillarone.riskanalytics.core.components.Component;
+import org.pillarone.riskanalytics.core.components.IComponentMarker;
 
 import java.util.*;
 
@@ -12,7 +13,7 @@ public class Packet implements Cloneable, Comparable {
     public Component sender;
     public String senderChannelName;
 
-    public Map<Class, Component> markers = new HashMap<Class, Component>();
+    private Map<Class<? extends IComponentMarker>, IComponentMarker> markers = new HashMap<Class<? extends IComponentMarker>, IComponentMarker>();
 
     public UUID id;
 
@@ -94,5 +95,13 @@ public class Packet implements Cloneable, Comparable {
 
     public void setDate(DateTime date) {
         this.date = date;
+    }
+
+    public void addMarker(Class<? extends IComponentMarker> marker, IComponentMarker sender) {
+        markers.put(marker, sender);
+    }
+
+    public IComponentMarker getMarkedSender(Class<? extends IComponentMarker> marker) {
+        return markers.get(marker);
     }
 }

@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.wiring;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pillarone.riskanalytics.core.components.Component;
+import org.pillarone.riskanalytics.core.components.IComponentMarker;
 import org.pillarone.riskanalytics.core.packets.Packet;
 import org.pillarone.riskanalytics.core.packets.PacketList;
 
@@ -38,7 +39,7 @@ public class Transmitter implements ITransmitter {
             ((Packet) packet).setSender(sender);
             ((Packet) packet).setSenderChannelName(senderChannelName);
             for (Class marker : sender.getMarkerClasses()) {
-                ((Packet) packet).markers.put(marker, sender);
+                ((Packet) packet).addMarker(marker, (IComponentMarker) sender);
             }
         }
         target.addAll(source);

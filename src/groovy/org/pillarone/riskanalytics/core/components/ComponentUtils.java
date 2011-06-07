@@ -12,6 +12,8 @@ public class ComponentUtils {
     public static final String SUB = "sub";
     public static final String PARM = "parm";
     public static final String OUT = "out";
+    public static final String GLOBAL = "global";
+    public static final String RUNTIME = "runtime";
 
     public static String getNormalizedPath(String path, String pathSeparator) {
         String[] pathElements = path.split(PATH_SEPARATOR);
@@ -53,6 +55,12 @@ public class ComponentUtils {
         }
         else if (componentName.startsWith(OUT)) {
             return componentName.substring(3);
+        }
+        else if (componentName.startsWith(GLOBAL)) {
+            return componentName.substring(6);
+        }
+        else if (componentName.startsWith(RUNTIME)) {
+            return componentName.substring(7);
         }
         return componentName;
     }

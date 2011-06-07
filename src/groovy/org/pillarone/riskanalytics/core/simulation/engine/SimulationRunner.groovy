@@ -257,11 +257,11 @@ public class SimulationRunner {
         // PrepareStructureInformationAction must be before WireModelAction
         runner.preSimulationActions << initModel
         runner.preSimulationActions << randomSeed
+        runner.preSimulationActions << runtimeParams
         runner.preSimulationActions << initParams
         runner.preSimulationActions << prepareStructure
         runner.preSimulationActions << injectResourceParams
         runner.preSimulationActions << applyGlobalParams
-        runner.preSimulationActions << runtimeParams
         runner.preSimulationActions << wireModel
         runner.preSimulationActions << periodCounter
         runner.preSimulationActions << injectScopes

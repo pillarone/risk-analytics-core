@@ -17,6 +17,7 @@ import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.pillarone.riskanalytics.core.util.MathUtils
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 
 /**
  * An abstract class which provides functionality to run model tests.
@@ -75,6 +76,10 @@ abstract class ModelTest extends GroovyTestCase {
         10
     }
 
+    List<ParameterHolder> getRuntimeParameters() {
+        []
+    }
+
     Simulation run
 
     protected void setUp() {
@@ -110,6 +115,10 @@ abstract class ModelTest extends GroovyTestCase {
 
         if (modelInstance.requiresStartDate()) {
             run.beginOfFirstPeriod = new DateTime(2009, 1, 1, 0, 0, 0, 0)
+        }
+
+        for(ParameterHolder parameterHolder in getRuntimeParameters()) {
+            run.addParameter(parameterHolder)
         }
 
         assertNotNull run.save()

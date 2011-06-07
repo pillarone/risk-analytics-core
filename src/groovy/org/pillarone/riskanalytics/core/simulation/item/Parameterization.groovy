@@ -23,7 +23,6 @@ import org.pillarone.riskanalytics.core.parameterization.validation.ValidatorReg
 import org.pillarone.riskanalytics.core.simulation.ILimitedPeriodCounter
 import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
-import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
@@ -322,18 +321,7 @@ class Parameterization extends ParametrizedItem {
     }
 
     public boolean isUsedInSimulation() {
-        if (!isLoaded()) {
-            load()
-        }
-        List<SimulationRun> result = null
-        try {
-            result = SimulationRun.findAllByParameterizationAndToBeDeleted(dao, false)
-        } catch (Exception e) {
-            LOG.error("Exception in method isUsedInSimulation : $e.message", e)
-        }
-        // lock a parameterization as soon as a simulation has started
-        // https://issuetracking.intuitive-collaboration.com/jira/browse/PMO-1242
-        return result.size() > 0
+        return SimulationRun.find("from ${SimulationRun.class.name} as run where run.parameterization.name = ? and run.parameterization.modelClassName = ? and run.parameterization.itemVersion =?", [name, modelClass.name, versionNumber.toString()]) != null
     }
 
     public boolean isEditable() {
@@ -387,7 +375,16 @@ class Parameterization extends ParametrizedItem {
 
 
     public List<Tag> getTags() {
+        addRemoveLockTag()
         return tags
+    }
+
+    private void addRemoveLockTag() {
+        Tag locked = Tag.findByName("LOCKED")
+        if (!tags.contains(locked) && isUsedInSimulation())
+            tags << locked
+        else if (tags.contains(locked) && !isUsedInSimulation())
+            tags.remove(locked)
     }
 
     public void setTags(Set selectedTags) {

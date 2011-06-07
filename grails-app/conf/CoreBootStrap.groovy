@@ -5,6 +5,8 @@ import org.pillarone.riskanalytics.core.BatchRunSimulationRun
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
 import org.pillarone.riskanalytics.core.output.SimulationRun
+import org.pillarone.riskanalytics.core.parameter.comment.Tag
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.EnumTagType
 import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.user.*
 
@@ -84,6 +86,11 @@ class CoreBootStrap {
                 } catch (Exception ex) {
                     ex.printStackTrace()
                 }
+            }
+        }
+        Tag.withTransaction { status ->
+            if (!Tag.findByName("LOCKED")) {
+                new Tag(name: "LOCKED", tagType: EnumTagType.PARAMETERIZATION).save()
             }
         }
 

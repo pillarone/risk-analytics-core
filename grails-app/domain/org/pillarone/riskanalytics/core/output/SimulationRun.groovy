@@ -7,6 +7,7 @@ import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.parameter.comment.ResultCommentDAO
 import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
 import org.pillarone.riskanalytics.core.parameter.Parameter
+import org.pillarone.riskanalytics.core.util.DatabaseUtils
 
 class SimulationRun {
 
@@ -58,6 +59,9 @@ class SimulationRun {
         endTime type: DateTimeMillisUserType
         creationDate type: DateTimeMillisUserType
         modificationDate type: DateTimeMillisUserType
+        if (DatabaseUtils.isOracleDatabase()) {
+            comment(column: 'comment_value')
+        }
     }
 
     public boolean equals(Object obj) {

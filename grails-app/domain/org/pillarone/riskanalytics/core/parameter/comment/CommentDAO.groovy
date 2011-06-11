@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.parameter.comment
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
 import org.pillarone.riskanalytics.core.user.Person
+import org.pillarone.riskanalytics.core.util.DatabaseUtils
 
 class CommentDAO {
     String path
@@ -22,6 +23,9 @@ class CommentDAO {
 
     static mapping = {
         timeStamp type: DateTimeMillisUserType
+        if (DatabaseUtils.isOracleDatabase()) {
+            comment(column: 'comment_value')
+        }
     }
 
     String toString() {

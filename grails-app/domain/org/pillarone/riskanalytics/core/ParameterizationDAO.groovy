@@ -10,6 +10,7 @@ import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowComme
 import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.workflow.Status
+import org.pillarone.riskanalytics.core.util.DatabaseUtils
 
 class ParameterizationDAO {
 
@@ -60,6 +61,10 @@ class ParameterizationDAO {
         creationDate type: DateTimeMillisUserType
         modificationDate type: DateTimeMillisUserType
         valuationDate type: DateTimeMillisUserType
+        if (DatabaseUtils.isOracleDatabase()) {
+            comment(column: 'comment_value')
+            parameters(joinTable:[name: 'dao_parameter', key:'dao_id', column: 'parameter_id'])
+        }
     }
 
     String toString() {

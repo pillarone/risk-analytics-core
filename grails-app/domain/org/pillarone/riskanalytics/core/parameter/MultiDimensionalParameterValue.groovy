@@ -1,7 +1,6 @@
 package org.pillarone.riskanalytics.core.parameter
 
-import org.pillarone.riskanalytics.core.parameter.MultiDimensionalParameter
-import org.pillarone.riskanalytics.core.parameter.Parameter
+import org.pillarone.riskanalytics.core.util.DatabaseUtils
 
 class MultiDimensionalParameterValue {
 
@@ -15,6 +14,14 @@ class MultiDimensionalParameterValue {
         row(min: 0)
         col(min: 0)
         value(maxSize: 1000)
+    }
+
+    static mapping = {
+        if (DatabaseUtils.isOracleDatabase()) {
+            table('mdp_value')
+            row(column: 'row_number')
+            multiDimensionalParameter(column: 'mdp_id')
+        }
     }
 
 }

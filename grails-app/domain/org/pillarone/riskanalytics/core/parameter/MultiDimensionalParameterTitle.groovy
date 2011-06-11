@@ -1,6 +1,6 @@
 package org.pillarone.riskanalytics.core.parameter
 
-import org.pillarone.riskanalytics.core.parameter.MultiDimensionalParameter
+import org.pillarone.riskanalytics.core.util.DatabaseUtils
 
 class MultiDimensionalParameterTitle {
 
@@ -14,6 +14,13 @@ class MultiDimensionalParameterTitle {
         //todo validator
         row()
         col()
+    }
+
+    static mapping = {
+        if (DatabaseUtils.isOracleDatabase()) {
+            table("mdp_title")
+            row(column: 'row_number')
+        }
     }
 
 }

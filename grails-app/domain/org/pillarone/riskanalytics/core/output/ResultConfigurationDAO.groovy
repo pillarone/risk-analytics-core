@@ -4,6 +4,7 @@ import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
 import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.util.DatabaseUtils
 
 public class ResultConfigurationDAO {
 
@@ -36,5 +37,8 @@ public class ResultConfigurationDAO {
         lastUpdater lazy: false
         creationDate type: DateTimeMillisUserType
         modificationDate type: DateTimeMillisUserType
+        if (DatabaseUtils.isOracleDatabase()) {
+            comment(column: 'comment_value')
+        }
     }
 }

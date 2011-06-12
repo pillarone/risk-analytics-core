@@ -18,7 +18,7 @@
     <condition property="GRAILS_JVM_OPTS" value="${env.GRAILS_JVM_OPTS}">
       <isset property="env.GRAILS_JVM_OPTS" />
     </condition>
-    <property name="GRAILS_JVM_OPTS" value="-Xmx1024m -XX:MaxPermSize=512m"/>
+    <property name="GRAILS_JVM_OPTS" value="-Xmx1024m -XX:MaxPermSize=512m -Duser.language='en'"/>
 
     <tstamp>
         <format property="build-timestamp" pattern="dd.MM.yyyy HH:mm"/>

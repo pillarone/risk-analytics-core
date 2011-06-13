@@ -61,6 +61,7 @@ class SimulationRun {
         modificationDate type: DateTimeMillisUserType
         if (DatabaseUtils.isOracleDatabase()) {
             comment(column: 'comment_value')
+            runtimeParameters(joinTable: [name: 'run_parameter', key:'run_id', column: 'parameter_id'])
         }
     }
 

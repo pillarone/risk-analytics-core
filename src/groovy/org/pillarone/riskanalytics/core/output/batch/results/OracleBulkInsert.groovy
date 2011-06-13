@@ -34,7 +34,8 @@ class OracleBulkInsert extends AbstractResultsBulkInsert {
 
     @Override
     protected void writeResult(List values) {
-        writer.append(values.join(","))
+        //TODO: properly handle null dates
+        writer.append(values.collect { it == null ? 0 : it}.join(","))
         writer.newLine()
     }
 

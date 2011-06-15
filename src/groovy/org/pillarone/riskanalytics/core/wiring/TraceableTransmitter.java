@@ -16,12 +16,16 @@ public class TraceableTransmitter extends Transmitter {
     public TraceableTransmitter(Transmitter transmitter, IPacketListener packetListener) {
         super(transmitter.getSender(), transmitter.getSource(), transmitter.getReceiver(), transmitter.getTarget());
         this.transmitter = transmitter;
-        this.packetListener=packetListener;
+        this.packetListener = packetListener;
     }
 
     public void transmit() {
         if (isTransmitted()) { // TODO (msh): check case of retransmission and delete flag if unneccessary
             throw new IllegalStateException("No retransmission allowed: " + this);
+        }
+
+        if (source.isEmpty() && !ComposedComponent.class.isAssignableFrom(sender.getClass())) {
+            source.add(new Packet());
         }
 
         setMarkers();
@@ -41,7 +45,7 @@ public class TraceableTransmitter extends Transmitter {
         notifyReceiver(this);
     }
 
-    protected void notifyReceiver(Transmitter transmitter){
+    protected void notifyReceiver(Transmitter transmitter) {
         this.transmitter.notifyReceiver(transmitter);
     }
 

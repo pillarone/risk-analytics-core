@@ -22,9 +22,15 @@ class OracleBulkInsert extends AbstractResultsBulkInsert {
             String insert = "INSERT INTO single_value_result " +
                     "(id, version, simulation_run_id, period, iteration, path_id, collector_id, field_id, value_index, value, date_time) " +
                     "(SELECT result_id_sequence.nextval, 0, run_id, period, iteration, path_id, collector_id, field_id, value_index, value, datetime FROM ${externalTableName})"
+            sql.execute("DROP INDEX single_value_result_x1")
+            sql.execute("DROP INDEX single_value_result_x2")
+
             sql.execute(createDirectory)
             sql.execute(createExternalTable)
             int numberOfResults = sql.executeUpdate(insert)
+            sql.execute("CREATE INDEX single_value_result_x1 on single_value_result(simulation_run_id, period, path_id, collector_id, field_id, value, iteration) ")
+            sql.execute("CREATE INDEX single_value_result_x2 on single_value_result(simulation_run_id, period, path_id, collector_id, field_id, iteration, value) ")
+
             time = System.currentTimeMillis() - time
             LOG.info("${numberOfResults} results saved in ${time} ms");
 

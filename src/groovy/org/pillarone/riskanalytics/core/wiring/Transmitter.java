@@ -79,7 +79,7 @@ public class Transmitter implements ITransmitter {
     }
 
     protected void filterSource() {
-        target.addAll(source);
+        receiver.filterInChannel(target, source);
     }
 
     public boolean isTransmitted() {

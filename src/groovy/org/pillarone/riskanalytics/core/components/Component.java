@@ -141,6 +141,17 @@ abstract public class Component implements Cloneable {
         }
     }
 
+    /**
+     *  This method adds all packet of the source to the inChannel. Overwrite it in order to apply filters
+     *  on incoming packets.
+     *
+     *  @inChannel of this component
+     *  @source outChannel of the sending component
+     */
+    public void filterInChannel(PacketList inChannel, PacketList source) {
+        inChannel.addAll(source);
+    }
+
     protected void resetInputTransmitters() {
         transmitCount = 0;
         for (ITransmitter input : allInputTransmitter) {

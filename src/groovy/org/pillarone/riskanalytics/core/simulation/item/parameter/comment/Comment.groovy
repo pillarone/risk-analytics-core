@@ -1,7 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.item.parameter.comment
 
 import org.joda.time.DateTime
-
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 import org.pillarone.riskanalytics.core.parameter.comment.CommentTag
 import org.pillarone.riskanalytics.core.parameter.comment.Tag
@@ -168,7 +167,9 @@ class Comment implements Cloneable {
     }
 
     public Comment clone() {
-        Comment clone = (Comment) super.clone()
+        Comment clone = new Comment(path, period)
+        clone.user = user
+        clone.comment = comment
         clone.lastChange = (DateTime) new DateTime(lastChange.millis)
         clone.tags = (Set) tags.clone()
         clone.files = (Set) files.clone()

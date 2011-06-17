@@ -167,7 +167,7 @@ class Comment implements Cloneable {
     }
 
     public Comment clone() {
-        Comment clone = new Comment(path, period)
+        Comment clone = this.class.newInstance([path, period] as Object[])
         clone.user = user
         clone.comment = comment
         clone.lastChange = (DateTime) new DateTime(lastChange.millis)

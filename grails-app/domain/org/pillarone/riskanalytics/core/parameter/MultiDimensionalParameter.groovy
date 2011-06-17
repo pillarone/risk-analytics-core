@@ -6,6 +6,7 @@ import org.pillarone.riskanalytics.core.parameterization.AbstractMultiDimensiona
 import org.pillarone.riskanalytics.core.parameterization.*
 import org.springframework.jdbc.datasource.DataSourceUtils
 import java.sql.Connection
+import org.pillarone.riskanalytics.core.util.DatabaseUtils
 
 class MultiDimensionalParameter extends Parameter {
 
@@ -135,34 +136,34 @@ class MultiDimensionalParameter extends Parameter {
      */
     public Object getParameterInstance() {
         //TODO: check how this affects performance
-//        if (parameterObject == null) {
-            Class clazz = Thread.currentThread().contextClassLoader.loadClass(className)
-            Class markerClass
-            if (markerClassName != null) {
-                markerClass = Thread.currentThread().contextClassLoader.loadClass(markerClassName)
-            }
-            def mdpInstance = null
-            switch (className) {
-                case SimpleMultiDimensionalParameter.name:
-                    mdpInstance = clazz.newInstance([getCellValues()] as Object[])
-                    break;
-                case TableMultiDimensionalParameter.name:
-                    mdpInstance = clazz.newInstance([getCellValues(), getColumnTitles()] as Object[])
-                    break;
-                case MatrixMultiDimensionalParameter.name:
-                    mdpInstance = clazz.newInstance([getCellValues(), getRowTitles(), getColumnTitles()] as Object[])
-                    break;
-                case ComboBoxMatrixMultiDimensionalParameter.name:
-                    mdpInstance = clazz.newInstance([getCellValues(), getColumnTitles(), markerClass] as Object[])
-                    break;
-                case ComboBoxTableMultiDimensionalParameter.name:
-                    mdpInstance = clazz.newInstance([getCellValues(), getColumnTitles(), markerClass] as Object[])
-                    break;
-                case ConstrainedMultiDimensionalParameter.name:
-                    mdpInstance = clazz.newInstance([getCellValues(), getColumnTitles(), ConstraintsFactory.getConstraints(constraintName)] as Object[])
-                    break;
-            }
-            parameterObject = mdpInstance
+        //        if (parameterObject == null) {
+        Class clazz = Thread.currentThread().contextClassLoader.loadClass(className)
+        Class markerClass
+        if (markerClassName != null) {
+            markerClass = Thread.currentThread().contextClassLoader.loadClass(markerClassName)
+        }
+        def mdpInstance = null
+        switch (className) {
+            case SimpleMultiDimensionalParameter.name:
+                mdpInstance = clazz.newInstance([getCellValues()] as Object[])
+                break;
+            case TableMultiDimensionalParameter.name:
+                mdpInstance = clazz.newInstance([getCellValues(), getColumnTitles()] as Object[])
+                break;
+            case MatrixMultiDimensionalParameter.name:
+                mdpInstance = clazz.newInstance([getCellValues(), getRowTitles(), getColumnTitles()] as Object[])
+                break;
+            case ComboBoxMatrixMultiDimensionalParameter.name:
+                mdpInstance = clazz.newInstance([getCellValues(), getColumnTitles(), markerClass] as Object[])
+                break;
+            case ComboBoxTableMultiDimensionalParameter.name:
+                mdpInstance = clazz.newInstance([getCellValues(), getColumnTitles(), markerClass] as Object[])
+                break;
+            case ConstrainedMultiDimensionalParameter.name:
+                mdpInstance = clazz.newInstance([getCellValues(), getColumnTitles(), ConstraintsFactory.getConstraints(constraintName)] as Object[])
+                break;
+        }
+        parameterObject = mdpInstance
 //        }
         return parameterObject
     }
@@ -179,7 +180,11 @@ class MultiDimensionalParameter extends Parameter {
         List result = []
         Sql sql = new Sql(DataSourceUtils.getConnection(dataSource))
         int i = 0
-        List column = sql.rows("SELECT value FROM multi_dimensional_parameter_value v where v.multi_dimensional_parameter_id = ? and v.col = ? order by v.row", [this.id, i])
+        String query = DatabaseUtils.isOracleDatabase() ?
+            "SELECT value FROM mdp_value v where v.mdp_id = ? and v.col = ? order by v.row_number" :
+            "SELECT value FROM multi_dimensional_parameter_value v where v.multi_dimensional_parameter_id = ? and v.col = ? order by v.row"
+
+        List column = sql.rows(query, [this.id, i])
         while (column.size() > 0) {
             result << column.collect {GroovyRowResult res ->
                 ByteArrayInputStream str = new ByteArrayInputStream(res.getAt(0))
@@ -187,7 +192,7 @@ class MultiDimensionalParameter extends Parameter {
                 return str2.readObject()
             }
             i++
-            column = sql.rows("SELECT value FROM multi_dimensional_parameter_value v where v.multi_dimensional_parameter_id = ? and v.col = ? order by v.row", [this.id, i])
+            column = sql.rows(query, [this.id, i])
         }
         if (result.size() == 0) {
             return []

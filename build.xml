@@ -15,6 +15,11 @@
     </condition>
     <property name="grails" value="${GRAILS_HOME}/bin/grails"/>
 
+    <condition property="GRAILS_JVM_OPTS" value="${env.GRAILS_JVM_OPTS}">
+      <isset property="env.GRAILS_JVM_OPTS" />
+    </condition>
+    <property name="GRAILS_JVM_OPTS" value="-Xmx1024m -XX:MaxPermSize=512m -Duser.language='en'"/>
+
     <tstamp>
         <format property="build-timestamp" pattern="dd.MM.yyyy HH:mm"/>
     </tstamp>
@@ -48,8 +53,7 @@
             <arg value="compile"/>
             <arg value="--non-interactive"/>
             <env key="GRAILS_HOME" value="${GRAILS_HOME}"/>
-            <env key="JAVA_OPTS"
-                 value="-Xmx1024m -XX:MaxPermSize=512m -Duser.language=en"/>
+            <env key="JAVA_OPTS" value="${GRAILS_JVM_OPTS}"/>
         </exec>
     </target>
 
@@ -64,8 +68,8 @@
             <arg value="test-app"/>
             <!--<arg value="-coverage"/>-->
             <env key="GRAILS_HOME" value="${GRAILS_HOME}"/>
-            <env key="JAVA_OPTS"
-                 value="-Xmx1024m -XX:MaxPermSize=512m -Dtools.jar=../jre1.5.0_11/lib/tools.jar -Djava.awt.headless=false -Duser.language='en'"/>
+            <!-- I am pretty sure the -Dtools.jar option below can go (who is using jre5 anymore anyway?) but did not dare remove it -->
+            <env key="JAVA_OPTS" value="${GRAILS_JVM_OPTS} -Djava.awt.headless=false -Dtools.jar=../jre1.5.0_11/lib/tools.jar "/>
         </exec>
         <copy todir="${dist.dir}">
             <fileset dir="target" includes="test-reports/"/>
@@ -95,8 +99,7 @@
         <exec executable="${grails}" failonerror="true" resolveexecutable="true">
             <arg value="jar -destination=out/production/RiskAnalyticsCore"/>
             <env key="GRAILS_HOME" value="${GRAILS_HOME}"/>
-            <env key="JAVA_OPTS"
-                 value="-Xmx1024m -XX:MaxPermSize=512m -Duser.language='en'"/>
+            <env key="JAVA_OPTS" value="${GRAILS_JVM_OPTS}"/>
         </exec>
     </target>
 

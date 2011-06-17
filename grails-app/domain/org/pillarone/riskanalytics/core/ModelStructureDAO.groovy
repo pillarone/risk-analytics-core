@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core
 
 import org.pillarone.riskanalytics.core.output.ConfigObjectHolder
+import org.pillarone.riskanalytics.core.util.DatabaseUtils
 
 class ModelStructureDAO {
 
@@ -17,5 +18,8 @@ class ModelStructureDAO {
 
     static mapping = {
         stringData lazy: true
+        if(DatabaseUtils.isOracleDatabase()) {
+            comment(column: 'comment_value')
+        }
     }
 }

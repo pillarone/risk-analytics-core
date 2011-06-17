@@ -4,6 +4,7 @@ import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.user.Person
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
+import org.pillarone.riskanalytics.core.util.DatabaseUtils
 
 class AuditLog {
 
@@ -26,6 +27,10 @@ class AuditLog {
     }
 
     static mapping = {
-        date type: DateTimeMillisUserType
+        if(DatabaseUtils.isOracleDatabase()) {
+            date type: DateTimeMillisUserType, column: 'date_time'
+        } else {
+            date type: DateTimeMillisUserType
+        }
     }
 }

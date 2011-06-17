@@ -4,6 +4,7 @@ import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.user.Person
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
+import org.pillarone.riskanalytics.core.util.DatabaseUtils
 
 class WorkflowCommentDAO {
 
@@ -27,5 +28,8 @@ class WorkflowCommentDAO {
 
     static mapping = {
         timeStamp type: DateTimeMillisUserType
+        if (DatabaseUtils.isOracleDatabase()) {
+            comment(column: "comment_value")
+        }
     }
 }

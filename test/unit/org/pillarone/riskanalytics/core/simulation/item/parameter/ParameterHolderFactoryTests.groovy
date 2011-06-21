@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.simulation.item.parameter
 
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import models.core.CoreModel
+import org.pillarone.riskanalytics.core.example.migration.OptionalComponent
 
 /**
  * @author fouad.jaada@intuitive-collaboration.com
@@ -18,7 +19,7 @@ class ParameterHolderFactoryTests extends GroovyTestCase {
 
         int paramCount = parameterization.parameters.size()
 
-        ParameterHolderFactory.renamePathOfParameter(parameterization, "pathToBeReplaced", "newPath")
+        ParameterHolderFactory.renamePathOfParameter(parameterization, "pathToBeReplaced", "newPath", new OptionalComponent())
 
         List allPaths = parameterization.parameters*.path
 

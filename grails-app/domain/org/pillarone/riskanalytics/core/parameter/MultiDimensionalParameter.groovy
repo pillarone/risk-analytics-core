@@ -5,7 +5,7 @@ import groovy.sql.Sql
 import org.pillarone.riskanalytics.core.parameterization.AbstractMultiDimensionalParameter
 import org.pillarone.riskanalytics.core.parameterization.*
 import org.springframework.jdbc.datasource.DataSourceUtils
-import java.sql.Connection
+
 import org.pillarone.riskanalytics.core.util.DatabaseUtils
 
 class MultiDimensionalParameter extends Parameter {
@@ -42,6 +42,24 @@ class MultiDimensionalParameter extends Parameter {
         constraintName = value instanceof ConstrainedMultiDimensionalParameter ? value.constraints.name : null
         removeObsoleteParameters(value.valueRowCount, value.valueColumnCount)
         removeObsoleteTitles(value.rowCount, value.columnCount)
+    }
+
+    private static Map CLASS_NAMES_FROM_v16_TO_v17 =
+    ["org.pillarone.riskanalytics.domain.pc.underwriting.IUnderwritingInfoMarker"
+            : "org.pillarone.riskanalytics.domain.utils.marker.IUnderwritingInfoMarker",
+     "org.pillarone.riskanalytics.domain.pc.generators.claims.PerilMarker"
+      : "org.pillarone.riskanalytics.domain.utils.marker.IPerilMarker"]
+
+    private String translateClassNamesHACK_migration_v16_v17(String name) {
+        if (! CLASS_NAMES_FROM_v16_TO_v17.containsKey(name)) {
+            return name
+        }
+        try {
+            Class.forName(name)
+            return name
+        } catch (ClassNotFoundException e) {
+            return CLASS_NAMES_FROM_v16_TO_v17.get(name)
+        }
     }
 
     private void extractRowTitles(List titles, int offset) {
@@ -140,7 +158,8 @@ class MultiDimensionalParameter extends Parameter {
         Class clazz = Thread.currentThread().contextClassLoader.loadClass(className)
         Class markerClass
         if (markerClassName != null) {
-            markerClass = Thread.currentThread().contextClassLoader.loadClass(markerClassName)
+            String translatedClassName = translateClassNamesHACK_migration_v16_v17(markerClassName)
+            markerClass = Thread.currentThread().contextClassLoader.loadClass(translatedClassName)
         }
         def mdpInstance = null
         switch (className) {

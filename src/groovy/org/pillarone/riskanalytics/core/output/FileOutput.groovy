@@ -6,6 +6,7 @@ public class FileOutput implements ICollectorOutputStrategy {
 
     String resultLocation
     SimulationScope simulationScope
+    String filename = null;
 
     public ICollectorOutputStrategy leftShift(List results) {
 
@@ -25,8 +26,10 @@ public class FileOutput implements ICollectorOutputStrategy {
         return this
     }
 
-    private String getFileName(SingleValueResultPOJO result){
-        return "${resultLocation}${File.separator}${replaceChars(simulationScope.simulation.name)}.tsl"
+    private String getFileName(SingleValueResultPOJO result) {
+        if (filename == null)
+            filename = "${resultLocation}${File.separator}${replaceChars(simulationScope.simulation.name)}.tsl"
+        return filename;
     }
 
     private String replaceChars(String s) {

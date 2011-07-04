@@ -1,6 +1,5 @@
 package org.pillarone.riskanalytics.core.wiring;
 
-import org.pillarone.riskanalytics.core.components.Component;
 import org.pillarone.riskanalytics.core.components.ComposedComponent;
 import org.pillarone.riskanalytics.core.packets.Packet;
 import org.pillarone.riskanalytics.core.packets.PacketList;
@@ -24,22 +23,26 @@ public class TraceableTransmitter extends Transmitter {
             throw new IllegalStateException("No retransmission allowed: " + this);
         }
 
-        if (source.isEmpty() && !ComposedComponent.class.isAssignableFrom(sender.getClass())) {
+        /*if (source.isEmpty() && !ComposedComponent.class.isAssignableFrom(sender.getClass())) {
             source.add(new Packet());
-        }
+        }*/
 
         setMarkers();
+        PacketList targetClone = (PacketList) target.clone();
         filterSource();
 
+        PacketList filteredPackets = ((PacketList) target.clone());
+        filteredPackets.removeAll(targetClone);
+        
         if (!ComposedComponent.class.isAssignableFrom(sender.getClass())) {
 
-            for (Object o : target) {
+            for (Object o : filteredPackets) {
                 if (((Packet) o).id == null)
                     ((Packet) o).id = UUID.randomUUID();
             }
         }
 
-        packetListener.packetSent(this);
+        packetListener.packetSent(this, filteredPackets);
 
         setTransmitted(true);
         notifyReceiver(this);

@@ -136,4 +136,8 @@ abstract public class ComposedComponent extends Component {
     public void optimizeWiring() {
         WiringUtils.optimizeWiring(this);
     }
+
+    public List<Component> getListedComponents() {
+        return new ArrayList<Component>();
+    }
 }

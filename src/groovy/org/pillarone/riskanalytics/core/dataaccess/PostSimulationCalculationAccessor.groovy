@@ -21,6 +21,18 @@ class PostSimulationCalculationAccessor {
         return res
     }
 
+    static Map<String, Double> getKeyFigureResults(SimulationRun simulationRun, String collectorName, String keyFigure) {
+        Map<String, List> valuesMap = [:]
+        def postSimulationCalculations = PostSimulationCalculation.executeQuery("SELECT p.path.pathName, p.field.fieldName, p.period,p.result FROM org.pillarone.riskanalytics.core.output.PostSimulationCalculation as p " +
+                " WHERE p.collector.collectorName = ? and p.run.id = ?  and p.keyFigure = ?", [collectorName, simulationRun.id, keyFigure])
+        for (def s: postSimulationCalculations) {
+            String key = s[0] + ":" + s[1] + ":" + s[2]
+            if (s[3])
+                valuesMap[key] = s[3]
+        }
+        return valuesMap
+    }
+
     static def getResult(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName, String keyFigure, def keyFigureParameter) {
         if (keyFigureParameter == null) {
             return getResult(simulationRun, periodIndex, pathName, collectorName, fieldName, keyFigure)

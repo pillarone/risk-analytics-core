@@ -442,6 +442,11 @@ class Parameterization extends ParametrizedItem {
             original.comments << comment.toConfigObject()
         }
 
+        original.tags = []
+        tags.each {Tag tag ->
+            original.tags << tag.toString()
+        }
+
         return original
     }
 

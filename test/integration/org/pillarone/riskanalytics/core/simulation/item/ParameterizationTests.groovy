@@ -12,12 +12,12 @@ import org.pillarone.riskanalytics.core.parameter.comment.ParameterizationCommen
 import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowCommentDAO
 import org.pillarone.riskanalytics.core.parameterization.validation.TestValidationService
 import org.pillarone.riskanalytics.core.parameterization.validation.ValidatorRegistry
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 import org.pillarone.riskanalytics.core.simulation.item.parameter.StringParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
 import org.pillarone.riskanalytics.core.workflow.Status
-import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
-import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 
 class ParameterizationTests extends GroovyTestCase {
 
@@ -402,7 +402,7 @@ class ParameterizationTests extends GroovyTestCase {
         ConfigObject configObject = parameterization.toConfigObject()
 
 
-        assertEquals 7, configObject.size()
+        assertEquals 8, configObject.size()
         assertTrue configObject.containsKey("applicationVersion")
         assertTrue configObject.containsKey("periodLabels")
         assertEquals CoreModel, configObject.model
@@ -417,7 +417,7 @@ class ParameterizationTests extends GroovyTestCase {
 
         parameterization.periodLabels = ["Q1"]
         configObject = parameterization.toConfigObject()
-        assertEquals 7, configObject.size()
+        assertEquals 8, configObject.size()
         assertEquals "periodLabels", ["Q1"], configObject.periodLabels
     }
 

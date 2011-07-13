@@ -104,4 +104,7 @@ public class Packet implements Cloneable, Comparable {
     public IComponentMarker getMarkedSender(Class<? extends IComponentMarker> marker) {
         return markers.get(marker);
     }
+
+    public void initDefaultPacket(){
+    }
 }

@@ -23,9 +23,16 @@ public class TraceableTransmitter extends Transmitter {
             throw new IllegalStateException("No retransmission allowed: " + this);
         }
 
-        /*if (source.isEmpty() && !ComposedComponent.class.isAssignableFrom(sender.getClass())) {
-            source.add(new Packet());
-        }*/
+        if (source.isEmpty() && !ComposedComponent.class.isAssignableFrom(sender.getClass())) {
+            try {
+                Packet p=(Packet) source.getType().newInstance();
+                p.initDefaultPacket();
+                p.setOrigin(sender);
+                source.add(p);
+            } catch (Exception e) {
+                
+            }
+        }
 
         setMarkers();
         PacketList targetClone = (PacketList) target.clone();
@@ -33,7 +40,7 @@ public class TraceableTransmitter extends Transmitter {
 
         PacketList filteredPackets = ((PacketList) target.clone());
         filteredPackets.removeAll(targetClone);
-        
+
         if (!ComposedComponent.class.isAssignableFrom(sender.getClass())) {
 
             for (Object o : filteredPackets) {

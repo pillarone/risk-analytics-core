@@ -11,6 +11,8 @@ public class FileConstants {
     public static final String TEMP_FILE_DIRECTORY;
     public static final String EXTERNAL_DATABASE_DIRECTORY;
     public static final String COMMENT_FILE_DIRECTORY;
+    public static final String COMMENT_PDF_DIRECTORY;
+    public static final String REPORT_PDF_DIRECTORY;
 
     static {
         String baseDir = System.getProperty("p1.temp");
@@ -44,6 +46,16 @@ public class FileConstants {
 
         COMMENT_FILE_DIRECTORY = BASE_DATA_DIRECTORY + File.separatorChar + "commentFiles";
         file = new File(COMMENT_FILE_DIRECTORY);
+        file.mkdirs();
+        assert file.exists();
+
+        COMMENT_PDF_DIRECTORY = BASE_DATA_DIRECTORY + File.separatorChar + "commentPDFs";
+        file = new File(COMMENT_PDF_DIRECTORY);
+        file.mkdirs();
+        assert file.exists();
+
+        REPORT_PDF_DIRECTORY = BASE_DATA_DIRECTORY + File.separatorChar + "reportPDFs";
+        file = new File(REPORT_PDF_DIRECTORY);
         file.mkdirs();
         assert file.exists();
 

@@ -181,9 +181,9 @@ class ParameterHolderFactory {
      * @param componentPath
      * @return model path of all parameters referencing the component using its marker interface
      */
-    public static List<String> referencingParametersPaths(Parameterization parameterization, String componentPath) {
+    public static List<String> referencingParametersPaths(Parameterization parameterization, String componentPath, Component component) {
         String componentName = ComponentUtils.getComponentNormalizedName(componentPath)
-        Class markerInterface = getMarkerInterface(parameterization, componentPath)
+        Class markerInterface = getMarkerInterface(component)
         List<ParameterHolder> markerParameterHolders = affectedParameterHolders(parameterization, markerInterface, componentPath)
         List<String> referencingPaths = []
         for (ParameterHolder parameterHolder: markerParameterHolders) {

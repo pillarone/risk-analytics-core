@@ -249,7 +249,10 @@ public class GroovyUtils {
                     try {
                         text = bundle.getString(key)
                         text = MessageFormat.format(text, args)
-                    } catch (Exception ex) { text = null}
+                    }
+                    catch (MissingResourceException ex) {
+                        text = null
+                    }
                 }
             }
         }

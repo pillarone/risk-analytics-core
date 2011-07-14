@@ -21,6 +21,7 @@ class Comment implements Cloneable {
     boolean added = false
     boolean updated = false
     boolean deleted = false
+    final static String POST_LOCKING = "post locking"
 
     protected Comment() { }
 
@@ -151,7 +152,7 @@ class Comment implements Cloneable {
         StringBuilder sb = new StringBuilder("\"\"[")
         String newComment = replaceCharacters(comment)
         sb.append("path:'${path}', period:${period}, lastChange:new org.joda.time.DateTime(${lastChange.millis}),user:null, comment: ${c}\"${c}\"${c}\"${newComment}${c}\"${c}\"${c}\"")
-        if (tags && !tags.isEmpty()) sb.append(", " + GroovyUtils.toString("tags", tags*.name))
+        if (tags && !tags.isEmpty()) sb.append(", " + GroovyUtils.toString("tags", tags*.name - [POST_LOCKING]))
         if (files && !files.isEmpty()) sb.append(", " + GroovyUtils.toString("files", files as List))
         sb.append("]\"\"")
         return sb.toString()
@@ -171,7 +172,7 @@ class Comment implements Cloneable {
         clone.user = user
         clone.comment = comment
         clone.lastChange = (DateTime) new DateTime(lastChange.millis)
-        clone.tags = (Set) tags.clone()
+        clone.tags = tags.findAll {it.name != POST_LOCKING}.clone() as Set
         clone.files = (Set) files.clone()
 
         clone.added = false

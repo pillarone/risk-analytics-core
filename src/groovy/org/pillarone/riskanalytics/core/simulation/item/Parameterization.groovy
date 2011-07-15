@@ -209,6 +209,18 @@ class Parameterization extends ParametrizedItem {
         }
     }
 
+    @Override
+    void addComment(Comment comment) {
+        setChanged(true)
+        super.addComment(comment)
+    }
+
+    @Override
+    void removeComment(Comment comment) {
+        setChanged(true)
+        super.removeComment(comment)
+    }
+
     protected void commentAdded(ParameterizationDAO dao, WorkflowComment comment) {
         WorkflowCommentDAO commentDAO = new WorkflowCommentDAO(parameterization: dao)
         comment.applyToDomainObject(commentDAO)

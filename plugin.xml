@@ -57,6 +57,9 @@ Persistence &amp; Simulation engine.
     <resource>org.pillarone.riskanalytics.core.user.Person</resource>
     <resource>org.pillarone.riskanalytics.core.user.PersonAuthority</resource>
     <resource>org.pillarone.riskanalytics.core.user.UserSettings</resource>
+    <resource>org.pillarone.riskanalytics.core.user.itemuse.UserUsedItem</resource>
+    <resource>org.pillarone.riskanalytics.core.user.itemuse.item.UserUsedParameterization</resource>
+    <resource>org.pillarone.riskanalytics.core.user.itemuse.item.UserUsedSimulationRun</resource>
     <resource>org.pillarone.riskanalytics.core.workflow.AuditLog</resource>
     <resource>DBCleanUpJob</resource>
     <resource>org.pillarone.riskanalytics.core.output.batch.BatchRunner</resource>

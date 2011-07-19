@@ -8,8 +8,10 @@ import org.pillarone.riskanalytics.core.output.DeleteSimulationStrategy
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.parameter.Parameter
+import org.pillarone.riskanalytics.core.parameter.SimulationTag
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 import org.pillarone.riskanalytics.core.parameter.comment.ResultCommentDAO
+import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.FunctionComment
 
@@ -33,12 +35,13 @@ class Simulation extends ParametrizedItem {
     String comment
 
     List<ParameterHolder> runtimeParameters = []
-
+    List<Tag> tags
 
     private SimulationRun run
 
     public Simulation(String name) {
         super(name)
+        tags = []
     }
 
     protected Object createDao() {
@@ -73,6 +76,7 @@ class Simulation extends ParametrizedItem {
         run.modificationDate = modificationDate
         run.randomSeed = randomSeed
         saveComments(run)
+        saveTags(run)
         saveParameters(runtimeParameters, run.runtimeParameters, run)
         println()
     }
@@ -103,6 +107,7 @@ class Simulation extends ParametrizedItem {
         if (completeLoad) {
             loadComments(run)
             loadParameters(runtimeParameters, run.runtimeParameters)
+            tags = run.tags*.tag
         }
     }
 
@@ -139,6 +144,40 @@ class Simulation extends ParametrizedItem {
             comments << new FunctionComment(c)
         }
 
+    }
+
+    protected void saveTags(SimulationRun run) {
+        List tagsToRemove = []
+        for (SimulationTag tag in run.tags) {
+            if (!tags.contains(tag.tag)) {
+                tagsToRemove << tag
+            }
+        }
+        for (SimulationTag tag in tagsToRemove) {
+            run.removeFromTags(tag)
+
+        }
+        tagsToRemove.each {it.delete()}
+
+        for (Tag tag in tags) {
+            if (!run.tags*.tag?.contains(tag)) {
+                run.addToTags(new SimulationTag(tag: tag))
+            }
+        }
+    }
+
+    public void setTags(Set selectedTags) {
+        selectedTags.each {Tag tag ->
+            if (!tags.contains(tag))
+                tags << tag
+        }
+        List tagsToRemove = []
+        tags.each {Tag tag ->
+            if (!selectedTags.contains(tag))
+                tagsToRemove << tag
+        }
+        if (tagsToRemove.size() > 0)
+            tags.removeAll(tagsToRemove)
     }
 
     /**

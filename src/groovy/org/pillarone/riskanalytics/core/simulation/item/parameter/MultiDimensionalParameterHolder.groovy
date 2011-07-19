@@ -1,10 +1,10 @@
 package org.pillarone.riskanalytics.core.simulation.item.parameter
 
+import org.pillarone.riskanalytics.core.parameter.MultiDimensionalParameter
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameterization.AbstractMultiDimensionalParameter
-import org.pillarone.riskanalytics.core.parameter.MultiDimensionalParameter
-import org.pillarone.riskanalytics.core.parameterization.ConstrainedMultiDimensionalParameter
 import org.pillarone.riskanalytics.core.parameterization.ComboBoxTableMultiDimensionalParameter
+import org.pillarone.riskanalytics.core.parameterization.ConstrainedMultiDimensionalParameter
 
 class MultiDimensionalParameterHolder extends ParameterHolder implements IMarkerValueAccessor {
 
@@ -53,7 +53,7 @@ class MultiDimensionalParameterHolder extends ParameterHolder implements IMarker
             paths.add(path)
         }
         else if ((value instanceof ComboBoxTableMultiDimensionalParameter) && markerInterface.is(value.markerClass)) {
-            if (value.values.indexOf(refValue) > -1) {
+            if (value.values[0].indexOf(refValue) > -1) {
                 paths.add(path)
             }
         }
@@ -67,7 +67,7 @@ class MultiDimensionalParameterHolder extends ParameterHolder implements IMarker
                 ((ConstrainedMultiDimensionalParameter) value).updateReferenceValues(markerInterface, oldValue, newValue)
             }
             else if (value instanceof ComboBoxTableMultiDimensionalParameter) {
-                int row = value.values.indexOf(oldValue)
+                int row = value.values[0].indexOf(oldValue)
                 row += value.getTitleRowCount()
                 if (row > -1) {
                     value.setValueAt newValue, row, 0

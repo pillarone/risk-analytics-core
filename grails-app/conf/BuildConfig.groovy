@@ -22,7 +22,7 @@ grails.project.dependency.resolution = {
         runtime ":spring-security-core:1.1.2"
         runtime ":tomcat:1.3.7"
 
-        test ":code-coverage:1.2.2"
+        test ":code-coverage:1.2.4"
     }
 }
 
@@ -43,6 +43,8 @@ grails.project.dependency.distribution = {
 }
 
 coverage {
+    enabledByDefault = true
+    xml = true
     exclusions = [
             'models/**',
             '**/*Test*',

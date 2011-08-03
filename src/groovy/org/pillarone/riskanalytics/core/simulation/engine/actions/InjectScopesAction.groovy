@@ -38,6 +38,7 @@ public class InjectScopesAction implements Action {
             }
 
             createStoreForComponentIfNeeded(component)
+            component.idGenerator = simulationScope.idGenerator
 
         }
 

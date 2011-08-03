@@ -27,6 +27,7 @@ class CoreModelTests extends ModelTest {
 
         CoreModel model = runner.currentScope.model
         assertEquals(10, model.exampleInputOutputComponent.runtimeInt)
+        assertTrue(model.exampleInputOutputComponent.doCalculationCalled)
     }
 
 

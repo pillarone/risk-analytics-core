@@ -27,6 +27,7 @@ class CoreModel extends StochasticModel {
         exampleInputOutputComponent = new ExampleInputOutputComponent()
         dynamicComponent = new ExampleDynamicComponent()
         parameterComponent = new ExampleParameterComponent()
+        addStartComponent(exampleInputOutputComponent)
     }
 
     void wireComponents() {

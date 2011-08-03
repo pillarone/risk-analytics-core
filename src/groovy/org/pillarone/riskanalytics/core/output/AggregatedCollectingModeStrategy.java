@@ -1,9 +1,12 @@
 package org.pillarone.riskanalytics.core.output;
 
-import org.pillarone.riskanalytics.core.packets.PacketList;
+import org.pillarone.riskanalytics.core.output.aggregation.SumAggregator;
 import org.pillarone.riskanalytics.core.packets.Packet;
+import org.pillarone.riskanalytics.core.packets.PacketList;
 
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class AggregatedCollectingModeStrategy extends AbstractCollectingModeStrategy {
 
@@ -14,22 +17,14 @@ public class AggregatedCollectingModeStrategy extends AbstractCollectingModeStra
 
 
     public List<SingleValueResultPOJO> collect(PacketList packets) throws IllegalAccessException {
-        Packet p = (Packet) packets.get(0);
-        Map packetValues = p.getValuesToSave();
-        for (int i = 1; i < packets.size(); i++) {
-            p = (Packet) packets.get(i);
-            Map valuesToAggregate = p.getValuesToSave();
-            Set<Map.Entry> entrySet = valuesToAggregate.entrySet();
-            for (Map.Entry entry : entrySet) {
-                packetValues.put(entry.getKey(), ((Double)packetValues.get(entry.getKey())) + ((Double)entry.getValue()));
-            }
-        }
-        return createSingleValueResults((Packet) packets.get(0), packetValues, 0);
+        SumAggregator sumAggregator = new SumAggregator();
+        Packet aggregatedPacket = sumAggregator.aggregate(packets);
+        return createSingleValueResults((Packet) packets.get(0), aggregatedPacket.getValuesToSave(), 0);
     }
 
     public String getDisplayName(Locale locale) {
         if (displayName == null) {
-            displayName = ResourceBundle.getBundle(RESOURCE_BUNDLE, locale).getString("ICollectingModeStrategy."+IDENTIFIER);
+            displayName = ResourceBundle.getBundle(RESOURCE_BUNDLE, locale).getString("ICollectingModeStrategy." + IDENTIFIER);
         }
         return displayName;
     }

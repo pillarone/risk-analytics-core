@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.output;
 
-import org.pillarone.riskanalytics.core.output.aggregation.SumAggregator;
+import org.pillarone.riskanalytics.core.output.aggregation.IPacketAggregator;
+import org.pillarone.riskanalytics.core.output.aggregation.PacketAggregatorRegistry;
 import org.pillarone.riskanalytics.core.packets.Packet;
 import org.pillarone.riskanalytics.core.packets.PacketList;
 
@@ -17,7 +18,7 @@ public class AggregatedCollectingModeStrategy extends AbstractCollectingModeStra
 
 
     public List<SingleValueResultPOJO> collect(PacketList packets) throws IllegalAccessException {
-        SumAggregator sumAggregator = new SumAggregator();
+        IPacketAggregator<Packet> sumAggregator = PacketAggregatorRegistry.getAggregator(packets.get(0).getClass());
         Packet aggregatedPacket = sumAggregator.aggregate(packets);
         return createSingleValueResults((Packet) packets.get(0), aggregatedPacket.getValuesToSave(), 0);
     }

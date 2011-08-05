@@ -1,13 +1,14 @@
 package org.pillarone.riskanalytics.core.example.component
 
 import org.pillarone.riskanalytics.core.components.Component
+import org.pillarone.riskanalytics.core.components.InitializingComponent
 import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObject
 import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObjectClassifier
 import org.pillarone.riskanalytics.core.packets.Packet
 import org.pillarone.riskanalytics.core.packets.PacketList
-import org.pillarone.riskanalytics.core.components.InitializingComponent
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
-import junit.framework.Assert
+import static junit.framework.Assert.*
+import org.pillarone.riskanalytics.core.simulation.engine.id.IIdGenerator
 
 class ExampleInputOutputComponent extends Component implements InitializingComponent {
 
@@ -21,14 +22,23 @@ class ExampleInputOutputComponent extends Component implements InitializingCompo
     int globalInt
     String globalString
 
-    protected void doCalculation() {
+    Integer runtimeInt = 1
 
+    boolean doCalculationCalled = false
+
+    protected void doCalculation() {
+        IIdGenerator generator = getIdGenerator()
+        assertNotNull(generator)
+        String firstId = generator.nextValue()
+        assertNotNull(firstId)
+        assertFalse(firstId.equals(generator.nextValue()))
+        doCalculationCalled = true
     }
 
     void afterParameterInjection(SimulationScope scope) {
         injectedScope = scope
-        Assert.assertNotNull globalString
-        Assert.assertEquals 1, globalInt
+        assertNotNull globalString
+        assertEquals 1, globalInt
     }
 
 

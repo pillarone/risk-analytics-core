@@ -25,4 +25,10 @@ class LimitedContinuousPeriodCounter extends ContinuousPeriodCounter implements 
     DateTime endOfLastPeriod() {
         endOfPeriod(numberOfPeriods)
     }
+
+    @Override
+    String toString() {
+        return startOfFirstPeriod().toString() + ", number of periods: " + periodCount()
+    }
+
 }

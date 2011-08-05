@@ -70,6 +70,12 @@ abstract class ResultAccessor {
         }
     }
 
+    static Map<String, Double> getMeans(SimulationRun simulationRun, String collectorName) {
+        if (simulationRun.iterations == 1) {
+            return DeterminsiticResultAccessor.getSingleValues(simulationRun, collectorName)
+        }
+        return PostSimulationCalculationAccessor.getKeyFigureResults(simulationRun, collectorName, PostSimulationCalculation.MEAN)
+    }
 
     static Double getMin(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
         int pathId = getPathId(pathName, simulationRun.id);

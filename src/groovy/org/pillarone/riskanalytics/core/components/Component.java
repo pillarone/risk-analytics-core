@@ -6,6 +6,7 @@ import org.pillarone.riskanalytics.core.model.ModelPath;
 import org.pillarone.riskanalytics.core.model.ModelPathComponent;
 import org.pillarone.riskanalytics.core.packets.PacketList;
 import org.pillarone.riskanalytics.core.parameterization.IParameterObject;
+import org.pillarone.riskanalytics.core.simulation.engine.id.IIdGenerator;
 import org.pillarone.riskanalytics.core.util.GroovyUtils;
 import org.pillarone.riskanalytics.core.wiring.ITransmitter;
 
@@ -23,9 +24,10 @@ abstract public class Component implements Cloneable {
     private List<PacketList> inChannels = new ArrayList<PacketList>();
     private List<PacketList> outChannels = new ArrayList<PacketList>();
     private int transmitCount = 0;
+    private IIdGenerator idGenerator;
     // todo(mwy): how to make sure that only classes derived of IComponentMarker are part of the list?
     private List<Class> markerList = new ArrayList<Class>();
-
+    
     protected Component() {
         for (Class intf : this.getClass().getInterfaces()) {
             if (IComponentMarker.class.isAssignableFrom(intf)) {
@@ -38,6 +40,14 @@ abstract public class Component implements Cloneable {
     protected final static Integer N = Integer.MAX_VALUE; 
 
     abstract protected void doCalculation();
+
+    public void setIdGenerator(IIdGenerator idGenerator) {
+        this.idGenerator = idGenerator;
+    }
+
+    public IIdGenerator getIdGenerator() {
+        return idGenerator;
+    }
 
     public List<ITransmitter> getAllInputTransmitter() {
         return allInputTransmitter;

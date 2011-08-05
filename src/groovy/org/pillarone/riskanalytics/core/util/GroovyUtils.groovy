@@ -1,11 +1,12 @@
 package org.pillarone.riskanalytics.core.util
 
+import org.joda.time.DateTime
+
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import java.text.MessageFormat
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
 
@@ -248,7 +249,10 @@ public class GroovyUtils {
                     try {
                         text = bundle.getString(key)
                         text = MessageFormat.format(text, args)
-                    } catch (Exception ex) { text = null}
+                    }
+                    catch (MissingResourceException ex) {
+                        text = null
+                    }
                 }
             }
         }
@@ -269,5 +273,17 @@ public class GroovyUtils {
                 LOG.error "Failed to remove meta class of script after using config slurper - possible memory leak."
             }
         }
+    }
+
+    public static String toString(String attributeName, List<String> values) {
+        StringBuilder sb = new StringBuilder()
+        sb.append(attributeName + ":([")
+        values.eachWithIndex {String value, int index ->
+            sb.append("'" + value + "'")
+            if (index != values.size() - 1)
+                sb.append(",")
+        }
+        sb.append("] as Set)")
+        return sb.toString()
     }
 }

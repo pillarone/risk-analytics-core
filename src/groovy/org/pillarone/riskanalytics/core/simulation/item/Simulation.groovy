@@ -7,12 +7,16 @@ import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.output.DeleteSimulationStrategy
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.output.SimulationRun
+import org.pillarone.riskanalytics.core.parameter.Parameter
+import org.pillarone.riskanalytics.core.parameter.SimulationTag
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 import org.pillarone.riskanalytics.core.parameter.comment.ResultCommentDAO
-import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
+import org.pillarone.riskanalytics.core.parameter.comment.Tag
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.FunctionComment
 import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 
-class Simulation extends CommentableItem {
+class Simulation extends ParametrizedItem {
 
     Parameterization parameterization
     ResultConfiguration template
@@ -31,11 +35,14 @@ class Simulation extends CommentableItem {
 
     String comment
 
+    List<ParameterHolder> runtimeParameters = []
+    List<Tag> tags
 
     private SimulationRun run
 
     public Simulation(String name) {
         super(name)
+        tags = []
     }
 
     protected Object createDao() {
@@ -70,6 +77,9 @@ class Simulation extends CommentableItem {
         run.modificationDate = modificationDate
         run.randomSeed = randomSeed
         saveComments(run)
+        saveTags(run)
+        saveParameters(runtimeParameters, run.runtimeParameters, run)
+        println()
     }
 
     protected void mapFromDao(def source, boolean completeLoad) {
@@ -98,16 +108,78 @@ class Simulation extends CommentableItem {
         randomSeed = run.randomSeed
         if (completeLoad) {
             loadComments(run)
+            loadParameters(runtimeParameters, run.runtimeParameters)
+            tags = run.tags*.tag
         }
+    }
+
+    @Override
+    protected void addToDao(Parameter parameter, Object dao) {
+        dao = dao as SimulationRun
+        dao.addToRuntimeParameters(parameter)
+    }
+
+    @Override
+    protected void removeFromDao(Parameter parameter, Object dao) {
+        dao = dao as SimulationRun
+        dao.removeFromRuntimeParameters(parameter)
+    }
+
+    void addParameter(ParameterHolder parameter) {
+        runtimeParameters << parameter
+        parameter.added = true
+    }
+
+    void removeParameter(ParameterHolder parameter) {
+        if (parameter.added) {
+            runtimeParameters.remove(parameter)
+            return
+        }
+        parameter.removed = true
+        parameter.modified = false
     }
 
     private void loadComments(SimulationRun dao) {
         comments = []
 
         for (ResultCommentDAO c in dao.comments) {
-            comments << new Comment(c)
+            comments << new FunctionComment(c)
         }
 
+    }
+
+    protected void saveTags(SimulationRun run) {
+        List tagsToRemove = []
+        for (SimulationTag tag in run.tags) {
+            if (!tags.contains(tag.tag)) {
+                tagsToRemove << tag
+            }
+        }
+        for (SimulationTag tag in tagsToRemove) {
+            run.removeFromTags(tag)
+
+        }
+        tagsToRemove.each {it.delete()}
+
+        for (Tag tag in tags) {
+            if (!run.tags*.tag?.contains(tag)) {
+                run.addToTags(new SimulationTag(tag: tag))
+            }
+        }
+    }
+
+    public void setTags(Set selectedTags) {
+        selectedTags.each {Tag tag ->
+            if (!tags.contains(tag))
+                tags << tag
+        }
+        List tagsToRemove = []
+        tags.each {Tag tag ->
+            if (!selectedTags.contains(tag))
+                tagsToRemove << tag
+        }
+        if (tagsToRemove.size() > 0)
+            tags.removeAll(tagsToRemove)
     }
 
     /**

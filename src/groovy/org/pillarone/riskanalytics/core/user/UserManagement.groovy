@@ -21,4 +21,8 @@ class UserManagement {
         SpringSecurityService securityService = ApplicationHolder.application.mainContext.getBean("springSecurityService")
         return securityService
     }
+
+    public static boolean isLoggedIn() {
+        return getSpringSecurityService().isLoggedIn()
+    }
 }

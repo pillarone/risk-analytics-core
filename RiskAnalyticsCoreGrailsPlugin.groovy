@@ -2,6 +2,8 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pillarone.riskanalytics.core.util.GrailsConfigValidator
 import org.pillarone.riskanalytics.core.output.batch.results.GenericBulkInsert as GenericResultBulkInsert
 import org.pillarone.riskanalytics.core.output.batch.calculations.GenericBulkInsert as GenericCalculationBulkInsert
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.joda.time.DateTimeZone
 import org.pillarone.riskanalytics.core.example.migration.TestConstrainedTable
 import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
 import org.pillarone.riskanalytics.core.output.CollectingModeFactory
@@ -14,13 +16,16 @@ import org.springframework.remoting.rmi.RmiProxyFactoryBean
 import org.springframework.remoting.rmi.RmiServiceExporter
 import org.pillarone.riskanalytics.core.remoting.IResultService
 import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
+import org.pillarone.riskanalytics.core.output.aggregation.PacketAggregatorRegistry
+import org.pillarone.riskanalytics.core.packets.Packet
+import org.pillarone.riskanalytics.core.output.aggregation.SumAggregator
 import org.pillarone.riskanalytics.core.remoting.impl.ResultService
 import org.pillarone.riskanalytics.core.parameterization.ConstraintsFactory
 import org.pillarone.riskanalytics.core.parameterization.SimpleConstraint
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.4-ALPHA-2.5.6-kti"
+    def version = "1.4-ALPHA-7-kti"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.7 > *"
     // the other plugins this plugin depends on
@@ -108,6 +113,12 @@ Persistence & Simulation engine.
     }
 
     def doWithApplicationContext = {applicationContext ->
+
+        /** Setting the default time zone to UTC avoids problems in multi user context with different time zones
+         *  and switches off daylight saving capabilities and possible related problems.          */
+        DateTimeZone.setDefault(DateTimeZone.UTC)
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
+
         //Checks at startup if certain config options required for the core are set and sets defaults otherwise
         ConfigObject grailsConfig = ConfigurationHolder.config
         def standardCalculatorOutput = [
@@ -129,6 +140,8 @@ Persistence & Simulation engine.
 
         ConstraintsFactory.registerConstraint(new SimpleConstraint())
         ConstraintsFactory.registerConstraint(new TestConstrainedTable())
+
+        PacketAggregatorRegistry.registerAggregator(Packet, new SumAggregator())
     }
 
     def onChange = {event ->

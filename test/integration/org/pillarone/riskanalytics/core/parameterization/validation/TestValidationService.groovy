@@ -3,16 +3,15 @@ package org.pillarone.riskanalytics.core.parameterization.validation
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.StringParameterHolder
 
-
 class TestValidationService implements IParameterizationValidator {
 
-    List<ParameterValidationError> validate(List<ParameterHolder> parameters) {
-        List<ParameterValidationError> errors = []
+    List<ParameterValidation> validate(List<ParameterHolder> parameters) {
+        List<ParameterValidation> errors = []
 
         for (ParameterHolder param in parameters) {
             if (param instanceof StringParameterHolder) {
                 if (param.businessObject == "INVALID") {
-                    errors << new TestError("invalid", [])
+                    errors << new TestError(ValidationType.ERROR, "invalid", [])
                 }
             }
         }
@@ -23,10 +22,10 @@ class TestValidationService implements IParameterizationValidator {
 
 }
 
-class TestError extends ParameterValidationError {
+class TestError extends ParameterValidation {
 
-    def TestError(message, arguments) {
-        super(message, arguments);
+    def TestError(ValidationType validationType, message, arguments) {
+        super(validationType, message, arguments);
     }
 
     String getLocalizedMessage(Locale locale) {

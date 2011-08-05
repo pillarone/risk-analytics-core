@@ -13,7 +13,7 @@ public class TableMultiDimensionalParameter extends AbstractMultiDimensionalPara
     public TableMultiDimensionalParameter(List cellValues, List titles) {
         super(cellValues);
         this.titles = titles;
-        if (!valuesConverted && (cellValues.size() != titles.size())) {
+        if (!cellValues.isEmpty() && cellValues.size() != titles.size()) {
             if ((cellValues.get(0) instanceof List) && ((List) cellValues.get(0)).size() != 0) {
                 throw new IllegalArgumentException("cell values and titles must be of same dimension but were " +
                         "cell values: " + cellValues.size() +

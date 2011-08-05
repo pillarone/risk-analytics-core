@@ -5,7 +5,8 @@ import groovy.sql.Sql
 import org.pillarone.riskanalytics.core.parameterization.AbstractMultiDimensionalParameter
 import org.pillarone.riskanalytics.core.parameterization.*
 import org.springframework.jdbc.datasource.DataSourceUtils
-import java.sql.Connection
+
+import org.pillarone.riskanalytics.core.util.DatabaseUtils
 
 class MultiDimensionalParameter extends Parameter {
 
@@ -41,6 +42,24 @@ class MultiDimensionalParameter extends Parameter {
         constraintName = value instanceof ConstrainedMultiDimensionalParameter ? value.constraints.name : null
         removeObsoleteParameters(value.valueRowCount, value.valueColumnCount)
         removeObsoleteTitles(value.rowCount, value.columnCount)
+    }
+
+    private static Map CLASS_NAMES_FROM_v16_TO_v17 =
+    ["org.pillarone.riskanalytics.domain.pc.underwriting.IUnderwritingInfoMarker"
+            : "org.pillarone.riskanalytics.domain.utils.marker.IUnderwritingInfoMarker",
+     "org.pillarone.riskanalytics.domain.pc.generators.claims.PerilMarker"
+      : "org.pillarone.riskanalytics.domain.utils.marker.IPerilMarker"]
+
+    private String translateClassNamesHACK_migration_v16_v17(String name) {
+        if (! CLASS_NAMES_FROM_v16_TO_v17.containsKey(name)) {
+            return name
+        }
+        try {
+            Class.forName(name)
+            return name
+        } catch (ClassNotFoundException e) {
+            return CLASS_NAMES_FROM_v16_TO_v17.get(name)
+        }
     }
 
     private void extractRowTitles(List titles, int offset) {
@@ -135,34 +154,35 @@ class MultiDimensionalParameter extends Parameter {
      */
     public Object getParameterInstance() {
         //TODO: check how this affects performance
-//        if (parameterObject == null) {
-            Class clazz = Thread.currentThread().contextClassLoader.loadClass(className)
-            Class markerClass
-            if (markerClassName != null) {
-                markerClass = Thread.currentThread().contextClassLoader.loadClass(markerClassName)
-            }
-            def mdpInstance = null
-            switch (className) {
-                case SimpleMultiDimensionalParameter.name:
-                    mdpInstance = clazz.newInstance([getCellValues()] as Object[])
-                    break;
-                case TableMultiDimensionalParameter.name:
-                    mdpInstance = clazz.newInstance([getCellValues(), getColumnTitles()] as Object[])
-                    break;
-                case MatrixMultiDimensionalParameter.name:
-                    mdpInstance = clazz.newInstance([getCellValues(), getRowTitles(), getColumnTitles()] as Object[])
-                    break;
-                case ComboBoxMatrixMultiDimensionalParameter.name:
-                    mdpInstance = clazz.newInstance([getCellValues(), getColumnTitles(), markerClass] as Object[])
-                    break;
-                case ComboBoxTableMultiDimensionalParameter.name:
-                    mdpInstance = clazz.newInstance([getCellValues(), getColumnTitles(), markerClass] as Object[])
-                    break;
-                case ConstrainedMultiDimensionalParameter.name:
-                    mdpInstance = clazz.newInstance([getCellValues(), getColumnTitles(), ConstraintsFactory.getConstraints(constraintName)] as Object[])
-                    break;
-            }
-            parameterObject = mdpInstance
+        //        if (parameterObject == null) {
+        Class clazz = Thread.currentThread().contextClassLoader.loadClass(className)
+        Class markerClass
+        if (markerClassName != null) {
+            String translatedClassName = translateClassNamesHACK_migration_v16_v17(markerClassName)
+            markerClass = Thread.currentThread().contextClassLoader.loadClass(translatedClassName)
+        }
+        def mdpInstance = null
+        switch (className) {
+            case SimpleMultiDimensionalParameter.name:
+                mdpInstance = clazz.newInstance([getCellValues()] as Object[])
+                break;
+            case TableMultiDimensionalParameter.name:
+                mdpInstance = clazz.newInstance([getCellValues(), getColumnTitles()] as Object[])
+                break;
+            case MatrixMultiDimensionalParameter.name:
+                mdpInstance = clazz.newInstance([getCellValues(), getRowTitles(), getColumnTitles()] as Object[])
+                break;
+            case ComboBoxMatrixMultiDimensionalParameter.name:
+                mdpInstance = clazz.newInstance([getCellValues(), getColumnTitles(), markerClass] as Object[])
+                break;
+            case ComboBoxTableMultiDimensionalParameter.name:
+                mdpInstance = clazz.newInstance([getCellValues(), getColumnTitles(), markerClass] as Object[])
+                break;
+            case ConstrainedMultiDimensionalParameter.name:
+                mdpInstance = clazz.newInstance([getCellValues(), getColumnTitles(), ConstraintsFactory.getConstraints(constraintName)] as Object[])
+                break;
+        }
+        parameterObject = mdpInstance
 //        }
         return parameterObject
     }
@@ -179,7 +199,11 @@ class MultiDimensionalParameter extends Parameter {
         List result = []
         Sql sql = new Sql(DataSourceUtils.getConnection(dataSource))
         int i = 0
-        List column = sql.rows("SELECT value FROM multi_dimensional_parameter_value v where v.multi_dimensional_parameter_id = ? and v.col = ? order by v.row", [this.id, i])
+        String query = DatabaseUtils.isOracleDatabase() ?
+            "SELECT value FROM mdp_value v where v.mdp_id = ? and v.col = ? order by v.row_number" :
+            "SELECT value FROM multi_dimensional_parameter_value v where v.multi_dimensional_parameter_id = ? and v.col = ? order by v.row"
+
+        List column = sql.rows(query, [this.id, i])
         while (column.size() > 0) {
             result << column.collect {GroovyRowResult res ->
                 ByteArrayInputStream str = new ByteArrayInputStream(res.getAt(0))
@@ -187,7 +211,7 @@ class MultiDimensionalParameter extends Parameter {
                 return str2.readObject()
             }
             i++
-            column = sql.rows("SELECT value FROM multi_dimensional_parameter_value v where v.multi_dimensional_parameter_id = ? and v.col = ? order by v.row", [this.id, i])
+            column = sql.rows(query, [this.id, i])
         }
         if (result.size() == 0) {
             return []

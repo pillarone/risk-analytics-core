@@ -31,7 +31,7 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertTrue amdp instanceof SimpleMultiDimensionalParameter
         def values = amdp.values
         assertEquals 1, values.size()
-        assertEquals 0, values[0]
+        assertEquals 0, values[0][0]
 
         parameter.discard()
         def reloaded = MultiDimensionalParameter.findByPath('testGetSimpleInstance')

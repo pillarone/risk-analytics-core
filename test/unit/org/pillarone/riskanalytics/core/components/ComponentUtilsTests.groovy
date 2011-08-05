@@ -24,6 +24,8 @@ class ComponentUtilsTests extends GroovyTestCase {
         assertEquals 'ClaimsGenerator', ComponentUtils.removeNamingConventions('subClaimsGenerator')
         assertEquals 'Portion', ComponentUtils.removeNamingConventions('parmPortion')
         assertEquals 'Ultimate', ComponentUtils.removeNamingConventions('outUltimate')
+        assertEquals 'Ultimate', ComponentUtils.removeNamingConventions('globalUltimate')
+        assertEquals 'Ultimate', ComponentUtils.removeNamingConventions('runtimeUltimate')
         assertEquals 'Ultimate', ComponentUtils.removeNamingConventions('Ultimate')
         assertNull ComponentUtils.removeNamingConventions(null)
     }

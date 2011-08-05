@@ -15,13 +15,7 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
     Map<String, ParameterHolder> classifierParameters
 
     public ParameterObjectParameterHolder(Parameter parameter) {
-        super(parameter.path, parameter.periodIndex);
-        classifierParameters = new HashMap<String, ParameterHolder>()
-        this.classifier = Thread.currentThread().contextClassLoader.loadClass(parameter.type.parameterType).valueOf(parameter.type.parameterValue)
-        for (ParameterEntry entry in parameter.parameterEntries) {
-            def holder = ParameterHolderFactory.getHolder(entry.parameterEntryValue)
-            classifierParameters.put(entry.parameterEntryKey, holder)
-        }
+        super(parameter);
     }
 
     public ParameterObjectParameterHolder(String path, int periodIndex, IParameterObject value) {
@@ -30,6 +24,16 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
         this.classifier = value.type
         for (Map.Entry entry in value.parameters) {
             classifierParameters.put(entry.key, ParameterHolderFactory.getHolder(path + ":$entry.key", periodIndex, entry.value))
+        }
+    }
+
+    @Override
+    void setParameter(Parameter parameter) {
+        classifierParameters = new HashMap<String, ParameterHolder>()
+        this.classifier = Thread.currentThread().contextClassLoader.loadClass(parameter.type.parameterType).valueOf(parameter.type.parameterValue)
+        for (ParameterEntry entry in parameter.parameterEntries) {
+            def holder = ParameterHolderFactory.getHolder(entry.parameterEntryValue)
+            classifierParameters.put(entry.parameterEntryKey, holder)
         }
     }
 

@@ -102,6 +102,10 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
         return period
     }
 
+    boolean belongsToCurrentPeriod(DateTime date) {
+        return belongsToPeriod(date) == currentPeriod
+    }
+
     /**
      * @param date
      * @return valuation date at or before date

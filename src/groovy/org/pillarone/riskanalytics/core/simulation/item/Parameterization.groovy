@@ -17,12 +17,12 @@ import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowComme
 import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
 import org.pillarone.riskanalytics.core.parameterization.ParameterWriter
 import org.pillarone.riskanalytics.core.parameterization.validation.IParameterizationValidator
-import org.pillarone.riskanalytics.core.parameterization.validation.ParameterValidationError
+import org.pillarone.riskanalytics.core.parameterization.validation.ParameterValidation
+import org.pillarone.riskanalytics.core.parameterization.validation.ValidationType
 import org.pillarone.riskanalytics.core.parameterization.validation.ValidatorRegistry
 import org.pillarone.riskanalytics.core.simulation.ILimitedPeriodCounter
 import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
-import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
@@ -31,7 +31,7 @@ import org.pillarone.riskanalytics.core.workflow.Status
 import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 
-class Parameterization extends CommentableItem {
+class Parameterization extends ParametrizedItem {
 
     public static final String PERIOD_DATE_FORMAT = "yyyy-MM-dd"
 
@@ -71,6 +71,12 @@ class Parameterization extends CommentableItem {
         parameterHolders = []
         tags = []
         status = Status.NONE
+        periodCount = 1
+    }
+
+    public Parameterization(String name, Class modelClass) {
+        this(name)
+        this.modelClass = modelClass
     }
 
     protected Object createDao() {
@@ -83,12 +89,12 @@ class Parameterization extends CommentableItem {
 
     void validate() {
         valid = false
-        List<ParameterValidationError> errors = []
+        List<ParameterValidation> errors = []
         for (IParameterizationValidator validator in ValidatorRegistry.getValidators()) {
             errors.addAll(validator.validate(parameterHolders.findAll { !it.removed }))
         }
 
-        valid = errors.empty
+        valid = errors.empty || errors.every {ParameterValidation validation -> validation.validationType != ValidationType.ERROR}
         validationErrors = errors
     }
 
@@ -167,31 +173,21 @@ class Parameterization extends CommentableItem {
         dao.status = status
         dao.dealId = dealId
         dao.valuationDate = valuationDate
-        saveParameters(dao)
+        saveParameters(parameterHolders, dao.parameters, dao)
         saveComments(dao)
         saveTags(dao)
     }
 
-    protected void saveParameters(ParameterizationDAO dao) {
-        Iterator<ParameterHolder> iterator = parameterHolders.iterator()
-        while (iterator.hasNext()) {
-            ParameterHolder parameterHolder = iterator.next()
-            if (parameterHolder.hasParameterChanged()) {
-                Parameter parameter = dao.parameters.find { it.path == parameterHolder.path && it.periodIndex == parameterHolder.periodIndex }
-                parameterHolder.applyToDomainObject(parameter)
-                parameterHolder.modified = false
-            } else if (parameterHolder.added) {
-                Parameter newParameter = parameterHolder.createEmptyParameter()
-                parameterHolder.applyToDomainObject(newParameter)
-                dao.addToParameters(newParameter)
-                parameterHolder.added = false
-            } else if (parameterHolder.removed) {
-                Parameter parameter = dao.parameters.find { it.path == parameterHolder.path && it.periodIndex == parameterHolder.periodIndex }
-                dao.removeFromParameters(parameter)
-                parameter.delete()
-                iterator.remove()
-            }
-        }
+    @Override
+    protected void addToDao(Parameter parameter, Object dao) {
+        dao = dao as ParameterizationDAO
+        dao.addToParameters(parameter)
+    }
+
+    @Override
+    protected void removeFromDao(Parameter parameter, Object dao) {
+        dao = dao as ParameterizationDAO
+        dao.removeFromParameters(parameter)
     }
 
     protected void saveTags(ParameterizationDAO dao) {
@@ -212,6 +208,18 @@ class Parameterization extends CommentableItem {
                 dao.addToTags(new ParameterizationTag(tag: tag))
             }
         }
+    }
+
+    @Override
+    void addComment(Comment comment) {
+        setChanged(true)
+        super.addComment(comment)
+    }
+
+    @Override
+    void removeComment(Comment comment) {
+        setChanged(true)
+        super.removeComment(comment)
     }
 
     protected void commentAdded(ParameterizationDAO dao, WorkflowComment comment) {
@@ -265,19 +273,11 @@ class Parameterization extends CommentableItem {
         valuationDate = dao.valuationDate
         comment = dao.comment
         if (completeLoad) {
-            loadParameters(dao)
+            loadParameters(parameterHolders, dao.parameters)
             loadComments(dao)
             tags = dao.tags*.tag
         }
         LOG.info("Parameterization $name loaded in ${System.currentTimeMillis() - time}ms")
-    }
-
-    private void loadParameters(ParameterizationDAO dao) {
-        parameterHolders = []
-
-        for (Parameter p in dao.parameters) {
-            parameterHolders << ParameterHolderFactory.getHolder(p)
-        }
     }
 
     private void loadComments(ParameterizationDAO dao) {
@@ -334,18 +334,7 @@ class Parameterization extends CommentableItem {
     }
 
     public boolean isUsedInSimulation() {
-        if (!isLoaded()) {
-            load()
-        }
-        List<SimulationRun> result = null
-        try {
-            result = SimulationRun.findAllByParameterizationAndToBeDeleted(dao, false)
-        } catch (Exception e) {
-            LOG.error("Exception in method isUsedInSimulation : $e.message", e)
-        }
-        // lock a parameterization as soon as a simulation has started
-        // https://issuetracking.intuitive-collaboration.com/jira/browse/PMO-1242
-        return result.size() > 0
+        return SimulationRun.find("from ${SimulationRun.class.name} as run where run.parameterization.name = ? and run.parameterization.modelClassName = ? and run.parameterization.itemVersion =?", [name, modelClass.name, versionNumber.toString()]) != null
     }
 
     public boolean isEditable() {
@@ -399,7 +388,16 @@ class Parameterization extends CommentableItem {
 
 
     public List<Tag> getTags() {
+        addRemoveLockTag()
         return tags
+    }
+
+    private void addRemoveLockTag() {
+        Tag locked = Tag.findByName("LOCKED")
+        if (!tags.contains(locked) && isUsedInSimulation())
+            tags << locked
+        else if (tags.contains(locked) && !isUsedInSimulation())
+            tags.remove(locked)
     }
 
     public void setTags(Set selectedTags) {
@@ -455,6 +453,11 @@ class Parameterization extends CommentableItem {
         original.comments = []
         comments.each { Comment comment ->
             original.comments << comment.toConfigObject()
+        }
+
+        original.tags = []
+        tags.each {Tag tag ->
+            original.tags << tag.toString()
         }
 
         return original

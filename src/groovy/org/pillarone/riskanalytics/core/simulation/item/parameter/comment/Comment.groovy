@@ -6,6 +6,7 @@ import org.pillarone.riskanalytics.core.parameter.comment.CommentTag
 import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.user.UserManagement
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 class Comment implements Cloneable {
 
@@ -15,10 +16,12 @@ class Comment implements Cloneable {
     Person user
     protected String comment
     private Set<Tag> tags = new HashSet()
+    Set<String> files = new HashSet<String>()
 
     boolean added = false
     boolean updated = false
     boolean deleted = false
+    final static String POST_LOCKING = "post locking"
 
     protected Comment() { }
 
@@ -30,6 +33,9 @@ class Comment implements Cloneable {
         comment = commentDAO.comment
         if (commentDAO.tags?.size() > 0) {
             tags.addAll(commentDAO.tags?.tag)
+        }
+        if (commentDAO.files) {
+            files.addAll(commentDAO.files.split(","))
         }
     }
 
@@ -52,11 +58,24 @@ class Comment implements Cloneable {
             }
             addTag(tag)
         }
+        files = commentMap['files']
         lastChange = commentMap['lastChange']
     }
 
     public List<Tag> getTags() {
         return tags.toList()
+    }
+
+    public void addFile(String file) {
+        files.add(file)
+    }
+
+    public void removeFile(String file) {
+        files.remove(file)
+    }
+
+    public void clearFiles() {
+        files.clear()
     }
 
     public void setTags(Set selectedTags) {
@@ -124,7 +143,7 @@ class Comment implements Cloneable {
                 dao.addToTags(new CommentTag(tag: tag))
             }
         }
-
+        dao.files = files ? files.join(",") : ""
     }
 
     public String toConfigObject() {
@@ -133,15 +152,8 @@ class Comment implements Cloneable {
         StringBuilder sb = new StringBuilder("\"\"[")
         String newComment = replaceCharacters(comment)
         sb.append("path:'${path}', period:${period}, lastChange:new org.joda.time.DateTime(${lastChange.millis}),user:null, comment: ${c}\"${c}\"${c}\"${newComment}${c}\"${c}\"${c}\"")
-        if (tags && !tags.isEmpty()) {
-            sb.append(", tags:([")
-            tags.eachWithIndex {Tag tag, int index ->
-                sb.append("'" + tag.name + "'")
-                if (index != tags.size() - 1)
-                    sb.append(",")
-            }
-            sb.append("] as Set)")
-        }
+        if (tags && !tags.isEmpty()) sb.append(", " + GroovyUtils.toString("tags", tags*.name - [POST_LOCKING]))
+        if (files && !files.isEmpty()) sb.append(", " + GroovyUtils.toString("files", files as List))
         sb.append("]\"\"")
         return sb.toString()
     }
@@ -156,9 +168,12 @@ class Comment implements Cloneable {
     }
 
     public Comment clone() {
-        Comment clone = (Comment) super.clone()
+        Comment clone = this.class.newInstance([path, period] as Object[])
+        clone.user = user
+        clone.comment = comment
         clone.lastChange = (DateTime) new DateTime(lastChange.millis)
-        clone.tags = (Set) tags.clone()
+        clone.tags = tags.findAll {it.name != POST_LOCKING}.clone() as Set
+        clone.files = (Set) files.clone()
 
         clone.added = false
         clone.updated = false

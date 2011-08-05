@@ -63,22 +63,31 @@ public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensiona
 
     public List getValuesAsObjects() {
         List result = new ArrayList();
-        if (valuesConverted) {
-            for (Object o : getValues()) {
+        for (Object o : getValues()) {
+            List l = new ArrayList();
+            for (Object obj : (List) o) {
                 if (!(o instanceof String && ((String) o).length() == 0)) {
-                    result.add(comboBoxValues.get(o));
+                    l.add(comboBoxValues.get(obj));
                 }
-            }
-        } else {
-            for (Object o : getValues()) {
-                List l = new ArrayList();
-                for (Object obj : (List) o) {
-                    if (!(o instanceof String && ((String) o).length() == 0)) {
-                        l.add(comboBoxValues.get(obj));
-                    }
 
+            }
+            result.add(l);
+        }
+        return result;
+    }
+
+    /**
+     * @param subList
+     * @param removeNullElements
+     * @return only the first list returned by getValuesAsObjects() and clears this list if the first element is null
+     */
+    public List getValuesAsObjects(int subList, boolean removeNullElements) {
+        List result = (List) getValuesAsObjects().get(subList);
+        if (removeNullElements && result.size() > 0) {
+            for (int item = result.size() - 1; item >= 0; item--) {
+                if (result.get(item) == null) {
+                    result.remove(item);
                 }
-                result.addAll(l);
             }
         }
         return result;

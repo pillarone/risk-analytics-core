@@ -35,6 +35,7 @@ class StatusChangeServiceTests extends GroovyTestCase {
         existingParameterization.modelClass = EmptyModel
         existingParameterization.periodCount = 0
         existingParameterization.dealId = 1
+        existingParameterization.status = org.pillarone.riskanalytics.core.workflow.Status.DATA_ENTRY
         existingParameterization.versionNumber = new VersionNumber("R1")
         existingParameterization.save()
 

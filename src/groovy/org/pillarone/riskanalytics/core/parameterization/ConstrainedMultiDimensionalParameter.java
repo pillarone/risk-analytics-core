@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.parameterization;
 
+import org.joda.time.DateTime;
 import org.pillarone.riskanalytics.core.components.Component;
 import org.pillarone.riskanalytics.core.components.IComponentMarker;
 import org.pillarone.riskanalytics.core.model.Model;
@@ -133,6 +134,8 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
             result = 0d;
         } else if (columnClass == Integer.class) {
             result = 0;
+        } else if (columnClass == DateTime.class) {
+            result = new DateTime(new DateTime().getYear(), 1, 1, 0, 0, 0, 0);
         } else if (columnClass.isEnum()) {
             result = GroovyUtils.getEnumValuesFromClass(columnClass).get(0);
         } else {

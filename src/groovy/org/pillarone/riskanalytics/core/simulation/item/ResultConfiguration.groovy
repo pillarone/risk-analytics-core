@@ -4,7 +4,6 @@ import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.output.*
 import org.pillarone.riskanalytics.core.ModelDAO
-import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 
 class ResultConfiguration extends ModellingItem {
@@ -122,10 +121,7 @@ class ResultConfiguration extends ModellingItem {
     }
 
     public boolean isUsedInSimulation() {
-        if (!isLoaded()) {
-            load()
-        }
-        return SimulationRun.findByResultConfigurationAndToBeDeleted(dao, false) != null
+        return SimulationRun.find("from ${SimulationRun.class.name} as run where run.resultConfiguration.name = ? and run.resultConfiguration.modelClassName = ? and run.resultConfiguration.itemVersion =?", [name, modelClass.name, versionNumber.toString()]) != null
     }
 
     boolean isEditable() {

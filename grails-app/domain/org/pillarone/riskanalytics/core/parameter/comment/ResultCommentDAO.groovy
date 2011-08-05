@@ -6,6 +6,12 @@ class ResultCommentDAO extends CommentDAO {
 
     SimulationRun simulationRun
 
+    String function
+
     static belongsTo = SimulationRun
+
+    static constraints = {
+        function(nullable: true)
+    }
 
 }

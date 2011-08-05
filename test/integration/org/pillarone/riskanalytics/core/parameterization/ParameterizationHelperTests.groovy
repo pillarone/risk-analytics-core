@@ -1,11 +1,8 @@
 package org.pillarone.riskanalytics.core.parameterization
 
 import models.core.CoreModel
-import org.joda.time.DateTime
-import org.pillarone.riskanalytics.core.parameter.Parameter
-import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObject
 import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObjectClassifier
-import org.pillarone.riskanalytics.core.parameterization.ParameterizationHelper
+import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.parameter.IntegerParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
@@ -61,6 +58,8 @@ class ParameterizationHelperTests extends GroovyTestCase {
         configObject.model = CoreModel
         configObject.periodCount = 2
         configObject.displayName = 'Name'
+        configObject.tags = ['tag1', 'tag2']
+        configObject.comments = ["[path:'path',period:0, lastChange:new org.joda.time.DateTime(${new Date().getTime()}), user:null, comment:'test']"]
         configObject.components.exampleInputOutputComponent.parmParameterObject[0] = ExampleParameterObjectClassifier.TYPE0.getParameterObject(["a": 0, "b": 1])
         configObject.components.exampleInputOutputComponent.parmParameterObject[1] = ExampleParameterObjectClassifier.TYPE1.getParameterObject(["p1": 0, "p2": 1])
 
@@ -70,6 +69,14 @@ class ParameterizationHelperTests extends GroovyTestCase {
 
         def parameterObject = param.getParameters('exampleInputOutputComponent:parmParameterObject')
         assertEquals 2, parameterObject.size()
+
+        def comments = param.comments
+        assertEquals 1, param.comments.size()
+        assertEquals 'test', comments.get(0).getText()
+        assertEquals 'path', comments.get(0).getPath()
+
+        def tags = param.tags
+        assertEquals 2, tags.size()
 
         def pop = parameterObject[0] as ParameterObjectParameterHolder
         assertEquals 'TYPE0', pop.classifier.toString()

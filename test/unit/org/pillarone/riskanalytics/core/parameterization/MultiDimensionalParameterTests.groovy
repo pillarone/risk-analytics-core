@@ -14,10 +14,16 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
 
     void testConstructor() {
         AbstractMultiDimensionalParameter param = new SimpleMultiDimensionalParameter([1, 2, 3])
-        assertTrue param.valuesConverted
-
+        assertEquals "Z0C0", 1, param.getValueAt(0, 0)
+        assertEquals "Z1C0", 2, param.getValueAt(1, 0)
+        assertEquals "Z2C0", 3, param.getValueAt(2, 0)
         param = new SimpleMultiDimensionalParameter([[1, 2, 3], [4, 5, 6]])
-        assertFalse param.valuesConverted
+        assertEquals "Z0C0", 1, param.getValueAt(0, 0)
+        assertEquals "Z1C0", 2, param.getValueAt(1, 0)
+        assertEquals "Z2C0", 3, param.getValueAt(2, 0)
+        assertEquals "Z0C1", 4, param.getValueAt(0, 1)
+        assertEquals "Z1C1", 5, param.getValueAt(1, 1)
+        assertEquals "Z2C1", 6, param.getValueAt(2, 1)
     }
 
     void testRowCount() {
@@ -46,7 +52,7 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         AbstractMultiDimensionalParameter param = new SimpleMultiDimensionalParameter([[1, 2, 3], [4, 5]])
         assertEquals([[1, 2, 3], [4, 5]], param.getValues())
         param = new SimpleMultiDimensionalParameter([1, 2, 3])
-        assertEquals([1, 2, 3], param.getValues())
+        assertEquals([[1, 2, 3]], param.getValues())
     }
 
     void testSetValueAt() {
@@ -185,7 +191,7 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
 
         param = new SimpleMultiDimensionalParameter([1])
         param.max_tokens = 2
-        output = "new org.pillarone.riskanalytics.core.parameterization.SimpleMultiDimensionalParameter(org.pillarone.riskanalytics.core.util.GroovyUtils.toList(['[1]']))"
+        output = "new org.pillarone.riskanalytics.core.parameterization.SimpleMultiDimensionalParameter(org.pillarone.riskanalytics.core.util.GroovyUtils.toList([['[1]']]))"
 
         parmStringValue = param.toString()
         assertTrue output.equals(parmStringValue)
@@ -193,7 +199,7 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
 
         param = new SimpleMultiDimensionalParameter([1, 2, 3, 4, 5])
         param.max_tokens = 2
-        output = "new org.pillarone.riskanalytics.core.parameterization.SimpleMultiDimensionalParameter(org.pillarone.riskanalytics.core.util.GroovyUtils.toList(['[1, 2, 3]', '[4, 5]']))"
+        output = "new org.pillarone.riskanalytics.core.parameterization.SimpleMultiDimensionalParameter(org.pillarone.riskanalytics.core.util.GroovyUtils.toList([['[1, 2, 3]', '[4, 5]']]))"
 
         parmStringValue = param.toString()
         assertTrue output.equals(parmStringValue)
@@ -201,7 +207,7 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
 
         param = new SimpleMultiDimensionalParameter([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
         param.max_tokens = 1
-        output = "new org.pillarone.riskanalytics.core.parameterization.SimpleMultiDimensionalParameter(org.pillarone.riskanalytics.core.util.GroovyUtils.toList(['[1, 2]', '[3]', '[4]', '[5]', '[6]', '[7]', '[8]', '[9]', '[10]', '[11]']))"
+        output = "new org.pillarone.riskanalytics.core.parameterization.SimpleMultiDimensionalParameter(org.pillarone.riskanalytics.core.util.GroovyUtils.toList([['[1, 2]', '[3]', '[4]', '[5]', '[6]', '[7]', '[8]', '[9]', '[10]', '[11]']]))"
 
         parmStringValue = param.toString()
         assertTrue output.equals(parmStringValue)
@@ -209,7 +215,7 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
 
         param = new SimpleMultiDimensionalParameter([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
         param.max_tokens = 2
-        output = "new org.pillarone.riskanalytics.core.parameterization.SimpleMultiDimensionalParameter(org.pillarone.riskanalytics.core.util.GroovyUtils.toList(['[1, 2, 3]', '[4, 5]', '[6, 7]', '[8, 9]', '[10, 11]']))"
+        output = "new org.pillarone.riskanalytics.core.parameterization.SimpleMultiDimensionalParameter(org.pillarone.riskanalytics.core.util.GroovyUtils.toList([['[1, 2, 3]', '[4, 5]', '[6, 7]', '[8, 9]', '[10, 11]']]))"
 
         parmStringValue = param.toString()
         assertTrue output.equals(parmStringValue)

@@ -31,22 +31,25 @@ abstract class AbstractParameterValidationService {
     /**
      * @return list of validation errors or null if candidate is ok
      */
-    List<ParameterValidationError> validate(Object classifier, Object candidate) {
+    List<ParameterValidation> validate(Object classifier, Object candidate) {
         List errors = []
         for (validator in findValidators(classifier)) {
             def result = validator(candidate)
             if (null == result || true == result) continue  // validation ok
-            errors << createErrorObject(result.remove(0 as int).toString(), result)
+            if (!(result[0] instanceof ValidationType)) throw new IllegalArgumentException("${result} doesn't contains ValidationType")
+            ValidationType validationType = result.remove(0 as int)
+            String messageKey = result.remove(0 as int).toString()
+            errors << createErrorObject(validationType, messageKey, result)
         }
         return errors
     }
 
-    abstract ParameterValidationError createErrorObject(String msg, List args)
+    abstract ParameterValidation createErrorObject(ValidationType validationType, String msg, List args)
 
     /**
      * Convenience method for validate(obj, obj) when obj is its own classifier.
      */
-    List<ParameterValidationError> validate(Object candidate) {
+    List<ParameterValidation> validate(Object candidate) {
         validate(candidate, candidate)
     }
 

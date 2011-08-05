@@ -1,7 +1,8 @@
 package org.pillarone.riskanalytics.core.parameterization
 
 import org.pillarone.riskanalytics.core.parameterization.validation.AbstractParameterValidationService
-import org.pillarone.riskanalytics.core.parameterization.validation.ParameterValidationError
+import org.pillarone.riskanalytics.core.parameterization.validation.ParameterValidation
+import org.pillarone.riskanalytics.core.parameterization.validation.ValidationType
 
 class ParameterValidationServiceTests extends GroovyTestCase {
 
@@ -18,7 +19,7 @@ class ParameterValidationServiceTests extends GroovyTestCase {
 
     void testOneSingletonValidatorRegistered() {
         def singleton = new Object()
-        service.register(singleton) { ["errorkey", 1, 2] }
+        service.register(singleton) { [ValidationType.ERROR, "errorkey", 1, 2] }
         def errors = service.validate(singleton)
         assertEquals 1, errors.size()
         assert errors[0].toString().contains('errorkey')
@@ -26,8 +27,8 @@ class ParameterValidationServiceTests extends GroovyTestCase {
 
     void testSingletonRegisteredTwoValidators() {
         def singleton = new Object()
-        service.register(singleton) { ["errorkey", 1, 2] }
-        service.register(singleton) { ["otherkey", 1, 2] }
+        service.register(singleton) { [ValidationType.ERROR, "errorkey", 1, 2] }
+        service.register(singleton) { [ValidationType.ERROR, "otherkey", 1, 2] }
         assertEquals 2, service.validate(singleton).size()
     }
 
@@ -39,16 +40,16 @@ class ParameterValidationServiceTests extends GroovyTestCase {
     }
 
     void testClassValidatorRegistered() {
-        service.register(Object) { ["errorkey", 1, 2] }
+        service.register(Object) { [ValidationType.ERROR, "errorkey", 1, 2] }
         assertEquals 1, service.validate(new Object()).size()
     }
 
     void testEqualValidatorRegistered() {
         String one = "x" * 256
         String two = "x" * 256
-        assert ! one.is(two)
+        assert !one.is(two)
         assert one == two
-        service.register(one) { ["errorkey", 1, 2] }
+        service.register(one) { [ValidationType.ERROR, "errorkey", 1, 2] }
         assertEquals 1, service.validate(two).size()
     }
 
@@ -56,18 +57,17 @@ class ParameterValidationServiceTests extends GroovyTestCase {
         def key = 0..10
         def obj = 5
         assert key.isCase(obj)
-        service.register(key) { ["errorkey", 1, 2] }
+        service.register(key) { [ValidationType.ERROR, "errorkey", 1, 2] }
         assertEquals 1, service.validate(obj).size()
     }
 
 
-
 }
 
-class TestValidationError extends ParameterValidationError {
+class TestValidationError extends ParameterValidation {
 
-    def TestValidationError(message, arguments) {
-        super(message, arguments);
+    def TestValidationError(ValidationType validationType, message, arguments) {
+        super(validationType, message, arguments);
     }
 
     String getLocalizedMessage(Locale locale) {
@@ -78,8 +78,8 @@ class TestValidationError extends ParameterValidationError {
 
 class TestValidationService extends AbstractParameterValidationService {
 
-    ParameterValidationError createErrorObject(String msg, List args) {
-        return new TestValidationError(msg, args);
+    ParameterValidation createErrorObject(ValidationType validationType, String msg, List args) {
+        return new TestValidationError(validationType, msg, args);
     }
 
 }

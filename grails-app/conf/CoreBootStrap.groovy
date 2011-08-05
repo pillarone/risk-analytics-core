@@ -1,6 +1,7 @@
 import grails.plugins.springsecurity.SpringSecurityService
 import grails.util.Environment
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.pillarone.riskanalytics.core.BatchRunSimulationRun
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
 import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
@@ -9,19 +10,15 @@ import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
 import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.user.*
-import org.joda.time.DateTimeZone
+import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.BatchRunSimulationRun
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.EnumTagType
 
 class CoreBootStrap {
 
     SpringSecurityService authenticateService
 
     def init = {servletContext ->
-
-        /** Setting the default time zone to UTC avoids problems in multi user context with different time zones
-         *  and switches off daylight saving capabilities and possible related problems.      */
-        DateTimeZone.setDefault(DateTimeZone.UTC)
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
 
         authenticateService = UserManagement.getSpringSecurityService()
 
@@ -101,6 +98,11 @@ class CoreBootStrap {
                 } catch (Exception ex) {
                     ex.printStackTrace()
                 }
+            }
+        }
+        Tag.withTransaction { status ->
+            if (!Tag.findByName("LOCKED")) {
+                new Tag(name: "LOCKED", tagType: EnumTagType.PARAMETERIZATION).save()
             }
         }
 

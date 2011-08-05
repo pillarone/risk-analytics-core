@@ -15,7 +15,7 @@ class VariableLengthPeriodCounter extends ValuationDatePeriodCounter {
         return dates.size() - 1
     }
 
-    int belongsToPeriod(DateTime date) throws AfterSimulationEndException {
+    public int belongsToPeriod(DateTime date) throws AfterSimulationEndException {
         if (!date.isBefore(endOfLastPeriod())) throw new AfterSimulationEndException()
         return super.belongsToPeriod(date)
     }

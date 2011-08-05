@@ -8,13 +8,17 @@ class StringParameterHolder extends ParameterHolder {
     private String value;
 
     public StringParameterHolder(Parameter parameter) {
-        super(parameter.path, parameter.periodIndex);
-        this.value = parameter.parameterValue
+        super(parameter);
     }
 
     public StringParameterHolder(String path, int periodIndex, String value) {
         super(path, periodIndex);
         this.value = value;
+    }
+
+    @Override
+    void setParameter(Parameter parameter) {
+        this.value = parameter.parameterValue
     }
 
     String getBusinessObject() {

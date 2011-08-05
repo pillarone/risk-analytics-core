@@ -3,10 +3,12 @@ package org.pillarone.riskanalytics.core.parameterization
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
 import org.pillarone.riskanalytics.core.model.Model
+import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
-import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.EnumTagType
 
 public class ParameterizationHelper {
 
@@ -41,7 +43,19 @@ public class ParameterizationHelper {
         }
         Parameterization result = new Parameterization(paramName)
         result.modelClass = model.class
+        result.periodCount = injector.periodCount
 
+        addParameters(result, injector, model)
+
+        addPeriodLabels(result, configObject)
+
+        addComments(result, configObject)
+
+        addTags(result, configObject)
+        return result
+    }
+
+    static void addParameters(Parameterization result, ParameterInjector injector, Model model) {
         injector.periodCount.times {index ->
             injector.injectConfiguration(model, index)
             Map parameterMap = [:]
@@ -51,13 +65,17 @@ public class ParameterizationHelper {
                 result.addParameter(it)
             }
         }
+    }
 
-        result.periodCount = injector.periodCount
+    static void addPeriodLabels(Parameterization result, ConfigObject configObject) {
         def periodLabels = []
         if (configObject.containsKey("periodLabels")) {
             periodLabels = configObject.periodLabels as String[]
         }
         result.periodLabels = periodLabels
+    }
+
+    static void addComments(Parameterization result, ConfigObject configObject) {
         //comments
         if (configObject.containsKey("comments")) {
             List comments = configObject.comments as List
@@ -68,8 +86,20 @@ public class ParameterizationHelper {
                 }
             }
         }
+    }
 
-        return result
+    static void addTags(Parameterization result, ConfigObject configObject) {
+        //tags
+        if (configObject.containsKey("tags")) {
+            List tagNames = configObject.tags as List
+            List tags = []
+            tagNames.each {String name ->
+                Tag tag = Tag.findByNameAndTagType(name, EnumTagType.PARAMETERIZATION)
+                if (!tag) tag = new Tag(name: name, tagType: EnumTagType.PARAMETERIZATION).save()
+                tags << tag
+            }
+            result.setTags(tags as Set)
+        }
     }
 
     protected static Map getAllParameter(Model model) {

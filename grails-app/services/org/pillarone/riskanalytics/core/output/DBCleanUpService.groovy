@@ -1,9 +1,5 @@
 package org.pillarone.riskanalytics.core.output
 
-import org.pillarone.riskanalytics.core.output.PostSimulationCalculation
-import org.pillarone.riskanalytics.core.output.SimulationRun
-import org.pillarone.riskanalytics.core.output.SingleValueResult
-
 class DBCleanUpService {
 
     boolean transactional = true

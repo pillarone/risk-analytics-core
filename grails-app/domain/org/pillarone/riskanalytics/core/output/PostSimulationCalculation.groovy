@@ -3,6 +3,8 @@ package org.pillarone.riskanalytics.core.output
 class PostSimulationCalculation {
 
     public static final String MEAN = 'mean'
+    public static final String MIN = 'min'
+    public static final String MAX = 'max'
     public static final String STDEV = 'stdev'
     // todo(jwa): change later to PERCENTILE_LOSS, VAR_LOSS, TVAR_LOSS
     public static final String PERCENTILE = 'percentile'

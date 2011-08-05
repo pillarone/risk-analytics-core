@@ -15,10 +15,9 @@ import static org.pillarone.riskanalytics.core.workflow.Status.*
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.remoting.ITransactionService
 import org.pillarone.riskanalytics.core.remoting.impl.RemotingUtils
+import grails.orm.HibernateCriteriaBuilder
 
 class StatusChangeService {
-
-    private ITransactionService service = RemotingUtils.getTransactionService()
 
     private static Log LOG = LogFactory.getLog(StatusChangeService)
 
@@ -35,8 +34,16 @@ class StatusChangeService {
                     parameterization.status = Status.REJECTED
                     parameterization.save()
                 } else if (parameterization.status == NONE) {
-                    ParameterizationDAO dao = ParameterizationDAO.findByDealIdAndIdNotEqual(parameterization.dealId, parameterization.id)
-                    if (dao != null) {
+                    HibernateCriteriaBuilder criteria = ParameterizationDAO.createCriteria()
+                    List<ParameterizationDAO> p14nsInWorkflow = criteria.list {
+                        and {
+                            eq("dealId", parameterization.dealId)
+                            ne("id", parameterization.id)
+                            ne("status", org.pillarone.riskanalytics.core.workflow.Status.NONE)
+                        }
+                    }
+
+                    if (! p14nsInWorkflow.isEmpty()) {
                         throw new WorkflowException(parameterization.name, DATA_ENTRY, "Parameterization is already in workflow.")
                     }
                 }
@@ -147,6 +154,7 @@ class StatusChangeService {
     }
 
     private String getTransactionName(long dealId) {
+        ITransactionService service = RemotingUtils.getTransactionService()
         service.allTransactions.find { it.dealId == dealId }.name
     }
 }

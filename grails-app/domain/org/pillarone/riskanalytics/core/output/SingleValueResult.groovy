@@ -2,7 +2,7 @@ package org.pillarone.riskanalytics.core.output
 
 import org.hibernate.FetchMode
 import org.joda.time.DateTime
-import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
+import org.pillarone.riskanalytics.core.util.DatabaseUtils
 
 class SingleValueResult {
 
@@ -29,7 +29,11 @@ class SingleValueResult {
     static mapping = {
         id generator: 'identity'
         path lazy: false, fetchMode: FetchMode.JOIN
-        date type: DateTimeMillisUserType
+        if (!DatabaseUtils.isOracleDatabase()) {
+            date type: org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
+        } else {
+            date type: org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType, column: 'date_time'
+        }
     }
 
     String toString() {

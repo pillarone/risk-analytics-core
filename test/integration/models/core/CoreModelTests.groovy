@@ -1,6 +1,8 @@
 package models.core
 
 import org.pillarone.riskanalytics.core.simulation.engine.ModelTest
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 
 /**
  * This does not really test the CoreModel but:
@@ -15,8 +17,17 @@ class CoreModelTests extends ModelTest {
         CoreModel
     }
 
+    @Override
+    List<ParameterHolder> getRuntimeParameters() {
+        return [ParameterHolderFactory.getHolder("runtimeInt", 0, 10)]
+    }
+
     void postSimulationEvaluation() {
 //        assertEquals 3, run.simulationRun.periodCount
+
+        CoreModel model = runner.currentScope.model
+        assertEquals(10, model.exampleInputOutputComponent.runtimeInt)
+        assertTrue(model.exampleInputOutputComponent.doCalculationCalled)
     }
 
 

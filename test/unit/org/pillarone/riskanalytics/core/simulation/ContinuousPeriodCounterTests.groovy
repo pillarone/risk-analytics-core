@@ -138,6 +138,29 @@ class ContinuousPeriodCounterTests extends GroovyTestCase {
         shouldFail(BeforeSimulationStartException, { counter.belongsToPeriod(new DateTime(2009, 12, 31, 0,0,0,0))})
     }
 
+    void testBelongsToCurrentPeriod() {
+        ContinuousPeriodCounter counter = new ContinuousPeriodCounter(date20100101, PeriodBase.YEARLY.toPeriod())
+
+        assertTrue  "2010-01-01 in 2010", counter.belongsToCurrentPeriod(date20100101)
+        assertTrue  "2010-03-31 in 2010", counter.belongsToCurrentPeriod(date20100331)
+        assertTrue  "2010-12-31 in 2010", counter.belongsToCurrentPeriod(date20101231)
+        assertFalse "2011-01-01 in 2010", counter.belongsToCurrentPeriod(date20110101)
+        assertFalse "2011-12-31 in 2010", counter.belongsToCurrentPeriod(date20111231)
+        assertFalse "2012-01-01 in 2010", counter.belongsToCurrentPeriod(date20120101)
+        assertFalse "2012-12-31 in 2010", counter.belongsToCurrentPeriod(date20121231)
+
+        counter.next()
+
+        assertFalse "2010-01-01 in 2011", counter.belongsToCurrentPeriod(date20100101)
+        assertFalse "2010-03-31 in 2011", counter.belongsToCurrentPeriod(date20100331)
+        assertFalse "2010-12-31 in 2011", counter.belongsToCurrentPeriod(date20101231)
+        assertTrue  "2011-01-01 in 2011", counter.belongsToCurrentPeriod(date20110101)
+        assertTrue  "2011-12-31 in 2011", counter.belongsToCurrentPeriod(date20111231)
+        assertFalse "2012-01-01 in 2011", counter.belongsToCurrentPeriod(date20120101)
+        assertFalse "2012-12-31 in 2011", counter.belongsToCurrentPeriod(date20121231)
+
+    }
+
     void testStartOfPeriod() {
         ContinuousPeriodCounter counter = new ContinuousPeriodCounter(date20100101, PeriodBase.YEARLY.toPeriod())
 

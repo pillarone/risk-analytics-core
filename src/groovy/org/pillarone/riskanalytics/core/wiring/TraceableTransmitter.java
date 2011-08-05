@@ -6,12 +6,20 @@ import org.pillarone.riskanalytics.core.packets.PacketList;
 
 import java.util.UUID;
 
+/**
+ * Decorator of a Transmitter which notifies a PacketListener
+ */
 public class TraceableTransmitter extends Transmitter {
 
     private Transmitter transmitter;
     private IPacketListener packetListener;
 
 
+    /**
+     *
+     * @param transmitter Transmitter to decorate
+     * @param packetListener PacketListener to notify
+     */
     public TraceableTransmitter(Transmitter transmitter, IPacketListener packetListener) {
         super(transmitter.getSender(), transmitter.getSource(), transmitter.getReceiver(), transmitter.getTarget());
         this.transmitter = transmitter;
@@ -23,6 +31,7 @@ public class TraceableTransmitter extends Transmitter {
             throw new IllegalStateException("No retransmission allowed: " + this);
         }
 
+        //Create default packets if no packets are sent on source channel
         if (source.isEmpty() && !ComposedComponent.class.isAssignableFrom(sender.getClass())) {
             try {
                 Packet p=(Packet) source.getType().newInstance();
@@ -35,21 +44,23 @@ public class TraceableTransmitter extends Transmitter {
         }
 
         setMarkers();
-        PacketList targetClone = (PacketList) target.clone();
+        PacketList targetBeforeFilter = (PacketList) target.clone();
         filterSource();
 
-        PacketList filteredPackets = ((PacketList) target.clone());
-        filteredPackets.removeAll(targetClone);
+        PacketList targetAfterFilter = ((PacketList) target.clone());
+
+        //Currently sent packets is difference between targetAfterFilter and targetBeforeFilter
+        targetAfterFilter.removeAll(targetBeforeFilter);
 
         if (!ComposedComponent.class.isAssignableFrom(sender.getClass())) {
 
-            for (Object o : filteredPackets) {
+            for (Object o : targetAfterFilter) {
                 if (((Packet) o).id == null)
                     ((Packet) o).id = UUID.randomUUID();
             }
         }
 
-        packetListener.packetSent(this, filteredPackets);
+        packetListener.packetSent(this, targetAfterFilter);
 
         setTransmitted(true);
         notifyReceiver(this);

@@ -26,7 +26,7 @@ class EnumParameterHolder extends ParameterHolder {
     }
 
     void applyToDomainObject(Parameter parameter) {
-        parameter.parameterType = value.getClass().getName()
+        parameter.parameterType = value.getDeclaringClass().getName()
         parameter.parameterValue = value.toString()
     }
 
@@ -35,7 +35,7 @@ class EnumParameterHolder extends ParameterHolder {
     }
 
     protected void updateValue(Object newValue) {
-        value = Enum.valueOf(value.getClass(), newValue)
+        value = Enum.valueOf(value.getDeclaringClass(), newValue)
     }
 
 }

@@ -53,7 +53,7 @@ class ResultConfigurationWriter implements IConfigObjectWriter {
     }
 
     private void appendValue(BufferedWriter out, Enum value) {
-        out << "${value.getClass().name}.$value"
+        out << "${value.getDeclaringClass().name}.$value"
     }
 
     private void appendValue(BufferedWriter out, Class value) {

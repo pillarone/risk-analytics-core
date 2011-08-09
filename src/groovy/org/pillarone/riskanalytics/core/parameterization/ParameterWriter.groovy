@@ -57,8 +57,8 @@ class ParameterWriter implements IConfigObjectWriter {
             keyString = "${keyString.substring(0, keyString.lastIndexOf('.'))}[$key]"
         }
         out << keyString << "="
-        if (value.getClass().isEnum()) {
-            out << "${value.getClass().name}.$value" as Object
+        if (value instanceof Enum) {
+            out << "${value.getDeclaringClass().name}.$value" as Object
         }
         else if (value instanceof List && !(value instanceof Range)) {
             out << "["

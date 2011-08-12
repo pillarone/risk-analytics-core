@@ -16,7 +16,7 @@ class ModelHelper {
     private static final String RESERVES = "claimsGenerators"
     private static final String CONTRACTS = "reinsuranceContracts"
     private static final String LOB = "linesOfBusiness"
-    private static final String LOB_MARKER = "LobMarker"
+    private static final String SEGMENT_MARKER = "SegmentMarker"
     private static final String PERIL_MARKER = "PerilMarker"
     private static final String RESERVE_MARKER = "IReserveMarker"
     private static final String CONTRACT_MARKER = "IReinsuranceContractMarker"
@@ -144,7 +144,7 @@ class ModelHelper {
     private static Set<String> getPossibleDrillDownOutputPaths(Map<Class, List<String>> outputPathsByMarkerInterface,
                                                                Map<Class, List<String>> componentNameByMarkerInterface) {
         Set<String> results = []
-        Class lobMarker = componentNameByMarkerInterface.keySet().find { clazz -> clazz.name.contains(LOB_MARKER) }
+        Class lobMarker = componentNameByMarkerInterface.keySet().find { clazz -> clazz.name.contains(SEGMENT_MARKER) }
         Class perilMarker = componentNameByMarkerInterface.keySet().find { clazz -> clazz.name.contains(PERIL_MARKER) }
         Class reserveMarker = componentNameByMarkerInterface.keySet().find { clazz -> clazz.name.contains(RESERVE_MARKER)}
         Class contractMarker = componentNameByMarkerInterface.keySet().find { clazz -> clazz.name.contains(CONTRACT_MARKER) }

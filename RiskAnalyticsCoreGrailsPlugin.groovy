@@ -19,6 +19,8 @@ import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
 import org.pillarone.riskanalytics.core.output.aggregation.PacketAggregatorRegistry
 import org.pillarone.riskanalytics.core.packets.Packet
 import org.pillarone.riskanalytics.core.output.aggregation.SumAggregator
+import org.pillarone.riskanalytics.core.packets.SingleValuePacket
+import org.pillarone.riskanalytics.core.output.aggregation.SumAggregatorSingleValuePacket
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
@@ -124,6 +126,7 @@ Persistence & Simulation engine.
         ConstraintsFactory.registerConstraint(new TestConstrainedTable())
 
         PacketAggregatorRegistry.registerAggregator(Packet, new SumAggregator())
+        PacketAggregatorRegistry.registerAggregator(SingleValuePacket, new SumAggregatorSingleValuePacket())
     }
 
     def onChange = {event ->

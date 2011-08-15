@@ -1,7 +1,5 @@
 package org.pillarone.riskanalytics.core.packets;
 
-import org.pillarone.riskanalytics.core.packets.Packet;
-
 import java.util.HashMap;
 import java.util.Map;
 

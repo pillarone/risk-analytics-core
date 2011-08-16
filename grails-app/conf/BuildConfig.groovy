@@ -24,6 +24,12 @@ grails.project.dependency.resolution = {
 
         test ":code-coverage:1.2.4"
     }
+
+    dependencies {
+        runtime 'net.sf.jasperreports:jasperreports:4.0.1', {
+            exclude "xml-apis"
+        }
+    }
 }
 
 grails.project.dependency.distribution = {

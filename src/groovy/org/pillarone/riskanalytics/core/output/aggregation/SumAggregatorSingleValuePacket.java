@@ -3,7 +3,7 @@ package org.pillarone.riskanalytics.core.output.aggregation;
 import org.pillarone.riskanalytics.core.packets.PacketList;
 import org.pillarone.riskanalytics.core.packets.SingleValuePacket;
 
-class SumAggregatorSingleValuePacket implements IPacketAggregator<SingleValuePacket> {
+public class SumAggregatorSingleValuePacket implements IPacketAggregator<SingleValuePacket> {
 
     public SingleValuePacket aggregate(PacketList packets) {
 

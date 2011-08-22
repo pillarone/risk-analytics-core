@@ -120,7 +120,7 @@ class Parameterization extends ParametrizedItem {
             id = daoToBeSaved.id
             notifyItemSaved()
         }
-
+        LOG.info("Saved parameterization ${this}")
         return result
     }
 
@@ -487,5 +487,11 @@ class Parameterization extends ParametrizedItem {
         }
         return 0
     }
+
+    @Override
+    String toString() {
+        "$name v$versionNumber"
+    }
+
 
 }

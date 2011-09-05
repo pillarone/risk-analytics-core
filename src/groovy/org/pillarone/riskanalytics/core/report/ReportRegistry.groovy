@@ -1,17 +1,17 @@
 package org.pillarone.riskanalytics.core.report
 
 import com.google.common.collect.Multimap
-import com.google.common.collect.TreeMultimap
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import com.google.common.collect.ArrayListMultimap
 
 abstract class ReportRegistry {
 
     private static Log LOG = LogFactory.getLog(ReportRegistry)
 
-    private static Multimap<Class, IReportModel> reportMap = TreeMultimap.create()
+    private static Multimap<Class, IReportModel> reportMap = ArrayListMultimap.create()
 
-    public static void registerAggregator(Class modelClass, IReportModel report) {
+    public static void registerReportModel(Class modelClass, IReportModel report) {
         Collection<IReportModel> existing = reportMap.get(modelClass)
         if (existing.find { it.class == report.class }) {
             LOG.warn("Report ${report.class.name} for $modelClass.name already registered.")
@@ -20,7 +20,7 @@ abstract class ReportRegistry {
         reportMap.put(modelClass, report)
     }
 
-    public static List<IReportModel> getAggregator(Class modelClass) {
+    public static List<IReportModel> getReportModel(Class modelClass) {
         return reportMap.get(modelClass)
     }
 

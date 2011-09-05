@@ -77,7 +77,11 @@ abstract public class ComposedComponent extends Component {
      * the internal wiring of ComposedComponent it may contain.
      */
     public void internalWiring() {
-        wireComposedComponents(this);
+        try {
+            wireComposedComponents(this);
+        } catch (Throwable e) {
+            throw new RuntimeException("Failed to wire " + this + ": " + e.getMessage(), e);
+        }
     }
 
     /**

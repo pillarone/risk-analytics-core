@@ -9,6 +9,7 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolde
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.EnumTagType
+import org.springframework.transaction.TransactionStatus
 
 public class ParameterizationHelper {
 
@@ -95,7 +96,13 @@ public class ParameterizationHelper {
             List tags = []
             tagNames.each {String name ->
                 Tag tag = Tag.findByNameAndTagType(name, EnumTagType.PARAMETERIZATION)
-                if (!tag) tag = new Tag(name: name, tagType: EnumTagType.PARAMETERIZATION).save()
+                if (!tag) {
+                    Tag.withTransaction {TransactionStatus status ->
+                        tag = new Tag(name: name, tagType: EnumTagType.PARAMETERIZATION).save()
+                    }
+                }
+
+
                 tags << tag
             }
             result.setTags(tags as Set)

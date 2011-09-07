@@ -1,24 +1,22 @@
 package org.pillarone.riskanalytics.core.report
 
-import org.pillarone.riskanalytics.core.simulation.item.Simulation
-import net.sf.jasperreports.engine.JRExporterParameter
-import net.sf.jasperreports.engine.JasperFillManager
-import net.sf.jasperreports.engine.util.JRLoader
-import net.sf.jasperreports.engine.JasperReport
-import net.sf.jasperreports.engine.JasperPrint
-import net.sf.jasperreports.engine.JRExporter
 import net.sf.jasperreports.engine.export.JRPdfExporter
-
+import net.sf.jasperreports.engine.util.JRLoader
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
+import net.sf.jasperreports.engine.*
 
 abstract class ReportFactory {
 
     public static byte[] createPDFReport(IReportModel reportModel, Simulation simulation) {
+
+        compileReport(reportModel)
+        
         JRExporter exporter = new JRPdfExporter()
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()
         exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, byteArrayOutputStream)
 
-        JasperReport jasperReport = (JasperReport) JRLoader.loadObject(reportModel.reportFile);
+        JasperReport jasperReport = (JasperReport) JRLoader.loadObject(reportModel.mainReportFile);
         jasperReport.setWhenNoDataType(jasperReport.WHEN_NO_DATA_TYPE_ALL_SECTIONS_NO_DETAIL);
         JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, reportModel.getParameters(simulation), reportModel.getDataSource(simulation))
 
@@ -26,6 +24,17 @@ abstract class ReportFactory {
         exporter.exportReport()
 
         return byteArrayOutputStream.toByteArray()
+    }
+
+    private static void compileReport(IReportModel model) {
+        for (URL url in model.allSourceFiles) {
+            URL jasperURL = new URL(url.toExternalForm().replace("jrxml", "jasper"))
+            File jasperFile = new File(jasperURL.toURI())
+            if(!jasperFile.exists()) {
+                File sourceFile = new File(url.toURI())
+                JasperCompileManager.compileReportToStream(sourceFile.newInputStream(), jasperFile.newOutputStream())
+            }
+        }
     }
 
 }

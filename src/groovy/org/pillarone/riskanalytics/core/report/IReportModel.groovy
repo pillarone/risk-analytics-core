@@ -8,7 +8,9 @@ public interface IReportModel {
 
     String getName()
 
-    URL getReportFile()
+    URL getMainReportFile()
+
+    List<URL> getAllSourceFiles()
 
     JRDataSource getDataSource(Simulation simulation)
 

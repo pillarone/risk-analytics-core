@@ -5,32 +5,17 @@ package org.pillarone.riskanalytics.core.packets
  */
 class ITestPacketApple extends SingleValuePacket {
 
-    private double ultimate;
     private static final String ULTIMATE = "ultimate";
 
      public void plus(ITestPacketApple testPacketApple) {
-        ultimate += testPacketApple.getUltimate();
+        value += testPacketApple.value;
     }
 
      @Override
     public Map<String, Number> getValuesToSave() throws IllegalAccessException {
         Map<String, Number> valuesToSave = new HashMap<String, Number>(1);
-        valuesToSave.put(ULTIMATE, ultimate);
+        valuesToSave.put(ULTIMATE, value);
         return valuesToSave;
     }
-
-     public double getUltimate() {
-        return ultimate;
-    }
-
-    public void setUltimate(double ultimate) {
-        this.ultimate = ultimate;
-    }
-
-    @Deprecated
-    public double getValue() {
-        return ultimate;
-    }
-
 
 }

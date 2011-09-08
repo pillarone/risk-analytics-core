@@ -3,19 +3,18 @@ package org.pillarone.riskanalytics.core.simulation.engine
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.joda.time.DateTime
-import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.model.DeterministicModel
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.output.CollectorFactory
 import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
-import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
-import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
 import org.pillarone.riskanalytics.core.parameterization.StructureInformation
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
+import org.pillarone.riskanalytics.core.simulation.engine.id.IIdGenerator
+import org.pillarone.riskanalytics.core.simulation.engine.id.CountingIdGenerator
 
 /**
  * The SimulationScope provides information, that is valid throughout the whole simulation.
@@ -43,7 +42,13 @@ public class SimulationScope {
 
     MappingCache mappingCache
 
+    IIdGenerator idGenerator
+
     private volatile SimulationState simulationState = SimulationState.NOT_RUNNING
+
+    SimulationScope() {
+        idGenerator = new CountingIdGenerator()
+    }
 
     public void setSimulation(Simulation simulation) {
         this.simulation = simulation

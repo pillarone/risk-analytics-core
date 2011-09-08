@@ -61,7 +61,7 @@ class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
         PacketList<ITestPacketApple> claims = []
         def result = 0
         10.times {
-            claims << new ITestPacketApple(ultimate: 1.1d)
+            claims << new ITestPacketApple(value: 1.1d)
             result += 1.1d
         }
         List<SingleValueResultPOJO> aggregatedValues = strategy.collect(claims)

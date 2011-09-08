@@ -120,7 +120,7 @@ class Parameterization extends ParametrizedItem {
             id = daoToBeSaved.id
             notifyItemSaved()
         }
-
+        LOG.info("Saved parameterization ${this}")
         return result
     }
 
@@ -207,6 +207,18 @@ class Parameterization extends ParametrizedItem {
                 dao.addToTags(new ParameterizationTag(tag: tag))
             }
         }
+    }
+
+    @Override
+    void addComment(Comment comment) {
+        setChanged(true)
+        super.addComment(comment)
+    }
+
+    @Override
+    void removeComment(Comment comment) {
+        setChanged(true)
+        super.removeComment(comment)
     }
 
     protected void commentAdded(ParameterizationDAO dao, WorkflowComment comment) {
@@ -442,6 +454,11 @@ class Parameterization extends ParametrizedItem {
             original.comments << comment.toConfigObject()
         }
 
+        original.tags = []
+        tags.each {Tag tag ->
+            original.tags << tag.toString()
+        }
+
         return original
     }
 
@@ -470,5 +487,11 @@ class Parameterization extends ParametrizedItem {
         }
         return 0
     }
+
+    @Override
+    String toString() {
+        "$name v$versionNumber"
+    }
+
 
 }

@@ -82,6 +82,28 @@ in order to start the application in
 <ul><li>English use 'actuary':'actuary'</li>
 <li>German use 'aktuar':'aktuar'</li>
 <li>French use 'actuaire':'actuaire'</li>
+<li>Users with role 'reviewer':
+<ul>
+  <li>Grace</li>
+  <li>Ruby</li>
+  <li>Olivia</li>
+  <li>Jack</li>
+  <li>Thomas</li>
+  <li>Oliver</li>
+</ul>
+</li>
+<li>Users with role 'calibrator':
+<ul>
+  <li>Joshua</li>
+  <li>Harry</li>
+  <li>Charlie</li>
+  <li>Daniel</li>
+  <li>Emily</li>
+  <li>Jessica</li>
+  <li>Sophie</li>
+  <li>Chloe</li>
+</ul>
+</li>
 </ul>
 </div>
 </body>

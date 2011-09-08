@@ -8,13 +8,16 @@ import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
 import org.pillarone.riskanalytics.core.parameter.IntegerParameter
 import org.pillarone.riskanalytics.core.parameter.Parameter
+import org.pillarone.riskanalytics.core.parameter.SimulationTag
 import org.pillarone.riskanalytics.core.parameter.comment.ResultCommentDAO
+import org.pillarone.riskanalytics.core.parameter.comment.Tag
+import org.pillarone.riskanalytics.core.simulation.item.parameter.IntegerParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.EnumTagType
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.FunctionComment
 import org.pillarone.riskanalytics.core.workflow.Status
 import org.pillarone.riskanalytics.core.output.*
-import org.pillarone.riskanalytics.core.simulation.item.parameter.IntegerParameterHolder
 
 class SimulationTests extends GroovyTestCase {
 
@@ -258,6 +261,24 @@ class SimulationTests extends GroovyTestCase {
 
         assertEquals 0, simulation.comments.size()
         assertEquals initialCount, ResultCommentDAO.count()
+    }
+
+    public void testAddSimulationTag() {
+        Simulation simulation = createSimulation("Tests")
+        int simulationTagCount = SimulationTag.count()
+        Tag tag = new Tag(name: 'tag', tagType: EnumTagType.PARAMETERIZATION).save()
+
+        simulation.setTags([tag] as Set)
+        simulation.save()
+
+        assertEquals simulationTagCount + 1, SimulationTag.count()
+
+        simulation.setTags([] as Set)
+        simulation.save()
+
+        assertEquals simulationTagCount, SimulationTag.count()
+
+
     }
 
 

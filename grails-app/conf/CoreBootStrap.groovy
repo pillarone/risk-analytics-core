@@ -6,11 +6,17 @@ import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.parameter.comment.Tag
+import org.pillarone.riskanalytics.core.report.IReportModel
+import org.pillarone.riskanalytics.core.report.ReportRegistry
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.EnumTagType
 import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.user.*
+import org.apache.commons.logging.LogFactory
+import org.apache.commons.logging.Log
 
 class CoreBootStrap {
+
+    private static Log LOG = LogFactory.getLog(CoreBootStrap)
 
     SpringSecurityService authenticateService
 
@@ -91,6 +97,19 @@ class CoreBootStrap {
         Tag.withTransaction { status ->
             if (!Tag.findByName("LOCKED")) {
                 new Tag(name: "LOCKED", tagType: EnumTagType.PARAMETERIZATION).save()
+            }
+        }
+
+        if (!Boolean.getBoolean("keepCompiledJasperFiles")) {
+            for (IReportModel reportModel in ReportRegistry.getAllReportModels()) {
+                for (URL url in reportModel.allSourceFiles) {
+                    URL jasperURL = new URL(url.toExternalForm().replace("jrxml", "jasper"))
+                    File jasperFile = new File(jasperURL.toURI())
+                    if(jasperFile.exists()) {
+                        jasperFile.delete()
+                        LOG.info("Deleting cached report file ${jasperFile.name}")
+                    }
+                }
             }
         }
 

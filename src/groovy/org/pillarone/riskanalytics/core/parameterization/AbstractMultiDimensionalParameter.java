@@ -10,11 +10,16 @@ import java.util.*;
 
 public abstract class AbstractMultiDimensionalParameter implements Cloneable {
 
+    /**
+     * Outer list contains the columns. In order to access the cell in column 5 and row 2, use values.get(5).get(2)
+     */
     protected List<List> values;
     protected Model simulationModel;
-    protected boolean valuesConverted = false;
     public int max_tokens = 500;
 
+    /**
+     * @param cellValues can be a normal or nested list and is converted to a nested list if provided as normal list
+     */
     public AbstractMultiDimensionalParameter(List cellValues) {
         Iterator iterator = cellValues.iterator();
         boolean listFound = false;
@@ -28,17 +33,16 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable {
         } else {
             ArrayList<List> list = new ArrayList<List>(1);
             list.add(new ArrayList(cellValues));
-            valuesConverted = true;
             this.values = list;
         }
     }
 
     public boolean isEmpty() {
-        if(values.size() == 0) {
+        if (values.size() == 0) {
             return true;
         }
-        for(List list : values) {
-            if(!list.isEmpty()) {
+        for (List list : values) {
+            if (!list.isEmpty()) {
                 return false;
             }
         }
@@ -94,7 +98,7 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable {
     }
 
     public List getValues() {
-        return valuesConverted && !values.isEmpty() /* should not happen.. PMO-1556 */ ? values.get(0) : values;
+        return values;
     }
 
     public void addColumnAt(int columnIndex) {
@@ -133,9 +137,6 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable {
     public void setDimension(MultiDimensionalParameterDimension dimension) {
         int newRowCount = dimension.getRows();
         int newColumnCount = dimension.getColumns();
-        if (newColumnCount > 1) {
-            valuesConverted = false;
-        }
 
         int currentRowCount = getValueRowCount();
         int currentColumnCount = getValueColumnCount();
@@ -144,7 +145,6 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable {
             for (int i = 0; i < (newColumnCount - currentColumnCount); i++) {
                 addColumn(currentColumnCount);
             }
-            valuesConverted = false;
             columnsAdded(newColumnCount - currentColumnCount);
         }
 
@@ -218,11 +218,7 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable {
         StringBuffer buffer = new StringBuffer("new ");
         buffer.append(this.getClass().getName());
         buffer.append("(");
-        if (!valuesConverted) {
-            buffer.append("org.pillarone.riskanalytics.core.util.GroovyUtils.toList(" + GroovyUtils.listToString(GroovyUtils.getSplitList(values, max_tokens)) + ")");
-        } else {
-            buffer.append("org.pillarone.riskanalytics.core.util.GroovyUtils.toList(" + GroovyUtils.listToString(GroovyUtils.getSplitList(values.get(0), max_tokens)) + ")");
-        }
+        buffer.append("org.pillarone.riskanalytics.core.util.GroovyUtils.toList(" + GroovyUtils.listToString(GroovyUtils.getSplitList(values, max_tokens)) + ")");
         appendAdditionalConstructorArguments(buffer);
         buffer.append(")");
         return buffer.toString();
@@ -259,10 +255,6 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable {
         }
     }
 
-    public boolean isValuesConverted() {
-        return valuesConverted;
-    }
-
     public void setSimulationModel(Model simulationModel) {
         this.simulationModel = simulationModel;
     }
@@ -294,7 +286,6 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable {
     @Override
     public AbstractMultiDimensionalParameter clone() throws CloneNotSupportedException {
         final AbstractMultiDimensionalParameter clone = (AbstractMultiDimensionalParameter) super.clone();
-        clone.valuesConverted = valuesConverted;
         clone.simulationModel = simulationModel;
         clone.values = new ArrayList<List>(values.size());
         for (List list : values) {

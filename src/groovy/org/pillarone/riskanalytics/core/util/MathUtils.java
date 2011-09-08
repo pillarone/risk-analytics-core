@@ -247,6 +247,9 @@ public class MathUtils {
      */
     public static double calculateTvarOfSortedValues(double[] sortedValues, double severity, QuantilePerspective perspective) {
         severity = severity / 100d;
+        if (severity >= 1.0){
+            throw new IllegalArgumentException("TVaR not defined for quantile-levels greater than or equal to 1.0");
+        }
         int size = sortedValues.length;
         int index = (int) Math.floor(size * severity);
         double sum = 0;
@@ -257,13 +260,13 @@ public class MathUtils {
                     sum += sortedValues[i];
                 }
                 conditionalMean = sum / (size * (1 - severity));
-                return conditionalMean - (calculateSum(sortedValues) / (double) size);
+                return conditionalMean - calculateMean(sortedValues);
             case PROFIT:
                 for (int i = index; i < size; i++) {
                     sum += sortedValues[size - (i + 1)];
                 }
                 conditionalMean = sum / (size * (1 - severity));
-                return -(conditionalMean - (calculateSum(sortedValues) / (double) size));
+                return -(conditionalMean - calculateMean(sortedValues));
             default:
                 throw new IllegalArgumentException("TVaR is calculated for loss or profit distribution: specify accordingly!");
         }
@@ -282,7 +285,7 @@ public class MathUtils {
     }
 
     public static double calculateMean(double[] values) {
-        return calculateSum(values) / values.length;
+        return calculateSum(values) / (double) values.length;
     }
 
     public static double calculateSum(double[] values) {

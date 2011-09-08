@@ -24,4 +24,8 @@ abstract class ReportRegistry {
         return reportMap.get(modelClass)
     }
 
+    public static List<IReportModel> getAllReportModels() {
+        return reportMap.values().toList()
+    }
+
 }

@@ -21,6 +21,7 @@ import org.pillarone.riskanalytics.core.packets.Packet
 import org.pillarone.riskanalytics.core.output.aggregation.SumAggregator
 import org.pillarone.riskanalytics.core.packets.SingleValuePacket
 import org.pillarone.riskanalytics.core.output.aggregation.SumAggregatorSingleValuePacket
+import org.pillarone.riskanalytics.core.output.AggregatedWithSingleAvailableCollectingModeStrategy
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
@@ -121,6 +122,7 @@ Persistence & Simulation engine.
 
         CollectingModeFactory.registerStrategy(new SingleValueCollectingModeStrategy())
         CollectingModeFactory.registerStrategy(new AggregatedCollectingModeStrategy())
+        CollectingModeFactory.registerStrategy(new AggregatedWithSingleAvailableCollectingModeStrategy())
 
         ConstraintsFactory.registerConstraint(new SimpleConstraint())
         ConstraintsFactory.registerConstraint(new TestConstrainedTable())

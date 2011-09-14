@@ -74,11 +74,6 @@ class Calculator {
             long collector = array[2]
             long field = array[3]
             double avg = array[4]
-            //use only aggregated values
-            if (collector == collectorMapping?.id) {
-//                println "${collector}"
-//                continue
-            }
 
             int isStochastic = array[5] == array[6] ? 1 : 0
             bulkInsert.addResults(periodIndex, PostSimulationCalculation.MEAN, null, path, field, collector, avg)
@@ -138,7 +133,7 @@ class Calculator {
 
         long time = System.currentTimeMillis()
 
-        double[] results = ResultAccessor.getValuesSorted(run, periodIndex, pathId, collector, fieldId, singleCollectorId) as double[]
+        double[] results = ResultAccessor.getValuesSorted(run, periodIndex, pathId, collector, fieldId) as double[]
 
         LOG.debug("Loaded results for calculations ($pathId, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
         return results

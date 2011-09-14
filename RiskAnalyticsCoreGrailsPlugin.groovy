@@ -25,7 +25,7 @@ import org.pillarone.riskanalytics.core.output.AggregatedWithSingleAvailableColl
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.4-BETA-4"
+    def version = "1.4-BETA-5"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.7 > *"
     // the other plugins this plugin depends on

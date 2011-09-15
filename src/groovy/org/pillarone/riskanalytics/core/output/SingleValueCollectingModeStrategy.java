@@ -15,6 +15,12 @@ public class SingleValueCollectingModeStrategy extends AbstractCollectingModeStr
     private static final String RESOURCE_BUNDLE = "org.pillarone.riskanalytics.core.output.applicationResources";
     private String displayName;
 
+    private AggregatedCollectingModeStrategy aggregatedCollectingMode;
+
+    public SingleValueCollectingModeStrategy() {
+        aggregatedCollectingMode = new AggregatedWithSingleAvailableCollectingModeStrategy();
+    }
+
     public List<SingleValueResultPOJO> collect(PacketList results) throws IllegalAccessException {
         List<SingleValueResultPOJO> result = new ArrayList<SingleValueResultPOJO>(results.size());
         int valueIndex = 0;
@@ -22,6 +28,11 @@ public class SingleValueCollectingModeStrategy extends AbstractCollectingModeStr
             result.addAll(createSingleValueResults((Packet) p, ((Packet)p).getValuesToSave(), valueIndex));
             valueIndex++;
         }
+        final List<SingleValueResultPOJO> aggregatedValues = aggregatedCollectingMode.collect(results);
+        for (SingleValueResultPOJO singleValueResult : aggregatedValues) {
+            singleValueResult.setCollector(packetCollector.getSimulationScope().getMappingCache().lookupCollector(aggregatedCollectingMode.getIdentifier()));
+        }
+        result.addAll(aggregatedValues);
         return result;
     }
 
@@ -36,4 +47,9 @@ public class SingleValueCollectingModeStrategy extends AbstractCollectingModeStr
         return IDENTIFIER;
     }
 
+    @Override
+    public void setPacketCollector(PacketCollector packetCollector) {
+        super.setPacketCollector(packetCollector);
+        aggregatedCollectingMode.setPacketCollector(packetCollector);
+    }
 }

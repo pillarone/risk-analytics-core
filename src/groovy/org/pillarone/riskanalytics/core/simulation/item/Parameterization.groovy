@@ -387,16 +387,17 @@ class Parameterization extends ParametrizedItem {
 
 
     public List<Tag> getTags() {
-        addRemoveLockTag()
         return tags
     }
 
-    private void addRemoveLockTag() {
+    public void addRemoveLockTag() {
+        if (!isLoaded()) load()
         Tag locked = Tag.findByName("LOCKED")
         if (!tags.contains(locked) && isUsedInSimulation())
             tags << locked
         else if (tags.contains(locked) && !isUsedInSimulation())
             tags.remove(locked)
+        save()
     }
 
     public void setTags(Set selectedTags) {

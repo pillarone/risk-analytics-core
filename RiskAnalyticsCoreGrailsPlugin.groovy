@@ -5,8 +5,14 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.joda.time.DateTimeZone
 import org.pillarone.riskanalytics.core.example.migration.TestConstrainedTable
 import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
+import org.pillarone.riskanalytics.core.output.AggregatedWithSingleAvailableCollectingModeStrategy
 import org.pillarone.riskanalytics.core.output.CollectingModeFactory
 import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
+import org.pillarone.riskanalytics.core.output.aggregation.PacketAggregatorRegistry
+import org.pillarone.riskanalytics.core.output.aggregation.SumAggregator
+import org.pillarone.riskanalytics.core.output.aggregation.SumAggregatorSingleValuePacket
+import org.pillarone.riskanalytics.core.packets.Packet
+import org.pillarone.riskanalytics.core.packets.SingleValuePacket
 import org.pillarone.riskanalytics.core.parameterization.ConstraintsFactory
 import org.pillarone.riskanalytics.core.parameterization.SimpleConstraint
 import org.pillarone.riskanalytics.core.remoting.IResultService
@@ -16,16 +22,10 @@ import org.pillarone.riskanalytics.core.util.GrailsConfigValidator
 import org.springframework.remoting.rmi.RmiProxyFactoryBean
 import org.springframework.remoting.rmi.RmiServiceExporter
 import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
-import org.pillarone.riskanalytics.core.output.aggregation.PacketAggregatorRegistry
-import org.pillarone.riskanalytics.core.packets.Packet
-import org.pillarone.riskanalytics.core.output.aggregation.SumAggregator
-import org.pillarone.riskanalytics.core.packets.SingleValuePacket
-import org.pillarone.riskanalytics.core.output.aggregation.SumAggregatorSingleValuePacket
-import org.pillarone.riskanalytics.core.output.AggregatedWithSingleAvailableCollectingModeStrategy
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.4-BETA-5"
+    def version = "1.4-BETA-5.1"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.7 > *"
     // the other plugins this plugin depends on
@@ -100,7 +100,7 @@ Persistence & Simulation engine.
     def doWithApplicationContext = {applicationContext ->
 
         /** Setting the default time zone to UTC avoids problems in multi user context with different time zones
-         *  and switches off daylight saving capabilities and possible related problems.          */
+         *  and switches off daylight saving capabilities and possible related problems.            */
         DateTimeZone.setDefault(DateTimeZone.UTC)
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
 

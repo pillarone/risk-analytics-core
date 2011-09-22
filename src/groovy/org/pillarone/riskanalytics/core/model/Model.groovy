@@ -19,7 +19,7 @@ abstract class Model {
     private List<Component> immutableStartComponents = startComponents.asImmutable()
 
     public String getName() {
-        return this.getClass().simpleName - "Model"
+        return getName(this.getClass())
     }
 
     void init() {
@@ -29,6 +29,10 @@ abstract class Model {
 
         initComponents()
         initAllComponents()
+    }
+
+    public static String getName(final Class modelClass) {
+        return modelClass.simpleName - "Model"
     }
 
     abstract void initComponents()

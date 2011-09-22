@@ -215,6 +215,14 @@ class Parameterization extends ParametrizedItem {
         super.addComment(comment)
     }
 
+    void addTaggedComment(String commentText, Tag tag) {
+        String modelName = Model.getName(modelClass)
+        Comment comment = new Comment(modelName, -1)
+        comment.text = commentText
+        comment.addTag(tag)
+        this.addComment(comment)
+    }
+
     @Override
     void removeComment(Comment comment) {
         setChanged(true)

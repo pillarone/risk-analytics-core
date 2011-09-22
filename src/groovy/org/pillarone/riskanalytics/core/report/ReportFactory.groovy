@@ -38,8 +38,8 @@ abstract class ReportFactory {
         for (URL url in model.allSourceFiles) {
             URL jasperURL = new URL(url.toExternalForm().replace("jrxml", "jasper"))
             File jasperFile = new File(jasperURL.toURI())
-            if (!jasperFile.exists()) {
-                File sourceFile = new File(url.toURI())
+            File sourceFile = new File(url.toURI())
+            if(!jasperFile.exists() || jasperFile.lastModified() < sourceFile.lastModified()) {
                 JasperCompileManager.compileReportToStream(sourceFile.newInputStream(), jasperFile.newOutputStream())
             }
         }

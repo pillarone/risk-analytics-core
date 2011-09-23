@@ -98,7 +98,7 @@ class WiringTests extends GroovyTestCase {
             // basic field access
             assertSame(packet, sender.input1[0])
         }
-        
+
 
     }
 
@@ -107,7 +107,7 @@ class WiringTests extends GroovyTestCase {
         receiver = new TestComponent()
 
         WiringUtils.use(WireCategory) {
-            shouldFail(IllegalArgumentException,
+            shouldFail(WiringException,
                 {
                     receiver.inApple = sender.outOrange
                 }

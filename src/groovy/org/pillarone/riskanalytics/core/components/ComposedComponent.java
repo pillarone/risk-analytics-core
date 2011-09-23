@@ -5,6 +5,7 @@ import org.pillarone.riskanalytics.core.model.ModelPath;
 import org.pillarone.riskanalytics.core.model.ModelPathComponent;
 import org.pillarone.riskanalytics.core.wiring.ITransmitter;
 import org.pillarone.riskanalytics.core.wiring.SilentTransmitter;
+import org.pillarone.riskanalytics.core.wiring.WiringException;
 import org.pillarone.riskanalytics.core.wiring.WiringUtils;
 
 import java.util.ArrayList;
@@ -80,7 +81,7 @@ abstract public class ComposedComponent extends Component {
         try {
             wireComposedComponents(this);
         } catch (Throwable e) {
-            throw new RuntimeException("Failed to wire " + this + ": " + e.getMessage(), e);
+            throw new WiringException("Failed to wire " + this + ": " + e.getMessage(), e);
         }
     }
 

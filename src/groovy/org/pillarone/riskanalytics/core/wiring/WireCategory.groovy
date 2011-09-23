@@ -29,7 +29,7 @@ class WireCategory {
             target.allInputTransmitter << transmitter
             source.allOutputTransmitter << transmitter
         } catch (Throwable t) {
-            throw new RuntimeException("doSetProperty failed, sourcePropertyName: " + sourcePropertyName + ", targetPropertyName: " + targetPropertyName + ", msg: " + t.getMessage(), t);
+            throw new WiringException("doSetProperty failed, sourcePropertyName: " + sourcePropertyName + ", targetPropertyName: " + targetPropertyName + ", msg: " + t.getMessage(), t);
         }
     }
 

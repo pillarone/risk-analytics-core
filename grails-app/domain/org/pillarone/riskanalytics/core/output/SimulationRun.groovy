@@ -9,6 +9,7 @@ import org.pillarone.riskanalytics.core.parameter.SimulationTag
 import org.pillarone.riskanalytics.core.parameter.comment.ResultCommentDAO
 import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
 import org.pillarone.riskanalytics.core.util.DatabaseUtils
+import org.pillarone.riskanalytics.core.user.Person
 
 class SimulationRun {
 
@@ -28,6 +29,7 @@ class SimulationRun {
     DateTime beginOfFirstPeriod
     DateTime creationDate
     DateTime modificationDate
+    Person creator
 
     // more to come here
 
@@ -51,6 +53,7 @@ class SimulationRun {
         usedModel nullable: true
         parameterization nullable: true
         resultConfiguration nullable: true
+        creator nullable: true
     }
 
     static mapping = {
@@ -59,6 +62,7 @@ class SimulationRun {
         startTime type: DateTimeMillisUserType
         endTime type: DateTimeMillisUserType
         creationDate type: DateTimeMillisUserType
+        creator lazy: false
         modificationDate type: DateTimeMillisUserType
         if (DatabaseUtils.isOracleDatabase()) {
             comment(column: 'comment_value')

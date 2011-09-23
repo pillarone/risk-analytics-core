@@ -79,7 +79,7 @@ abstract class DynamicComposedComponent extends ComposedComponent {
     /**
      * This has to be overridden so that dynamic sub components are recognized as properties.
      * The values are cached because this method is called often. The cache is invalidated when a
-     * component is added or removed. 
+     * component is added or removed.
      */
     public Map getProperties() {
         if (props == null) {
@@ -131,6 +131,8 @@ abstract class DynamicComposedComponent extends ComposedComponent {
      */
     public void clear() {
         componentList.clear()
+        //invalidate cached properties
+        props = null
     }
 
     /**

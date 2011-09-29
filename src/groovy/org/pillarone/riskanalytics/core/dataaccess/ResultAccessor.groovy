@@ -2,14 +2,32 @@ package org.pillarone.riskanalytics.core.dataaccess
 
 import groovy.sql.GroovyRowResult
 import groovy.sql.Sql
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 import org.pillarone.riskanalytics.core.util.MathUtils
 import org.pillarone.riskanalytics.core.output.*
 
 class ResultAccessor {
 
+    static Log LOG = LogFactory.getLog(ResultAccessor)
+
     static List getRawData(SimulationRun simulationRun) {
 
         return SingleValueResult.findAllBySimulationRun(simulationRun)
+    }
+
+    static String exportCsv(SimulationRun simulationRun) {
+        String fileName = GroovyUtils.getExportFileName(simulationRun)
+        if (new File(fileName).exists()) return fileName
+        Sql sql = new Sql(simulationRun.dataSource)
+        try {
+            sql.execute("select concat_ws(',',cast(s.iteration as char),cast(s.period as char),mapping.path_name, cast(s.value as char))  INTO OUTFILE ? from single_value_result as s, path_mapping as mapping  where s.simulation_run_id ='" + simulationRun.id + "' and mapping.id=s.path_id", [fileName])
+        } catch (Exception ex) {
+            LOG.error "exception occured during export simulation as csv : $ex"
+            return null
+        }
+        return fileName
     }
 
     static List getPaths(SimulationRun simulationRun) {

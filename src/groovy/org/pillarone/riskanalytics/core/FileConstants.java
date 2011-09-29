@@ -13,6 +13,7 @@ public class FileConstants {
     public static final String COMMENT_FILE_DIRECTORY;
     public static final String COMMENT_PDF_DIRECTORY;
     public static final String REPORT_PDF_DIRECTORY;
+    public static final String CSV_EXPORT_DIRECTORY;
 
     static {
         String baseDir = System.getProperty("p1.temp");
@@ -56,6 +57,11 @@ public class FileConstants {
 
         REPORT_PDF_DIRECTORY = BASE_DATA_DIRECTORY + File.separatorChar + "reportPDFs";
         file = new File(REPORT_PDF_DIRECTORY);
+        file.mkdirs();
+        assert file.exists();
+
+        CSV_EXPORT_DIRECTORY = BASE_DATA_DIRECTORY + File.separatorChar + "csvExport";
+        file = new File(CSV_EXPORT_DIRECTORY);
         file.mkdirs();
         assert file.exists();
 

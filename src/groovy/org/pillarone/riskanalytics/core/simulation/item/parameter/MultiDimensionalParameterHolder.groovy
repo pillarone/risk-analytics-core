@@ -63,15 +63,20 @@ class MultiDimensionalParameterHolder extends ParameterHolder implements IMarker
     List<String> updateReferenceValues(Class markerInterface, String oldValue, String newValue) {
         List<String> referencePaths = referencePaths(markerInterface, oldValue)
         if (referencePaths) {
+            boolean modified = false
             if (value instanceof ConstrainedMultiDimensionalParameter) {
-                ((ConstrainedMultiDimensionalParameter) value).updateReferenceValues(markerInterface, oldValue, newValue)
+                modified = ((ConstrainedMultiDimensionalParameter) value).updateReferenceValues(markerInterface, oldValue, newValue)
             }
             else if (value instanceof ComboBoxTableMultiDimensionalParameter) {
                 int row = value.values[0].indexOf(oldValue)
                 row += value.getTitleRowCount()
                 if (row > -1) {
+                    modified = true
                     value.setValueAt newValue, row, 0
                 }
+            }
+            if(modified) {
+                setModified(true)
             }
         }
         return referencePaths

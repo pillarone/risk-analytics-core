@@ -12,8 +12,9 @@ public interface IReportModel {
 
     List<URL> getAllSourceFiles()
 
-    JRDataSource getDataSource(Simulation simulation)
+    JRDataSource getDataSource(IReportData reportData)
 
-    Map getParameters(Simulation simulation)
+    Map getParameters(IReportData reportData)
 
+    String getDefaultReportFileNameWithoutExtension(IReportData reportData)
 }

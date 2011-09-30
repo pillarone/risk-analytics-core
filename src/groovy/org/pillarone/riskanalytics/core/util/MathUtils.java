@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.util;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.pillarone.riskanalytics.core.output.QuantilePerspective;
 import umontreal.iro.lecuyer.rng.F2NL607;
 import umontreal.iro.lecuyer.rng.RandomStreamBase;
@@ -8,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MathUtils {
+
+    private static Log LOG = LogFactory.getLog(MathUtils.class);
 
     private static ThreadLocal<F2NL607> RANDOM_NUMBER_GENERATOR_INSTANCE = new ThreadLocal<F2NL607>() {
 
@@ -104,8 +108,7 @@ public class MathUtils {
                 streamStartingAtSubstream.resetNextSubstream();
             }
             return streamStartingAtSubstream;
-        }
-        else {
+        } else {
             return stream;
         }
     }
@@ -152,33 +155,35 @@ public class MathUtils {
      */
 
     public static double calculatePercentileOfSortedValues(double[] sortedValues, double severity, QuantilePerspective perspective) {
-        severity = severity / 100d;
-        int size = sortedValues.length;
-        int g = (int) Math.floor((size + 1 / 3d) * severity + 1 / 3d);
-        double gamma = (size + 1 / 3d) * severity + 1 / 3d - g;
-        switch (perspective) {
-            case LOSS:
-                if (g == 0) {
-                    return sortedValues[0];
-                }
-                else if (g >= size) {
-                    return sortedValues[size - 1];
-                }
-                else {
-                    return (1 - gamma) * sortedValues[g - 1] + gamma * sortedValues[g];
-                }
-            case PROFIT:
-                if (g == 0) {
-                    return sortedValues[size - 1];
-                }
-                else if (g >= size) {
-                    return sortedValues[0];
-                }
-                else {
-                    return (1 - gamma) * sortedValues[size - g] + gamma * sortedValues[size - (g + 1)];
-                }
-            default:
-                throw new IllegalArgumentException("percentile is calculated for loss or profit distribution: specify accordingly!");
+        try {
+            severity = severity / 100d;
+            int size = sortedValues.length;
+            int g = (int) Math.floor((size + 1 / 3d) * severity + 1 / 3d);
+            double gamma = (size + 1 / 3d) * severity + 1 / 3d - g;
+            switch (perspective) {
+                case LOSS:
+                    if (g == 0) {
+                        return sortedValues[0];
+                    } else if (g >= size) {
+                        return sortedValues[size - 1];
+                    } else {
+                        return (1 - gamma) * sortedValues[g - 1] + gamma * sortedValues[g];
+                    }
+                case PROFIT:
+                    if (g == 0) {
+                        return sortedValues[size - 1];
+                    } else if (g >= size) {
+                        return sortedValues[0];
+                    } else {
+                        return (1 - gamma) * sortedValues[size - g] + gamma * sortedValues[size - (g + 1)];
+                    }
+                default:
+                    throw new IllegalArgumentException("percentile is calculated for loss or profit distribution: specify accordingly!");
+            }
+        } catch (Exception ex) {
+            LOG.error("Error occured by calculate a percentile : " + ex.toString());
+            ex.printStackTrace();
+            return 0.0;
         }
     }
 
@@ -247,6 +252,9 @@ public class MathUtils {
      */
     public static double calculateTvarOfSortedValues(double[] sortedValues, double severity, QuantilePerspective perspective) {
         severity = severity / 100d;
+        if (severity >= 1.0) {
+            throw new IllegalArgumentException("TVaR not defined for quantile-levels greater than or equal to 1.0");
+        }
         int size = sortedValues.length;
         int index = (int) Math.floor(size * severity);
         double sum = 0;
@@ -257,13 +265,13 @@ public class MathUtils {
                     sum += sortedValues[i];
                 }
                 conditionalMean = sum / (size * (1 - severity));
-                return conditionalMean - (calculateSum(sortedValues) / (double) size);
+                return conditionalMean - calculateMean(sortedValues);
             case PROFIT:
                 for (int i = index; i < size; i++) {
                     sum += sortedValues[size - (i + 1)];
                 }
                 conditionalMean = sum / (size * (1 - severity));
-                return -(conditionalMean - (calculateSum(sortedValues) / (double) size));
+                return -(conditionalMean - calculateMean(sortedValues));
             default:
                 throw new IllegalArgumentException("TVaR is calculated for loss or profit distribution: specify accordingly!");
         }
@@ -282,7 +290,7 @@ public class MathUtils {
     }
 
     public static double calculateMean(double[] values) {
-        return calculateSum(values) / values.length;
+        return calculateSum(values) / (double) values.length;
     }
 
     public static double calculateSum(double[] values) {

@@ -121,7 +121,7 @@ class Parameterization extends ParametrizedItem {
             id = daoToBeSaved.id
             notifyItemSaved()
         }
-
+        LOG.info("Saved parameterization ${this}")
         return result
     }
 
@@ -214,6 +214,14 @@ class Parameterization extends ParametrizedItem {
     void addComment(Comment comment) {
         setChanged(true)
         super.addComment(comment)
+    }
+
+    void addTaggedComment(String commentText, Tag tag) {
+        String modelName = Model.getName(modelClass)
+        Comment comment = new Comment(modelName, -1)
+        comment.text = commentText
+        comment.addTag(tag)
+        this.addComment(comment)
     }
 
     @Override
@@ -388,16 +396,17 @@ class Parameterization extends ParametrizedItem {
 
 
     public List<Tag> getTags() {
-        addRemoveLockTag()
         return tags
     }
 
-    private void addRemoveLockTag() {
+    public void addRemoveLockTag() {
+        if (!isLoaded()) load()
         Tag locked = Tag.findByName("LOCKED")
         if (!tags.contains(locked) && isUsedInSimulation())
             tags << locked
         else if (tags.contains(locked) && !isUsedInSimulation())
             tags.remove(locked)
+        save()
     }
 
     public void setTags(Set selectedTags) {
@@ -488,5 +497,11 @@ class Parameterization extends ParametrizedItem {
         }
         return 0
     }
+
+    @Override
+    String toString() {
+        "$name v$versionNumber"
+    }
+
 
 }

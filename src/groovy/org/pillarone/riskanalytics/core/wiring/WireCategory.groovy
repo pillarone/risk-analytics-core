@@ -32,17 +32,21 @@ class WireCategory {
 
         def source = ((LinkedProperty) sender).source
         def sourcePropertyName = ((LinkedProperty) sender).name
-        PacketList sourceProperty = source.properties[sourcePropertyName]
-        PacketList targetProperty = target.properties[targetPropertyName]
-        if (!targetProperty.isCompatibleTo(sourceProperty)) {
-            throw new IllegalArgumentException("Wiring only allowed with same types for input and output")
+        try {
+            PacketList sourceProperty = source.properties[sourcePropertyName]
+            PacketList targetProperty = target.properties[targetPropertyName]
+            if (!targetProperty.isCompatibleTo(sourceProperty)) {
+                throw new IllegalArgumentException("Wiring only allowed with same types for input and output")
+            }
+            Transmitter transmitter = createTransmitter(sourceProperty, source, targetProperty, target)
+            if (packetListener.get()!=null){
+                transmitter=new TraceableTransmitter(transmitter,packetListener.get());
+            }
+            target.allInputTransmitter << transmitter
+            source.allOutputTransmitter << transmitter
+        } catch (Throwable t) {
+            throw new WiringException("doSetProperty failed, sourcePropertyName: " + sourcePropertyName + ", targetPropertyName: " + targetPropertyName + ", msg: " + t.getMessage(), t);
         }
-        Transmitter transmitter = createTransmitter(sourceProperty, source, targetProperty, target)
-        if (packetListener.get()!=null){
-            transmitter=new TraceableTransmitter(transmitter,packetListener.get());
-        }
-        target.allInputTransmitter << transmitter
-        source.allOutputTransmitter << transmitter
     }
 
     protected static Transmitter createTransmitter(PacketList sourceProperty, Component source, PacketList targetProperty, Component target) {

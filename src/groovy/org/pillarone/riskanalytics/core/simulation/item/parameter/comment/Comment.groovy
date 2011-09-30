@@ -7,6 +7,7 @@ import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.user.UserManagement
 import org.pillarone.riskanalytics.core.util.GroovyUtils
+import org.springframework.transaction.TransactionStatus
 
 class Comment implements Cloneable {
 
@@ -53,8 +54,10 @@ class Comment implements Cloneable {
         commentMap['tags']?.each {String tagName ->
             Tag tag = Tag.findByName(tagName)
             if (!tag) {
-                tag = new Tag(name: tagName)
-                tag.save()
+                Tag.withTransaction {TransactionStatus status ->
+                    tag = new Tag(name: tagName)
+                    tag.save()
+                }
             }
             addTag(tag)
         }

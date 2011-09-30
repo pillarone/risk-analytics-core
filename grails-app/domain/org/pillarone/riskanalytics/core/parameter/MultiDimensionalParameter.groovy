@@ -44,24 +44,6 @@ class MultiDimensionalParameter extends Parameter {
         removeObsoleteTitles(value.rowCount, value.columnCount)
     }
 
-    private static Map CLASS_NAMES_FROM_v16_TO_v17 =
-    ["org.pillarone.riskanalytics.domain.pc.underwriting.IUnderwritingInfoMarker"
-            : "org.pillarone.riskanalytics.domain.utils.marker.IUnderwritingInfoMarker",
-     "org.pillarone.riskanalytics.domain.pc.generators.claims.PerilMarker"
-      : "org.pillarone.riskanalytics.domain.utils.marker.IPerilMarker"]
-
-    private String translateClassNamesHACK_migration_v16_v17(String name) {
-        if (! CLASS_NAMES_FROM_v16_TO_v17.containsKey(name)) {
-            return name
-        }
-        try {
-            Class.forName(name)
-            return name
-        } catch (ClassNotFoundException e) {
-            return CLASS_NAMES_FROM_v16_TO_v17.get(name)
-        }
-    }
-
     private void extractRowTitles(List titles, int offset) {
         for (int i = 0; i < titles.size(); i++) {
             modifyOrCreateParameterTitle(i + offset, 0, titles[i])
@@ -158,8 +140,7 @@ class MultiDimensionalParameter extends Parameter {
         Class clazz = Thread.currentThread().contextClassLoader.loadClass(className)
         Class markerClass
         if (markerClassName != null) {
-            String translatedClassName = translateClassNamesHACK_migration_v16_v17(markerClassName)
-            markerClass = Thread.currentThread().contextClassLoader.loadClass(translatedClassName)
+            markerClass = Thread.currentThread().contextClassLoader.loadClass(markerClassName)
         }
         def mdpInstance = null
         switch (className) {

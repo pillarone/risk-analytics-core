@@ -50,7 +50,7 @@ class WiringCategoryTests extends GroovyTestCase {
         sender.outValue1 = new PacketList()
         receiver.input1 = new PacketList(TestPacketApple)
         // elements of sender's packetList do not fit into receivers input PacketList
-        shouldFail(IllegalArgumentException, {WireCategory.doSetProperty(receiver, "input1", property)})
+        shouldFail(WiringException, {WireCategory.doSetProperty(receiver, "input1", property)})
 
     }
 

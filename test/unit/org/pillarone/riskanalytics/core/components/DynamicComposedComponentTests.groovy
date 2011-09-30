@@ -22,6 +22,22 @@ class DynamicComposedComponentTests extends GroovyTestCase {
 
     }
 
+    void testCacheIsCleared() {
+        TestDynamicComposedComponent composedComponent = new TestDynamicComposedComponent()
+        final TestComponent testComponent = new TestComponent(name: "subTest")
+        composedComponent.addSubComponent(testComponent)
+        assertTrue(composedComponent.properties.keySet().contains("subTest"))
+
+        composedComponent.removeSubComponent(testComponent)
+        assertFalse(composedComponent.properties.keySet().contains("subTest"))
+
+        composedComponent.addSubComponent(testComponent)
+        assertTrue(composedComponent.properties.keySet().contains("subTest"))
+
+        composedComponent.clear()
+        assertFalse(composedComponent.properties.keySet().contains("subTest"))
+    }
+
     void testGetProperties() {
         TestDynamicComposedComponent composedComponent = new TestDynamicComposedComponent()
         composedComponent.addSubComponent(new TestComponent(name: 'subSomeComponent'))

@@ -32,10 +32,6 @@ public class PacketCollector extends Component {
 
     SimulationScope simulationScope
 
-    private PathMapping pathMapping
-    private CollectorMapping collectorMapping
-    private Map fieldMappings = [:]
-
     String path
 
     public PacketCollector() {

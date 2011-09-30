@@ -74,6 +74,7 @@ class Simulation extends ParametrizedItem {
         }
         run.beginOfFirstPeriod = beginOfFirstPeriod
         run.creationDate = creationDate
+        run.creator = creator
         run.modificationDate = modificationDate
         run.randomSeed = randomSeed
         saveComments(run)
@@ -104,6 +105,7 @@ class Simulation extends ParametrizedItem {
         }
         beginOfFirstPeriod = run.beginOfFirstPeriod
         creationDate = run.creationDate
+        creator = run.creator
         modificationDate = run.modificationDate
         randomSeed = run.randomSeed
         if (completeLoad) {

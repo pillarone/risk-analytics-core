@@ -2,10 +2,15 @@ package org.pillarone.riskanalytics.core.dataaccess
 
 import org.pillarone.riskanalytics.core.util.MathUtils
 import org.pillarone.riskanalytics.core.output.*
-
+import groovy.sql.Sql
 import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper
+import org.pillarone.riskanalytics.core.util.GroovyUtils
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 
 abstract class ResultAccessor {
+
+    private static Log LOG = LogFactory.getLog(ResultAccessor)
 
     private static HashMap<String, Integer> pathCache = new HashMap<String, Integer>();
     private static HashMap<String, Integer> fieldCache = new HashMap<String, Integer>();
@@ -26,6 +31,19 @@ abstract class ResultAccessor {
     static List getRawData(SimulationRun simulationRun) {
         //TODO: won't work like this
         return SingleValueResult.findAllBySimulationRun(simulationRun)
+    }
+
+    static String exportCsv(SimulationRun simulationRun) {
+        String fileName = GroovyUtils.getExportFileName(simulationRun)
+        if (new File(fileName).exists()) return fileName
+        Sql sql = new Sql(simulationRun.dataSource)
+        try {
+            sql.execute("select concat_ws(',',cast(s.iteration as char),cast(s.period as char),mapping.path_name, cast(s.value as char))  INTO OUTFILE ? from single_value_result as s, path_mapping as mapping  where s.simulation_run_id ='" + simulationRun.id + "' and mapping.id=s.path_id", [fileName])
+        } catch (Exception ex) {
+            LOG.error "exception occured during export simulation as csv : $ex"
+            return null
+        }
+        return fileName
     }
 
     static List getPaths(SimulationRun simulationRun) {
@@ -141,8 +159,8 @@ abstract class ResultAccessor {
     }
 
     static Double getNthOrderStatistic(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName,
-                                       String fieldName, double percentage, CompareOperator compareOperator, boolean singleValuesCollected) {
-        double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName, singleValuesCollected) as double[]
+                                       String fieldName, double percentage, CompareOperator compareOperator) {
+        double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
         double lowestPercentage = 100d / values.size()
         if ((compareOperator.equals(CompareOperator.LESS_THAN) && percentage <= lowestPercentage)
                 || compareOperator.equals(CompareOperator.GREATER_THAN) && percentage == 100) {
@@ -188,7 +206,7 @@ abstract class ResultAccessor {
             return result.result
         }
         else {
-            double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName, true) as double[]
+            double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
             return MathUtils.calculatePercentile(values, severity, perspective)
         }
     }

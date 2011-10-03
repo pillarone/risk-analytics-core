@@ -8,6 +8,7 @@ import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
 import org.pillarone.riskanalytics.core.wiring.WireCategory
 import org.pillarone.riskanalytics.core.wiring.WiringUtils
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
+import java.lang.reflect.Field
 
 abstract class Model {
 
@@ -189,4 +190,14 @@ abstract class Model {
         }
         return new VersionNumber(versionNumber)
     }
+
+    List<String> getSortedProperties() {
+        List<String> sortedProps = []
+
+        getClass().declaredFields.each {Field field ->
+            sortedProps << field.name
+        }
+        return sortedProps
+    }
+
 }

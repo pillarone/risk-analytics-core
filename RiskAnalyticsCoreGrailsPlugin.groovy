@@ -27,7 +27,7 @@ import org.pillarone.riskanalytics.core.FileConstants
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.4-BETA-7-kti"
+    def version = "1.4-BETA-7.1-kti"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.7 > *"
     // the other plugins this plugin depends on

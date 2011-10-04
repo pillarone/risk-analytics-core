@@ -10,8 +10,6 @@ public interface IReportModel {
 
     URL getMainReportFile()
 
-    List<URL> getAllSourceFiles()
-
     JRDataSource getDataSource(IReportData reportData)
 
     Map getParameters(IReportData reportData)

@@ -100,19 +100,6 @@ class CoreBootStrap {
             }
         }
 
-        if (!Boolean.getBoolean("keepCompiledJasperFiles")) {
-            for (IReportModel reportModel in ReportRegistry.getAllReportModels()) {
-                for (URL url in reportModel.allSourceFiles) {
-                    URL jasperURL = new URL(url.toExternalForm().replace("jrxml", "jasper"))
-                    File jasperFile = new File(jasperURL.toURI())
-                    if(jasperFile.exists()) {
-                        jasperFile.delete()
-                        LOG.info("Deleting cached report file ${jasperFile.name}")
-                    }
-                }
-            }
-        }
-
         if (Environment.current == Environment.TEST) {
             return
         }

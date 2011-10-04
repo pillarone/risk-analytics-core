@@ -25,8 +25,6 @@ abstract class ReportFactory {
     }
 
     public static byte[] createReport(IReportModel reportModel, IReportData reportData, JRExporter exporter) {
-        compileReport(reportModel)
-
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()
         exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, byteArrayOutputStream)
 
@@ -39,17 +37,6 @@ abstract class ReportFactory {
 
         return byteArrayOutputStream.toByteArray()
 
-    }
-
-    private static void compileReport(IReportModel model) {
-        for (URL url in model.allSourceFiles) {
-            URL jasperURL = new URL(url.toExternalForm().replace("jrxml", "jasper"))
-            File jasperFile = new File(jasperURL.toURI())
-            File sourceFile = new File(url.toURI())
-            if(!jasperFile.exists() || jasperFile.lastModified() < sourceFile.lastModified()) {
-                JasperCompileManager.compileReportToStream(sourceFile.newInputStream(), jasperFile.newOutputStream())
-            }
-        }
     }
 
 }

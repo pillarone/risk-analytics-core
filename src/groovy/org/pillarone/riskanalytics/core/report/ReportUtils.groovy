@@ -1,18 +1,18 @@
 package org.pillarone.riskanalytics.core.report
 
 import org.pillarone.riskanalytics.core.report.impl.ReportDataCollection
-import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.report.impl.ModellingItemReportData
+import org.pillarone.riskanalytics.core.simulation.item.ModellingItem
 
 /**
  * bzetterstrom
  */
 abstract class ReportUtils {
-    public static Simulation getSingleSimulation(IReportData reportData) {
-        Simulation simulation = null;
+    public static ModellingItem getSingleModellingItem(IReportData reportData) {
+        ModellingItem modellingItem = null;
         reportData.accept(new IReportDataVisitor() {
             void visitModellingItemReportData(ModellingItemReportData modellingItemReportData) {
-                simulation = (Simulation)modellingItemReportData.item
+                modellingItem = (ModellingItem)modellingItemReportData.item
             }
 
             void visitReportDataCollection(ReportDataCollection reportDataCollection) {
@@ -25,6 +25,26 @@ abstract class ReportUtils {
                 }
             }
         })
-        simulation
+        modellingItem
     }
+
+    public static boolean isSingleItem(final IReportData reportData, final Class expectedItemType) {
+        boolean isSingleItem = false;
+        reportData.accept(new IReportDataVisitor() {
+            void visitModellingItemReportData(ModellingItemReportData modellingItemReportData) {
+                isSingleItem = expectedItemType.isAssignableFrom(modellingItemReportData.item.getClass())
+            }
+
+            void visitReportDataCollection(ReportDataCollection reportDataCollection) {
+                if (reportDataCollection.size() != 1) {
+                    isSingleItem = false
+                } else {
+                    reportDataCollection.get(0).accept(this)
+                }
+            }
+        })
+        isSingleItem
+    }
+
+
 }

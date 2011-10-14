@@ -12,6 +12,35 @@ abstract class ReportFactory {
 
     private static Log LOG = LogFactory.getLog(ReportFactory)
 
+    public enum ReportFormat {
+
+        PDF (new JRPdfExporter(), "PDF", "pdf"),
+        PPT  (new JRPptxExporter(), "PowerPoint", "pptx"),
+        XLS  (new JRXlsExporter(), "Excel", "xls")
+
+        private final JRExporter jrExporter
+        private final String renderedFormatSuchAsPDF
+        private final String fileExtension
+
+        ReportFormat(JRExporter jrExporter, String renderedFormatSuchAsPDF, String fileExtension) {
+            this.jrExporter = jrExporter
+            this.renderedFormatSuchAsPDF = renderedFormatSuchAsPDF
+            this.fileExtension = fileExtension
+        }
+
+        public JRExporter getExporter() {
+            jrExporter
+        }
+
+        public String getRenderedFormatSuchAsPDF() {
+            renderedFormatSuchAsPDF
+        }
+
+        public String getFileExtension() {
+            fileExtension
+        }
+    }
+
     public static byte[] createPDFReport(IReportModel reportModel, IReportData reportData) {
         return createReport(reportModel, reportData, new JRPdfExporter())
     }
@@ -22,6 +51,10 @@ abstract class ReportFactory {
 
     public static byte[] createXLSReport(IReportModel reportModel, IReportData reportData) {
         return createReport(reportModel, reportData, new JRXlsExporter())
+    }
+
+    public static byte[] createReport(IReportModel reportModel, IReportData reportData, ReportFormat format) {
+        return createReport(reportModel, reportData, format.getExporter())
     }
 
     public static byte[] createReport(IReportModel reportModel, IReportData reportData, JRExporter exporter) {

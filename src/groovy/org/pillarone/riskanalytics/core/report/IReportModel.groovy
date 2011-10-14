@@ -1,8 +1,8 @@
 package org.pillarone.riskanalytics.core.report
 
 import net.sf.jasperreports.engine.JRDataSource
-import org.pillarone.riskanalytics.core.simulation.item.Simulation
-
+import org.pillarone.riskanalytics.core.report.ReportFactory
+import org.pillarone.riskanalytics.core.report.ReportFactory.ReportFormat
 
 public interface IReportModel {
 
@@ -15,4 +15,6 @@ public interface IReportModel {
     Map getParameters(IReportData reportData)
 
     String getDefaultReportFileNameWithoutExtension(IReportData reportData)
+
+    boolean isValidFormatAndData(ReportFactory.ReportFormat reportFormat, IReportData reportData)
 }

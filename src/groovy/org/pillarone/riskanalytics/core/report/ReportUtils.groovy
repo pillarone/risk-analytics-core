@@ -3,6 +3,9 @@ package org.pillarone.riskanalytics.core.report
 import org.pillarone.riskanalytics.core.report.impl.ReportDataCollection
 import org.pillarone.riskanalytics.core.report.impl.ModellingItemReportData
 import org.pillarone.riskanalytics.core.simulation.item.ModellingItem
+import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
+import org.pillarone.riskanalytics.core.model.Model
+import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 
 /**
  * bzetterstrom
@@ -46,5 +49,15 @@ abstract class ReportUtils {
         isSingleItem
     }
 
+    public static void loadAndApplyParameterizationToModel(Model model, Parameterization parameterization) {
+        model.init()
+
+        ParameterApplicator applicator = new ParameterApplicator()
+        applicator.model = model
+        parameterization.load(true)
+        applicator.parameterization = parameterization
+        applicator.init()
+        applicator.applyParameterForPeriod(0)
+    }
 
 }

@@ -1,7 +1,5 @@
 package org.pillarone.riskanalytics.core.output
 
-import org.jfree.data.statistics.HistogramDataset
-
 /**
  * Created by IntelliJ IDEA.
  * User: fja

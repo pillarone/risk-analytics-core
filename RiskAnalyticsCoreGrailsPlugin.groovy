@@ -22,6 +22,8 @@ import org.pillarone.riskanalytics.core.util.GrailsConfigValidator
 import org.springframework.remoting.rmi.RmiProxyFactoryBean
 import org.springframework.remoting.rmi.RmiServiceExporter
 import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
+import org.codehaus.groovy.grails.orm.hibernate.HibernateEventListeners
+import org.pillarone.riskanalytics.core.listener.ModellingItemHibernateListener
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
@@ -91,6 +93,14 @@ Persistence & Simulation engine.
         }
 
         resultServiceBean(ResultService) { }
+
+        modellingItemListener(ModellingItemHibernateListener)
+
+        hibernateEventListeners(HibernateEventListeners) {
+            listenerMap = ['post-insert':modellingItemListener,
+                    'post-update':modellingItemListener,
+                    'post-delete':modellingItemListener]
+        }
     }
 
     def doWithDynamicMethods = {ctx ->

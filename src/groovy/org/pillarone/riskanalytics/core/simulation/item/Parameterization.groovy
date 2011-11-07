@@ -284,7 +284,7 @@ class Parameterization extends ParametrizedItem {
             tags = dao.tags*.tag
             if (!tags) tags = []
         }
-        LOG.info("Parameterization $name loaded in ${System.currentTimeMillis() - time}ms")
+        LOG.info("Parameterization $name v$versionNumber loaded in ${System.currentTimeMillis() - time}ms")
     }
 
     private void loadComments(ParameterizationDAO dao) {

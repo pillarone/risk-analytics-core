@@ -5,7 +5,7 @@ import org.pillarone.riskanalytics.core.packets.SingleValuePacket;
 
 public class SumAggregatorSingleValuePacket implements IPacketAggregator<SingleValuePacket> {
 
-    public SingleValuePacket aggregate(PacketList packets) {
+    public SingleValuePacket aggregate(PacketList<SingleValuePacket> packets) {
 
         SingleValuePacket aggregatedPacket = null;
         try {

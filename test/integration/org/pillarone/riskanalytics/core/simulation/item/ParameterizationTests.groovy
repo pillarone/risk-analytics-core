@@ -51,6 +51,7 @@ class ParameterizationTests extends GroovyTestCase {
 
         assertNotNull parameterization.dao
         assertNotNull parameterization.modelClass
+        assertNotNull parameterization.tags
         assertSame "wrong model class", EmptyModel, parameterization.modelClass
     }
 
@@ -109,6 +110,7 @@ class ParameterizationTests extends GroovyTestCase {
         reloadedParameterization.load()
 
         assertEquals "modelClass not changed", CoreModel, reloadedParameterization.modelClass
+        assertNotNull parameterization.tags
     }
 
 

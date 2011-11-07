@@ -24,10 +24,12 @@ import org.pillarone.riskanalytics.core.parameterization.SimpleConstraint
 import org.gridgain.grid.GridSpringBean
 import org.gridgain.grid.GridConfigurationAdapter
 import org.pillarone.riskanalytics.core.FileConstants
+import org.codehaus.groovy.grails.orm.hibernate.HibernateEventListeners
+import org.pillarone.riskanalytics.core.listener.ModellingItemHibernateListener
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.4-BETA-7.1-kti"
+    def version = "1.4-RC-2-kri"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.7 > *"
     // the other plugins this plugin depends on
@@ -107,6 +109,14 @@ Persistence & Simulation engine.
         }
         grid(GridSpringBean) {
             configuration = ref('grid.cfg')
+        }
+
+        modellingItemListener(ModellingItemHibernateListener)
+
+        hibernateEventListeners(HibernateEventListeners) {
+            listenerMap = ['post-insert':modellingItemListener,
+                    'post-update':modellingItemListener,
+                    'post-delete':modellingItemListener]
         }
     }
 

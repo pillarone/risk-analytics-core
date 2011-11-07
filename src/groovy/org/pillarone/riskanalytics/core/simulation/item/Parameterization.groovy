@@ -45,7 +45,7 @@ class Parameterization extends ParametrizedItem {
      */
     Integer periodCount
     List<ParameterHolder> parameterHolders
-    List<Tag> tags
+    List<Tag> tags = []
     List periodLabels
 
     boolean orderByPath = false
@@ -69,7 +69,6 @@ class Parameterization extends ParametrizedItem {
         setName(name)
         versionNumber = new VersionNumber('1')
         parameterHolders = []
-        tags = []
         status = Status.NONE
         periodCount = 1
     }
@@ -284,6 +283,7 @@ class Parameterization extends ParametrizedItem {
             loadParameters(parameterHolders, dao.parameters)
             loadComments(dao)
             tags = dao.tags*.tag
+            if (!tags) tags = []
         }
         LOG.info("Parameterization $name loaded in ${System.currentTimeMillis() - time}ms")
     }

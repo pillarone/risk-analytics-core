@@ -176,7 +176,7 @@ class Comment implements Cloneable {
         clone.comment = comment
         clone.lastChange = (DateTime) new DateTime(lastChange.millis)
         clone.tags = tags.findAll {it.name != POST_LOCKING}.clone() as Set
-        clone.files = (Set) files.clone()
+        clone.files = (Set) files?.clone()
 
         clone.added = false
         clone.updated = false

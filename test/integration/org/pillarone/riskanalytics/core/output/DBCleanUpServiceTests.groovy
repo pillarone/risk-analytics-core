@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.output
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.joda.time.DateTime
+import models.core.CoreModel
 
 class DBCleanUpServiceTests extends GroovyTestCase {
     private DBCleanUpService service
@@ -10,17 +11,17 @@ class DBCleanUpServiceTests extends GroovyTestCase {
     void testCleanUp() {
         int runCount = SimulationRun.count()
         int resultCount = SingleValueResult.count()
-        SimulationRun simulationRun = new SimulationRun(name: "testRun", model: "model", startTime: new DateTime())
+        SimulationRun simulationRun = new SimulationRun(name: "testRun", model: CoreModel.name, startTime: new DateTime())
         ParameterizationDAO params = new ParameterizationDAO()
         params.name = "name"
-        params.modelClassName = "model"
+        params.modelClassName = CoreModel.name
         params.itemVersion = "0.0"
         params.periodCount = 1
         simulationRun.parameterization = params.save()
 
         ResultConfigurationDAO template = new ResultConfigurationDAO()
         template.name = "name"
-        template.modelClassName = "model"
+        template.modelClassName = CoreModel.name
         template.itemVersion = "0.0"
         simulationRun.resultConfiguration = template.save()
 

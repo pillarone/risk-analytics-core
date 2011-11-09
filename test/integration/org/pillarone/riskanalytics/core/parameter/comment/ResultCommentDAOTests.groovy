@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.parameter.comment
 
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.output.SimulationRun
+import models.core.CoreModel
 
 /**
  * @author fouad.jaada@intuitive-collaboration.com
@@ -14,7 +15,7 @@ class ResultCommentDAOTests extends GroovyTestCase {
         int commentCount = CommentDAO.count()
         int commentTagCount = CommentTag.count()
 
-        SimulationRun simulationRun = new SimulationRun(name: "testRun", model: "model", startTime: new DateTime())
+        SimulationRun simulationRun = new SimulationRun(name: "testRun", model: CoreModel.name, startTime: new DateTime())
         simulationRun.save()
 
         Tag tag = new Tag(name: 'tag').save()

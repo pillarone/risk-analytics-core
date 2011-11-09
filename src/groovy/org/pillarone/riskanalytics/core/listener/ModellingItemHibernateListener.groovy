@@ -10,6 +10,10 @@ import org.pillarone.riskanalytics.core.simulation.item.ModellingItem
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
+import org.pillarone.riskanalytics.core.output.SimulationRun
+import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
+import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,7 +26,7 @@ class ModellingItemHibernateListener implements PostInsertEventListener, PostUpd
     final List<ModellingItemListener> _listeners = new ArrayList<ModellingItemListener>();
 
     void addModellingItemListener(ModellingItemListener listener) {
-        assert ! _listeners.contains(listener);
+        assert !_listeners.contains(listener);
         _listeners.add(listener);
     }
 
@@ -33,7 +37,7 @@ class ModellingItemHibernateListener implements PostInsertEventListener, PostUpd
     void onPostInsert(PostInsertEvent postInsertEvent) {
         ModellingItem item = getModellingItem(postInsertEvent.entity)
         if (item != null) {
-            for(ModellingItemListener listener : _listeners) {
+            for (ModellingItemListener listener: _listeners) {
                 listener.modellingItemAdded(item)
             }
         }
@@ -42,7 +46,7 @@ class ModellingItemHibernateListener implements PostInsertEventListener, PostUpd
     void onPostUpdate(PostUpdateEvent postUpdateEvent) {
         ModellingItem item = getModellingItem(postUpdateEvent.entity)
         if (item != null) {
-            for(ModellingItemListener listener : _listeners) {
+            for (ModellingItemListener listener: _listeners) {
                 listener.modellingItemChanged(item)
             }
         }
@@ -51,43 +55,44 @@ class ModellingItemHibernateListener implements PostInsertEventListener, PostUpd
     void onPostDelete(PostDeleteEvent postDeleteEvent) {
         ModellingItem item = getModellingItem(postDeleteEvent.entity)
         if (item != null) {
-            for(ModellingItemListener listener : _listeners) {
+            for (ModellingItemListener listener: _listeners) {
                 listener.modellingItemDeleted(item)
             }
         }
     }
 
     ModellingItem getModellingItem(Object entity) {
-        // todo: add other relevant ModellingItem subclasses here, such as ResultConfiguration and Simulation
         if (entity instanceof ParameterizationDAO) {
-            return getItem((ParameterizationDAO)entity)
-        } else {
-            return null;
+            return toParameterization(entity)
+        } else if (entity instanceof ResultConfigurationDAO) {
+            return toResultConfiguration(entity)
+        } else if (entity instanceof SimulationRun) {
+            return toSimulation(entity)
         }
+
+        return null
     }
 
-    // todo: this code is based on a call in the class
-    //    org.pillarone.riskanalytics.application.dataaccess.item.ModellingItemFactory
-    // refactoring needed (we can not have dependencies on the RiskAnalyticsApplication package here
-    private ModellingItem getItem(ParameterizationDAO dao, Class modelClass = null) {
-        Parameterization item = new Parameterization(dao.name)
-        item.versionNumber = new VersionNumber(dao.itemVersion)
-        // PMO-645 set valid  for parameterization check
-        item.valid = dao.valid
-        item.status = dao.status
-        if (modelClass != null) {
-            item.modelClass = modelClass
-            item.creator = dao.creator
-            if (item.creator)
-                item.creator.username = dao.creator.username
-            item.lastUpdater = dao.lastUpdater
-            if (item.lastUpdater)
-                item.lastUpdater.username = dao.lastUpdater.username
-            item.creationDate = dao.getCreationDate()
-            item.modificationDate = dao.getModificationDate()
-            item.tags = dao.tags*.tag
-        }
-        item
+    private Parameterization toParameterization(ParameterizationDAO dao) {
+        Parameterization parameterization = new Parameterization(dao.name, getClass().getClassLoader().loadClass(dao.modelClassName))
+        parameterization.versionNumber = new VersionNumber(dao.itemVersion)
+
+        return parameterization
+    }
+
+    private ResultConfiguration toResultConfiguration(ResultConfigurationDAO dao) {
+        ResultConfiguration resultConfiguration = new ResultConfiguration(dao.name)
+        resultConfiguration.modelClass = getClass().getClassLoader().loadClass(dao.modelClassName)
+        resultConfiguration.versionNumber = new VersionNumber(dao.itemVersion)
+
+        return resultConfiguration
+    }
+
+    private Simulation toSimulation(SimulationRun dao) {
+        Simulation simulation = new Simulation(dao.name)
+        simulation.modelClass = getClass().getClassLoader().loadClass(dao.model)
+
+        return simulation
     }
 
 }

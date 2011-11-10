@@ -465,7 +465,9 @@ class Parameterization extends ParametrizedItem {
 
         original.tags = []
         tags.each {Tag tag ->
-            original.tags << tag.toString()
+            if (tag.toString() != Tag.LOCKED_TAG) {
+                original.tags << tag.toString()
+            }
         }
 
         return original

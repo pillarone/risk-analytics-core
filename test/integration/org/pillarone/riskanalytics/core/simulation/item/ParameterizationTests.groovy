@@ -18,6 +18,8 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.StringParamete
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
 import org.pillarone.riskanalytics.core.workflow.Status
+import org.pillarone.riskanalytics.core.parameter.comment.Tag
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.EnumTagType
 
 class ParameterizationTests extends GroovyTestCase {
 
@@ -421,6 +423,15 @@ class ParameterizationTests extends GroovyTestCase {
         configObject = parameterization.toConfigObject()
         assertEquals 8, configObject.size()
         assertEquals "periodLabels", ["Q1"], configObject.periodLabels
+
+        parameterization.tags << new Tag(name: "MyTag", tagType: EnumTagType.PARAMETERIZATION)
+        parameterization.tags << new Tag(name: Tag.LOCKED_TAG, tagType: EnumTagType.PARAMETERIZATION)
+
+        //do not export locked tag
+        configObject = parameterization.toConfigObject()
+        assertEquals(1, configObject.tags.size())
+        assertEquals("MyTag", configObject.tags[0])
+
     }
 
     void testValidation() {

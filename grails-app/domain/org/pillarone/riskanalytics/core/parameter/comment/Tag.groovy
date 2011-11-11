@@ -4,6 +4,8 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.EnumTa
 
 class Tag {
 
+    public static final String LOCKED_TAG = "LOCKED"
+
     String name
 
     EnumTagType tagType = EnumTagType.COMMENT

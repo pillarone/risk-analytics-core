@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.packets;
 
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -49,6 +51,15 @@ public class PacketList<E extends Packet> extends ArrayList<E> {
         return super.addAll(index, c);
     }
 
+    public Packet getPacketMatchingReportingDate(DateTime reportingDate  ) {
+        for (Packet packet : this) {
+            if(packet.getDate().equals(reportingDate)){
+                return packet;
+            }
+        }
+        throw new IllegalArgumentException("Packet not found with appropriate reporting date ");
+    }
+    
     public boolean isCompatibleTo(PacketList otherList) {
         return elementType.isAssignableFrom(otherList.elementType);
     }

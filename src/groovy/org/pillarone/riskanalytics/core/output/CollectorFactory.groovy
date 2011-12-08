@@ -5,6 +5,7 @@ import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.parameterization.StructureInformation
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 /**
  * The CollectorFactory is resonsible for the creation of PacketCollectors as they are defined in the
@@ -63,7 +64,7 @@ public class CollectorFactory {
         def component = model
 
         for (String componentName in pathElements[1..-2]) {
-            if (component.properties.keySet().contains(componentName)) {
+            if (GroovyUtils.getProperties(component).keySet().contains(componentName)) {
                 component = component[componentName]
             } else {
                 if (component instanceof DynamicComposedComponent) {

@@ -10,6 +10,7 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolde
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.EnumTagType
 import org.springframework.transaction.TransactionStatus
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 public class ParameterizationHelper {
 
@@ -116,7 +117,7 @@ public class ParameterizationHelper {
     }
 
     protected static void collectAllParameter(Model model, Map parameter) {
-        model.properties.each {propertyName, propertyValue ->
+        GroovyUtils.getProperties(model).each {propertyName, propertyValue ->
             if (propertyValue instanceof Component) {
                 collectAllParameter propertyValue, propertyName, parameter
             }
@@ -125,7 +126,7 @@ public class ParameterizationHelper {
 
     protected static void collectAllParameter(Component component, String prefix, Map parameter) {
 
-        component.properties.each {propertyName, propertyValue ->
+        GroovyUtils.getProperties(component).each {propertyName, propertyValue ->
             if (propertyName.startsWith("parm")) {
                 parameter[prefix + ":" + propertyName] = propertyValue
             }

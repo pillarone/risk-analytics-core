@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.output
 import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.util.ModelInjector
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 class CollectorInjector extends ModelInjector {
     Set collectors
@@ -27,7 +28,7 @@ class CollectorInjector extends ModelInjector {
         configObject.each {componentsPropertyName, value ->
             if (value instanceof ConfigObject) {
                 // handle selection for all subComponents
-                if (!object.properties.containsKey(componentsPropertyName) && object instanceof DynamicComposedComponent) {
+                if (!GroovyUtils.getProperties(object).containsKey(componentsPropertyName) && object instanceof DynamicComposedComponent) {
                     object.allSubComponents().each {subComponent ->
                         injectConfig configObject[componentsPropertyName], subComponent
                     }

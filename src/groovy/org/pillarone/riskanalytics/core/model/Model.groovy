@@ -9,6 +9,7 @@ import org.pillarone.riskanalytics.core.wiring.WireCategory
 import org.pillarone.riskanalytics.core.wiring.WiringUtils
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import java.lang.reflect.Field
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 abstract class Model {
 
@@ -39,7 +40,7 @@ abstract class Model {
     abstract void initComponents()
 
     void initAllComponents() {
-        for (prop in this.properties) {
+        for (prop in GroovyUtils.getProperties(this)) {
             if (prop.value instanceof Component && !allComponents.contains(prop.value)) {
                 allComponents << prop.value
             }
@@ -166,7 +167,7 @@ abstract class Model {
         if (clazz.isAssignableFrom(c.class)) {
             lobs << c
         } else if (c instanceof ComposedComponent) {
-            c.properties.each {key, val ->
+            GroovyUtils.getProperties(c).each {key, val ->
                 if (key.startsWith('sub')) {
                     traverseModel(val, lobs, clazz)
                 }

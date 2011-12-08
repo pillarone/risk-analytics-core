@@ -7,6 +7,7 @@ import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 /**
  * The ParameterApplicator is responsible for writing the parameter values defined by the ParameterizationDAO to the model.
@@ -103,7 +104,7 @@ public class ParameterApplicator {
 
     protected def getPropertyOrSubComponent(String propertyName, DynamicComposedComponent component) {
 
-        if (!component.properties.containsKey(propertyName)) {
+        if (!GroovyUtils.getProperties(component).containsKey(propertyName)) {
             if (propertyName.startsWith("sub")) {
                 Component subComponent = component.createDefaultSubComponent()
                 subComponent.name = propertyName

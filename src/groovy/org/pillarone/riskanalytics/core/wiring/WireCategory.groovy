@@ -4,6 +4,7 @@ import org.apache.log4j.Logger
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.packets.PacketList
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 class WireCategory {
 
@@ -33,8 +34,8 @@ class WireCategory {
         def source = ((LinkedProperty) sender).source
         def sourcePropertyName = ((LinkedProperty) sender).name
         try {
-            PacketList sourceProperty = source.properties[sourcePropertyName]
-            PacketList targetProperty = target.properties[targetPropertyName]
+            PacketList sourceProperty = GroovyUtils.getProperties(source)[sourcePropertyName]
+            PacketList targetProperty = GroovyUtils.getProperties(target)[targetPropertyName]
             if (!targetProperty.isCompatibleTo(sourceProperty)) {
                 throw new IllegalArgumentException("Wiring only allowed with same types for input and output")
             }

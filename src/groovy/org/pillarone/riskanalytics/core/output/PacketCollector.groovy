@@ -8,6 +8,7 @@ import org.pillarone.riskanalytics.core.packets.PacketList
 import org.pillarone.riskanalytics.core.parameterization.StructureInformation
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 import org.pillarone.riskanalytics.core.wiring.WireCategory
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 /**
  * A PacketCollector is a special component used for collecting other components output.
@@ -69,7 +70,7 @@ public class PacketCollector extends Component {
         def component = model
         def outChannel = pathElements[-1]
         pathElements[1..-2].each {propertyName ->
-            if (component.properties.containsKey(propertyName)) {
+            if (GroovyUtils.getProperties(component).containsKey(propertyName)) {
                 component = component[propertyName]
             } else {
                 component = structureInformation.componentPaths.inverse().get(pathElements[0..-2].join(":"))

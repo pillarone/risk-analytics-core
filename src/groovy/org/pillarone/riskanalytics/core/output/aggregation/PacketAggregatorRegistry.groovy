@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.output.aggregation
 
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.apache.commons.collections.MapUtils
 
 class PacketAggregatorRegistry {
 
@@ -36,6 +37,10 @@ class PacketAggregatorRegistry {
         }
 
         throw new IllegalStateException("No aggregator found for $packetClass.name")
+    }
+
+    public static Map<Class, IPacketAggregator> getAllAggregators() {
+        return MapUtils.unmodifiableMap(aggregatorMap)
     }
 
 }

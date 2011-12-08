@@ -7,6 +7,7 @@ import org.joda.time.DateTime;
 import org.pillarone.riskanalytics.core.batch.BatchRunInfoService;
 import org.pillarone.riskanalytics.core.output.Calculator;
 import org.pillarone.riskanalytics.core.output.PathMapping;
+import org.pillarone.riskanalytics.core.output.aggregation.PacketAggregatorRegistry;
 import org.pillarone.riskanalytics.core.simulation.SimulationState;
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.mapping.AbstractNodeMappingStrategy;
@@ -83,6 +84,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         for (int i = 0; i < Math.min(cpuCount, simulationBlocks.size()); i++) {
             UUID jobId = UUID.randomUUID();
             SimulationJob job = new SimulationJob(configurations.get(i), jobId, grid.localNode().id());
+            job.setAggregatorMap(PacketAggregatorRegistry.getAllAggregators());
             jobIds.add(jobId);
             jobs.add(job);
             LOG.info("Created a new job with block count " + configurations.get(i).getSimulationBlocks().size());

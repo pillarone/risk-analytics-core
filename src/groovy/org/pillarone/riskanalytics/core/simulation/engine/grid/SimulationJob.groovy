@@ -1,13 +1,14 @@
 package org.pillarone.riskanalytics.core.simulation.engine.grid
 
-import org.gridgain.grid.GridJobAdapter
-import org.pillarone.riskanalytics.core.simulation.engine.SimulationRunner
-import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-
+import org.gridgain.grid.GridJobAdapter
+import org.pillarone.riskanalytics.core.output.aggregation.PacketAggregatorRegistry
+import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
+import org.pillarone.riskanalytics.core.simulation.engine.SimulationRunner
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.GridOutputStrategy
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.JobResult
+import org.pillarone.riskanalytics.core.output.aggregation.IPacketAggregator
 
 class SimulationJob extends GridJobAdapter<JobResult> {
 
@@ -17,6 +18,8 @@ class SimulationJob extends GridJobAdapter<JobResult> {
     private int jobCount = 0;
 
     private static Log LOG = LogFactory.getLog(SimulationJob)
+
+    Map<Class, IPacketAggregator> aggregatorMap = [:]
 
     public SimulationJob(SimulationConfiguration simulationConfiguration, UUID jobId, UUID masterNodeId) {
         this.jobIdentifier = jobId
@@ -31,6 +34,10 @@ class SimulationJob extends GridJobAdapter<JobResult> {
         getClass().getClassLoader().loadClass("java.lang.reflect.InvocationTargetException")
         getClass().getClassLoader().loadClass("org.pillarone.riskanalytics.core.components.ComponentUtils")
         //***** http://www.gridgainsystems.com/jiveforums/thread.jspa?threadID=1324&tstart=0
+
+        for(Map.Entry<Class, IPacketAggregator> entry in aggregatorMap) {
+            PacketAggregatorRegistry.registerAggregator(entry.key, entry.value)
+        }
 
         Date start = new Date()
         ExpandoMetaClass.enableGlobally()

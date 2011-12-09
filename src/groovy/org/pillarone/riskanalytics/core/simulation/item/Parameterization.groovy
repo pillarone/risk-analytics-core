@@ -98,11 +98,8 @@ class Parameterization extends ParametrizedItem {
 
     public save() {
         def result = null
-        def daoToBeSaved = getDao()
         daoClass.withTransaction {TransactionStatus status ->
-            if (daoToBeSaved.id != null) {
-                daoToBeSaved = daoToBeSaved.merge()
-            }
+            def daoToBeSaved = getDao()
             validate()
             if (!validationErrors.empty) {
                 LOG.warn("${daoToBeSaved} is not valid\n" + validationErrors.join("\n"))
@@ -284,7 +281,7 @@ class Parameterization extends ParametrizedItem {
             tags = dao.tags*.tag
             if (!tags) tags = []
         }
-        LOG.info("Parameterization $name v$versionNumber loaded in ${System.currentTimeMillis() - time}ms")
+        LOG.info("Parameterization $name loaded in ${System.currentTimeMillis() - time}ms")
     }
 
     private void loadComments(ParameterizationDAO dao) {

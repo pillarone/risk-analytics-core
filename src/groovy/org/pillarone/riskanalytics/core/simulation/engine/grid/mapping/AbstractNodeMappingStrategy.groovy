@@ -27,7 +27,7 @@ abstract class AbstractNodeMappingStrategy implements INodeMappingStrategy {
         for (GridNode node: usableNodes) {
             String ip = node.externalAddresses().iterator().next();
             if (!usedHosts.contains(ip)) {
-                processorCount += node.metrics().getAvailableProcessors();
+                processorCount += node.metrics().getTotalCpus();
                 usedHosts.add(ip);
             }
         }

@@ -92,7 +92,7 @@ class PortReplicatorCategory {
 
     static boolean isSubcomponent(Component compound, Component component) {
         for (p in GroovyUtils.getProperties(compound).values()) {
-            if (p && (p.is(component) || (Collection.isAssignableFrom(p.class) && p.contains(component)))) {
+            if (p && (p.is(component) || (Collection.isAssignableFrom(p.getClass()) && p.contains(component)))) {
                 return true
             }
         }

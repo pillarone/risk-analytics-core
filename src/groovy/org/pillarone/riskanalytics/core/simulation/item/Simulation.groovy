@@ -139,6 +139,16 @@ class Simulation extends ParametrizedItem {
         parameter.modified = false
     }
 
+    public Object getParameter(String path) {
+        for (int i = 0; i < runtimeParameters.size(); i++) {
+            ParameterHolder parameterHolder = runtimeParameters.get(i);
+            if (parameterHolder.getPath().equals(path)) {
+                return parameterHolder.getBusinessObject();
+            }
+        }
+        throw new IllegalArgumentException("Failed to get runtime parameter for path '${path}'.");
+    }
+
     private void loadComments(SimulationRun dao) {
         comments = []
 

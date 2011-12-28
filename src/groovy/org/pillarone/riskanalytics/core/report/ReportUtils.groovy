@@ -49,6 +49,22 @@ abstract class ReportUtils {
         isSingleItem
     }
 
+    public static Collection<ModellingItem> getModellingItemCollection(IReportData reportData) {
+        List<ModellingItem> modellingItems = new ArrayList<ModellingItem>();
+        reportData.accept(new IReportDataVisitor() {
+            void visitModellingItemReportData(ModellingItemReportData modellingItemReportData) {
+                modellingItems.add((ModellingItem)modellingItemReportData.item)
+            }
+
+            void visitReportDataCollection(ReportDataCollection reportDataCollection) {
+                for (IReportData reportData2: reportDataCollection) {
+                    reportData2.accept(this)
+                }
+            }
+        })
+        modellingItems
+    }
+
     public static void loadAndApplyParameterizationToModel(Model model, Parameterization parameterization) {
         model.init()
 

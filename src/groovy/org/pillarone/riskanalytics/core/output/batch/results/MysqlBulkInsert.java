@@ -14,8 +14,9 @@ class MysqlBulkInsert extends AbstractResultsBulkInsert {
             for (Object value : values) {
                 String toWrite = value != null ? value.toString() : "null";
                 getWriter().append(toWrite);
+                getWriter().append(',');
             }
-            getWriter().append(";");
+            getWriter().append(';');
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

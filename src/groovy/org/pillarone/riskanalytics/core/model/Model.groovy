@@ -14,7 +14,9 @@ import org.pillarone.riskanalytics.core.util.GroovyUtils
 abstract class Model {
 
     List<Component> allComponents = []
+    List<Component> allComponentsIncludingNested = []
     List<ComposedComponent> allComposedComponents = []
+    List<ComposedComponent> allComposedComponentsIncludingNested = []
 
     private List<Component> startComponents = []
     protected List<PeriodStore> allPeriodStores = []
@@ -26,15 +28,48 @@ abstract class Model {
 
     void init() {
         allComponents.clear()
+        allComponentsIncludingNested.clear()
         allComposedComponents.clear()
+        allComposedComponentsIncludingNested.clear()
         startComponents.clear()
 
         initComponents()
         initAllComponents()
+        initAllComponentsIncludingNested()
+        initAllComposedComponentsIncludingNested()
     }
 
     public static String getName(final Class modelClass) {
         return modelClass.simpleName - "Model"
+    }
+
+    public void initAllComponentsIncludingNested() {
+        if (!allComponentsIncludingNested.empty) return;
+        if (allComponents == null) {
+            initAllComponents();
+        }
+        for (Component component : allComponents) {
+            addComponentsRecursively(component, allComponentsIncludingNested);
+        }
+    }
+    
+    private void addComponentsRecursively(Component component, List<Component> components) {
+        components.add(component);
+        if (component instanceof ComposedComponent) {
+            for (Component nestedComponent : component.allSubComponents()) {
+                addComponentsRecursively(nestedComponent, components);
+            }
+        }
+    }
+    
+    private void initAllComposedComponentsIncludingNested() {
+        if (!allComposedComponentsIncludingNested.empty) return;
+        initAllComponentsIncludingNested();
+        for (Component component : allComponentsIncludingNested) {
+            if (component instanceof ComposedComponent) {
+                allComposedComponentsIncludingNested.add(component);
+            }
+        }
     }
 
     abstract void initComponents()

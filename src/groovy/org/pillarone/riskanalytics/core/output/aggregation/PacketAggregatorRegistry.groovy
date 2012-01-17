@@ -40,7 +40,7 @@ class PacketAggregatorRegistry {
     }
 
     public static Map<Class, IPacketAggregator> getAllAggregators() {
-        return MapUtils.unmodifiableMap(aggregatorMap)
+        return new HashMap(aggregatorMap)
     }
 
 }

@@ -16,6 +16,7 @@ import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.user.*
 import org.apache.commons.logging.LogFactory
 import org.apache.commons.logging.Log
+import org.pillarone.riskanalytics.core.output.AggregatedWithSingleAvailableCollectingModeStrategy
 
 class CoreBootStrap {
 
@@ -32,6 +33,7 @@ class CoreBootStrap {
             if (CollectorMapping.count() == 0) {
                 new CollectorMapping(collectorName: SingleValueCollectingModeStrategy.IDENTIFIER).save()
                 new CollectorMapping(collectorName: AggregatedCollectingModeStrategy.IDENTIFIER).save()
+                new CollectorMapping(collectorName: AggregatedWithSingleAvailableCollectingModeStrategy.IDENTIFIER).save()
             }
         }
 

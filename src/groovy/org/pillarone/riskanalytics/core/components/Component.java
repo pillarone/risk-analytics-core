@@ -27,7 +27,7 @@ abstract public class Component implements Cloneable {
     private IIdGenerator idGenerator;
     // todo(mwy): how to make sure that only classes derived of IComponentMarker are part of the list?
     private List<Class> markerList = new ArrayList<Class>();
-    
+
     protected Component() {
         for (Class intf : this.getClass().getInterfaces()) {
             if (IComponentMarker.class.isAssignableFrom(intf)) {
@@ -37,7 +37,7 @@ abstract public class Component implements Cloneable {
     }
 
     /** this constant is used for annotating PacketList */
-    protected final static Integer N = Integer.MAX_VALUE; 
+    protected final static Integer N = Integer.MAX_VALUE;
 
     abstract protected void doCalculation();
 
@@ -200,7 +200,12 @@ abstract public class Component implements Cloneable {
             for (Field field : declaredFields) {
                 String fieldName = field.getName();
                 if (fieldName.startsWith("in") || fieldName.startsWith("out") || fieldName.startsWith("parm") || fieldName.startsWith("sub")) {
-                    fields.put(fieldName, DefaultGroovyMethods.getAt(this, fieldName));
+                    field.setAccessible(true);
+                    try {
+                        fields.put(fieldName, field.get(this));
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
 

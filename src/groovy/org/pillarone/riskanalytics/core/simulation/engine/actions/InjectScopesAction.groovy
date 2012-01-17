@@ -24,7 +24,7 @@ public class InjectScopesAction implements Action {
 
     public void perform() {
         LOG.debug "Publishing scopes to components"
-        for (Component component : simulationScope.model.allComponentsIncludingNested) {
+        for (Component component : simulationScope.model.allComponentsRecursively) {
             addFallBackSimulationContext(component)
             injectScope "simulationScope", component
             injectScope "iterationScope", component

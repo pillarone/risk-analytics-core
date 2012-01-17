@@ -34,4 +34,7 @@ public class AggregatedCollectingModeStrategy extends AbstractCollectingModeStra
         return IDENTIFIER;
     }
 
+    public boolean isCompatibleWith(Class packetClass) {
+        return Packet.class.isAssignableFrom(packetClass);
+    }
 }

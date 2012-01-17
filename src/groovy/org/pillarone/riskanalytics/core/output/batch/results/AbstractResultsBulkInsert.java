@@ -7,33 +7,48 @@ import org.pillarone.riskanalytics.core.output.batch.AbstractBulkInsert;
 import org.pillarone.riskanalytics.core.util.GroovyUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /*
  * This is class is in java because it is called very often during a simulation and there is a significant performance boost compared to groovy.
  */
 public abstract class AbstractResultsBulkInsert extends AbstractBulkInsert {
 
+    private Map<Object, Long> idCache = new HashMap<Object, Long>();
+
     void addResults(List<SingleValueResultPOJO> results) {
         List values = new ArrayList(7);
         for (SingleValueResultPOJO result : results) {
-            values.add(getSimulationRunId());
-            values.add(result.getPeriod());
-            values.add(result.getIteration());
-            values.add(GroovyUtils.getId(result.getPath()));
-            values.add(GroovyUtils.getId(result.getField()));
-            values.add(GroovyUtils.getId(result.getCollector()));
-            values.add(result.getValue());
-            values.add(result.getValueIndex());
+            values.add(Long.toString(getSimulationRunId()));
+            values.add(Integer.toString(result.getPeriod()));
+            values.add(Integer.toString(result.getIteration()));
+            values.add(Long.toString(obtainId(result.getPath())));
+            values.add(Long.toString(obtainId(result.getField())));
+            values.add(Long.toString(obtainId(result.getCollector())));
+            values.add(Double.toString(result.getValue()));
+            values.add(Integer.toString(result.getValueIndex()));
             if (result.getDate() == null) {
                 values.add(null);
             }
             else {
-                values.add(result.getDate().getMillis());
+                values.add(Long.toString(result.getDate().getMillis()));
             }
             writeResult(values);
             values.clear();
         }
+    }
+
+    private long obtainId(Object mapping) {
+        if(idCache.containsKey(mapping)) {
+            return idCache.get(mapping);
+        }
+
+        long id = GroovyUtils.getId(mapping);
+        idCache.put(mapping, id);
+
+        return id;
     }
 
     public static AbstractBulkInsert getBulkInsertInstance() {

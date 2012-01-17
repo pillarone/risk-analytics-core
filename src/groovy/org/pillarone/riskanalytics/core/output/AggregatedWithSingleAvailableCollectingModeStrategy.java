@@ -8,4 +8,9 @@ public class AggregatedWithSingleAvailableCollectingModeStrategy extends Aggrega
     public String getIdentifier() {
         return IDENTIFIER;
     }
+
+    @Override
+    public boolean isCompatibleWith(Class packetClass) {
+        return false; //don't show in UI - used internally only
+    }
 }

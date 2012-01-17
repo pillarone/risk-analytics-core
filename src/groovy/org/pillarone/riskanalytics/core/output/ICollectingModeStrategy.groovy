@@ -4,13 +4,15 @@ import org.pillarone.riskanalytics.core.packets.PacketList
 
 public interface ICollectingModeStrategy {
 
-    //do not use a grails domain class here (performance)
-    List<SingleValueResultPOJO> collect(PacketList results) throws Exception
+  //do not use a grails domain class here (performance)
+  List<SingleValueResultPOJO> collect(PacketList results) throws Exception
 
-    String getDisplayName(Locale locale)
+  String getDisplayName(Locale locale)
 
-    String getIdentifier()
+  String getIdentifier()
 
-    void setPacketCollector(PacketCollector packetCollector)
+  void setPacketCollector(PacketCollector packetCollector)
+
+  boolean isCompatibleWith(Class packetClass)
 
 }

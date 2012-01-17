@@ -189,7 +189,7 @@ public class GroovyUtils {
         return result
     }
 
-    static Long getId(def domainClass) {
+    static long getId(def domainClass) {
         return domainClass.id
     }
 

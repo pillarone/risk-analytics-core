@@ -17,7 +17,7 @@ public class SingleValueResultPOJO {
     private CollectorMapping collector;
     private FieldMapping field;
     private int valueIndex;
-    private Double value;
+    private double value;
     private DateTime date;
 
     public CollectorMapping getCollector() {
@@ -68,11 +68,11 @@ public class SingleValueResultPOJO {
         this.simulationRun = simulationRun;
     }
 
-    public Double getValue() {
+    public double getValue() {
         return value;
     }
 
-    public void setValue(Double value) {
+    public void setValue(double value) {
         this.value = value;
     }
 

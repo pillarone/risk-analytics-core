@@ -85,6 +85,7 @@ class Simulation extends ParametrizedItem {
 
     protected void mapFromDao(def source, boolean completeLoad) {
         SimulationRun run = source as SimulationRun
+        this.run = run
         comment = run.comment
         modelClass = ModelRegistry.instance.getModelClass(run.model)
         Parameterization parameterization = new Parameterization(run.parameterization.name)

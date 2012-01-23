@@ -9,6 +9,8 @@ import org.pillarone.riskanalytics.core.simulation.engine.SimulationRunner
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.GridOutputStrategy
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.JobResult
 import org.pillarone.riskanalytics.core.output.aggregation.IPacketAggregator
+import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
+import org.pillarone.riskanalytics.core.simulation.ILimitedPeriodCounter
 
 class SimulationJob extends GridJobAdapter<JobResult> {
 
@@ -46,10 +48,15 @@ class SimulationJob extends GridJobAdapter<JobResult> {
         runner.start()
 
         GridOutputStrategy outputStrategy = this.simulationConfiguration.outputStrategy
-        return new JobResult(
+        final JobResult result = new JobResult(
                 totalMessagesSent: outputStrategy.totalMessages, start: start, end: new Date(),
                 nodeName: jobIdentifier.toString(), simulationException: runner.error?.error
         )
+        final IPeriodCounter periodCounter = runner.currentScope.iterationScope.periodScope.periodCounter
+        if(periodCounter instanceof ILimitedPeriodCounter) {
+            result.numberOfSimulatedPeriods = periodCounter.periodCount()
+        }
+        return result
     }
 
     void cancel() {

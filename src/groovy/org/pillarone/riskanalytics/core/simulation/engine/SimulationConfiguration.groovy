@@ -118,14 +118,20 @@ public class SimulationConfiguration implements Serializable, Cloneable {
         List<String> paths = []
         // todo: requires a proper refactoring as the core plugin itself knows nothing about the aggregate drill down collector
         ICollectingModeStrategy drillDownCollector = CollectingModeFactory.getStrategy("AGGREGATED_DRILL_DOWN")
-        if (drillDownCollector != null) {
-            for (PacketCollector collector : collectors) {
-                if (collector.mode.class.equals(drillDownCollector.class)) {
+        addMatchingCollector(drillDownCollector, collectors, paths)
+        ICollectingModeStrategy splitPerSourceCollector = CollectingModeFactory.getStrategy("SPLIT_PER_SOURCE")
+        addMatchingCollector(splitPerSourceCollector, collectors, paths)
+        return paths
+    }
+
+    private addMatchingCollector(ICollectingModeStrategy collectorModeStrategy, List<PacketCollector> collectors, ArrayList<String> paths) {
+        if (collectorModeStrategy != null) {
+            for (PacketCollector collector: collectors) {
+                if (collector.mode.class.equals(collectorModeStrategy.class)) {
                     paths << collector.path
                 }
             }
         }
-        return paths
     }
 
 }

@@ -16,10 +16,12 @@ class ModelHelper {
     private static final String RESERVES = "claimsGenerators"
     private static final String CONTRACTS = "reinsuranceContracts"
     private static final String LOB = "linesOfBusiness"
+    private static final String SEGMENTS = "segments"
     private static final String SEGMENT_MARKER = "SegmentMarker"
     private static final String PERIL_MARKER = "PerilMarker"
     private static final String RESERVE_MARKER = "IReserveMarker"
     private static final String CONTRACT_MARKER = "IReinsuranceContractMarker"
+    private static final String LEGAL_ENTITY_MARKER = "ILegalEntityMarker"
 
 
     /**
@@ -148,6 +150,7 @@ class ModelHelper {
         Class perilMarker = componentNameByMarkerInterface.keySet().find { clazz -> clazz.name.contains(PERIL_MARKER) }
         Class reserveMarker = componentNameByMarkerInterface.keySet().find { clazz -> clazz.name.contains(RESERVE_MARKER)}
         Class contractMarker = componentNameByMarkerInterface.keySet().find { clazz -> clazz.name.contains(CONTRACT_MARKER) }
+        Class legalEntityMarker = componentNameByMarkerInterface.keySet().find { clazz -> clazz.name.contains(LEGAL_ENTITY_MARKER) }
 
         for (String path : outputPathsByMarkerInterface.get(lobMarker)) {
             String pathWithoutChannel = getPathBase(path)
@@ -160,9 +163,18 @@ class ModelHelper {
             String pathWithoutChannel = getPathBase(path)
             String channel = getChannel(path)
             extendedPaths(componentNameByMarkerInterface, lobMarker, LOB, pathWithoutChannel, channel, results)
+            extendedPaths(componentNameByMarkerInterface, lobMarker, SEGMENTS, pathWithoutChannel, channel, results)
             extendedPaths(componentNameByMarkerInterface, perilMarker, PERILS, pathWithoutChannel, channel, results)
             extendedPaths(componentNameByMarkerInterface, reserveMarker, RESERVES, pathWithoutChannel, channel, results)
             extendedPaths(componentNameByMarkerInterface, lobMarker, LOB, contractMarker, PERILS, pathWithoutChannel, channel, results)
+            extendedPaths(componentNameByMarkerInterface, lobMarker, SEGMENTS, contractMarker, PERILS, pathWithoutChannel, channel, results)
+        }
+        for (String path : outputPathsByMarkerInterface.get(legalEntityMarker)) {
+            String pathWithoutChannel = getPathBase(path)
+            String channel = getChannel(path)
+            extendedPaths(componentNameByMarkerInterface, perilMarker, PERILS, pathWithoutChannel, channel, results)
+            extendedPaths(componentNameByMarkerInterface, contractMarker, CONTRACTS, pathWithoutChannel, channel, results)
+            extendedPaths(componentNameByMarkerInterface, lobMarker, SEGMENTS, pathWithoutChannel, channel, results)
         }
         return results
     }

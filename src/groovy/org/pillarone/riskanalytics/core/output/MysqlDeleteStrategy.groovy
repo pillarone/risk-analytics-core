@@ -19,6 +19,12 @@ class MysqlDeleteStrategy extends DeleteSimulationStrategy {
             } catch (Exception e) {
                 //the partition was not created yet
             }
+            try {
+                sql.execute("ALTER TABLE post_simulation_calculation DROP PARTITION P${simulationRun.id}")
+            } catch (Exception e) {
+//                the partition was not created yet
+            }
+
             sql.execute("DELETE FROM post_simulation_calculation where run_id=${simulationRun.id}")
             simulationRun.delete(flush: true)
             LOG.info "Simulation ${simulationRun.name} deleted in ${System.currentTimeMillis() - time}ms"

@@ -16,7 +16,7 @@ abstract public class ComposedComponent extends Component {
 
     private List<ITransmitter> allInputReplicationTransmitter = new ArrayList<ITransmitter>();
     private List<Transmitter> allOutputReplicationTransmitter = new ArrayList<Transmitter>();
-
+    private List<Component> startComponents;
 
     public List<ITransmitter> getAllInputReplicationTransmitter() {
         return allInputReplicationTransmitter;
@@ -29,6 +29,17 @@ abstract public class ComposedComponent extends Component {
     protected void doCalculation() {
         for (ITransmitter transmitter : allInputReplicationTransmitter) {
             transmitter.transmit();
+        }
+        if (startComponents == null) {
+            startComponents = new ArrayList<Component>();
+            for (Component component : allSubComponents()) {
+                if (!component.hasWiredInChannels()) {
+                    startComponents.add(component);
+                }
+            }
+        }
+        for (Component component : startComponents) {
+            component.start();
         }
     }
 

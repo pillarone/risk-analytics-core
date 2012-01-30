@@ -308,6 +308,21 @@ abstract public class Component implements Cloneable {
         return false;
     }
 
+    public boolean hasWiredInChannels() {
+        return numberOfWiredInChannels() > 0;
+    }
+
+    public int numberOfWiredInChannels() {
+        int number = 0;
+        Map<String, Object> properties = allComponentProperties();
+        for (Map.Entry<String, Object> property : properties.entrySet()) {
+            if (property.getKey().startsWith("in") && property.getValue() instanceof PacketList && isReceiverWired((PacketList) property.getValue())) {
+                number++;
+            }
+        }
+        return number;
+    }
+
     @Override
     public Component clone() throws CloneNotSupportedException {
         return (Component) super.clone();

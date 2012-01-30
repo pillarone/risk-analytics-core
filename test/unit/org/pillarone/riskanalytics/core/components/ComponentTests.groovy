@@ -110,6 +110,35 @@ class ComponentTests extends GroovyTestCase {
         assertEquals "correct property value", 2.0, list.get(0).value
     }
 
+    void testNumberOfWiredInChannels() {
+        Component component1 = new TestComponent()
+        Component component2 = new TestComponent()
+        assertEquals "component 1: no in channels wired", 0, component1.numberOfWiredInChannels()
+        assertEquals "component 2: no in channels wired", 0, component2.numberOfWiredInChannels()
+        assertFalse component1.hasWiredInChannels()
+        assertFalse component2.hasWiredInChannels()
+
+        Transmitter transmitter1 = new Transmitter(component1, component1.outValue1, component2, component2.input1)
+        component2.allInputTransmitter << transmitter1
+        assertEquals "component 1: no in channels wired after first wiring", 0, component1.numberOfWiredInChannels()
+        assertEquals "component 2: 1 in channels wired", 1, component2.numberOfWiredInChannels()
+        assertFalse component1.hasWiredInChannels()
+        assertTrue component2.hasWiredInChannels()
+
+        Transmitter transmitter2 = new Transmitter(component1, component1.outValue1, component2, component2.input1)
+        component2.allInputTransmitter << transmitter2
+        assertEquals "component 1: no in channels wired after second wiring", 0, component1.numberOfWiredInChannels()
+        assertEquals "component 2: 1 in channels wired", 1, component2.numberOfWiredInChannels()
+        assertFalse component1.hasWiredInChannels()
+        assertTrue component2.hasWiredInChannels()
+
+        Transmitter transmitter3 = new Transmitter(component1, component1.outValue1, component2, component2.input2)
+        component2.allInputTransmitter << transmitter3
+        assertEquals "component 1: no in channels wired after third wiring", 0, component1.numberOfWiredInChannels()
+        assertEquals "component 2: 2 in channels wired", 2, component2.numberOfWiredInChannels()
+        assertFalse component1.hasWiredInChannels()
+        assertTrue component2.hasWiredInChannels()
+    }
 }
 
 

@@ -2,6 +2,7 @@ import org.pillarone.riskanalytics.core.output.batch.results.SQLServerBulkInsert
 import org.pillarone.riskanalytics.core.output.batch.results.MysqlBulkInsert
 import org.pillarone.riskanalytics.core.output.batch.calculations.MysqlCalculationsBulkInsert
 import grails.plugins.springsecurity.SecurityConfigType
+import org.pillarone.riskanalytics.core.simulation.engine.grid.mapping.OneNodeStrategy
 
 environments {
 
@@ -49,6 +50,7 @@ environments {
                 'tvarProfitFunction': [99, 99.5],
                 'pdf': 200
         ]
+        nodeMappingStrategy = OneNodeStrategy
     }
     sqlserver {
         models = ["FiniteReModel"]

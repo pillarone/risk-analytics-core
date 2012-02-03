@@ -98,9 +98,8 @@ class ComposedComponentTests extends GroovyTestCase {
         assertSame component.outValue1, component.allOutputReplicationTransmitter[0].target
     }
 
-  //TODO: sku: fix tests
-    /*void testInnerStartComponentResolution() {
-        TestStartComposedComponent component = new TestStartComposedComponent()
+    void testInnerStartComponentResolution() {
+        TestStartComposedComponent component = new TestStartComposedComponent(name: 'outest')
         component.internalWiring()
         component.input1 << new SingleValuePacket(value:  1.5)
         component.doCalculation()
@@ -134,6 +133,6 @@ class ComposedComponentTests extends GroovyTestCase {
         assertEquals "outValue 1", [2d], component.outValue1*.value
         assertEquals "outValue 2", [16d], component.outValue2*.value
 
-    }*/
+    }
 }
 

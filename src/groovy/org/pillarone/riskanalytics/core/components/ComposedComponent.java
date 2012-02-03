@@ -38,17 +38,6 @@ abstract public class ComposedComponent extends Component {
         for (Component component : startComponents) {
             component.start();
         }
-        if (startComponents == null) {
-            startComponents = new ArrayList<Component>();
-            for (Component component : allSubComponents()) {
-                if (!component.hasWiredInChannels()) {
-                    startComponents.add(component);
-                }
-            }
-        }
-        for (Component component : startComponents) {
-            component.start();
-        }
     }
 
     protected void reset() {

@@ -52,4 +52,8 @@ public class SingleValueCollectingModeStrategy extends AbstractCollectingModeStr
         super.setPacketCollector(packetCollector);
         aggregatedCollectingMode.setPacketCollector(packetCollector);
     }
+
+    public boolean isCompatibleWith(Class packetClass) {
+        return Packet.class.isAssignableFrom(packetClass);
+    }
 }

@@ -6,7 +6,7 @@ import org.pillarone.riskanalytics.core.report.IReportDataVisitor
 /**
  * bzetterstrom
  */
-class ReportDataCollection implements IReportData {
+class ReportDataCollection implements IReportData, Iterable<IReportData> {
     List<IReportData> collection
 
 
@@ -24,5 +24,9 @@ class ReportDataCollection implements IReportData {
 
     IReportData get(int index) {
         collection.get(index)
+    }
+
+    Iterator<IReportData> iterator() {
+        return collection.iterator()
     }
 }

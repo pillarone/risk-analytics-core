@@ -108,8 +108,8 @@ class CoreBootStrap {
             }
         }
         Tag.withTransaction { status ->
-            if (!Tag.findByName("LOCKED")) {
-                new Tag(name: "LOCKED", tagType: EnumTagType.PARAMETERIZATION).save()
+            if (!Tag.findByName(Tag.LOCKED_TAG)) {
+                new Tag(name: Tag.LOCKED_TAG, tagType: EnumTagType.PARAMETERIZATION).save()
             }
         }
 

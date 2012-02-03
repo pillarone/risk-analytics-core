@@ -22,9 +22,6 @@ public class WireModelAction implements Action {
             Model model = simulationScope.model
             ResultConfiguration resultConfig = simulationScope.resultConfiguration
 
-            model.wire()
-            LOG.debug "Model wired"
-
             CollectorFactory collectorFactory = simulationScope.collectorFactory
             collectorFactory.structureInformation = simulationScope.structureInformation
 
@@ -33,8 +30,11 @@ public class WireModelAction implements Action {
             collectors.each {PacketCollector it ->
                 it.attachToModel(model, simulationScope.structureInformation)
             }
-
+            //due to PMO-1919 collectors need to be attached before wire is called
             LOG.debug "Collectors attached"
+
+            model.wire()
+            LOG.debug "Model wired"
 
             LOG.debug "Optimizing wiring"
             model.optimizeComposedComponentWiring()

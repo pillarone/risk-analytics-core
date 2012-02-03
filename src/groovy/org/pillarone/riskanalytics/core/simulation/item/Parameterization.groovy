@@ -99,11 +99,8 @@ class Parameterization extends ParametrizedItem {
 
     public save() {
         def result = null
-        def daoToBeSaved = getDao()
         daoClass.withTransaction {TransactionStatus status ->
-            if (daoToBeSaved.id != null) {
-                daoToBeSaved = daoToBeSaved.merge()
-            }
+            def daoToBeSaved = getDao()
             validate()
             if (!validationErrors.empty) {
                 LOG.warn("${daoToBeSaved} is not valid\n" + validationErrors.join("\n"))
@@ -401,7 +398,7 @@ class Parameterization extends ParametrizedItem {
 
     public void addRemoveLockTag() {
         if (!isLoaded()) load()
-        Tag locked = Tag.findByName("LOCKED")
+        Tag locked = Tag.findByName(Tag.LOCKED_TAG)
         if (!tags.contains(locked) && isUsedInSimulation())
             tags << locked
         else if (tags.contains(locked) && !isUsedInSimulation())
@@ -466,7 +463,9 @@ class Parameterization extends ParametrizedItem {
 
         original.tags = []
         tags.each {Tag tag ->
-            original.tags << tag.toString()
+            if (tag.toString() != Tag.LOCKED_TAG) {
+                original.tags << tag.toString()
+            }
         }
 
         return original

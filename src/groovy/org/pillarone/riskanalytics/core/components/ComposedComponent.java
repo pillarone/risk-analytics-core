@@ -3,10 +3,7 @@ package org.pillarone.riskanalytics.core.components;
 import org.pillarone.riskanalytics.core.model.IModelVisitor;
 import org.pillarone.riskanalytics.core.model.ModelPath;
 import org.pillarone.riskanalytics.core.model.ModelPathComponent;
-import org.pillarone.riskanalytics.core.wiring.ITransmitter;
-import org.pillarone.riskanalytics.core.wiring.Transmitter;
-import org.pillarone.riskanalytics.core.wiring.WiringUtils;
-import org.pillarone.riskanalytics.core.wiring.WiringException;
+import org.pillarone.riskanalytics.core.wiring.*;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -15,20 +12,31 @@ import java.util.List;
 abstract public class ComposedComponent extends Component {
 
     private List<ITransmitter> allInputReplicationTransmitter = new ArrayList<ITransmitter>();
-    private List<Transmitter> allOutputReplicationTransmitter = new ArrayList<Transmitter>();
+    private List<SilentTransmitter> allOutputReplicationTransmitter = new ArrayList<SilentTransmitter>();
     private List<Component> startComponents;
 
     public List<ITransmitter> getAllInputReplicationTransmitter() {
         return allInputReplicationTransmitter;
     }
 
-    public List<Transmitter> getAllOutputReplicationTransmitter() {
+    public List<SilentTransmitter> getAllOutputReplicationTransmitter() {
         return allOutputReplicationTransmitter;
     }
 
     protected void doCalculation() {
         for (ITransmitter transmitter : allInputReplicationTransmitter) {
             transmitter.transmit();
+        }
+        if (startComponents == null) {
+            startComponents = new ArrayList<Component>();
+            for (Component component : allSubComponents()) {
+                if (!component.hasWiredInChannels()) {
+                    startComponents.add(component);
+                }
+            }
+        }
+        for (Component component : startComponents) {
+            component.start();
         }
         if (startComponents == null) {
             startComponents = new ArrayList<Component>();

@@ -8,6 +8,7 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.IntegerParamet
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjectParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.StringParameterHolder
+import models.core.ResourceModel
 
 class ParameterizationHelperTests extends GroovyTestCase {
 
@@ -41,6 +42,16 @@ class ParameterizationHelperTests extends GroovyTestCase {
 
         parameterization.save()
         assertEquals initialParameterCount + 8, Parameter.count()
+    }
+
+    void testCreateDefaultResourceParameterization() {
+        int initialParameterCount = Parameter.count()
+        CoreModel model = new ResourceModel()
+        Parameterization parameterization = ParameterizationHelper.createDefaultParameterization(model)
+        assertEquals 3, parameterization.parameters.size()
+
+        parameterization.save()
+        assertEquals initialParameterCount + 9, Parameter.count()
     }
 
     void testCreateDefaultParameterizationForMultiplePeriods() {

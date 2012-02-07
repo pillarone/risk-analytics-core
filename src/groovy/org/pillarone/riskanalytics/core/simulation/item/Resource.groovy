@@ -11,6 +11,7 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Commen
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
 import org.pillarone.riskanalytics.core.workflow.Status
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
+import org.pillarone.riskanalytics.core.components.IResource
 
 class Resource extends ParametrizedItem {
 
@@ -28,6 +29,21 @@ class Resource extends ParametrizedItem {
         parameterHolders = []
         status = Status.NONE
         versionNumber = new VersionNumber("1")
+    }
+
+    IResource getResourceInstance() {
+        IResource instance = modelClass.newInstance()
+        if(!name.isEmpty()) {
+            if(!isLoaded()) {
+                load()
+            }
+            for(ParameterHolder holder in parameterHolders) {
+                instance[holder.path] = holder.businessObject
+            }
+        } else {
+            instance.useDefault()
+        }
+        return instance
     }
 
     @Override

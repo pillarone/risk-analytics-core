@@ -6,6 +6,7 @@ import org.pillarone.riskanalytics.core.packets.SingleValuePacket
 import org.pillarone.riskanalytics.core.wiring.PortReplicatorCategory
 import org.pillarone.riskanalytics.core.wiring.WireCategory
 import org.pillarone.riskanalytics.core.wiring.WiringUtils
+import org.pillarone.riskanalytics.core.example.component.TestComponent2
 
 /**
  * @author stefan.kunz (at) intuitive-collaboration (dot) com

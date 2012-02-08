@@ -46,12 +46,12 @@ class ParameterizationHelperTests extends GroovyTestCase {
 
     void testCreateDefaultResourceParameterization() {
         int initialParameterCount = Parameter.count()
-        CoreModel model = new ResourceModel()
+        ResourceModel model = new ResourceModel()
         Parameterization parameterization = ParameterizationHelper.createDefaultParameterization(model)
-        assertEquals 3, parameterization.parameters.size()
+        assertEquals 2, parameterization.parameters.size()
 
         parameterization.save()
-        assertEquals initialParameterCount + 9, Parameter.count()
+        assertEquals initialParameterCount + 2, Parameter.count()
     }
 
     void testCreateDefaultParameterizationForMultiplePeriods() {

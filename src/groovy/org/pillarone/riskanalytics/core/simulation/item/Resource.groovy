@@ -12,6 +12,7 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workfl
 import org.pillarone.riskanalytics.core.workflow.Status
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 import org.pillarone.riskanalytics.core.components.IResource
+import org.pillarone.riskanalytics.core.components.ResourceHolder
 
 class Resource extends ParametrizedItem {
 
@@ -31,9 +32,9 @@ class Resource extends ParametrizedItem {
         versionNumber = new VersionNumber("1")
     }
 
-    IResource getResourceInstance() {
+    ResourceHolder getResourceInstance() {
         IResource instance = modelClass.newInstance()
-        if(!name.isEmpty()) {
+        if(name != null) {
             if(!isLoaded()) {
                 load()
             }
@@ -43,7 +44,7 @@ class Resource extends ParametrizedItem {
         } else {
             instance.useDefault()
         }
-        return instance
+        return new ResourceHolder(instance, name, versionNumber, instance.class)
     }
 
     @Override

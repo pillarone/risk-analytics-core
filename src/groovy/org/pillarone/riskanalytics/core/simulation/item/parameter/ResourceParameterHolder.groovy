@@ -19,7 +19,7 @@ class ResourceParameterHolder extends ParameterHolder {
     ResourceParameterHolder(String path, int periodIndex, Resource resource) {
         super(path, periodIndex)
         name = resource.name
-        version = resource.versionNumber.toString()
+        version = resource.versionNumber?.toString()
         resourceClass = resource.modelClass
     }
 
@@ -40,7 +40,9 @@ class ResourceParameterHolder extends ParameterHolder {
     @Override
     Object getBusinessObject() {
         Resource resource = new Resource(name,resourceClass)
-        resource.versionNumber = new VersionNumber(version)
+        if (version != null) {
+            resource.versionNumber = new VersionNumber(version)
+        }
         return resource.resourceInstance
     }
 

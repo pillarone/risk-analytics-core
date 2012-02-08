@@ -61,7 +61,7 @@ class ResourceTests extends GroovyTestCase {
 
         resource.load()
 
-        ExampleResource exampleResource = resource.resourceInstance
+        ExampleResource exampleResource = resource.resourceInstance.resource
         assertEquals(99, exampleResource.parmInteger)
         assertEquals("String", exampleResource.parmString)
     }

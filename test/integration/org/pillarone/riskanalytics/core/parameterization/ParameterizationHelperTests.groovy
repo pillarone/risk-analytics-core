@@ -9,6 +9,8 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolde
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjectParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.StringParameterHolder
 import models.core.ResourceModel
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ResourceParameterHolder
+import org.pillarone.riskanalytics.core.example.component.ExampleResource
 
 class ParameterizationHelperTests extends GroovyTestCase {
 
@@ -49,9 +51,16 @@ class ParameterizationHelperTests extends GroovyTestCase {
         ResourceModel model = new ResourceModel()
         Parameterization parameterization = ParameterizationHelper.createDefaultParameterization(model)
         assertEquals 2, parameterization.parameters.size()
-
+        ResourceParameterHolder resource = parameterization.parameterHolders.find { it instanceof ResourceParameterHolder}
+        assertNotNull(resource)
+        assertEquals(ExampleResource, resource.resourceClass)
         parameterization.save()
         assertEquals initialParameterCount + 2, Parameter.count()
+
+        def stringWriter = new StringWriter()
+        BufferedWriter writer = new BufferedWriter(stringWriter)
+        new ParameterWriter().write(parameterization.toConfigObject(), writer)
+        assertTrue(stringWriter.toString().contains("parmResource[0]=new org.pillarone.riskanalytics.core.components.ResourceHolder(org.pillarone.riskanalytics.core.example.component.ExampleResource)"))
     }
 
     void testCreateDefaultParameterizationForMultiplePeriods() {

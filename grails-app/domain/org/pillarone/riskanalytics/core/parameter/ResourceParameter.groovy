@@ -12,5 +12,10 @@ class ResourceParameter extends Parameter {
         return ResourceParameter
     }
 
+    static constraints = {
+        name(nullable: true)
+        itemVersion(nullable: true)
+    }
+
 
 }

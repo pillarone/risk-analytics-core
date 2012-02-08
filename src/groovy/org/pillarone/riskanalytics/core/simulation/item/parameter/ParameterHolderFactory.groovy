@@ -4,7 +4,7 @@ import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.components.ComponentUtils
 import org.pillarone.riskanalytics.core.components.IComponentMarker
-import org.pillarone.riskanalytics.core.components.IResource
+import org.pillarone.riskanalytics.core.components.ResourceHolder
 import org.pillarone.riskanalytics.core.parameterization.AbstractMultiDimensionalParameter
 import org.pillarone.riskanalytics.core.parameterization.ConstrainedString
 import org.pillarone.riskanalytics.core.parameterization.IParameterObject
@@ -14,8 +14,10 @@ import org.pillarone.riskanalytics.core.parameter.*
 
 class ParameterHolderFactory {
 
-    public static ParameterHolder getHolder(String path, int periodIndex, IResource value) {
-        return new ResourceParameterHolder(path, periodIndex, new Resource("", value.class))
+    public static ParameterHolder getHolder(String path, int periodIndex, ResourceHolder value) {
+        Resource resource = new Resource(value.name, value.resourceClass)
+        resource.versionNumber = value.version
+        return new ResourceParameterHolder(path, periodIndex, resource)
     }
 
     public static ParameterHolder getHolder(String path, int periodIndex, int value) {

@@ -34,11 +34,11 @@ class Resource extends ParametrizedItem {
 
     ResourceHolder getResourceInstance() {
         IResource instance = modelClass.newInstance()
-        if(name != null) {
-            if(!isLoaded()) {
+        if (name != null) {
+            if (!isLoaded()) {
                 load()
             }
-            for(ParameterHolder holder in parameterHolders) {
+            for (ParameterHolder holder in parameterHolders) {
                 instance[holder.path] = holder.businessObject
             }
         } else {
@@ -190,6 +190,12 @@ class Resource extends ParametrizedItem {
             return true
         }
         return false
+    }
+
+    List getParameters(String path) {
+        return parameterHolders.findAll {ParameterHolder parameter ->
+            parameter.path == path && !parameter.removed
+        }
     }
 
 

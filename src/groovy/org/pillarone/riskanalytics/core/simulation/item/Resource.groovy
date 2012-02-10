@@ -13,6 +13,8 @@ import org.pillarone.riskanalytics.core.workflow.Status
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 import org.pillarone.riskanalytics.core.components.IResource
 import org.pillarone.riskanalytics.core.components.ResourceHolder
+import org.pillarone.riskanalytics.core.output.SimulationRun
+import org.pillarone.riskanalytics.core.parameter.ResourceParameter
 
 class Resource extends ParametrizedItem {
 
@@ -67,6 +69,16 @@ class Resource extends ParametrizedItem {
     @Override
     def getDaoClass() {
         return ResourceDAO
+    }
+
+    public List<String> getAllEditablePaths() {
+        List result = []
+        for (Comment comment in comments) {
+            if (comment instanceof WorkflowComment) {
+                result << comment.path
+            }
+        }
+        return result
     }
 
     @Override
@@ -198,5 +210,19 @@ class Resource extends ParametrizedItem {
         }
     }
 
+    public boolean isUsedInSimulation() {
+        def criteria = ResourceParameter.createCriteria()
+        return criteria.count {
+            eq("name", name)
+            eq("itemVersion", versionNumber.toString())
+            eq("resourceClassName", modelClass.name)
+        } > 0
+    }
 
+    public boolean isEditable() {
+        if (status != Status.NONE && status != Status.DATA_ENTRY) {
+            return false
+        }
+        return !isUsedInSimulation()
+    }
 }

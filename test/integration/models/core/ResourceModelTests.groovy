@@ -30,6 +30,7 @@ class ResourceModelTests extends ModelTest {
         assertEquals(99, resource.resource.parmInteger)
         assertEquals("String", resource.resource.parmString)
         assertEquals("myResource", resource.name)
+        assertNotNull(resource.resource.simulationScope)
 
     }
 

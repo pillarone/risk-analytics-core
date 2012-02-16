@@ -10,6 +10,7 @@ import org.pillarone.riskanalytics.core.parameterization.ApplicableParameter
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.components.IResource
 
 
 class RuntimeParameterCollector implements IModelVisitor {
@@ -29,9 +30,13 @@ class RuntimeParameterCollector implements IModelVisitor {
     }
 
     void visitComponent(Component component, ModelPath path) {
-        for(Map.Entry<String, Object> entry in GroovyUtils.getProperties(component)) {
+        createApplicableParameters(component)
+    }
+
+    protected createApplicableParameters(def component) {
+        for (Map.Entry<String, Object> entry in GroovyUtils.getProperties(component)) {
             final String propertyName = entry.key
-            if(propertyName.startsWith(RUNTIME_PARAMETER_PREFIX)) {
+            if (propertyName.startsWith(RUNTIME_PARAMETER_PREFIX)) {
                 final ParameterHolder runtimeParameter = parameterHolders.find { it.path == propertyName }
                 if (runtimeParameter != null) {
                     applicableParameters << new ApplicableParameter(component: component, parameterPropertyName: propertyName, parameterValue: runtimeParameter.getBusinessObject())
@@ -40,6 +45,10 @@ class RuntimeParameterCollector implements IModelVisitor {
                 }
             }
         }
+    }
+
+    void visitResource(IResource resource, ModelPath path) {
+        createApplicableParameters(resource)
     }
 
     void visitParameterObject(IParameterObject parameterObject, ModelPath path) {

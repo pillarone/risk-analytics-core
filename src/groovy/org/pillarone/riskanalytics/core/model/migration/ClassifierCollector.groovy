@@ -6,6 +6,7 @@ import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.model.ModelPath
 import org.pillarone.riskanalytics.core.parameterization.AbstractParameterObjectClassifier
 import org.pillarone.riskanalytics.core.parameterization.IParameterObject
+import org.pillarone.riskanalytics.core.components.IResource
 
 class ClassifierCollector implements IModelVisitor {
 
@@ -34,6 +35,11 @@ class ClassifierCollector implements IModelVisitor {
             }
         }
     }
+
+    void visitResource(IResource resource, ModelPath path) {
+
+    }
+
 
     private static class ResultPair {
         ModelPath path

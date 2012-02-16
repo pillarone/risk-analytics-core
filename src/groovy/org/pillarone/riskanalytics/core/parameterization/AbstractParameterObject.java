@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.parameterization;
 
+import org.pillarone.riskanalytics.core.components.IResource;
+import org.pillarone.riskanalytics.core.components.ResourceHolder;
 import org.pillarone.riskanalytics.core.model.IModelVisitor;
 import org.pillarone.riskanalytics.core.model.ModelPath;
 import org.pillarone.riskanalytics.core.model.ModelPathComponent;
@@ -17,6 +19,9 @@ public abstract class AbstractParameterObject implements IParameterObject {
             if (entry.getValue() instanceof IParameterObject) {
                 IParameterObject parameterObject = (IParameterObject) entry.getValue();
                 parameterObject.accept(visitor, path.append(new ModelPathComponent(entry.getKey().toString(), parameterObject.getType().getClass())));
+            } else if (entry.getValue() instanceof ResourceHolder) {
+                IResource resource = ((ResourceHolder) entry.getValue()).getResource();
+                resource.accept(visitor, path.append(new ModelPathComponent(entry.getKey().toString(), resource.getClass())));
             }
         }
     }

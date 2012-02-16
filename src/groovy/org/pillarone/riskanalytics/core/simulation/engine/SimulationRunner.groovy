@@ -232,11 +232,11 @@ public class SimulationRunner {
         Action randomSeed = new RandomSeedAction(simulationScope: simulationScope)
         Action initParams = new PrepareParameterizationAction(simulationScope: simulationScope, periodScope: periodScope)
         Action runtimeParams = new InjectRuntimeParameterAction(simulationScope: simulationScope)
-        Action injectResourceParams = new PrepareResourceParameterizationAction(simulationScope: simulationScope)
         Action applyGlobalParams = new ApplyGlobalParametersAction(simulationScope: simulationScope)
-        Action periodCounter = new CreatePeriodCounterAction(simulationScope: simulationScope)
         Action prepareStructure = new PrepareStructureInformationAction(simulationScope: simulationScope)
+        Action injectResourceParams = new PrepareResourceParameterizationAction(simulationScope: simulationScope)
         Action wireModel = new WireModelAction(simulationScope: simulationScope)
+        Action periodCounter = new CreatePeriodCounterAction(simulationScope: simulationScope)
         Action injectScopes = new InjectScopesAction(
                 simulationScope: simulationScope,
                 iterationScope: iterationScope,
@@ -257,11 +257,12 @@ public class SimulationRunner {
         // PrepareStructureInformationAction must be before WireModelAction
         runner.preSimulationActions << initModel
         runner.preSimulationActions << randomSeed
-        runner.preSimulationActions << runtimeParams
-        runner.preSimulationActions << initParams
+        //order important!
+        runner.preSimulationActions << initParams //creates resource params
+        runner.preSimulationActions << runtimeParams //inject runtime params - resource params must be ready
+        runner.preSimulationActions << applyGlobalParams //distribute global params - resource params must already be injected
         runner.preSimulationActions << prepareStructure
         runner.preSimulationActions << injectResourceParams
-        runner.preSimulationActions << applyGlobalParams
         runner.preSimulationActions << wireModel
         runner.preSimulationActions << periodCounter
         runner.preSimulationActions << injectScopes

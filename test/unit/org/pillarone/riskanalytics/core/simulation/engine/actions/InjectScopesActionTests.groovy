@@ -34,8 +34,6 @@ class InjectScopesActionTests extends GroovyTestCase {
         assertSame "simulationScope not injected", simulationScope, model.componentCtx.simulationScope
         assertNull "No fallback simulationContext injected if simulationScope ist defined", model.componentCtx.simulationContext
 
-        assertSame "Fallback simulationContext not injected", simulationScope, model.componentCtxPS.simulationContext
-
         assertSame "No SimulationScope in collector injected", simulationScope, collector.simulationScope
 
         assertNotNull "No PeriodStore on component", model.componentCtxPS.periodStore

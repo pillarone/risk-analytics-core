@@ -9,6 +9,7 @@ import org.pillarone.riskanalytics.core.parameterization.IMultiDimensionalConstr
 import org.pillarone.riskanalytics.core.util.GroovyUtils
 import java.util.Map.Entry
 import org.pillarone.riskanalytics.core.model.ModelPath
+import org.pillarone.riskanalytics.core.components.IResource
 
 
 class ConstrainedMultiDimensionalParameterCollector implements IModelVisitor {
@@ -29,6 +30,10 @@ class ConstrainedMultiDimensionalParameterCollector implements IModelVisitor {
                 checkValue(entry.value)
             }
         }
+    }
+
+    void visitResource(IResource resource, ModelPath path) {
+
     }
 
     void visitParameterObject(IParameterObject parameterObject, ModelPath path) {

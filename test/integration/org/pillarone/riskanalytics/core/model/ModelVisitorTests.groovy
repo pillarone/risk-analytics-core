@@ -6,6 +6,14 @@ import org.pillarone.riskanalytics.core.parameterization.IParameterObject
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import models.core.CoreModel
 import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
+import org.pillarone.riskanalytics.core.components.IResource
+import models.core.ResourceModel
+import org.pillarone.riskanalytics.core.simulation.item.Resource
+import org.pillarone.riskanalytics.core.example.component.ExampleResource
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
+import org.pillarone.riskanalytics.core.parameter.comment.Tag
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
 
 
 class ModelVisitorTests extends GroovyTestCase {
@@ -37,15 +45,40 @@ class ModelVisitorTests extends GroovyTestCase {
 
     }
 
+    void testAcceptResource() {
+
+        Resource resource = new Resource("myResource", ExampleResource)
+        resource.addParameter(ParameterHolderFactory.getHolder("parmString", 0, "param"))
+        resource.addParameter(ParameterHolderFactory.getHolder("parmInteger", 0, 100))
+        resource.save()
+
+        FileImportService.importModelsIfNeeded(['Resource'])
+        Parameterization parameterization = new Parameterization("ResourceParameters")
+        parameterization.load()
+
+        model = new ResourceModel()
+        model.init()
+        model.injectComponentNames()
+
+        ParameterApplicator applicator = new ParameterApplicator(parameterization: parameterization, model: model)
+        applicator.init()
+        applicator.applyParameterForPeriod(0)
+
+        TestModelVisitor visitor = new TestModelVisitor()
+        model.accept(visitor)
+
+        assertEquals(1, visitor.calledForResource.size())
+    }
+
     private static class TestModelVisitor implements IModelVisitor {
 
         List<Component> calledForComponent = []
         List<Model> calledForModel = []
         List<IParameterObject> calledForParameterObject = []
+        List<IResource> calledForResource = []
 
         void visitComponent(Component component, ModelPath path) {
             calledForComponent << component
-            println path
         }
 
         void visitModel(Model model) {
@@ -54,8 +87,12 @@ class ModelVisitorTests extends GroovyTestCase {
 
         void visitParameterObject(IParameterObject parameterObject, ModelPath path) {
             calledForParameterObject << parameterObject
-            println path
         }
+
+        void visitResource(IResource resource, ModelPath path) {
+            calledForResource << resource
+        }
+
 
     }
 }

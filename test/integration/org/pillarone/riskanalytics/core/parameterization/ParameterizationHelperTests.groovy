@@ -66,7 +66,7 @@ class ParameterizationHelperTests extends GroovyTestCase {
 
     void testCreateDefaultResource() {
         Resource resource = ParameterizationHelper.createDefaultResource("test", new ExampleResource())
-        assertEquals(2, resource.parameterHolders.size())
+        assertEquals(3, resource.parameterHolders.size())
         assertEquals("test", resource.name)
         assertEquals(ExampleResource, resource.modelClass)
     }

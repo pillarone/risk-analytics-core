@@ -10,6 +10,8 @@ import org.pillarone.riskanalytics.core.FileConstants
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
 import org.pillarone.riskanalytics.core.output.SimulationRun
+import org.pillarone.riskanalytics.core.ResourceDAO
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ResourceParameterHolder.NameVersionPair
 
 /**
  *  This class contains methods which are easy/short to implement in Groovy, but unreadable in Java.
@@ -187,6 +189,10 @@ public class GroovyUtils {
             result = clazz.values()*.toString()
         }
         return result
+    }
+
+    static List<String> getValuesForResourceClass(Class clazz) {
+        return ResourceDAO.findAllByResourceClassName(clazz.name).collect { new NameVersionPair(it.name, it.itemVersion).toString()}
     }
 
     static long getId(def domainClass) {

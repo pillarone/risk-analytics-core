@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.parameterization;
 import org.joda.time.DateTime;
 import org.pillarone.riskanalytics.core.components.Component;
 import org.pillarone.riskanalytics.core.components.IComponentMarker;
+import org.pillarone.riskanalytics.core.components.ResourceHolder;
 import org.pillarone.riskanalytics.core.model.Model;
 import org.pillarone.riskanalytics.core.util.GroovyUtils;
 
@@ -60,10 +61,12 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
             for (Object value : list) {
                 Object possibleValues = getPossibleValues(row + 1, col);
                 if (possibleValues instanceof List) {
-                    List<String> validValues = (List<String>) possibleValues;
-                    if (!validValues.contains(value)) {
-                        if (validValues.size() > 0) {
-                            list.set(row, validValues.get(0));
+                    if (!(value instanceof ResourceHolder)) { //TODO: correctly implement for RH
+                        List<String> validValues = (List<String>) possibleValues;
+                        if (!validValues.contains(value)) {
+                            if (validValues.size() > 0) {
+                                list.set(row, validValues.get(0));
+                            }
                         }
                     }
                 }
@@ -104,6 +107,9 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
             return names;
         } else if (columnClass.isEnum()) {
             return GroovyUtils.getEnumValuesFromClass(columnClass);
+        }  else if (getValueAt(row, column) instanceof ResourceHolder) {
+            ResourceHolder holder = (ResourceHolder) getValueAt(row, column);
+            return GroovyUtils.getValuesForResourceClass(holder.getResourceClass());
         } else {
             return new Object();
         }

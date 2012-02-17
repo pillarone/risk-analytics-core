@@ -7,6 +7,7 @@ import org.pillarone.riskanalytics.core.parameterization.*
 import org.springframework.jdbc.datasource.DataSourceUtils
 
 import org.pillarone.riskanalytics.core.util.DatabaseUtils
+import net.sf.jasperreports.engine.util.ContextClassLoaderObjectInputStream
 
 class MultiDimensionalParameter extends Parameter {
 
@@ -188,7 +189,7 @@ class MultiDimensionalParameter extends Parameter {
         while (column.size() > 0) {
             result << column.collect {GroovyRowResult res ->
                 ByteArrayInputStream str = new ByteArrayInputStream(res.getAt(0))
-                ObjectInputStream str2 = new ObjectInputStream(str)
+                ObjectInputStream str2 = new ContextClassLoaderObjectInputStream(str)
                 return str2.readObject()
             }
             i++

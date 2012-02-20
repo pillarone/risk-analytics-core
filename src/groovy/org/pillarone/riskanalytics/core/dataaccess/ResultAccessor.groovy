@@ -323,7 +323,7 @@ class ResultAccessor {
         return SingleValueResult.executeQuery(sb.toString(), [collector, field, path, run.id])
     }
 
-   public static List<SingleValueResult> getSingleValueResultsWithDate(SimulationRun run, int periodIndex, String pathName, String collectorName, String fieldName) {
+   public static List<SingleValueResult> getSingleValueResultsWithDateSkipZeroes(SimulationRun run, int periodIndex, String pathName, String collectorName, String fieldName) {
         // todo: would have preferred to use SymbolicValueResult.findAll() here, but that didn't work since there
         // was some kind of 'version' field that all of a sudden showed up in the resulting SQL... ? I am at loss.
        return SingleValueResult.createCriteria().list {
@@ -332,6 +332,7 @@ class ResultAccessor {
            eq("path", org.pillarone.riskanalytics.core.output.PathMapping.findByPathName(pathName))
            eq("field", org.pillarone.riskanalytics.core.output.FieldMapping.findByFieldName(fieldName))
            eq("collector", org.pillarone.riskanalytics.core.output.CollectorMapping.findByCollectorName(collectorName))
+           not { eq("value", 0.0d) }
        }
     }
 

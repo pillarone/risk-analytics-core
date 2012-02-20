@@ -4,6 +4,11 @@ import org.pillarone.riskanalytics.core.parameterization.AbstractParameterObject
 import org.pillarone.riskanalytics.core.parameterization.IParameterObjectClassifier
 import org.pillarone.riskanalytics.core.parameterization.IParameterObject
 import org.pillarone.riskanalytics.core.parameterization.SimpleMultiDimensionalParameter
+import org.pillarone.riskanalytics.core.parameterization.ConstrainedMultiDimensionalParameter
+import org.pillarone.riskanalytics.core.components.ResourceHolder
+import org.pillarone.riskanalytics.core.example.component.ExampleResource
+import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
+import org.pillarone.riskanalytics.core.parameterization.ConstraintsFactory
 
 class ExampleParameterObjectClassifier extends AbstractParameterObjectClassifier {
 
@@ -33,6 +38,10 @@ class ExampleParameterObjectClassifier extends AbstractParameterObjectClassifier
             "NESTED_MDP", ["mdp": new SimpleMultiDimensionalParameter([[1, 2], [5, 6]])]
     )
 
+    public static final ExampleParameterObjectClassifier RESOURCE = new ExampleParameterObjectClassifier(
+            "RESOURCE", ["resource": new ConstrainedMultiDimensionalParameter([[new ResourceHolder(ExampleResource, "a", new VersionNumber("1"))]], ['title'], ConstraintsFactory.getConstraints(ExampleResourceConstraints.IDENTIFIER))]
+    )
+
     public static ExampleParameterObjectClassifier valueOf(String type) {
         types[type]
     }
@@ -43,7 +52,7 @@ class ExampleParameterObjectClassifier extends AbstractParameterObjectClassifier
     }
 
     List<IParameterObjectClassifier> getClassifiers() {
-        return [TYPE0, TYPE1, TYPE2, NESTED_PARAMETER_OBJECT, NESTED_MDP];
+        return [TYPE0, TYPE1, TYPE2, NESTED_PARAMETER_OBJECT, NESTED_MDP, RESOURCE];
     }
 
     IParameterObject getParameterObject(Map parameters) {

@@ -72,5 +72,9 @@ class ResourceParameterHolder extends ParameterHolder {
             return "${name} v${version}"
         }
 
+        public static NameVersionPair parse(String s) {
+            return new NameVersionPair(s.substring(0, s.lastIndexOf(" ")), s.substring(s.lastIndexOf(" ") + 2))
+        }
+
     }
 }

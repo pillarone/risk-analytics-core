@@ -24,6 +24,7 @@ import org.springframework.remoting.rmi.RmiServiceExporter
 import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
 import org.codehaus.groovy.grails.orm.hibernate.HibernateEventListeners
 import org.pillarone.riskanalytics.core.listener.ModellingItemHibernateListener
+import org.pillarone.riskanalytics.core.example.parameter.ExampleResourceConstraints
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
@@ -136,6 +137,7 @@ Persistence & Simulation engine.
 
         ConstraintsFactory.registerConstraint(new SimpleConstraint())
         ConstraintsFactory.registerConstraint(new TestConstrainedTable())
+        ConstraintsFactory.registerConstraint(new ExampleResourceConstraints())
 
         PacketAggregatorRegistry.registerAggregator(Packet, new SumAggregator())
         PacketAggregatorRegistry.registerAggregator(SingleValuePacket, new SumAggregatorSingleValuePacket())

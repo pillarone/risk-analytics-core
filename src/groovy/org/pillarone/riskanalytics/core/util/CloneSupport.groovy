@@ -53,6 +53,11 @@ abstract class CloneSupport {
         new Boolean(object.booleanValue())
     }
 
+    // http://stackoverflow.com/questions/1803503/why-are-java-enums-not-clonable
+    private static def doClone(Enum object) {
+        object
+    }
+
     private static def doClone(DateTime object) {
         new DateTime(object.millis)
     }

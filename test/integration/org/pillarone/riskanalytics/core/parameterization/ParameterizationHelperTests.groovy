@@ -51,12 +51,12 @@ class ParameterizationHelperTests extends GroovyTestCase {
         int initialParameterCount = Parameter.count()
         ResourceModel model = new ResourceModel()
         Parameterization parameterization = ParameterizationHelper.createDefaultParameterization(model)
-        assertEquals 2, parameterization.parameters.size()
+        assertEquals 3, parameterization.parameters.size()
         ResourceParameterHolder resource = parameterization.parameterHolders.find { it instanceof ResourceParameterHolder}
         assertNotNull(resource)
         assertEquals(ExampleResource, resource.resourceClass)
         parameterization.save()
-        assertEquals initialParameterCount + 2, Parameter.count()
+        assertEquals initialParameterCount + 5, Parameter.count()
 
         def stringWriter = new StringWriter()
         BufferedWriter writer = new BufferedWriter(stringWriter)

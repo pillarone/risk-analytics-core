@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.components;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber;
 
 import java.io.Serializable;
@@ -7,17 +9,11 @@ import java.io.Serializable;
 
 public class ResourceHolder<E extends IResource> implements Cloneable, Serializable {
 
-    private transient E resource;
+    private static final long serialVersionUID = 89572958934031L;
+
     private String name;
     private VersionNumber version;
     private Class resourceClass;
-
-    public ResourceHolder(E resource, String name, VersionNumber versionNumber, Class resourceClass) {
-        this.resource = resource;
-        this.name = name;
-        this.version = versionNumber;
-        this.resourceClass = resourceClass;
-    }
 
     public ResourceHolder(Class resourceClass) {
         this.resourceClass = resourceClass;
@@ -34,7 +30,7 @@ public class ResourceHolder<E extends IResource> implements Cloneable, Serializa
     }
 
     public E getResource() {
-        return resource;
+        return (E) ResourceRegistry.getResourceInstance(this);
     }
 
     public Class getResourceClass() {
@@ -48,7 +44,6 @@ public class ResourceHolder<E extends IResource> implements Cloneable, Serializa
     @Override
     public ResourceHolder clone() throws CloneNotSupportedException {
         ResourceHolder clone = (ResourceHolder) super.clone();
-        clone.resource = null;
         clone.version = new VersionNumber(this.version.toString());
         return clone;
     }
@@ -56,5 +51,23 @@ public class ResourceHolder<E extends IResource> implements Cloneable, Serializa
     @Override
     public String toString() {
         return name + " v" + (version != null ? version.toString() : null);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ResourceHolder) {
+            ResourceHolder holder = (ResourceHolder) obj;
+            return new EqualsBuilder().append(name, holder.name).
+                    append(version.toString(), holder.version.toString()).
+                    append(resourceClass.getName(), holder.resourceClass.getName()).isEquals();
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(name).append(version.toString()).
+                append(resourceClass.getName()).toHashCode();
     }
 }

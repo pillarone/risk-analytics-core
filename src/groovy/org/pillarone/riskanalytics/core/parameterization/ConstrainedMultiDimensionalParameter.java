@@ -1,10 +1,7 @@
 package org.pillarone.riskanalytics.core.parameterization;
 
 import org.joda.time.DateTime;
-import org.pillarone.riskanalytics.core.components.Component;
-import org.pillarone.riskanalytics.core.components.IComponentMarker;
-import org.pillarone.riskanalytics.core.components.IResource;
-import org.pillarone.riskanalytics.core.components.ResourceHolder;
+import org.pillarone.riskanalytics.core.components.*;
 import org.pillarone.riskanalytics.core.model.Model;
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber;
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ResourceParameterHolder;
@@ -101,6 +98,11 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
             List<String> selectedValues = values.get(column);
             for (String selectedValue : selectedValues) {
                 result.add(componentsOfType.get(selectedValue));
+            }
+        } else if (IResource.class.isAssignableFrom(columnType)) {
+            List<ResourceHolder> selectedValues = values.get(column);
+            for (ResourceHolder selectedValue : selectedValues) {
+                result.add(ResourceRegistry.getResourceInstance(selectedValue));
             }
         } else {
             result.addAll(values.get(column));

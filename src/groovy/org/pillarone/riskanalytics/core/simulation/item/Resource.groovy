@@ -35,6 +35,10 @@ class Resource extends ParametrizedItem {
     }
 
     ResourceHolder getResourceInstance() {
+        return new ResourceHolder(modelClass, name, versionNumber)
+    }
+
+    IResource createResourceInstance() {
         IResource instance = modelClass.newInstance()
         if (name != null) {
             if (!isLoaded()) {
@@ -46,7 +50,7 @@ class Resource extends ParametrizedItem {
         } else {
             instance.useDefault()
         }
-        return new ResourceHolder(instance, name, versionNumber, instance.class)
+        return instance
     }
 
     @Override

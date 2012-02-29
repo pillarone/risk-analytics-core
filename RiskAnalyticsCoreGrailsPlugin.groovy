@@ -26,10 +26,11 @@ import org.gridgain.grid.GridConfigurationAdapter
 import org.pillarone.riskanalytics.core.FileConstants
 import org.codehaus.groovy.grails.orm.hibernate.HibernateEventListeners
 import org.pillarone.riskanalytics.core.listener.ModellingItemHibernateListener
+import org.pillarone.riskanalytics.core.example.parameter.ExampleResourceConstraints
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.5-ALPHA-2.1-kti"
+    def version = "1.5-ALPHA-3.7-kti"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.7 > *"
     // the other plugins this plugin depends on
@@ -153,6 +154,7 @@ Persistence & Simulation engine.
 
         ConstraintsFactory.registerConstraint(new SimpleConstraint())
         ConstraintsFactory.registerConstraint(new TestConstrainedTable())
+        ConstraintsFactory.registerConstraint(new ExampleResourceConstraints())
 
         PacketAggregatorRegistry.registerAggregator(Packet, new SumAggregator())
         PacketAggregatorRegistry.registerAggregator(SingleValuePacket, new SumAggregatorSingleValuePacket())

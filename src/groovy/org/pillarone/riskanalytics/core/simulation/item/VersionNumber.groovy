@@ -2,6 +2,8 @@ package org.pillarone.riskanalytics.core.simulation.item
 
 class VersionNumber implements Comparable, Cloneable, Serializable {
 
+    private static final long serialVersionUID = -1640758346987125721L;
+
     List versionNumbers
     boolean workflow = false
 

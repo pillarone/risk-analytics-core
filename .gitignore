@@ -6,3 +6,5 @@ web-app/plugins/*
 stacktrace.log
 cobertura.ser
 exportParam.groovy
+.idea/*
+*.iml

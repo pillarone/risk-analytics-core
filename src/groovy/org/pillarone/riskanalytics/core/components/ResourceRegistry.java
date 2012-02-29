@@ -1,0 +1,33 @@
+package org.pillarone.riskanalytics.core.components;
+
+import org.pillarone.riskanalytics.core.simulation.item.Resource;
+
+import java.util.HashMap;
+import java.util.Map;
+
+
+public abstract class ResourceRegistry {
+
+    private static ThreadLocal<Map<ResourceHolder, IResource>> resources = new ThreadLocal<Map<ResourceHolder,IResource>>() {
+        @Override
+        protected Map<ResourceHolder, IResource> initialValue() {
+            return new HashMap<ResourceHolder, IResource>();
+        }
+    };
+
+
+    public static  IResource getResourceInstance(ResourceHolder holder) {
+        Map<ResourceHolder, IResource> map = resources.get();
+
+        IResource resourceInstance = map.get(holder);
+        if(resourceInstance == null) {
+            Resource resource = new Resource(holder.getName(), holder.getResourceClass());
+            resource.setVersionNumber(holder.getVersion());
+            resourceInstance = resource.createResourceInstance();
+            map.put(holder, resourceInstance);
+        }
+
+        return resourceInstance;
+    }
+
+}

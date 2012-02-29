@@ -87,9 +87,14 @@ abstract public class Component implements Cloneable {
         visitor.visitComponent(this, path);
         for (Map.Entry<String, Object> property : GroovyUtils.getProperties(this).entrySet()) {
             Object propertyValue = property.getValue();
-            if (property.getKey().startsWith("parm") && propertyValue instanceof IParameterObject) {
-                IParameterObject parameterObject = (IParameterObject) propertyValue;
-                parameterObject.accept(visitor, path.append(new ModelPathComponent(property.getKey(), parameterObject.getType().getClass())));
+            if (property.getKey().startsWith("parm")) {
+                if (propertyValue instanceof IParameterObject) {
+                    IParameterObject parameterObject = (IParameterObject) propertyValue;
+                    parameterObject.accept(visitor, path.append(new ModelPathComponent(property.getKey(), parameterObject.getType().getClass())));
+                } else if(propertyValue instanceof ResourceHolder) {
+                    IResource resource = ((ResourceHolder) propertyValue).getResource();
+                    resource.accept(visitor, path.append(new ModelPathComponent(property.getKey(), resource.getClass())));
+                }
             }
         }
     }

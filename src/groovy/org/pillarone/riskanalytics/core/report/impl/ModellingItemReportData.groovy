@@ -17,4 +17,11 @@ class ModellingItemReportData implements IReportData {
     void accept(IReportDataVisitor visitor) {
         visitor.visitModellingItemReportData(this)
     }
+
+    @Override
+    String toString() {
+        return getClass().getName() + "[item: " + item + "]";
+    }
+
+
 }

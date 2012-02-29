@@ -16,7 +16,6 @@ public class ParameterizationInfo implements Serializable {
     private String version;
 
     private Status status;
-    private Date valuationDate;
 
     public String getVersion() {
         return version;
@@ -64,14 +63,6 @@ public class ParameterizationInfo implements Serializable {
 
     public void setStatus(Status status) {
         this.status = status;
-    }
-
-    public Date getValuationDate() {
-        return valuationDate;
-    }
-
-    public void setValuationDate(Date valuationDate) {
-        this.valuationDate = valuationDate;
     }
 
     @Override

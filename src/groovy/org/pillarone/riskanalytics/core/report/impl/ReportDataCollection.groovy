@@ -29,4 +29,11 @@ class ReportDataCollection implements IReportData, Iterable<IReportData> {
     Iterator<IReportData> iterator() {
         return collection.iterator()
     }
+
+    @Override
+    String toString() {
+        return getClass().getName() + "[collection: " + collection.join(", ") + "]"
+    }
+
+
 }

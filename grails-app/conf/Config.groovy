@@ -37,6 +37,7 @@ environments {
         ]
     }
     test {
+        models = ["CoreModel"]
         log4j = {
             info 'org.pillarone.riskanalytics.core'
         }

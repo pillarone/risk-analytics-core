@@ -2,6 +2,8 @@ package org.pillarone.riskanalytics.core.parameterization
 
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
+import org.pillarone.riskanalytics.core.components.ResourceHolder
+import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 
 class ParameterWriter implements IConfigObjectWriter {
 
@@ -101,6 +103,14 @@ class ParameterWriter implements IConfigObjectWriter {
 
     private void appendValue(BufferedWriter out, DateTime value) {
         out << "new ${DateTime.name}(${value.year}, ${value.monthOfYear}, ${value.dayOfMonth}, 0, 0, 0, 0)"
+    }
+
+    private void appendValue(BufferedWriter out, ResourceHolder value) {
+        if (value.name != null && value.version != null) {
+            out << "new ${ResourceHolder.name}(${value.resourceClass.name},'${value.name}', new ${VersionNumber.name}(${value.version.toString()}))"
+        } else {
+            out << "new ${ResourceHolder.name}(${value.resourceClass.name})"
+        }
     }
 
     private void appendValue(BufferedWriter out, Object value) {

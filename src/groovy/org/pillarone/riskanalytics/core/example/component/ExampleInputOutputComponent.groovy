@@ -25,6 +25,7 @@ class ExampleInputOutputComponent extends Component implements InitializingCompo
     Integer runtimeInt = 1
 
     boolean doCalculationCalled = false
+    boolean afterParameterInjectionCalled = false
 
     protected void doCalculation() {
         IIdGenerator generator = getIdGenerator()
@@ -36,6 +37,7 @@ class ExampleInputOutputComponent extends Component implements InitializingCompo
     }
 
     void afterParameterInjection(SimulationScope scope) {
+        afterParameterInjectionCalled = true
         injectedScope = scope
         assertNotNull globalString
         assertEquals 1, globalInt

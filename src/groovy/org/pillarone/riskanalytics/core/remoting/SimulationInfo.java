@@ -15,6 +15,7 @@ public class SimulationInfo implements Serializable {
     private String resultTemplateName;
     private String comment;
     private int randomSeed;
+    private Date updateDate;
 
     public String getComment() {
         return comment;
@@ -78,5 +79,13 @@ public class SimulationInfo implements Serializable {
 
     public void setUser(final String user) {
         this.user = user;
+    }
+
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
     }
 }

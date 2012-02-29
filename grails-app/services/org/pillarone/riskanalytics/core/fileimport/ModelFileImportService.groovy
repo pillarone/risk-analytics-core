@@ -8,6 +8,7 @@ import org.springframework.beans.factory.config.BeanDefinition
 import org.pillarone.riskanalytics.core.model.MigratableModel
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.pillarone.riskanalytics.core.model.Model
+import org.pillarone.riskanalytics.core.util.ClassPathScanner
 
 /**
  * @author sebastian.cartier (at) intuitive-collaboration (dot) com
@@ -52,7 +53,7 @@ class ModelFileImportService extends FileImportService {
 
 
     protected Class findModelClass() {
-        ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false)
+        ClassPathScanner scanner = new ClassPathScanner()
         scanner.addIncludeFilter(new RegexPatternTypeFilter(Pattern.compile('(.*)\\.' + fileName + '$')))
         Set<BeanDefinition> components = scanner.findCandidateComponents("")
         if (components.size() > 1) {

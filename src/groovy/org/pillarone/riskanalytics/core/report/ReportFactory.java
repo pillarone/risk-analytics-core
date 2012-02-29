@@ -66,8 +66,11 @@ public abstract class ReportFactory {
 
             exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
             exporter.exportReport();
-        } catch (JRException e) {
-            throw new RuntimeException("Failed to create Jasper report: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create Jasper report: " +
+                    e.getMessage()
+                    + "\nreportModel: " + reportModel
+                    + "\nreportData: " + reportData, e);
         }
 
         return byteArrayOutputStream.toByteArray();

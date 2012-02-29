@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.remoting;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import org.joda.time.DateTime;
 
 public class ResultInfo implements Serializable {
 
@@ -13,11 +14,13 @@ public class ResultInfo implements Serializable {
         private int iteration;
         private double value;
         private Date periodDate;
+        private DateTime date;
 
-        private IterationValuePair(final int iteration, final double value, final Date date) {
+        public IterationValuePair(final int iteration, final double value, final Date periodDate, final DateTime date) {
             this.iteration = iteration;
             this.value = value;
-            this.periodDate = date;
+            this.periodDate = periodDate;
+            this.date = date;
         }
 
         public int getIteration() {
@@ -30,6 +33,10 @@ public class ResultInfo implements Serializable {
 
         public Date getPeriodDate() {
             return periodDate;
+        }
+
+        public DateTime getDate() {
+            return date;
         }
     }
 

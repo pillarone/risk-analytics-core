@@ -3,7 +3,6 @@ package org.pillarone.riskanalytics.core.remoting.impl
 import java.text.SimpleDateFormat
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.dataaccess.ResultAccessor
-import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
 import org.pillarone.riskanalytics.core.output.PostSimulationCalculation
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.remoting.IResultService
@@ -11,6 +10,13 @@ import org.pillarone.riskanalytics.core.remoting.ParameterizationInfo
 import org.pillarone.riskanalytics.core.remoting.ResultInfo
 import org.pillarone.riskanalytics.core.remoting.SimulationInfo
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
+import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
+import org.pillarone.riskanalytics.core.output.SingleValueResult
+import org.joda.time.DateTime
+
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
+
+import org.pillarone.riskanalytics.core.output.SymbolicValueResult
 
 class ResultService implements IResultService {
 
@@ -20,8 +26,7 @@ class ResultService implements IResultService {
         for (ParameterizationDAO dao in parameterizations) {
             result << new ParameterizationInfo(
                     parameterizationId: dao.id, name: dao.name, version: dao.itemVersion,
-                    comment: dao.comment, user: dao.lastUpdater?.username, status: dao.status,
-                    valuationDate: dao.valuationDate.toDate()
+                    comment: dao.comment, user: dao.lastUpdater?.username, status: dao.status
             )
         }
         return result
@@ -42,37 +47,48 @@ class ResultService implements IResultService {
         } catch (Exception e) {
             //period label aren't dates
         }
-        for (int i = 0; i < run.periodCount; i++) {
-            for (String fullPath in getPathsOfResult(paths, run)) {
-                ResultInfo info = new ResultInfo(path: fullPath, periodIndex: i)
-                if (i < periodDates.size()) {
-                    info.periodDate = periodDates[i]
+        for (int periodIndex = 0; periodIndex < run.periodCount; periodIndex++) {
+            for (String fullPath in getPathsOfResult(paths, run, periodIndex)) {
+                ResultInfo info = new ResultInfo(path: fullPath, periodIndex: periodIndex)
+                if (periodIndex < periodDates.size()) {
+                    info.periodDate = periodDates[periodIndex]
                 }
                 List<ResultInfo.IterationValuePair> values = []
-                int iteration = 0
 
                 String path = fullPath.substring(0, fullPath.lastIndexOf(":"))
                 String field = fullPath.substring(fullPath.lastIndexOf(":") + 1)
-                for (Number value in ResultAccessor.getValues(run, i, path, AggregatedCollectingModeStrategy.IDENTIFIER, field)) {
-                    values << new ResultInfo.IterationValuePair(iteration, value.toDouble(), periodDates[i])
-                    iteration++
+
+                List<SingleValueResult> results = ResultAccessor.getSingleValueResultsWithDateSkipZeroes(run, periodIndex, path, SingleValueCollectingModeStrategy.IDENTIFIER, field)
+
+                if (! results.isEmpty()) {
+                    for (SingleValueResult singleValueResult in results) {
+                        Double value = singleValueResult.getValue().toDouble()
+                        values << new ResultInfo.IterationValuePair(
+                                singleValueResult.getIteration(),
+                                value,
+                                periodDates[periodIndex],
+                        singleValueResult.getDate())
+                    }
+                    info.values = values
+                    result << info
                 }
-                info.values = values
-                result << info
             }
         }
         return result
-
     }
 
     /**
      * @param paths
      * @return paths where with regEx is replaced with existing subcomponents in a specific result
      */
-    private List<String> getPathsOfResult(List<String> paths, SimulationRun run) {
+    private List<String> getPathsOfResult(List<String> paths, SimulationRun run, int periodIndex) {
         if (!regExIsUsed(paths)) return paths
         Set<String> fullPaths = new HashSet<String>()
         List<String> allPaths = PostSimulationCalculation.executeQuery("SELECT  path.pathName FROM ${PostSimulationCalculation.class.name} as p  WHERE p.run.id = ? ", [run.id])
+        if (allPaths.isEmpty()) {
+            // try to get the pathnames from the symbolic single value results table instead -- a bit slower probably
+            allPaths.addAll(getAllPaths(run, periodIndex))
+        }
         for (int i = 0; i < paths.size(); i++) {
             String field = paths[i].substring(paths[i].lastIndexOf(":") + 1)
             String searchedPath = paths[i].substring(0, paths[i].lastIndexOf(":"))
@@ -88,6 +104,17 @@ class ResultService implements IResultService {
                 fullPaths << paths[i]
         }
         return fullPaths as List<String>;
+    }
+
+    private List<String> getAllPaths(SimulationRun simulationRun, int periodIndex) {
+        List<String> paths = []
+
+        def results = SymbolicValueResult.executeQuery("SELECT distinct(path) FROM ${SymbolicValueResult.name} " +
+                "WHERE simulation_run_id = ? and value <> 0.0 and period = ${periodIndex}", [simulationRun.id])
+        for (def s: results) {
+            paths << s
+        }
+        return paths
     }
 
     boolean regExIsUsed(List<String> paths) {
@@ -114,10 +141,14 @@ class ResultService implements IResultService {
             info.comment = run.comment
             info.randomSeed = run.randomSeed
 
+            def simulation = new Simulation(run.name)
+            simulation.load()
+            // todo: this is from the art-models plugin really, so doesn't belong here at all... But keep for now,
+            // since there are more important things to work on
+            info.updateDate = ((DateTime) simulation.getParameter("runtimeUpdateDate")).toDate()
+
             result << info
         }
         return result
     }
-
-
 }

@@ -1,9 +1,11 @@
 package org.pillarone.riskanalytics.core.parameterization;
 
 import org.joda.time.DateTime;
-import org.pillarone.riskanalytics.core.components.Component;
-import org.pillarone.riskanalytics.core.components.IComponentMarker;
+import org.pillarone.riskanalytics.core.components.*;
 import org.pillarone.riskanalytics.core.model.Model;
+import org.pillarone.riskanalytics.core.simulation.item.VersionNumber;
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ResourceParameterHolder;
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ResourceParameterHolder.NameVersionPair;
 import org.pillarone.riskanalytics.core.util.GroovyUtils;
 
 import java.math.BigDecimal;
@@ -60,16 +62,31 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
             for (Object value : list) {
                 Object possibleValues = getPossibleValues(row + 1, col);
                 if (possibleValues instanceof List) {
-                    List<String> validValues = (List<String>) possibleValues;
-                    if (!validValues.contains(value)) {
-                        if (validValues.size() > 0) {
-                            list.set(row, validValues.get(0));
-                        }
-                    }
+                    validate(value, (List<String>) possibleValues, list, row);
                 }
                 row++;
             }
             col++;
+        }
+    }
+
+    protected void validate(Object value, List<String> validValues, List list, int currentRow) {
+        if (value instanceof String) {
+            if (!validValues.contains(value)) {
+                if (validValues.size() > 0) {
+                    list.set(currentRow, validValues.get(0));
+                }
+            }
+        } else if (value instanceof ResourceHolder) {
+            ResourceHolder holder = (ResourceHolder) value;
+            NameVersionPair pair = new NameVersionPair(holder.getName(), holder.getVersion().toString());
+            if (!validValues.contains(pair.toString())) {
+                if (validValues.size() > 0) {
+                    pair = NameVersionPair.parse(validValues.get(0));
+                    holder = new ResourceHolder(holder.getResourceClass(), pair.getName(), new VersionNumber(pair.getVersion()));
+                    list.set(currentRow, holder);
+                }
+            }
         }
     }
 
@@ -81,6 +98,11 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
             List<String> selectedValues = values.get(column);
             for (String selectedValue : selectedValues) {
                 result.add(componentsOfType.get(selectedValue));
+            }
+        } else if (IResource.class.isAssignableFrom(columnType)) {
+            List<ResourceHolder> selectedValues = values.get(column);
+            for (ResourceHolder selectedValue : selectedValues) {
+                result.add(ResourceRegistry.getResourceInstance(selectedValue));
             }
         } else {
             result.addAll(values.get(column));
@@ -104,6 +126,8 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
             return names;
         } else if (columnClass.isEnum()) {
             return GroovyUtils.getEnumValuesFromClass(columnClass);
+        } else if (IResource.class.isAssignableFrom(columnClass)) {
+            return GroovyUtils.getValuesForResourceClass(columnClass);
         } else {
             return new Object();
         }
@@ -138,6 +162,13 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
             result = new DateTime(new DateTime().getYear(), 1, 1, 0, 0, 0, 0);
         } else if (columnClass.isEnum()) {
             result = GroovyUtils.getEnumValuesFromClass(columnClass).get(0);
+        } else if (IResource.class.isAssignableFrom(columnClass)) {
+            final List<String> values = GroovyUtils.getValuesForResourceClass(columnClass);
+            NameVersionPair pair = new NameVersionPair("", "1");
+            if (!values.isEmpty()) {
+                pair = ResourceParameterHolder.NameVersionPair.parse(values.get(0));
+            }
+            result = new ResourceHolder(columnClass, pair.getName(), new VersionNumber(pair.getVersion()));
         } else {
             try {
                 result = columnClass.newInstance();

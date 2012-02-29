@@ -8,6 +8,10 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.IntegerParamet
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjectParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.StringParameterHolder
+import models.core.ResourceModel
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ResourceParameterHolder
+import org.pillarone.riskanalytics.core.example.component.ExampleResource
+import org.pillarone.riskanalytics.core.simulation.item.Resource
 
 class ParameterizationHelperTests extends GroovyTestCase {
 
@@ -41,6 +45,30 @@ class ParameterizationHelperTests extends GroovyTestCase {
 
         parameterization.save()
         assertEquals initialParameterCount + 8, Parameter.count()
+    }
+
+    void testCreateDefaultResourceParameterization() {
+        int initialParameterCount = Parameter.count()
+        ResourceModel model = new ResourceModel()
+        Parameterization parameterization = ParameterizationHelper.createDefaultParameterization(model)
+        assertEquals 3, parameterization.parameters.size()
+        ResourceParameterHolder resource = parameterization.parameterHolders.find { it instanceof ResourceParameterHolder}
+        assertNotNull(resource)
+        assertEquals(ExampleResource, resource.resourceClass)
+        parameterization.save()
+        assertEquals initialParameterCount + 5, Parameter.count()
+
+        def stringWriter = new StringWriter()
+        BufferedWriter writer = new BufferedWriter(stringWriter)
+        new ParameterWriter().write(parameterization.toConfigObject(), writer)
+        assertTrue(stringWriter.toString().contains("parmResource[0]=new org.pillarone.riskanalytics.core.components.ResourceHolder(org.pillarone.riskanalytics.core.example.component.ExampleResource)"))
+    }
+
+    void testCreateDefaultResource() {
+        Resource resource = ParameterizationHelper.createDefaultResource("test", new ExampleResource())
+        assertEquals(3, resource.parameterHolders.size())
+        assertEquals("test", resource.name)
+        assertEquals(ExampleResource, resource.modelClass)
     }
 
     void testCreateDefaultParameterizationForMultiplePeriods() {

@@ -10,6 +10,8 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolde
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.EnumTagType
 import org.springframework.transaction.TransactionStatus
+import org.pillarone.riskanalytics.core.components.IResource
+import org.pillarone.riskanalytics.core.simulation.item.Resource
 import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 public class ParameterizationHelper {
@@ -28,8 +30,22 @@ public class ParameterizationHelper {
         return result
     }
 
+    static Resource createDefaultResource(String name, IResource resource) {
+        Resource result = new Resource(name, resource.class)
+
+        List parameterList = extractParameterHoldersFromResource(resource)
+        parameterList.each {
+            result.addParameter(it)
+        }
+        return result
+    }
+
     static List<ParameterHolder> extractParameterHoldersFromModel(Model model, int periodIndex) {
         return getAllParameter(model).collect {Map.Entry entry -> ParameterHolderFactory.getHolder(entry.key, periodIndex, entry.value) }
+    }
+
+    static List<ParameterHolder> extractParameterHoldersFromResource(IResource resource) {
+        return getAllParameter(resource).collect {Map.Entry entry -> ParameterHolderFactory.getHolder(entry.key, 0, entry.value) }
     }
 
 
@@ -110,7 +126,7 @@ public class ParameterizationHelper {
         }
     }
 
-    protected static Map getAllParameter(Model model) {
+    protected static Map getAllParameter(def model) {
         def parameter = [:]
         collectAllParameter(model, parameter)
         return parameter
@@ -132,6 +148,15 @@ public class ParameterizationHelper {
             }
             if (propertyName.startsWith("sub")) {
                 collectAllParameter(propertyValue, prefix + ":" + propertyName, parameter)
+            }
+        }
+    }
+
+    protected static void collectAllParameter(IResource resource, Map parameter) {
+
+        resource.properties.each {String propertyName, propertyValue ->
+            if (propertyName.startsWith("parm")) {
+                parameter[propertyName] = propertyValue
             }
         }
     }

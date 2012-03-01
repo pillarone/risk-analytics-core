@@ -28,6 +28,9 @@ public class PrepareParameterizationAction implements Action {
     PeriodScope periodScope
 
     public void perform() {
+        if(simulationScope.parameters.parameterHolders.empty) {
+            throw new IllegalStateException("Parameterization does not contain any parameters.")
+        }
 
         Model model = simulationScope.model
         ParameterApplicator applicator = new ParameterApplicator(model: model, parameterization: simulationScope.parameters)

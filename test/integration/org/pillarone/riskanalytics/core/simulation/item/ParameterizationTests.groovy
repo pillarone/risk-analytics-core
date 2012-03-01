@@ -464,6 +464,20 @@ class ParameterizationTests extends GroovyTestCase {
         assertFalse parameterization.valid
     }
 
+    void testIsLoaded() {
+        Parameterization parameterization = new Parameterization("testIsLoaded")
+        parameterization.modelClass = EmptyModel
+        parameterization.periodCount = 1
+        parameterization.save()
+
+        parameterization.load(false)
+        assertFalse(parameterization.isLoaded())
+
+        parameterization.load()
+        assertTrue(parameterization.isLoaded())
+
+    }
+
     void testIsEditable() {
         Parameterization parameterization = new Parameterization("newParams")
         parameterization.modelClass = EmptyModel

@@ -1,6 +1,7 @@
 import org.pillarone.riskanalytics.core.util.GrailsConfigValidator
 import org.pillarone.riskanalytics.core.output.batch.results.GenericBulkInsert as GenericResultBulkInsert
 import org.pillarone.riskanalytics.core.output.batch.calculations.GenericBulkInsert as GenericCalculationBulkInsert
+
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.joda.time.DateTimeZone
 import org.pillarone.riskanalytics.core.example.migration.TestConstrainedTable
@@ -8,9 +9,17 @@ import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
 import org.pillarone.riskanalytics.core.output.AggregatedWithSingleAvailableCollectingModeStrategy
 import org.pillarone.riskanalytics.core.output.CollectingModeFactory
 import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
+import org.pillarone.riskanalytics.core.output.aggregation.PacketAggregatorRegistry
+import org.pillarone.riskanalytics.core.output.aggregation.SumAggregator
 import org.pillarone.riskanalytics.core.output.aggregation.SumAggregatorSingleValuePacket
+import org.pillarone.riskanalytics.core.packets.Packet
 import org.pillarone.riskanalytics.core.packets.SingleValuePacket
+import org.pillarone.riskanalytics.core.parameterization.ConstraintsFactory
+import org.pillarone.riskanalytics.core.parameterization.SimpleConstraint
+import org.pillarone.riskanalytics.core.remoting.IResultService
 import org.pillarone.riskanalytics.core.remoting.ITransactionService
+import org.pillarone.riskanalytics.core.remoting.impl.ResultService
+import org.pillarone.riskanalytics.core.util.GrailsConfigValidator
 import org.springframework.remoting.rmi.RmiProxyFactoryBean
 import org.springframework.remoting.rmi.RmiServiceExporter
 import org.pillarone.riskanalytics.core.remoting.IResultService
@@ -30,7 +39,7 @@ import org.pillarone.riskanalytics.core.example.parameter.ExampleResourceConstra
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.5-ALPHA-3.7-kti"
+    def version = "1.5-ALPHA-3.8-kti"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.7 > *"
     // the other plugins this plugin depends on

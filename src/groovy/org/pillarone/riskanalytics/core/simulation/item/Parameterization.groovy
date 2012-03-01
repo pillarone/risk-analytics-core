@@ -56,6 +56,8 @@ class Parameterization extends ParametrizedItem {
     Long dealId
     DateTime valuationDate
 
+    private boolean loaded = false
+
     public Parameterization(Map params) {
         this(params.remove("name").toString())
         params.each {k, v ->
@@ -280,6 +282,7 @@ class Parameterization extends ParametrizedItem {
             loadComments(dao)
             tags = dao.tags*.tag
             if (!tags) tags = []
+            loaded = true
         }
         LOG.info("Parameterization $name loaded in ${System.currentTimeMillis() - time}ms")
     }
@@ -303,6 +306,7 @@ class Parameterization extends ParametrizedItem {
     @Override
     void unload() {
         super.unload()
+        loaded = false
         parameterHolders?.clear()
         comments?.clear()
         tags?.clear()
@@ -339,6 +343,11 @@ class Parameterization extends ParametrizedItem {
 
     public boolean isUsedInSimulation() {
         return SimulationRun.find("from ${SimulationRun.class.name} as run where run.parameterization.name = ? and run.parameterization.modelClassName = ? and run.parameterization.itemVersion =?", [name, modelClass.name, versionNumber.toString()]) != null
+    }
+
+    @Override
+    boolean isLoaded() {
+        return loaded
     }
 
     public boolean isEditable() {

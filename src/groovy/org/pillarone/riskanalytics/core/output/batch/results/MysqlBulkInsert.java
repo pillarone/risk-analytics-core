@@ -27,12 +27,10 @@ class MysqlBulkInsert extends AbstractResultsBulkInsert {
         Sql sql = new Sql(simulationRun.getDataSource());
         try {
             sql.execute("ALTER TABLE single_value_result ADD PARTITION (PARTITION P" + getSimulationRunId() + " VALUES IN (" + getSimulationRunId() + "))");
-            sql.execute("ALTER TABLE post_simulation_calculation ADD PARTITION (PARTITION P" + getSimulationRunId() + " VALUES IN (" + getSimulationRunId() + "))");
         } catch (Exception ex) {
             deletePartitionIfExist(sql, getSimulationRunId());
             try {
                 sql.execute("ALTER TABLE single_value_result ADD PARTITION (PARTITION P" + getSimulationRunId() + " VALUES IN (" + getSimulationRunId() + "))");
-                sql.execute("ALTER TABLE post_simulation_calculation ADD PARTITION (PARTITION P" + getSimulationRunId() + " VALUES IN (" + getSimulationRunId() + "))");
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -63,10 +61,6 @@ class MysqlBulkInsert extends AbstractResultsBulkInsert {
     private void deletePartitionIfExist(Sql sql, long partitionName) {
         try {
             sql.execute("ALTER TABLE single_value_result DROP PARTITION P" + partitionName);
-        } catch (Exception e) {//the partition was not created yet
-        }
-        try {
-            sql.execute("ALTER TABLE post_simulation_calculation DROP PARTITION P" + partitionName);
         } catch (Exception e) {//the partition was not created yet
         }
     }

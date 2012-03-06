@@ -16,6 +16,7 @@ import org.pillarone.riskanalytics.core.model.ModelHelper
 import org.pillarone.riskanalytics.core.output.ICollectingModeStrategy
 import org.pillarone.riskanalytics.core.output.CollectingModeFactory
 import org.pillarone.riskanalytics.core.wiring.IPacketListener
+import org.pillarone.riskanalytics.core.util.PeriodLabelsUtil
 
 /**
  * The SimulationConfiguration is a descriptor for a runnable simulation. All runtime aspects e.g. numberOfIterations,
@@ -99,8 +100,10 @@ public class SimulationConfiguration implements Serializable, Cloneable {
         List<PacketCollector> drillDownCollectors = resultConfiguration.getResolvedCollectors(model, collectorFactory)
         List<String> drillDownPaths = getDrillDownPaths(drillDownCollectors)
         Set paths = ModelHelper.getAllPossibleOutputPaths(model, drillDownPaths)
+        Set<String> inceptionPeriodPaths = getSplitByInceptionDateDrillDownPaths(drillDownCollectors, model)
+        paths.addAll(inceptionPeriodPaths)
 
-        Set fields = ModelHelper.getAllPossibleFields(model)
+        Set fields = ModelHelper.getAllPossibleFields(model, !inceptionPeriodPaths.empty)
         MappingCache cache = new MappingCache()
         cache.initCache(model)
 
@@ -133,6 +136,15 @@ public class SimulationConfiguration implements Serializable, Cloneable {
                 }
             }
         }
+    }
+    
+    private Set<String> getSplitByInceptionDateDrillDownPaths(List<PacketCollector> collectors, Model model) {
+        // todo: requires a proper refactoring as the core plugin itself knows nothing about the aggregate drill down collector
+        ICollectingModeStrategy splitPerInceptionDateCollector = CollectingModeFactory.getStrategy('SPLIT_BY_INCEPTION_DATE')
+        List<String> splitByInceptionDatePaths = []
+        addMatchingCollector(splitPerInceptionDateCollector, collectors, splitByInceptionDatePaths)
+        List<String> periodLabels = PeriodLabelsUtil.getPeriodLabels(simulation, model)
+        return ModelHelper.pathsExtendedWithPeriod(splitByInceptionDatePaths, periodLabels)
     }
 
 }

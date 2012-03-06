@@ -12,6 +12,9 @@ class ModelHelper {
 
     // todo(sku): try to reuse same constants of PC project
     private static final String PATH_SEPARATOR = ':'
+    private static final String PERIOD = 'period'
+    private static final String RESERVE_RISK = 'reserveRisk'
+    private static final String PREMIUM_RISK = 'premiumRisk'
     private static final String PERILS = "claimsGenerators"
     private static final String RESERVES = "claimsGenerators"
     private static final String CONTRACTS = "reinsuranceContracts"
@@ -27,14 +30,18 @@ class ModelHelper {
     /**
      * A static helper method which obtains all possible output paths of this model
      * @param model A model with all parameters injected
-     * @return All possible paths
+     * @return All possible fields
      */
-    public static Set<String> getAllPossibleFields(Model model) {
+    public static Set<String> getAllPossibleFields(Model model, boolean includeInceptionPeriodFields) {
         Set<String> results = []
         model.properties.each { String key, value ->
             if (value instanceof Component) {
                 results.addAll(getAllPossibleOutputFields(value))
             }
+        }
+        if (includeInceptionPeriodFields) {
+            results.add(RESERVE_RISK)
+            results.add(PREMIUM_RISK)
         }
         return results
     }
@@ -42,7 +49,7 @@ class ModelHelper {
     /**
      * A static helper method which obtains all possible output fields of this model
      * @param model A model with all parameters injected
-     * @return All possible fields
+     * @return All possible paths
      */
     public static Set<String> getAllPossibleOutputPaths(Model model, List<String> drillDownPaths) {
         String prefix = model.class.simpleName - "Model"
@@ -191,6 +198,25 @@ class ModelHelper {
             builder.append(channel)
             results.add(builder.toString())
         }
+    }
+    
+    public static Set<String> pathsExtendedWithPeriod(List<String> paths, List<String> periodLabels) {
+        Set<String> results = new HashSet<String>()
+        for (String path : paths) {
+            String pathWithoutChannel = getPathBase(path)
+            String channel = getChannel(path)
+            for (String periodLabel : periodLabels) {
+                StringBuilder builder = new StringBuilder(pathWithoutChannel)
+                builder.append(PATH_SEPARATOR)
+                builder.append(PERIOD)
+                builder.append(PATH_SEPARATOR)
+                builder.append(periodLabel)
+                builder.append(PATH_SEPARATOR)
+                builder.append(channel)
+                results.add(builder.toString())
+            }
+        }
+        return results
     }
 
     private static extendedPaths(Map<Class, List<String>> componentNameByMarkerInterface, Class markerClass1,

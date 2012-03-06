@@ -72,7 +72,7 @@ public class PeriodLabelsUtil {
                 }
                 if (simulationStartYear != null) {
                     modifiedPeriodLabels.clear();
-                    for (int period = 0; period < numberOfPeriods; period++) {
+                    for (String periodLabel : periodLabels) {
                         modifiedPeriodLabels.add(String.valueOf(simulationStartYear++));
                     }
                 }

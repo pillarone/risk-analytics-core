@@ -129,7 +129,7 @@ class Resource extends ParametrizedItem {
 
     @Override
     protected loadFromDB() {
-        return ResourceDAO.findByNameAndResourceClassName(name, modelClass.name)
+        return ResourceDAO.findWhere([name: name, resourceClassName: modelClass.name, itemVersion: versionNumber.toString()])
     }
 
     void addParameter(ParameterHolder parameter) {

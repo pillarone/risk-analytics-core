@@ -186,6 +186,9 @@ class ResultAccessor {
         }
         else {
             double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
+            if(values.length == 0) {
+                return null
+            }
             return MathUtils.calculatePercentile(values, severity, perspective)
         }
     }
@@ -206,6 +209,9 @@ class ResultAccessor {
         }
         else {
             double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
+            if(values.length == 0) {
+                return null
+            }
             return MathUtils.calculateVar(values, severity, perspective)
         }
     }
@@ -222,6 +228,9 @@ class ResultAccessor {
         }
         else {
             double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
+            if(values.length == 0) {
+                return null
+            }
             return MathUtils.calculateTvar(values, severity, perspective)
         }
     }

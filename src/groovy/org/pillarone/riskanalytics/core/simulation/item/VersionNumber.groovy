@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
+import org.pillarone.riskanalytics.core.ResourceDAO
+
 class VersionNumber implements Comparable, Cloneable, Serializable {
 
     private static final long serialVersionUID = -1640758346987125721L;
@@ -47,6 +49,13 @@ class VersionNumber implements Comparable, Cloneable, Serializable {
 
     static List getExistingVersions(ModellingItem item) {
         Collection existingVersions = item.daoClass.findAllByNameAndModelClassName(item.name, item.modelClass.name).collect {
+            new VersionNumber(it.itemVersion)
+        }
+        return existingVersions
+    }
+
+    static List getExistingVersions(Resource item) {
+        Collection existingVersions = ResourceDAO.findAllByNameAndResourceClassName(item.name, item.modelClass.name).collect {
             new VersionNumber(it.itemVersion)
         }
         return existingVersions

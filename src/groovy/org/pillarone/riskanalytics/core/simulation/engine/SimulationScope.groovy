@@ -16,6 +16,7 @@ import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationBlock
 import org.pillarone.riskanalytics.core.simulation.engine.id.IIdGenerator
 import org.pillarone.riskanalytics.core.simulation.engine.id.CountingIdGenerator
+import org.pillarone.riskanalytics.core.output.FileOutput
 
 /**
  * The SimulationScope provides information, that is valid throughout the whole simulation.
@@ -60,6 +61,9 @@ public class SimulationScope {
     }
 
     public CollectorFactory getCollectorFactory() {
+        if (outputStrategy instanceof FileOutput) {
+            outputStrategy.simulationScope = this
+        }
         return new CollectorFactory(outputStrategy)
     }
 

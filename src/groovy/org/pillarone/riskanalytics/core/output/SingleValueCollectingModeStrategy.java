@@ -10,7 +10,7 @@ import java.util.ResourceBundle;
 
 public class SingleValueCollectingModeStrategy extends AbstractCollectingModeStrategy {
 
-    static final String IDENTIFIER = "SINGLE";
+    public static final String IDENTIFIER = "SINGLE";
 
     private static final String RESOURCE_BUNDLE = "org.pillarone.riskanalytics.core.output.applicationResources";
     private String displayName;

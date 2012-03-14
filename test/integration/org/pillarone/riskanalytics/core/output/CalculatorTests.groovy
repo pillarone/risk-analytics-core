@@ -10,6 +10,8 @@ class CalculatorTests extends GroovyTestCase {
     SimulationRun run
 
     void setUp() {
+        assertNotNull(new CollectorMapping(collectorName: SingleValueCollectingModeStrategy.IDENTIFIER).save())
+
         new ParameterizationImportService().compareFilesAndWriteToDB(['CoreParameters'])
         new ResultConfigurationImportService().compareFilesAndWriteToDB(['CoreConfiguration'])
         run = new SimulationRun()
@@ -17,7 +19,7 @@ class CalculatorTests extends GroovyTestCase {
         run.parameterization = ParameterizationDAO.findByName('CoreParameters')
         run.resultConfiguration = ResultConfigurationDAO.findByName('CoreConfiguration')
         run.model = CoreModel.name
-        run.iterations = 3
+        run.iterations = 1
         run.periodCount = 2
         assertNotNull run.save()
 
@@ -28,16 +30,16 @@ class CalculatorTests extends GroovyTestCase {
         CollectorMapping collector = new CollectorMapping(collectorName: AggregatedCollectingModeStrategy.IDENTIFIER).save()
         FieldMapping field = new FieldMapping(fieldName: "field").save()
 
-        assertNotNull new SingleValueResult(simulationRun: run, iteration: 0, period: 0, value: 1, path: path1, collector: collector, field: field).save()
-        assertNotNull new SingleValueResult(simulationRun: run, iteration: 0, period: 0, value: 2, path: path2, collector: collector, field: field).save()
-        assertNotNull new SingleValueResult(simulationRun: run, iteration: 0, period: 0, value: 3, path: path3, collector: collector, field: field).save()
+        assertNotNull new SingleValueResult(simulationRun: run, iteration: 1, period: 0, value: 1, path: path1, collector: collector, field: field).save()
+        assertNotNull new SingleValueResult(simulationRun: run, iteration: 1, period: 0, value: 2, path: path2, collector: collector, field: field).save()
+        assertNotNull new SingleValueResult(simulationRun: run, iteration: 1, period: 0, value: 3, path: path3, collector: collector, field: field).save()
 
-        assertNotNull new SingleValueResult(simulationRun: run, iteration: 0, period: 1, value: 4, path: path1, collector: collector, field: field).save()
-        assertNotNull new SingleValueResult(simulationRun: run, iteration: 0, period: 1, value: 5, path: path2, collector: collector, field: field).save()
-        assertNotNull new SingleValueResult(simulationRun: run, iteration: 0, period: 1, value: 6, path: path3, collector: collector, field: field).save()
+        assertNotNull new SingleValueResult(simulationRun: run, iteration: 1, period: 1, value: 4, path: path1, collector: collector, field: field).save()
+        assertNotNull new SingleValueResult(simulationRun: run, iteration: 1, period: 1, value: 5, path: path2, collector: collector, field: field).save()
+        assertNotNull new SingleValueResult(simulationRun: run, iteration: 1, period: 1, value: 6, path: path3, collector: collector, field: field).save()
 
         //period 0 should be ignored, because path does not contain a result for all iterations
-        assertNotNull new SingleValueResult(simulationRun: run, iteration: 0, period: 1, value: 7, path: path4, collector: collector, field: field,).save()
+        assertNotNull new SingleValueResult(simulationRun: run, iteration: 1, period: 1, value: 7, path: path4, collector: collector, field: field,).save()
 
     }
 

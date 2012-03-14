@@ -18,6 +18,8 @@ import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.pillarone.riskanalytics.core.util.MathUtils
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
+import org.pillarone.riskanalytics.core.output.CollectorMapping
+import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
 
 /**
  * An abstract class which provides functionality to run model tests.
@@ -86,6 +88,7 @@ abstract class ModelTest extends GroovyTestCase {
         super.setUp()
         MathUtils.initRandomStreamBase(1234)
 
+        assertNotNull(new CollectorMapping(collectorName: SingleValueCollectingModeStrategy.IDENTIFIER).save())
         new ParameterizationImportService().compareFilesAndWriteToDB([getParameterFileName()])
         new ResultConfigurationImportService().compareFilesAndWriteToDB([getResultConfigurationFileName()])
         new ModelStructureImportService().compareFilesAndWriteToDB([getStructureFileName()])

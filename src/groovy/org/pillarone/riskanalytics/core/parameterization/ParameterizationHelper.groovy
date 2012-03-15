@@ -13,6 +13,11 @@ import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.components.IResource
 import org.pillarone.riskanalytics.core.simulation.item.Resource
 import org.pillarone.riskanalytics.core.util.GroovyUtils
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ResourceParameterHolder
+import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
+import org.pillarone.riskanalytics.core.simulation.item.parameter.MultiDimensionalParameterHolder
+import org.pillarone.riskanalytics.core.components.ResourceHolder
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjectParameterHolder
 
 public class ParameterizationHelper {
 
@@ -164,4 +169,40 @@ public class ParameterizationHelper {
     static List copyParameters(List parameters) {
         return parameters.collect { it.clone() }
     }
+
+    static List<Resource> collectUsedResources(List<ParameterHolder> parameters) {
+        List<Resource> result = new ArrayList<Resource>();
+        for (ParameterHolder parameter: parameters) {
+            if (parameter instanceof ResourceParameterHolder) {
+                ResourceParameterHolder parameterHolder = (ResourceParameterHolder) parameter;
+                Resource resource = new Resource(parameterHolder.getName(), parameterHolder.getResourceClass());
+                resource.setVersionNumber(new VersionNumber(parameterHolder.getVersion()));
+                result.add(resource);
+            } else if (parameter instanceof MultiDimensionalParameterHolder) {
+                AbstractMultiDimensionalParameter multiDimensionalParameter = ((MultiDimensionalParameterHolder) parameter).getBusinessObject();
+                if (multiDimensionalParameter instanceof ConstrainedMultiDimensionalParameter) {
+                    ConstrainedMultiDimensionalParameter constrainedMultiDimensionalParameter = (ConstrainedMultiDimensionalParameter) multiDimensionalParameter;
+                    for (int i = 0; i < constrainedMultiDimensionalParameter.getColumnCount(); i++) {
+                        if (IResource.class.isAssignableFrom(constrainedMultiDimensionalParameter.getConstraints().getColumnType(i))) {
+                            final List column = (List) constrainedMultiDimensionalParameter.getValues().get(i);
+                            for (Object entry: column) {
+                                if (entry instanceof ResourceHolder) {
+                                    ResourceHolder holder = (ResourceHolder) entry;
+                                    Resource resource = new Resource(holder.getName(), holder.getResourceClass());
+                                    resource.setVersionNumber(holder.getVersion());
+                                    result.add(resource);
+                                }
+                            }
+
+                        }
+                    }
+                }
+
+            } else if (parameter instanceof ParameterObjectParameterHolder) {
+                result.addAll(collectUsedResources(parameter.classifierParameters.values().toList()))
+            }
+        }
+        return result;
+    }
+
 }

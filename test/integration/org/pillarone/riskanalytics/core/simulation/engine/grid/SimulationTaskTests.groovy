@@ -8,6 +8,7 @@ import org.gridgain.grid.GridNode
 import org.pillarone.riskanalytics.core.simulation.engine.grid.mapping.AbstractNodeMappingStrategy
 import org.gridgain.grid.kernal.GridRichNodeImpl
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 
 
 class SimulationTaskTests extends GroovyTestCase {
@@ -138,6 +139,7 @@ class SimulationTaskTests extends GroovyTestCase {
         Simulation simulation = new Simulation("test")
         simulation.id = 1L
         simulation.numberOfIterations = iterationCount
+        simulation.parameterization = new Parameterization("test")
         configuration.simulation = simulation
         assertNull simulation.start
         assertNull simulation.end

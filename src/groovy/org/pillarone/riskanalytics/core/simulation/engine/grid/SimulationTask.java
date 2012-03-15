@@ -8,6 +8,7 @@ import org.pillarone.riskanalytics.core.batch.BatchRunInfoService;
 import org.pillarone.riskanalytics.core.output.Calculator;
 import org.pillarone.riskanalytics.core.output.PathMapping;
 import org.pillarone.riskanalytics.core.output.aggregation.PacketAggregatorRegistry;
+import org.pillarone.riskanalytics.core.parameterization.ParameterizationHelper;
 import org.pillarone.riskanalytics.core.simulation.SimulationState;
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.mapping.AbstractNodeMappingStrategy;
@@ -16,6 +17,7 @@ import org.pillarone.riskanalytics.core.simulation.engine.grid.output.JobResult;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultDescriptor;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultTransferObject;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultWriter;
+import org.pillarone.riskanalytics.core.simulation.item.Resource;
 import org.pillarone.riskanalytics.core.simulation.item.Simulation;
 
 import java.util.*;
@@ -81,10 +83,17 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
             configurations.get(i % cpuCount).addSimulationBlock(simulationBlocks.get(i));
         }
 
+        List<Resource> allResources = ParameterizationHelper.collectUsedResources(simulationConfiguration.getSimulation().getRuntimeParameters());
+        allResources.addAll(ParameterizationHelper.collectUsedResources(simulationConfiguration.getSimulation().getParameterization().getParameters()));
+
+        for (Resource resource : allResources) {
+            resource.load();
+        }
         for (int i = 0; i < Math.min(cpuCount, simulationBlocks.size()); i++) {
             UUID jobId = UUID.randomUUID();
             SimulationJob job = new SimulationJob(configurations.get(i), jobId, grid.localNode().id());
             job.setAggregatorMap(PacketAggregatorRegistry.getAllAggregators());
+            job.setLoadedResources(allResources);
             jobIds.add(jobId);
             jobs.add(job);
             LOG.info("Created a new job with block count " + configurations.get(i).getSimulationBlocks().size());

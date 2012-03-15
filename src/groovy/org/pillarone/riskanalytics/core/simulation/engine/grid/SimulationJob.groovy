@@ -11,6 +11,8 @@ import org.pillarone.riskanalytics.core.simulation.engine.grid.output.JobResult
 import org.pillarone.riskanalytics.core.output.aggregation.IPacketAggregator
 import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
 import org.pillarone.riskanalytics.core.simulation.ILimitedPeriodCounter
+import org.pillarone.riskanalytics.core.components.ResourceRegistry
+import org.pillarone.riskanalytics.core.simulation.item.Resource
 
 class SimulationJob extends GridJobAdapter<JobResult> {
 
@@ -22,6 +24,7 @@ class SimulationJob extends GridJobAdapter<JobResult> {
     private static Log LOG = LogFactory.getLog(SimulationJob)
 
     Map<Class, IPacketAggregator> aggregatorMap = [:]
+    List<Resource> loadedResources = []
 
     public SimulationJob(SimulationConfiguration simulationConfiguration, UUID jobId, UUID masterNodeId) {
         this.jobIdentifier = jobId
@@ -40,6 +43,7 @@ class SimulationJob extends GridJobAdapter<JobResult> {
         for(Map.Entry<Class, IPacketAggregator> entry in aggregatorMap) {
             PacketAggregatorRegistry.registerAggregator(entry.key, entry.value)
         }
+        ResourceRegistry.preLoad(loadedResources)
 
         Date start = new Date()
         ExpandoMetaClass.enableGlobally()

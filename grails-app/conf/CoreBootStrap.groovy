@@ -30,10 +30,17 @@ class CoreBootStrap {
 
         //All mappings must be persistent before a simulation is started
         CollectorMapping.withTransaction { status ->
-            if (CollectorMapping.count() == 0) {
-                new CollectorMapping(collectorName: SingleValueCollectingModeStrategy.IDENTIFIER).save()
-                new CollectorMapping(collectorName: AggregatedCollectingModeStrategy.IDENTIFIER).save()
-                new CollectorMapping(collectorName: AggregatedWithSingleAvailableCollectingModeStrategy.IDENTIFIER).save()
+            CollectorMapping mapping = new CollectorMapping(collectorName: SingleValueCollectingModeStrategy.IDENTIFIER)
+            if (CollectorMapping.find(mapping) == null) {
+                mapping.save()
+            }
+            mapping = new CollectorMapping(collectorName: AggregatedCollectingModeStrategy.IDENTIFIER)
+            if (CollectorMapping.find(mapping) == null) {
+                mapping.save()
+            }
+            mapping = new CollectorMapping(collectorName: AggregatedWithSingleAvailableCollectingModeStrategy.IDENTIFIER)
+            if (CollectorMapping.find(mapping) == null) {
+                mapping.save()
             }
         }
 
@@ -125,9 +132,9 @@ class CoreBootStrap {
         if (modelFilter) {
             models = modelFilter.collect {it - "Model"}
         }
-            ParameterizationDAO.withTransaction {TransactionStatus status ->
-                FileImportService.importModelsIfNeeded(models)
-            }
+        ParameterizationDAO.withTransaction {TransactionStatus status ->
+            FileImportService.importModelsIfNeeded(models)
+        }
     }
 
     def destroy = {

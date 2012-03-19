@@ -10,10 +10,11 @@ import java.io.File;
 public class GridHelper {
 
     public static Grid getGrid() {
-        if (ApplicationHolder.getApplication() == null)
-            return GridFactory.getGrid();
-        else
+        try {
             return (Grid) ApplicationHolder.getApplication().getMainContext().getBean("grid");
+        } catch (Exception e) {
+            return GridFactory.getGrid();
+        }
     }
 
     public static String getResultLocation(long runId) {

@@ -13,6 +13,10 @@ import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
 import org.pillarone.riskanalytics.core.simulation.ILimitedPeriodCounter
 import org.pillarone.riskanalytics.core.components.ResourceRegistry
 import org.pillarone.riskanalytics.core.simulation.item.Resource
+import org.springframework.context.support.GenericApplicationContext
+import org.springframework.beans.factory.config.BeanDefinition
+import org.codehaus.groovy.grails.commons.DefaultGrailsApplication
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 
 class SimulationJob extends GridJobAdapter<JobResult> {
 
@@ -46,6 +50,7 @@ class SimulationJob extends GridJobAdapter<JobResult> {
         ResourceRegistry.preLoad(loadedResources)
 
         Date start = new Date()
+        initSpringContext()
         ExpandoMetaClass.enableGlobally()
         runner.setJobCount(jobCount)
         runner.setSimulationConfiguration(simulationConfiguration)
@@ -68,13 +73,25 @@ class SimulationJob extends GridJobAdapter<JobResult> {
         super.cancel()
     }
 
-    public void setJobCount(int jobCount) {
+    void setJobCount(int jobCount) {
         this.jobCount = jobCount;
     }
 
 
     UUID getJobIdentifier() {
         return jobIdentifier
+    }
+
+    private void initSpringContext() {
+        if (ApplicationHolder.application == null) { //if not on the main node, create dummy application with required beans
+            GenericApplicationContext ctx = new GenericApplicationContext()
+            for (Map.Entry<String, BeanDefinition> definition in simulationConfiguration.beans.entrySet()) {
+                ctx.registerBeanDefinition(definition.key, definition.value)
+            }
+            DefaultGrailsApplication grailsApplication = new DefaultGrailsApplication()
+            grailsApplication.mainContext = ctx
+            ApplicationHolder.application = grailsApplication
+        }
     }
 
 }

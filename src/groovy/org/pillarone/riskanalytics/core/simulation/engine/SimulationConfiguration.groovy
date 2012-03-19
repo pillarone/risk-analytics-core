@@ -17,6 +17,7 @@ import org.pillarone.riskanalytics.core.output.ICollectingModeStrategy
 import org.pillarone.riskanalytics.core.output.CollectingModeFactory
 import org.pillarone.riskanalytics.core.wiring.IPacketListener
 import org.pillarone.riskanalytics.core.util.PeriodLabelsUtil
+import org.springframework.beans.factory.config.BeanDefinition
 
 /**
  * The SimulationConfiguration is a descriptor for a runnable simulation. All runtime aspects e.g. numberOfIterations,
@@ -32,6 +33,7 @@ public class SimulationConfiguration implements Serializable, Cloneable {
     MappingCache mappingCache
     List<SimulationBlock> simulationBlocks = []
     IPacketListener packetListener;
+    Map<String, BeanDefinition> beans = [:]
 
     private static Log LOG = LogFactory.getLog(SimulationConfiguration)
 
@@ -137,7 +139,7 @@ public class SimulationConfiguration implements Serializable, Cloneable {
             }
         }
     }
-    
+
     private Set<String> getSplitByInceptionDateDrillDownPaths(List<PacketCollector> collectors, Model model) {
         // todo: requires a proper refactoring as the core plugin itself knows nothing about the aggregate drill down collector
         ICollectingModeStrategy splitPerInceptionDateCollector = CollectingModeFactory.getStrategy('SPLIT_BY_INCEPTION_DATE')

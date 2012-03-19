@@ -7,16 +7,9 @@ import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationTask
 
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.pillarone.riskanalytics.core.model.Model
-import org.pillarone.riskanalytics.core.model.ModelHelper
-import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
-
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationHandler
-import org.pillarone.riskanalytics.core.output.PacketCollector
-import org.pillarone.riskanalytics.core.output.CollectingModeFactory
-import org.pillarone.riskanalytics.core.output.ICollectingModeStrategy
-import org.pillarone.riskanalytics.core.output.CollectorFactory
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
+import org.pillarone.riskanalytics.core.simulation.engine.grid.SpringBeanDefinitionRegistry
 
 public class RunSimulationService {
 
@@ -53,6 +46,7 @@ public class RunSimulationService {
     public SimulationHandler runSimulationOnGrid(SimulationConfiguration configuration, ResultConfiguration resultConfiguration) {
         configuration.createMappingCache(resultConfiguration)
         configuration.prepareSimulationForGrid()
+        configuration.beans = SpringBeanDefinitionRegistry.getRequiredBeanDefinitions()
 
         SimulationTask task = new SimulationTask()
         SimulationHandler handler = new SimulationHandler(simulationTask: task)

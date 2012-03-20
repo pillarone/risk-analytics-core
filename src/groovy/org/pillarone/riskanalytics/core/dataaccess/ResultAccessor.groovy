@@ -1,6 +1,5 @@
 package org.pillarone.riskanalytics.core.dataaccess
 
-import groovy.sql.GroovyRowResult
 import groovy.sql.Sql
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
@@ -40,11 +39,6 @@ abstract class ResultAccessor {
 
 
     static Double getMean(SimulationRun simulationRun, int periodIndex, String pathName, String collectorName, String fieldName) {
-        if (simulationRun.iterations == 1) {
-            return DeterminsiticResultAccessor.getSingleValueFromView(simulationRun, fieldName, collectorName, pathName, periodIndex, 1)
-        }
-
-
         PostSimulationCalculation result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, pathName, collectorName, fieldName, PostSimulationCalculation.MEAN)
         if (result != null) {
             return result.result
@@ -240,7 +234,6 @@ abstract class ResultAccessor {
     }
 
     public static Double getUltimatesForOneIteration(SimulationRun simulationRun, int periodIndex, String pathName, String collectorName, String fieldName, int iteration) {
-        // TODO (Jul 13, 2009, msh): Why do we use a Criteria here ? See getSingleValueFromView(...)
         PathMapping path = PathMapping.findByPathName(pathName)
         FieldMapping field = FieldMapping.findByFieldName(fieldName)
         CollectorMapping collector = CollectorMapping.findByCollectorName(collectorName)

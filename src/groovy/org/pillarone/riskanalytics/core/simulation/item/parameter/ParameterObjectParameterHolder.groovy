@@ -4,9 +4,8 @@ import org.pillarone.riskanalytics.core.parameter.EnumParameter
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.ParameterEntry
 import org.pillarone.riskanalytics.core.parameter.ParameterObjectParameter
-import org.pillarone.riskanalytics.core.parameterization.IParameterObjectClassifier
 import org.pillarone.riskanalytics.core.parameterization.IParameterObject
-import org.pillarone.riskanalytics.core.parameterization.AbstractMultiDimensionalParameter
+import org.pillarone.riskanalytics.core.parameterization.IParameterObjectClassifier
 
 class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerValueAccessor {
 
@@ -21,7 +20,12 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
     public ParameterObjectParameterHolder(String path, int periodIndex, IParameterObject value) {
         super(path, periodIndex);
         classifierParameters = new HashMap<String, ParameterHolder>()
-        this.classifier = value.type
+        if (value) {
+            this.classifier = value.type
+        }
+        else {
+            throw new IllegalArgumentException("Value for path $path is null!")
+        }
         for (Map.Entry entry in value.parameters) {
             classifierParameters.put(entry.key, ParameterHolderFactory.getHolder(path + ":$entry.key", periodIndex, entry.value))
         }

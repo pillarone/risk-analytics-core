@@ -10,7 +10,6 @@ import org.pillarone.riskanalytics.core.wiring.WiringUtils
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import java.lang.reflect.Field
 import org.pillarone.riskanalytics.core.util.GroovyUtils
-import org.pillarone.riskanalytics.core.resultnavigator.ICategoryResolver
 
 abstract class Model {
 
@@ -221,9 +220,6 @@ abstract class Model {
             sortedProps << field.name
         }
         return sortedProps
-    }
-
-    void configureMatcherMap(Map<String, ICategoryResolver> matcherMap) {
     }
 
 }

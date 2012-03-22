@@ -222,4 +222,8 @@ abstract class Model {
         return sortedProps
     }
 
+    Closure createResultNavigatorMapping() {
+        return null
+    }
+
 }

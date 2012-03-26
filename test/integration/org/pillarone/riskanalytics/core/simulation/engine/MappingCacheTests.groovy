@@ -23,7 +23,7 @@ class MappingCacheTests extends GroovyTestCase {
 
         assertEquals 3, cache.paths.size()
         assertEquals 1, cache.fields.size()
-        assertEquals 1, cache.collectors.size()
+        assertEquals 2, cache.collectors.size() //+ single
     }
 
     void testLookup() {

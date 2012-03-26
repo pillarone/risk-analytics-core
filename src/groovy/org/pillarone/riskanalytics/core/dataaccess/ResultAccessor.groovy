@@ -1,6 +1,5 @@
 package org.pillarone.riskanalytics.core.dataaccess
 
-import groovy.sql.GroovyRowResult
 import groovy.sql.Sql
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
@@ -8,12 +7,11 @@ import org.pillarone.riskanalytics.core.util.GroovyUtils
 import org.pillarone.riskanalytics.core.util.MathUtils
 import org.pillarone.riskanalytics.core.output.*
 
-class ResultAccessor {
+abstract class ResultAccessor {
 
-    static Log LOG = LogFactory.getLog(ResultAccessor)
+    private static final Log LOG = LogFactory.getLog(ResultAccessor)
 
-    static List getRawData(SimulationRun simulationRun) {
-
+    static List<SingleValueResult> getAllResults(SimulationRun simulationRun) {
         return SingleValueResult.findAllBySimulationRun(simulationRun)
     }
 
@@ -30,106 +28,81 @@ class ResultAccessor {
         return fileName
     }
 
-    static List getPaths(SimulationRun simulationRun) {
-        return SingleValueResult.executeQuery("SELECT DISTINCT p.pathName " +
-                "FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s, org.pillarone.riskanalytics.core.output.PathMapping as p " +
-                "WHERE s.path.id = p.id AND s.simulationRun.id = " + simulationRun.id)
+    static List<ResultPathDescriptor> getDistinctPaths(SimulationRun run) {
+        CollectorMapping singleCollector = CollectorMapping.findByCollectorName(SingleValueCollectingModeStrategy.IDENTIFIER)
+        if (singleCollector == null) {
+            throw new IllegalStateException("Single collector mapping not found")
+        }
+        List<Object[]> queryResult = (List<Object[]>) SingleValueResult.executeQuery("SELECT DISTINCT s.path, s.field, s.collector, s.period FROM SingleValueResult s WHERE s.simulationRun = ? AND s.collector != ?", [run, singleCollector])
+        return queryResult.collect { new ResultPathDescriptor(it[0], it[1], it[2], it[3]) }
     }
 
 
-    static Double getMean(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
-        if (simulationRun.iterations == 1) {
-            return DeterminsiticResultAccessor.getSingleValueFromView(simulationRun, fieldName, collectorName, pathName, periodIndex)
-        }
-
-
-        def result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, pathName, collectorName, fieldName, PostSimulationCalculation.MEAN)
+    static Double getMean(SimulationRun simulationRun, int periodIndex, String pathName, String collectorName, String fieldName) {
+        PostSimulationCalculation result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, pathName, collectorName, fieldName, PostSimulationCalculation.MEAN)
         if (result != null) {
             return result.result
         }
         else {
-            def res = SingleValueResult.executeQuery("SELECT AVG(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
-                    " WHERE s.path.pathName = ? AND " +
-                    "s.collector.collectorName = ? AND " +
-                    "s.field.fieldName = ? AND " +
-                    "s.period = ? AND " +
-                    "s.simulationRun.id = ?", [pathName, collectorName, fieldName, periodIndex, simulationRun.id])
-            return res[0]
+            List<Double> allValues = getValues(simulationRun, pathName, collectorName, fieldName)
+            return allValues.sum() / simulationRun.iterations
         }
     }
 
-    static Map<String, Double> getMeans(SimulationRun simulationRun, String collectorName) {
-        if (simulationRun.iterations == 1) {
-            return DeterminsiticResultAccessor.getSingleValues(simulationRun, collectorName)
-        }
-        return PostSimulationCalculationAccessor.getKeyFigureResults(simulationRun, collectorName, PostSimulationCalculation.MEAN)
-    }
-
-    static Double getAvgOfSingleValueResult(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
-        def res = SingleValueResult.executeQuery("SELECT AVG(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
-                " WHERE s.path.pathName = ? AND " +
-                "s.collector.collectorName = ? AND " +
-                "s.field.fieldName = ? AND " +
-                "s.period = ? AND " +
-                "s.simulationRun.id = ?", [pathName, collectorName, fieldName, periodIndex, simulationRun.id])
-        return res[0]
-    }
-
-
-    static Double getMin(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
-        String query = "SELECT MIN(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
+    static Double getMin(SimulationRun simulationRun, int periodIndex, String pathName, String collectorName, String fieldName) {
+        String query = "SELECT MIN(value), COUNT(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
                 " WHERE s.path.pathName = ? AND " +
                 "s.collector.collectorName = ? AND " +
                 "s.field.fieldName = ? AND " +
                 "s.period = ? AND " +
                 "s.simulationRun.id = ?"
         def res = SingleValueResult.executeQuery(query, [pathName, collectorName, fieldName, periodIndex, simulationRun.id])
-        return res[0]
+        int count = res[0][1]
+        Double min = res[0][0]
+        if (count < simulationRun.iterations) {
+            min = Math.min(min, 0)
+        }
+        return min
     }
 
-    static Double getMax(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
-        String query = "SELECT MAX(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
+    static Double getMax(SimulationRun simulationRun, int periodIndex, String pathName, String collectorName, String fieldName) {
+        String query = "SELECT MAX(value), COUNT(value) FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
                 " WHERE s.path.pathName = ? AND " +
                 "s.collector.collectorName = ? AND " +
                 "s.field.fieldName = ? AND " +
                 "s.period = ? AND " +
                 "s.simulationRun.id = ?"
         def res = SingleValueResult.executeQuery(query, [pathName, collectorName, fieldName, periodIndex, simulationRun.id])
-        return res[0]
+        int count = res[0][1]
+        Double max = res[0][0]
+        if (count < simulationRun.iterations) {
+            max = Math.max(max, 0)
+        }
+        return max
     }
 
 
-    public static boolean hasDifferentValues(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
+    static boolean hasDifferentValues(SimulationRun simulationRun, int periodIndex, String pathName, String collectorName, String fieldName) {
         if (simulationRun.iterations == 1) {
             return false
         }
-        List values = getValues(simulationRun, periodIndex, pathName, collectorName, fieldName)
+        List<Double> values = getValues(simulationRun, periodIndex, pathName, collectorName, fieldName)
+        if (values.size() < simulationRun.iterations) {
+            values << 0d
+        }
         return values.max() != values.min()
-        //todo: fix query! does not work properly when called from RTTM
-        /*Statement stmt = simulationRun.dataSource.connection.createStatement()
-       ResultSet res = stmt.executeQuery("SELECT min(value) = max(value) as isStochastic FROM single_value_result s, path_mapping p, field_mapping f, collector_mapping c WHERE " +
-               "s.path_id = p.id " +
-               "AND s.field_id = f.id " +
-               "AND s.collector_id = c.id " +
-               "AND p.path_name = '" + pathName + "'" +
-               "AND f.field_name = '" + fieldName + "'" +
-               "AND c.collector_name = '" + collectorName + "'" +
-               "AND s.id = '"+ simulationRun.id + "'" +
-               "AND s.period = '"+ periodIndex + "'"
-       )
-       res.next()
-       return !res.getBoolean("isStochastic")*/
+
     }
 
-    static Double getStdDev(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName, String fieldName) {
-        def result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, path, collectorName, fieldName, PostSimulationCalculation.STDEV)
+    static Double getStdDev(SimulationRun simulationRun, int periodIndex, String path, String collectorName, String fieldName) {
+        PostSimulationCalculation result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, path, collectorName, fieldName, PostSimulationCalculation.STDEV)
         if (result != null) {
             return result.result
         }
         else {
-            double[] ultimates = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
-            if (ultimates.size() > 0) {
-                return MathUtils.calculateStandardDeviation(ultimates)
+            double[] sortedValues = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
+            if (sortedValues.size() > 0) {
+                return MathUtils.calculateStandardDeviation(sortedValues)
             }
             else {
                 return null
@@ -137,7 +110,7 @@ class ResultAccessor {
         }
     }
 
-    static Double getNthOrderStatistic(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName,
+    static Double getNthOrderStatistic(SimulationRun simulationRun, int periodIndex, String path, String collectorName,
                                        String fieldName, double percentage, CompareOperator compareOperator) {
         double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
         double lowestPercentage = 100d / values.size()
@@ -178,7 +151,7 @@ class ResultAccessor {
     }
 
 
-    static Double getPercentile(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName, String fieldName, Double severity,
+    static Double getPercentile(SimulationRun simulationRun, int periodIndex, String path, String collectorName, String fieldName, Double severity,
                                 QuantilePerspective perspective) {
         def result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, path, collectorName, fieldName, perspective.getPercentileAsString(), severity)
         if (result != null) {
@@ -186,22 +159,14 @@ class ResultAccessor {
         }
         else {
             double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
-            if(values.length == 0) {
+            if (values.length == 0) {
                 return null
             }
             return MathUtils.calculatePercentile(values, severity, perspective)
         }
     }
 
-    static Double getPercentile(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName, String fieldName, Double severity) {
-        return getPercentile(simulationRun, periodIndex, path, collectorName, fieldName, severity, QuantilePerspective.LOSS)
-    }
-
-    static Double getVar(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName, String fieldName, Double severity) {
-        return getVar(simulationRun, periodIndex, path, collectorName, fieldName, severity, QuantilePerspective.LOSS)
-    }
-
-    static Double getVar(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName, String fieldName, Double severity,
+    static Double getVar(SimulationRun simulationRun, int periodIndex, String path, String collectorName, String fieldName, Double severity,
                          QuantilePerspective perspective) {
         def result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, path, collectorName, fieldName, perspective.getVarAsString(), severity)
         if (result != null) {
@@ -209,18 +174,14 @@ class ResultAccessor {
         }
         else {
             double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
-            if(values.length == 0) {
+            if (values.length == 0) {
                 return null
             }
             return MathUtils.calculateVar(values, severity, perspective)
         }
     }
 
-    static Double getTvar(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName, String fieldName, Double severity) {
-        return getTvar(simulationRun, periodIndex, path, collectorName, fieldName, severity, QuantilePerspective.LOSS)
-    }
-
-    static Double getTvar(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName, String fieldName,
+    static Double getTvar(SimulationRun simulationRun, int periodIndex, String path, String collectorName, String fieldName,
                           Double severity, QuantilePerspective perspective) {
         def result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, path, collectorName, fieldName, perspective.getTvarAsString(), severity)
         if (result != null) {
@@ -228,102 +189,29 @@ class ResultAccessor {
         }
         else {
             double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
-            if(values.length == 0) {
+            if (values.length == 0) {
                 return null
             }
             return MathUtils.calculateTvar(values, severity, perspective)
         }
     }
 
-    static List getValuesSorted(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
-        SingleValueResult.executeQuery("SELECT value FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
+    static double[] getValuesSorted(SimulationRun simulationRun, int periodIndex, String pathName, String collectorName, String fieldName) {
+        return fillWithZeroes(simulationRun, (double[]) SingleValueResult.executeQuery("SELECT value FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
                 " WHERE s.path.pathName = ? AND " +
                 "s.period = ? AND " +
                 "s.collector.collectorName = ? AND " +
                 "s.field.fieldName = ? AND " +
-                "s.simulationRun.id = ? ORDER BY value", [pathName, periodIndex, collectorName, fieldName, simulationRun.id])
+                "s.simulationRun.id = ? ORDER BY value", [pathName, periodIndex, collectorName, fieldName, simulationRun.id]))
     }
 
-    static List getValuesSorted(SimulationRun simulationRun, int period, long pathId, long collectorId, long fieldId) {
-        return SingleValueResult.executeQuery("SELECT value FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
-                " WHERE s.path.id = ? AND " +
-                "s.period = ? AND " +
-                "s.collector.id = ? AND " +
-                "s.field.id = ? AND " +
-                "s.simulationRun.id = ? ORDER BY value", [pathId, period, collectorId, fieldId, simulationRun.id])
-    }
-
-    static List getValues(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
-        SingleValueResult.executeQuery("SELECT value FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
+    static double[] getValues(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
+        return fillWithZeroes(simulationRun, (double[]) SingleValueResult.executeQuery("SELECT value FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
                 " WHERE s.path.pathName = ? AND " +
                 "s.period = ? AND " +
                 "s.collector.collectorName = ? AND " +
                 "s.field.fieldName = ? AND " +
-                "s.simulationRun.id = ? ORDER BY s.iteration", [pathName, periodIndex, collectorName, fieldName, simulationRun.id])
-    }
-
-    static List getValues(SimulationRun simulationRun, int period, long pathId, long collectorId, long fieldId) {
-        SingleValueResult.executeQuery("SELECT value FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
-                " WHERE s.path.id = ? AND " +
-                "s.period = ? AND " +
-                "s.collector.id = ? AND " +
-                "s.field.id = ? AND " +
-                "s.simulationRun.id = ? ORDER BY s.iteration", [pathId, period, collectorId, fieldId, simulationRun.id])
-    }
-
-    static Map<String, List> getAllValues(SimulationRun simulationRun, String collectorName) {
-        Map<String, List> valuesMap = [:]
-        def singleValueResults = SingleValueResult.executeQuery("SELECT s.path.pathName, s.field.fieldName, s.period,s.value FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
-                " WHERE s.collector.collectorName = ? and s.simulationRun.id = ? ORDER BY s.iteration ", [collectorName, simulationRun.id])
-        for (def s: singleValueResults) {
-            String key = s[0] + ":" + s[1] + ":" + s[2]
-            List values = valuesMap[key]
-            if (!values) values = []
-            values << s[3]
-            valuesMap[key] = values
-        }
-        return valuesMap
-    }
-
-    static Double getStandardDeviationValue(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName, String fieldName) {
-        println " getStandardDeviationValue "
-        double[] ultimates = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
-        if (ultimates.size() > 0) {
-            return MathUtils.calculateStandardDeviation(ultimates)
-        }
-        else {
-            return null
-        }
-    }
-
-//    static Map<String, Double> getKeyFigureResults(SimulationRun simulationRun, int periodIndex = 0, String path, String collectorName, String fieldName) {
-    //        Map<String, List> valuesMap = [:]
-    //
-    //        def postSimulationCalculations = PostSimulationCalculation.executeQuery("SELECT p.path.pathName, p.field.fieldName, p.period,p.result FROM org.pillarone.riskanalytics.core.output.PostSimulationCalculation as p " +
-    //                " WHERE p.collector.collectorName = ? and p.run.id = ?  and p.keyFigure = ?", [collectorName, simulationRun.id, keyFigure])
-    //        for (def s: postSimulationCalculations) {
-    //            String key = s[0] + ":" + s[1] + ":" + s[2]
-    //            valuesMap[key] = s[3]
-    //        }
-    //        return valuesMap
-    //    }
-
-    public static List<Object[]> getAvgAndIsStochasticForSimulationRun(SimulationRun simulationRun, long singleCollectorId) {
-        Sql sql = new Sql(simulationRun.dataSource)
-        List<GroovyRowResult> rows = sql.rows("SELECT path_id, period,collector_id, field_id, AVG(value) as average, MIN(value) as minimum, MAX(value) as maximum " +
-                "FROM single_value_result s " +
-                " WHERE simulation_run_id = " + simulationRun.id + " AND collector_id != " + singleCollectorId +
-                " GROUP BY period, path_id, collector_id, field_id")
-        def result = []
-        for (GroovyRowResult row in rows) {
-            def array = new Object[7]
-            for (int i = 0; i < 7; i++) {
-                array[i] = row.getAt(i)
-            }
-            result << array
-        }
-        sql.close()
-        return result
+                "s.simulationRun.id = ? ORDER BY s.iteration", [pathName, periodIndex, collectorName, fieldName, simulationRun.id]))
     }
 
     public static List getSingleValueResults(String collector, String path, String field, SimulationRun run) {
@@ -332,45 +220,20 @@ class ResultAccessor {
         return SingleValueResult.executeQuery(sb.toString(), [collector, field, path, run.id])
     }
 
-   public static List<SingleValueResult> getSingleValueResultsWithDateSkipZeroes(SimulationRun run, int periodIndex, String pathName, String collectorName, String fieldName) {
+    public static List<SingleValueResult> getSingleValueResultsWithDateSkipZeroes(SimulationRun run, int periodIndex, String pathName, String collectorName, String fieldName) {
         // todo: would have preferred to use SymbolicValueResult.findAll() here, but that didn't work since there
         // was some kind of 'version' field that all of a sudden showed up in the resulting SQL... ? I am at loss.
-       return SingleValueResult.createCriteria().list {
-           eq("simulationRun", run)
-           eq("period", periodIndex)
-           eq("path", org.pillarone.riskanalytics.core.output.PathMapping.findByPathName(pathName))
-           eq("field", org.pillarone.riskanalytics.core.output.FieldMapping.findByFieldName(fieldName))
-           eq("collector", org.pillarone.riskanalytics.core.output.CollectorMapping.findByCollectorName(collectorName))
-           not { eq("value", 0.0d) }
-       }
-    }
-
-    public synchronized static List<Object[]> getResults(List<GroovyRowResult> rows, int size) {
-        def result = []
-        for (GroovyRowResult row in rows) {
-            def array = new Object[size]
-            for (int i = 0; i < size; i++) {
-                array[i] = row.getAt(i)
-            }
-            result << array
+        return SingleValueResult.createCriteria().list {
+            eq("simulationRun", run)
+            eq("period", periodIndex)
+            eq("path", org.pillarone.riskanalytics.core.output.PathMapping.findByPathName(pathName))
+            eq("field", org.pillarone.riskanalytics.core.output.FieldMapping.findByFieldName(fieldName))
+            eq("collector", org.pillarone.riskanalytics.core.output.CollectorMapping.findByCollectorName(collectorName))
+            not { eq("value", 0.0d) }
         }
-        return result
     }
 
-
-    public static int getAvgAndIsStochasticForSimulationRunCount(List result) {
-        int count = 0
-        for (array in result) {
-            int isStochastic = array[5] == array[6] ? 1 : 0
-            if (isStochastic == 0)
-                count++
-        }
-        return count
-    }
-
-
-    public static Double getUltimatesForOneIteration(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName, int iteration) {
-        // TODO (Jul 13, 2009, msh): Why do we use a Criteria here ? See getSingleValueFromView(...)
+    public static Double getUltimatesForOneIteration(SimulationRun simulationRun, int periodIndex, String pathName, String collectorName, String fieldName, int iteration) {
         PathMapping path = PathMapping.findByPathName(pathName)
         FieldMapping field = FieldMapping.findByFieldName(fieldName)
         CollectorMapping collector = CollectorMapping.findByCollectorName(collectorName)
@@ -391,6 +254,18 @@ class ResultAccessor {
             return null
         }
         return res[0][1]
+    }
+
+    private static double[] fillWithZeroes(SimulationRun run, double[] results) {
+        if (run.iterations == results.length || results.length == 0) return results
+
+        double[] result = new double[run.iterations]
+        System.arraycopy(results, 0, result, 0, results.length)
+        for (int i = results.length; i < result.length; i++) {
+            result[i] = 0d
+        }
+        Arrays.sort(result)
+        return result
     }
 
 }

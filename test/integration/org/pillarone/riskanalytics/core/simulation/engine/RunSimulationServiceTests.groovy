@@ -16,6 +16,8 @@ import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.output.CollectorMapping
+import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
 
 class RunSimulationServiceTests extends GrailsUnitTestCase {
 
@@ -32,6 +34,7 @@ class RunSimulationServiceTests extends GrailsUnitTestCase {
     }
 
     void testRunSimulation() {
+        assertNotNull(new CollectorMapping(collectorName: SingleValueCollectingModeStrategy.IDENTIFIER).save())
 
         new ParameterizationImportService().compareFilesAndWriteToDB(["CoreParameters"])
         new ResultConfigurationImportService().compareFilesAndWriteToDB(["CoreResultConfiguration"])

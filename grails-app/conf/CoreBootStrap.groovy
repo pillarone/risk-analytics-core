@@ -13,6 +13,8 @@ import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.user.*
 import org.apache.commons.logging.LogFactory
 import org.apache.commons.logging.Log
+import org.pillarone.riskanalytics.core.output.CollectorMapping
+import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
 
 class CoreBootStrap {
 
@@ -23,6 +25,15 @@ class CoreBootStrap {
     def init = {servletContext ->
 
         authenticateService = UserManagement.getSpringSecurityService()
+
+        CollectorMapping.withTransaction {
+            CollectorMapping single = new CollectorMapping(collectorName: SingleValueCollectingModeStrategy.IDENTIFIER)
+            if (CollectorMapping.find(single) == null) {
+                single.save()
+            } else {
+                single.discard()
+            }
+        }
 
         Authority.withTransaction { status ->
             if (Authority.count() == 0) {

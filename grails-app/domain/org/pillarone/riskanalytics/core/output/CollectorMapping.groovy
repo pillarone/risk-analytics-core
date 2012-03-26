@@ -4,4 +4,13 @@ class CollectorMapping implements Serializable {
 
     String collectorName
 
+    @Override
+    String toString() {
+        return collectorName
+    }
+
+    static constraints = {
+        collectorName(unique: true)
+    }
+
 }

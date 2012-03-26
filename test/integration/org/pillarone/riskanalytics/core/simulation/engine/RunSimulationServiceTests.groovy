@@ -20,6 +20,8 @@ import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationTask
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationHandler
 import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.output.CollectorMapping
+import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
 
 class RunSimulationServiceTests extends GrailsUnitTestCase {
 

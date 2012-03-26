@@ -4,4 +4,9 @@ class FieldMapping implements Serializable {
 
     String fieldName
 
+    @Override
+    String toString() {
+        return fieldName
+    }
+
 }

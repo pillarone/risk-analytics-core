@@ -7,6 +7,7 @@ import org.pillarone.riskanalytics.core.fileimport.ResultConfigurationImportServ
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultDescriptor
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultTransferObject
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultWriter
+import org.pillarone.riskanalytics.core.dataaccess.ResultAccessor
 
 class CalculatorTests extends GroovyTestCase {
 
@@ -14,6 +15,8 @@ class CalculatorTests extends GroovyTestCase {
     ResultWriter resultWriter
 
     void setUp() {
+        ResultAccessor.clearCaches()
+
         new ParameterizationImportService().compareFilesAndWriteToDB(['CoreParameters'])
         new ResultConfigurationImportService().compareFilesAndWriteToDB(['CoreConfiguration'])
         run = new SimulationRun()
@@ -21,7 +24,7 @@ class CalculatorTests extends GroovyTestCase {
         run.parameterization = ParameterizationDAO.findByName('CoreParameters')
         run.resultConfiguration = ResultConfigurationDAO.findByName('CoreConfiguration')
         run.model = CoreModel.name
-        run.iterations = 3
+        run.iterations = 1
         run.periodCount = 2
         assertNotNull run.save()
         resultWriter = new ResultWriter(run.id)
@@ -30,19 +33,20 @@ class CalculatorTests extends GroovyTestCase {
         PathMapping path2 = new PathMapping(pathName: "path2").save()
         PathMapping path3 = new PathMapping(pathName: "path3").save()
         PathMapping path4 = new PathMapping(pathName: "path4").save()
-        CollectorMapping collector = new CollectorMapping(collectorName: AggregatedCollectingModeStrategy.IDENTIFIER).save()
+        CollectorMapping collector = CollectorMapping.findByCollectorName(AggregatedCollectingModeStrategy.IDENTIFIER)
+        assertNotNull(collector)
         FieldMapping field = new FieldMapping(fieldName: "field").save()
 
-        writeResult new SingleValueResult(simulationRun: run, iteration: 0, period: 0, value: 1, path: path1, collector: collector, field: field)
-        writeResult new SingleValueResult(simulationRun: run, iteration: 0, period: 0, value: 2, path: path2, collector: collector, field: field)
-        writeResult new SingleValueResult(simulationRun: run, iteration: 0, period: 0, value: 3, path: path3, collector: collector, field: field)
+        writeResult new SingleValueResult(simulationRun: run, iteration: 1, period: 0, value: 1, path: path1, collector: collector, field: field)
+        writeResult new SingleValueResult(simulationRun: run, iteration: 1, period: 0, value: 2, path: path2, collector: collector, field: field)
+        writeResult new SingleValueResult(simulationRun: run, iteration: 1, period: 0, value: 3, path: path3, collector: collector, field: field)
 
-        writeResult new SingleValueResult(simulationRun: run, iteration: 0, period: 1, value: 4, path: path1, collector: collector, field: field)
-        writeResult new SingleValueResult(simulationRun: run, iteration: 0, period: 1, value: 5, path: path2, collector: collector, field: field)
-        writeResult new SingleValueResult(simulationRun: run, iteration: 0, period: 1, value: 6, path: path3, collector: collector, field: field)
+        writeResult new SingleValueResult(simulationRun: run, iteration: 1, period: 1, value: 4, path: path1, collector: collector, field: field)
+        writeResult new SingleValueResult(simulationRun: run, iteration: 1, period: 1, value: 5, path: path2, collector: collector, field: field)
+        writeResult new SingleValueResult(simulationRun: run, iteration: 1, period: 1, value: 6, path: path3, collector: collector, field: field)
 
         //period 0 should be ignored, because path does not contain a result for all iterations
-        writeResult new SingleValueResult(simulationRun: run, iteration: 0, period: 1, value: 7, path: path4, collector: collector, field: field,)
+        writeResult new SingleValueResult(simulationRun: run, iteration: 1, period: 1, value: 7, path: path4, collector: collector, field: field,)
 
     }
 

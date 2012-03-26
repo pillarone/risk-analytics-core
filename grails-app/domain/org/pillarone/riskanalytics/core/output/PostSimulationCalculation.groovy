@@ -31,4 +31,11 @@ class PostSimulationCalculation {
         keyFigure(inList: VALUES)
         keyFigureParameter(nullable: true)
     }
+
+    @Override
+    String toString() {
+        return "$keyFigure ${keyFigureParameter != null ? keyFigureParameter : ""} $path, $field $collector P$period: $result"
+    }
+
+
 }

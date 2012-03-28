@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 import org.pillarone.riskanalytics.core.simulation.engine.actions.Action
+import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 
 public class InitModelAction implements Action {
 
@@ -17,6 +18,12 @@ public class InitModelAction implements Action {
         Model instance = simulationScope.model
         instance.init()
         instance.injectComponentNames()
+
+        VersionNumber currentVersion = Model.getModelVersion(instance.class)
+        VersionNumber parameterizationModelVersion = simulationScope.simulation.parameterization.modelVersionNumber
+        if (currentVersion != parameterizationModelVersion) {
+            throw new IllegalStateException("Deployed model has version ${currentVersion}, but parameterization has version ${parameterizationModelVersion}")
+        }
 
         simulationScope.mappingCache.initCache(instance)
     }

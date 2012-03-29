@@ -214,7 +214,7 @@ public class SimulationRunner {
 
         simulationAction.iterationAction.periodAction.model = currentScope.model
 
-        currentScope.mappingCache = new MappingCache()
+        currentScope.mappingCache = MappingCache.instance
     }
 
     /**

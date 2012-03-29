@@ -25,6 +25,7 @@ import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
 import org.codehaus.groovy.grails.orm.hibernate.HibernateEventListeners
 import org.pillarone.riskanalytics.core.listener.ModellingItemHibernateListener
 import org.pillarone.riskanalytics.core.example.parameter.ExampleResourceConstraints
+import org.pillarone.riskanalytics.core.simulation.engine.MappingCache
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
@@ -102,6 +103,8 @@ Persistence & Simulation engine.
                     'post-update':modellingItemListener,
                     'post-delete':modellingItemListener]
         }
+
+        mappingCache(MappingCache) {}
     }
 
     def doWithDynamicMethods = {ctx ->

@@ -24,8 +24,6 @@ public class InitModelAction implements Action {
         if (currentVersion != parameterizationModelVersion) {
             throw new IllegalStateException("Deployed model has version ${currentVersion}, but parameterization has version ${parameterizationModelVersion}")
         }
-
-        simulationScope.mappingCache.initCache(instance)
     }
 
 

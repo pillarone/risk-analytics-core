@@ -4,6 +4,7 @@ import org.springframework.jdbc.datasource.DataSourceUtils
 import groovy.sql.Sql
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.BatchRunSimulationRun
 
 
 class MysqlDeleteStrategy extends DeleteSimulationStrategy {
@@ -26,6 +27,7 @@ class MysqlDeleteStrategy extends DeleteSimulationStrategy {
             }
 
             sql.execute("DELETE FROM post_simulation_calculation where run_id=${simulationRun.id}")
+            BatchRunSimulationRun.findAllBySimulationRun(simulationRun)*.delete()
             simulationRun.delete(flush: true)
             LOG.info "Simulation ${simulationRun.name} deleted in ${System.currentTimeMillis() - time}ms"
         }

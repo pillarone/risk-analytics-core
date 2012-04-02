@@ -261,12 +261,23 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         List<SimulationBlock> simBlocks = new ArrayList<SimulationBlock>();
         int iterationOffset = 0;
         int streamOffset = 0;
+        int j = 0;
         for (int i = blockSize; i < iterations; i += blockSize) {
-            simBlocks.add(new SimulationBlock(iterationOffset, blockSize, streamOffset++));
+            simBlocks.add(new SimulationBlock(iterationOffset, blockSize, streamOffset));
             iterationOffset += blockSize;
+            streamOffset = nextOffset(streamOffset);
+            j++;
         }
-        simBlocks.add(new SimulationBlock(iterationOffset, iterations - streamOffset * blockSize, streamOffset));
+        simBlocks.add(new SimulationBlock(iterationOffset, iterations - j * blockSize, streamOffset));
         return simBlocks;
+    }
+
+    private int nextOffset(int currentOffset) {
+        currentOffset++;
+        while((currentOffset >= 100 && currentOffset % 100 < 10)) {
+            currentOffset++;
+        }
+        return currentOffset;
     }
 
 }

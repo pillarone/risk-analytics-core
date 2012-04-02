@@ -54,6 +54,30 @@ class SimulationTaskTests extends GroovyTestCase {
         assertNull configuration.simulation.end
     }
 
+    void testReservedOffsets() {
+        SimulationTask simulationTask = new TestSimulationTask(1)
+
+        SimulationConfiguration configuration = createConfig(100500)
+        //tests will have to be adjusted for other values
+        assertEquals 1000, SimulationTask.SIMULATION_BLOCK_SIZE
+
+        List<GridNode> mockNodes = new ArrayList<GridNode>();
+        mockNodes.add(new TestGridNode(1));
+
+        Collection jobs = simulationTask.map(mockNodes, configuration).keySet();
+
+        assertEquals 1, jobs.size()
+
+        SimulationConfiguration runner = jobs.iterator().next().simulationConfiguration
+        assertEquals(101, runner.simulationBlocks.size())
+        assertEquals(99, runner.simulationBlocks[99].streamOffset)
+        assertEquals(1000, runner.simulationBlocks[99].blockSize)
+        //substreams 100 - 109 are reserved for business logic
+        assertEquals(110, runner.simulationBlocks[100].streamOffset)
+        assertEquals(500, runner.simulationBlocks[100].blockSize)
+
+    }
+
     void testSplitOneJobMultipleBlocks() {
         SimulationTask simulationTask = new TestSimulationTask(1)
 

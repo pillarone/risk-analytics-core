@@ -2,18 +2,11 @@ package org.pillarone.riskanalytics.core.simulation.engine.actions
 
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.RiskAnalyticsInconsistencyException
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
 import org.pillarone.riskanalytics.core.simulation.engine.PeriodScope
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
-import org.pillarone.riskanalytics.core.components.Component
-import org.pillarone.riskanalytics.core.parameterization.IParameterObject
-import org.pillarone.riskanalytics.core.components.InitializingComponent
-import org.pillarone.riskanalytics.core.util.GroovyUtils
-import org.pillarone.riskanalytics.core.parameterization.global.GlobalParameterTarget
-import org.pillarone.riskanalytics.core.parameterization.global.GlobalParameterSource
-import org.pillarone.riskanalytics.core.components.GlobalParameterComponent
-import java.lang.reflect.Method
 
 /**
  * Prepares the ParameterApplicator and applies the parameters of the first period. The later is required as following
@@ -29,7 +22,7 @@ public class PrepareParameterizationAction implements Action {
 
     public void perform() {
         if(simulationScope.parameters.parameterHolders.empty) {
-            throw new IllegalStateException("Parameterization does not contain any parameters.")
+            throw new RiskAnalyticsInconsistencyException("Parameterization does not contain any parameters.")
         }
 
         Model model = simulationScope.model

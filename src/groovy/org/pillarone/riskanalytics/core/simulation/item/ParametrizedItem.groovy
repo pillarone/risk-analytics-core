@@ -3,8 +3,12 @@ package org.pillarone.riskanalytics.core.simulation.item
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 
 abstract class ParametrizedItem extends CommentableItem {
+
+    private static Log LOG = LogFactory.getLog(ParametrizedItem)
 
     ParametrizedItem(String name) {
         super(name)
@@ -30,15 +34,18 @@ abstract class ParametrizedItem extends CommentableItem {
         while (iterator.hasNext()) {
             ParameterHolder parameterHolder = iterator.next()
             if (parameterHolder.hasParameterChanged()) {
+                LOG.debug("Parameter ${parameterHolder.path} P${parameterHolder.periodIndex} is marked as changed and will be updated.")
                 Parameter parameter = parameters.find { it.path == parameterHolder.path && it.periodIndex == parameterHolder.periodIndex }
                 parameterHolder.applyToDomainObject(parameter)
                 parameterHolder.modified = false
             } else if (parameterHolder.added) {
+                LOG.debug("Parameter ${parameterHolder.path} P${parameterHolder.periodIndex} is marked as added and will be added.")
                 Parameter newParameter = parameterHolder.createEmptyParameter()
                 parameterHolder.applyToDomainObject(newParameter)
                 addToDao(newParameter, dao)
                 parameterHolder.added = false
             } else if (parameterHolder.removed) {
+                LOG.debug("Parameter ${parameterHolder.path} P${parameterHolder.periodIndex} is marked as deleted and will be removed.")
                 Parameter parameter = parameters.find { it.path == parameterHolder.path && it.periodIndex == parameterHolder.periodIndex }
                 removeFromDao(parameter, dao)
                 parameter.delete()

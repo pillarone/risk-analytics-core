@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.parameterization.global
 import org.pillarone.riskanalytics.core.components.Component
 import java.lang.reflect.Method
 import org.pillarone.riskanalytics.core.util.PacketUtils
+import java.lang.reflect.InvocationTargetException
 
 
 class GlobalParameterSource {
@@ -13,7 +14,12 @@ class GlobalParameterSource {
 
     void applyToTarget(GlobalParameterTarget target) {
         checkTypes(target)
-        target.object = method.invoke(source, null)
+        try {
+            target.object = method.invoke(source, null)
+        }
+        catch (InvocationTargetException ex) {
+            throw new IllegalArgumentException("Problems with applying source " + source.getName() + ". A runtime parameter (" + identifier + ") might be null.", ex)
+        }
     }
 
     void checkTypes(GlobalParameterTarget target) {

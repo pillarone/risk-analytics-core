@@ -6,8 +6,12 @@ import org.pillarone.riskanalytics.core.parameter.ParameterEntry
 import org.pillarone.riskanalytics.core.parameter.ParameterObjectParameter
 import org.pillarone.riskanalytics.core.parameterization.IParameterObject
 import org.pillarone.riskanalytics.core.parameterization.IParameterObjectClassifier
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 
 class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerValueAccessor {
+
+    private static Log LOG = LogFactory.getLog(ParameterObjectParameterHolder)
 
     //Sufficient for the UI (faster to instantiate)
     IParameterObjectClassifier classifier
@@ -20,15 +24,12 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
     public ParameterObjectParameterHolder(String path, int periodIndex, IParameterObject value) {
         super(path, periodIndex);
         classifierParameters = new HashMap<String, ParameterHolder>()
-        if (value) {
-            this.classifier = value.type
-        }
-        else {
-            throw new IllegalArgumentException("Value for path $path is null!")
-        }
+        this.classifier = value.type
+
         for (Map.Entry entry in value.parameters) {
             classifierParameters.put(entry.key, ParameterHolderFactory.getHolder(path + ":$entry.key", periodIndex, entry.value))
         }
+        check()
     }
 
     @Override
@@ -39,6 +40,7 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
             def holder = ParameterHolderFactory.getHolder(entry.parameterEntryValue)
             classifierParameters.put(entry.parameterEntryKey, holder)
         }
+        check()
     }
 
     IParameterObject getBusinessObject() {
@@ -123,7 +125,7 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
             p.clearCachedValues()
         }
     }
-    
+
     private void writeObject(java.io.ObjectOutputStream out) throws IOException {
         String classifierClass = classifier.getClass().getName()
         String classifierType = classifier.displayName
@@ -167,5 +169,11 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
             return referencePaths
         }
         return Collections.emptyList()
+    }
+
+    private void check() {
+        if(classifier == null) { //TODO: would like to throw an exception here, but then migration fails
+            LOG.error("Classifier null in path $path period $periodIndex")
+        }
     }
 }

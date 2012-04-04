@@ -17,12 +17,13 @@ class SingleValueCollectingModeStrategyTests extends GroovyTestCase {
         PeriodScope periodScope = new PeriodScope()
         IterationScope iterationScope = new IterationScope(periodScope: periodScope)
         SimulationScope simulationScope = new SimulationScope(iterationScope: iterationScope)
-        simulationScope.mappingCache = new MappingCache(new EmptyModel())
+        simulationScope.mappingCache = MappingCache.instance
         simulationScope.simulation = new Simulation("name")
 
         SingleValueCollectingModeStrategy mode = new SingleValueCollectingModeStrategy()
         PacketCollector collector = new PacketCollector(mode)
         collector.simulationScope = simulationScope
+        collector.path = "somePath"
 
         PacketList<ITestPacketApple> list = new PacketList<ITestPacketApple>()
         list.add(new ITestPacketApple(value: 5))

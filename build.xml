@@ -38,7 +38,12 @@
         <delete dir="${dist.dir}"/>
 
         <mkdir dir="${dist.dir}"/>
-        <grails command="clean" jvmargs="-Dtools.jar=../jre1.5.0_11/lib/tools.jar"/>
+        <exec executable="${grails}" failonerror="true" resolveexecutable="true">
+            <arg value="clean"/>
+            <arg value="--non-interactive"/>
+            <env key="GRAILS_HOME" value="${GRAILS_HOME}"/>
+            <env key="JAVA_OPTS" value="${GRAILS_JVM_OPTS}"/>
+        </exec>
         <delete verbose="true">
             <fileset dir="." includes="*Db.script"/>
             <fileset dir="." includes="**Db.properties"/>

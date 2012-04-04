@@ -28,10 +28,14 @@ import org.pillarone.riskanalytics.core.util.GrailsConfigValidator
 import org.springframework.remoting.rmi.RmiProxyFactoryBean
 import org.springframework.remoting.rmi.RmiServiceExporter
 import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
+import org.codehaus.groovy.grails.orm.hibernate.HibernateEventListeners
+import org.pillarone.riskanalytics.core.listener.ModellingItemHibernateListener
+import org.pillarone.riskanalytics.core.example.parameter.ExampleResourceConstraints
+import org.pillarone.riskanalytics.core.simulation.engine.MappingCache
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.5-ALPHA-4-kti"
+    def version = "1.5-ALPHA-4.1-kti"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.7 > *"
     // the other plugins this plugin depends on
@@ -120,6 +124,8 @@ Persistence & Simulation engine.
                     'post-update':modellingItemListener,
                     'post-delete':modellingItemListener]
         }
+
+        mappingCache(MappingCache) {}
     }
 
     def doWithDynamicMethods = {ctx ->

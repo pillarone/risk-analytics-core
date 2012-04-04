@@ -54,6 +54,7 @@ public class SimulationConfiguration implements Serializable, Cloneable {
         preparedSimulation.parameterization = new Parameterization(simulation.parameterization.name)
         preparedSimulation.parameterization.periodCount = simulation.parameterization.periodCount
         preparedSimulation.parameterization.versionNumber = simulation.parameterization.versionNumber
+        preparedSimulation.parameterization.modelVersionNumber = simulation.parameterization.modelVersionNumber
 
         //clone parameters to make sure they don't have any model or component references
         preparedSimulation.parameterization.parameterHolders = simulation.parameterization.parameterHolders.collect { it.clone() }
@@ -106,11 +107,10 @@ public class SimulationConfiguration implements Serializable, Cloneable {
         paths.addAll(inceptionPeriodPaths)
 
         Set fields = ModelHelper.getAllPossibleFields(model, !inceptionPeriodPaths.empty)
-        MappingCache cache = new MappingCache()
-        cache.initCache(model)
+        MappingCache cache = MappingCache.instance
 
         for (String path in paths) {
-            cache.lookupPathDB(path)
+            cache.lookupPath(path)
         }
 
         for (String field in fields) {

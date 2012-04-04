@@ -29,9 +29,10 @@ class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
         new ParameterizationImportService().compareFilesAndWriteToDB(['CoreParameters'])
         new ResultConfigurationImportService().compareFilesAndWriteToDB(['CoreResultConfiguration'])
 
-        fieldMapping = getFieldMapping("ultimate")
-        pathMapping = getPathMapping("Empty:path")
-        collectorMapping = getCollectorMapping(AggregatedCollectingModeStrategy.IDENTIFIER)
+        MappingCache cacheInstance = MappingCache.instance
+        fieldMapping = cacheInstance.lookupField("ultimate")
+        pathMapping = cacheInstance.lookupPath("Empty:path")
+        collectorMapping = cacheInstance.lookupCollector(AggregatedCollectingModeStrategy.IDENTIFIER)
 
         Parameterization parameterization = new Parameterization("CoreParameters")
         parameterization.load()
@@ -51,7 +52,7 @@ class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
         periodScope.currentPeriod = 1
         iterationScope.currentIteration = 13
         simulationScope.simulation = run
-        simulationScope.mappingCache = new MappingCache(new EmptyModel())
+        simulationScope.mappingCache = cacheInstance
 
         strategy = new AggregatedCollectingModeStrategy()
         PacketCollector collector = new PacketCollector(strategy)
@@ -97,30 +98,4 @@ class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
         assertEquals bResult, aggregatedValues.find {it.field.fieldName == "b"}.value
     }
 
-    private FieldMapping getFieldMapping(String fieldName) {
-        FieldMapping fieldMapping = FieldMapping.findByFieldName(fieldName)
-        if (!fieldMapping) {
-            fieldMapping = new FieldMapping(fieldName: fieldName)
-            assertNotNull fieldMapping.save()
-        }
-        return fieldMapping
-    }
-
-    private CollectorMapping getCollectorMapping(String collectorName) {
-        CollectorMapping collectorMapping = CollectorMapping.findByCollectorName(collectorName)
-        if (!collectorMapping) {
-            collectorMapping = new CollectorMapping(collectorName: collectorName)
-            assertNotNull collectorMapping.save()
-        }
-        return collectorMapping
-    }
-
-    private PathMapping getPathMapping(String pathName) {
-        PathMapping pathMapping = PathMapping.findByPathName(pathName)
-        if (!pathMapping) {
-            pathMapping = new PathMapping(pathName: pathName)
-            assertNotNull pathMapping.save()
-        }
-        return pathMapping
-    }
 }

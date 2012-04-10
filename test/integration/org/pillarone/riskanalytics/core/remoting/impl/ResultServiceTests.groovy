@@ -16,6 +16,8 @@ import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
 import org.pillarone.riskanalytics.core.simulation.item.parameter.DateParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
+import org.pillarone.riskanalytics.core.parameter.comment.Tag
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.EnumTagType
 
 class ResultServiceTests extends GroovyTestCase {
 
@@ -71,6 +73,8 @@ class ResultServiceTests extends GroovyTestCase {
         parameterization1.comment = "comment 1"
         parameterization1.status = Status.IN_REVIEW
         parameterization1.valuationDate = new DateTime(2010, 1, 1, 0, 0, 0, 0)
+        final Tag tag = new Tag(name: "MyTag", tagType: EnumTagType.PARAMETERIZATION).save()
+        parameterization1.tags << tag
         parameterization1.save()
 
         Parameterization parameterization2 = new Parameterization("test2")
@@ -80,12 +84,14 @@ class ResultServiceTests extends GroovyTestCase {
         parameterization2.comment = "comment 2"
         parameterization2.status = Status.IN_PRODUCTION
         parameterization2.valuationDate = new DateTime(2011, 1, 1, 0, 0, 0, 0)
+        parameterization2.tags << tag
         parameterization2.save()
 
         Parameterization parameterization3 = new Parameterization("test2")
         parameterization3.modelClass = CoreModel
         parameterization3.dealId = 2
         parameterization3.periodCount = 1
+        parameterization3.tags << tag
         parameterization3.save()
 
         List<ParameterizationInfo> infos = resultService.getParameterizationInfosForTransactionId(1)

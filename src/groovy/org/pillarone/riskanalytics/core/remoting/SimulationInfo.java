@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.remoting;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 public class SimulationInfo implements Serializable {
 
@@ -16,6 +17,8 @@ public class SimulationInfo implements Serializable {
     private String comment;
     private int randomSeed;
     private Date updateDate;
+
+    private List<TagInfo> tags;
 
     public String getComment() {
         return comment;
@@ -87,5 +90,18 @@ public class SimulationInfo implements Serializable {
 
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
+    }
+
+    public List<TagInfo> getTags() {
+        return tags;
+    }
+
+    public void setTags(final List<TagInfo> tags) {
+        this.tags = tags;
+    }
+
+    @Override
+    public String toString() {
+        return "[" + getName() + " (" + getSimulationId() + ")]";
     }
 }

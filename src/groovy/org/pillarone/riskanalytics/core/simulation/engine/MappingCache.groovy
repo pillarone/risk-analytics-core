@@ -122,4 +122,11 @@ public class MappingCache {
         }
         return fieldMapping;
     }
+
+    public void clear() {
+        collectors.clear()
+        fields.clear()
+        paths.clear()
+        initialized = false
+    }
 }

@@ -88,6 +88,7 @@ abstract class ModelTest extends GroovyTestCase {
 
     protected void setUp() {
         super.setUp()
+        MappingCache.instance.clear()
         MathUtils.initRandomStreamBase(1234)
 
         new ParameterizationImportService().compareFilesAndWriteToDB([getParameterFileName()])

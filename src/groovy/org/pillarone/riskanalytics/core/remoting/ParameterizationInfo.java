@@ -4,6 +4,7 @@ import org.pillarone.riskanalytics.core.workflow.Status;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 public class ParameterizationInfo implements Serializable {
 
@@ -16,6 +17,8 @@ public class ParameterizationInfo implements Serializable {
     private String version;
 
     private Status status;
+
+    private List<TagInfo> tags;
 
     public String getVersion() {
         return version;
@@ -63,6 +66,14 @@ public class ParameterizationInfo implements Serializable {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public List<TagInfo> getTags() {
+        return tags;
+    }
+
+    public void setTags(final List<TagInfo> tags) {
+        this.tags = tags;
     }
 
     @Override

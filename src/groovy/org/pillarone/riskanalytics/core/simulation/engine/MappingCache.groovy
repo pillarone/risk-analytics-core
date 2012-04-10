@@ -122,4 +122,11 @@ public class MappingCache implements Serializable {
         }
         return fieldMapping;
     }
+
+    public void clear() {
+        collectors.clear()
+        fields.clear()
+        paths.clear()
+        initialized = false
+    }
 }

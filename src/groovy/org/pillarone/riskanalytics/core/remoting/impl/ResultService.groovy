@@ -17,6 +17,7 @@ import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
 import org.pillarone.riskanalytics.core.output.SymbolicValueResult
+import org.pillarone.riskanalytics.core.remoting.TagInfo
 
 class ResultService implements IResultService {
 
@@ -24,9 +25,12 @@ class ResultService implements IResultService {
         List<ParameterizationInfo> result = []
         List<ParameterizationDAO> parameterizations = ParameterizationDAO.findAllByDealId(dealId)
         for (ParameterizationDAO dao in parameterizations) {
+            List<TagInfo> tags = dao.tags*.getTag().name as List<TagInfo>;
             result << new ParameterizationInfo(
                     parameterizationId: dao.id, name: dao.name, version: dao.itemVersion,
-                    comment: dao.comment, user: dao.lastUpdater?.username, status: dao.status
+                    comment: dao.comment, user: dao.lastUpdater?.username, status: dao.status,
+                    tags: tags
+
             )
         }
         return result
@@ -143,6 +147,9 @@ class ResultService implements IResultService {
 
             def simulation = new Simulation(run.name)
             simulation.load()
+            List<TagInfo> tags = simulation.getTags()*.name as List<TagInfo>;
+            info.setTags(tags)
+
             // todo: this is from the art-models plugin really, so doesn't belong here at all... But keep for now,
             // since there are more important things to work on
             info.updateDate = ((DateTime) simulation.getParameter("runtimeUpdateDate")).toDate()

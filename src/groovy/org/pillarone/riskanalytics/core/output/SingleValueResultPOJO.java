@@ -20,6 +20,21 @@ public class SingleValueResultPOJO {
     private double value;
     private DateTime date;
 
+    @Override
+    public String toString() {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("Period: ");
+        buffer.append(period);
+        buffer.append("> ");
+        buffer.append(value);
+        buffer.append(" [");
+        buffer.append(path.toString());
+        buffer.append(":");
+        buffer.append(field.toString());
+        buffer.append("]");
+        return buffer.toString();
+    }
+
     public CollectorMapping getCollector() {
         return collector;
     }

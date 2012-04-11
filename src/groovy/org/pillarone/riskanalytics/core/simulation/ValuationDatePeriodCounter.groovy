@@ -102,8 +102,19 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
         return period
     }
 
+    /**
+     * @param date
+     * @return true if date belongs to current period, false if not and if the date is throwing a
+     *          NotInProjectionHorizon exception
+     */
     boolean belongsToCurrentPeriod(DateTime date) {
-        return belongsToPeriod(date) == currentPeriod
+        try {
+            int period = belongsToPeriod(date)
+            return period == currentPeriod
+        }
+        catch (NotInProjectionHorizon ex) {
+            return false
+        }
     }
 
     /**

@@ -82,8 +82,19 @@ public class ContinuousPeriodCounter implements IPeriodCounter {
         return period
     }
 
+    /**
+     * @param date
+     * @return true if date belongs to current period, false if not and if the date is throwing a
+     *          NotInProjectionHorizon exception
+     */
     boolean belongsToCurrentPeriod(DateTime date) {
-        return belongsToPeriod(date) == periodCount
+        try {
+            int period = belongsToPeriod(date)
+            return period == periodCount
+        }
+        catch (NotInProjectionHorizon ex) {
+            return false
+        }
     }
 
     DateTime startOfPeriod(DateTime date) {

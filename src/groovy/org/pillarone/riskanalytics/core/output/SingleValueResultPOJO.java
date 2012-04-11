@@ -95,11 +95,6 @@ public class SingleValueResultPOJO {
         return valueIndex;
     }
 
-    @Override
-    public String toString() {
-        return path.toString() + ":" + field.toString() + ": " + value;
-    }
-
     public void setValueIndex(int valueIndex) {
         this.valueIndex = valueIndex;
     }

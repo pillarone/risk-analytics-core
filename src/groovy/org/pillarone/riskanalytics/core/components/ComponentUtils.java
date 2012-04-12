@@ -29,16 +29,6 @@ public class ComponentUtils {
         return insertBlanks(normalizedPath.substring(pathSeparator.length()));
     }
 
-    public static String getModelName(String displayName, String prefix) {
-        StringBuffer componentName = new StringBuffer(prefix);
-        String[] splittedComponentName = displayName.split(" ");
-        for (String word : splittedComponentName) {
-            componentName.append(word.substring(0, 1).toUpperCase());
-            componentName.append(word.substring(1));
-        }
-        return componentName.toString();
-    }
-
     public static String getNormalizedName(String componentName) {
         return insertBlanks(removeNamingConventions(componentName));
     }
@@ -66,9 +56,8 @@ public class ComponentUtils {
     }
 
     public static String getComponentNormalizedName(String path) {
-        String[] subComponents = path.split(PATH_SEPARATOR.concat(SUB));
-        String componentName = subComponents[subComponents.length - 1];
-        return insertBlanks(componentName);
+        String[] subComponents = path.split(PATH_SEPARATOR);
+        return subComponents[subComponents.length - 1];
     }
 
     public static String insertBlanks(String componentName) {

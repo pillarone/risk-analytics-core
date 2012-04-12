@@ -4,6 +4,7 @@ import models.core.CoreModel
 import org.pillarone.riskanalytics.core.example.marker.ITestComponentMarker
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.util.GroovyUtils
+import org.pillarone.riskanalytics.core.example.parameter.ExampleMultiDimensionalConstraints
 
 class MultiDimensionalParameterTests extends GroovyTestCase {
 
@@ -254,19 +255,19 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         model.init()
         model.injectComponentNames()
 
-        AbstractMultiDimensionalParameter mdp = new ComboBoxMatrixMultiDimensionalParameter([[0, 1], [1, 0]], ['invalid name', 'hierarchy output component'], ITestComponentMarker)
+        AbstractMultiDimensionalParameter mdp = new ComboBoxMatrixMultiDimensionalParameter([[0, 1], [1, 0]], ['invalid name', 'hierarchyOutputComponent'], ITestComponentMarker)
         mdp.setSimulationModel(model)
         mdp.validateValues()
 
         assertFalse "invalid name" == mdp.getValueAt(0, 1)
-        assertEquals "hierarchy output component", mdp.getValueAt(0, 2)
+        assertEquals "hierarchyOutputComponent", mdp.getValueAt(0, 2)
 
-        mdp = new ComboBoxTableMultiDimensionalParameter([['invalid name', 'hierarchy output component']], ['title'], ITestComponentMarker)
+        mdp = new ComboBoxTableMultiDimensionalParameter([['invalid name', 'hierarchyOutputComponent']], ['title'], ITestComponentMarker)
         mdp.setSimulationModel(model)
         mdp.validateValues()
 
         assertFalse "invalid name" == mdp.getValueAt(1, 0)
-        assertEquals "hierarchy output component", mdp.getValueAt(2, 0)
+        assertEquals "hierarchyOutputComponent", mdp.getValueAt(2, 0)
     }
 
     void testGetColumnIndex() {
@@ -381,6 +382,66 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertEquals param6.titles, clone6.titles
 
         assertEquals param6.constraints, clone6.constraints
+    }
+
+    void testMarkerBasedCBTMDP() {
+        ComboBoxTableMultiDimensionalParameter parameter = new ComboBoxTableMultiDimensionalParameter([''], ['title'], ITestComponentMarker)
+        CoreModel model = new CoreModel()
+        model.init()
+        model.injectComponentNames()
+        parameter.simulationModel = model
+
+        //the normalized names should NOT be used (and saved)
+        List values = parameter.getPossibleValues(1, 0).sort { it.toString() }
+
+        assertEquals(2, values.size())
+        assertEquals("exampleOutputComponent", values[0])
+        assertEquals("hierarchyOutputComponent", values[1])
+
+        parameter.setValueAt("exampleOutputComponent", 1, 0)
+
+        List objects = parameter.getValuesAsObjects()
+        assertSame(model.exampleOutputComponent, objects[0][0])
+    }
+
+    void testMarkerBasedCBMMDP() {
+        ComboBoxMatrixMultiDimensionalParameter parameter = new ComboBoxMatrixMultiDimensionalParameter([1], ['exampleOutputComponent'], ITestComponentMarker)
+        CoreModel model = new CoreModel()
+        model.init()
+        model.injectComponentNames()
+        parameter.simulationModel = model
+
+        //the normalized names should NOT be used (and saved)
+        List values = parameter.getPossibleValues(1, 0).sort { it.toString() }
+
+        assertEquals(2, values.size())
+        assertEquals("exampleOutputComponent", values[0])
+        assertEquals("hierarchyOutputComponent", values[1])
+
+        parameter.setValueAt("exampleOutputComponent", 1, 0)
+
+        List objects = parameter.getHeadersAsObjects()
+        assertSame(model.exampleOutputComponent, objects[0])
+    }
+
+    void testMarkerBasedCMDP() {
+        ConstrainedMultiDimensionalParameter parameter = new ConstrainedMultiDimensionalParameter(["hierarchyOutputComponent"], ['title'], new ExampleMultiDimensionalConstraints())
+        CoreModel model = new CoreModel()
+        model.init()
+        model.injectComponentNames()
+        parameter.simulationModel = model
+
+        //the normalized names should NOT be used (and saved)
+        List values = parameter.getPossibleValues(1, 0).sort { it.toString() }
+
+        assertEquals(2, values.size())
+        assertEquals("exampleOutputComponent", values[0])
+        assertEquals("hierarchyOutputComponent", values[1])
+
+        parameter.setValueAt("exampleOutputComponent", 1, 0)
+
+        List objects = parameter.getValuesAsObjects(0)
+        assertSame(model.exampleOutputComponent, objects[0])
     }
 
 }

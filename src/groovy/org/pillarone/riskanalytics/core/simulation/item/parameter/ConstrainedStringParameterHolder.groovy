@@ -54,7 +54,7 @@ class ConstrainedStringParameterHolder extends ParameterHolder implements IMarke
 
     List<String> referencePaths(Class markerInterface, String refValue) {
         List<String> paths = new ArrayList()
-        if (markerInterface.is(value.markerClass) && ComponentUtils.getNormalizedName(value.stringValue).equals(refValue)) {
+        if (markerInterface.is(value.markerClass) && value.stringValue == refValue) {
             paths.add(path)
         }
         return paths
@@ -63,7 +63,7 @@ class ConstrainedStringParameterHolder extends ParameterHolder implements IMarke
     List<String> updateReferenceValues(Class markerInterface, String oldValue, String newValue) {
         List<String> paths = referencePaths(markerInterface, oldValue)
         if (paths) {
-            setValue(ComponentUtils.getModelName(newValue, ComponentUtils.SUB))
+            setValue(newValue)
         }
         return paths
     }

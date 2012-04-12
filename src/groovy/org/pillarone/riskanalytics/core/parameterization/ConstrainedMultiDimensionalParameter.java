@@ -44,7 +44,7 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
                     Map<String, Component> result = new HashMap<String, Component>();
                     List<Component> componentsOfType = simulationModel.getMarkedComponents(columnType);
                     for (Component component : componentsOfType) {
-                        result.put(normalizeName(component.getName()), component);
+                        result.put(component.getName(), component);
                     }
                     comboBoxValues.put(i, result);
                 }
@@ -119,9 +119,9 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
         Class columnClass = constraints.getColumnType(column);
         if (IComponentMarker.class.isAssignableFrom(columnClass)) {
             List<String> names = new ArrayList<String>();
-            List components = simulationModel.getMarkedComponents(columnClass);
-            for (Object component : components) {
-                names.add(normalizeName(((Component) component).getName()));
+            List<Component> components = simulationModel.getMarkedComponents(columnClass);
+            for (Component component : components) {
+                names.add(component.getName());
             }
             return names;
         } else if (columnClass.isEnum()) {

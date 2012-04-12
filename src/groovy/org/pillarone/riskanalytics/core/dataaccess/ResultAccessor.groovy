@@ -44,7 +44,7 @@ abstract class ResultAccessor {
             return result.result
         }
         else {
-            List<Double> allValues = getValues(simulationRun, pathName, collectorName, fieldName)
+            List<Double> allValues = getValues(simulationRun, periodIndex, pathName, collectorName, fieldName)
             return allValues.sum() / simulationRun.iterations
         }
     }
@@ -205,7 +205,7 @@ abstract class ResultAccessor {
                 "s.simulationRun.id = ? ORDER BY value", [pathName, periodIndex, collectorName, fieldName, simulationRun.id]))
     }
 
-    static double[] getValues(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
+    static double[] getValues(SimulationRun simulationRun, int periodIndex, String pathName, String collectorName, String fieldName) {
         return fillWithZeroes(simulationRun, (double[]) SingleValueResult.executeQuery("SELECT value FROM org.pillarone.riskanalytics.core.output.SingleValueResult as s " +
                 " WHERE s.path.pathName = ? AND " +
                 "s.period = ? AND " +

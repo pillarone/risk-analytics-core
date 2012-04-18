@@ -154,8 +154,14 @@ abstract class ModelTest extends GroovyTestCase {
 
     public void postSimulationEvaluation() {}
 
+    /** will fail if returning true during the first run as the *_ref.tsl needs to be created */
     protected boolean shouldCompareResults() {
         false
+    }
+
+    /** Overwrite and return false in order to log all differences */
+    protected boolean stopAtFirstDifference() {
+        true
     }
 
     private void clean() {
@@ -194,8 +200,6 @@ abstract class ModelTest extends GroovyTestCase {
         List lines = reference.readLines()
         for (int i = 1; i < lines.size(); i++) {
             String line = lines[i]
-//            LOG.debug "$i $line"
-//            String[] info = line.split("\t")
             String[] info = line.split()
             int iteration = Integer.parseInt(info[0])
             int period = Integer.parseInt(info[1])
@@ -207,9 +211,8 @@ abstract class ModelTest extends GroovyTestCase {
         }
 
         List resultLines = result.readLines()
-        assertEquals "Different result count: Reference: ${lines.size()}, Actual: ${resultLines.size()}", lines.size(), resultLines.size()
 
-
+        int countDifferences = 0
         for (int i = 1; i < resultLines.size(); i++) {
             String line = resultLines[i]
 //            String[] info = line.split("\t")
@@ -223,9 +226,17 @@ abstract class ModelTest extends GroovyTestCase {
             int key = createKey(iteration, period, valueIndex, path, field)
             def expectedResult = referenceResults.remove(key)
             assertNotNull "No result found for I$iteration P$period $path $field", expectedResult
-            assertEquals("Different value at I$iteration P$period $path $field", expectedResult, value, EPSILON)
-        }
+            if (stopAtFirstDifference()) {
+                assertEquals("Different value at I$iteration P$period $path $field", expectedResult, value, EPSILON)
+            }
+            else if (Math.abs(expectedResult - value) > EPSILON) {
+                LOG.error("Different value at I$iteration P$period $path $field, expected $expectedResult, $value")
+                countDifferences++
+            }
 
+        }
+        assertEquals "Differences found", 0, countDifferences
+        assertEquals "Different result count: Reference: ${lines.size()}, Actual: ${resultLines.size()}", lines.size(), resultLines.size()
         assertTrue("${referenceResults.size()} more results than expected", referenceResults.size() == 0)
 
     }

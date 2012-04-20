@@ -145,8 +145,9 @@ public class SimulationConfiguration implements Serializable, Cloneable {
         ICollectingModeStrategy splitPerInceptionDateCollector = CollectingModeFactory.getStrategy('SPLIT_BY_INCEPTION_DATE')
         List<String> splitByInceptionDatePaths = []
         addMatchingCollector(splitPerInceptionDateCollector, collectors, splitByInceptionDatePaths)
-        List<String> periodLabels = PeriodLabelsUtil.getPeriodLabels(simulation, model)
-        return ModelHelper.pathsExtendedWithPeriod(splitByInceptionDatePaths, periodLabels)
+        Set<String> periodLabels = model.periodLabelsBeforeProjectionStart()
+        periodLabels.addAll PeriodLabelsUtil.getPeriodLabels(simulation, model)
+        return ModelHelper.pathsExtendedWithPeriod(splitByInceptionDatePaths, periodLabels.toList())
     }
 
 }

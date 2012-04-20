@@ -226,4 +226,13 @@ abstract class Model {
         return null
     }
 
+    /**
+     * This method is required as the period counter provides only the projection labels and the inception date of
+     * reserves may be before the projection start.
+     * @return period labels before the projection start
+     */
+    Set<String> periodLabelsBeforeProjectionStart() {
+        []
+    }
+
 }

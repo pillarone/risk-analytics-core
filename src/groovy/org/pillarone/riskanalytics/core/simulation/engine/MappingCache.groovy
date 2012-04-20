@@ -84,6 +84,7 @@ public class MappingCache implements Serializable {
         if (pathMapping == null) {
             pathMapping = PathMapping.findByPathName(path)
             if (pathMapping == null) {
+                LOG.error("On KTI branch paths have to be persisted before simulation run! Path " + path + " not found!")
                 pathMapping = new PathMapping(pathName: path).save()
             }
             paths.put(path, pathMapping)
@@ -100,6 +101,7 @@ public class MappingCache implements Serializable {
         if (collectorMapping == null) {
             collectorMapping = CollectorMapping.findByCollectorName(collector)
             if (collectorMapping == null) {
+                LOG.error("On KTI branch collectors have to be persisted before simulation run! Collector " + collector + " not found!")
                 collectorMapping = new CollectorMapping(collectorName: collector).save()
             }
             collectors.put(collector, collectorMapping)
@@ -116,6 +118,7 @@ public class MappingCache implements Serializable {
         if (fieldMapping == null) {
             fieldMapping = FieldMapping.findByFieldName(field)
             if (fieldMapping == null) {
+                LOG.error("On KTI branch fields have to be persisted before simulation run! Field " + field + " not found!")
                 fieldMapping = new FieldMapping(fieldName: field).save()
             }
             fields.put(field, fieldMapping)

@@ -17,10 +17,13 @@ abstract class ResultAccessor {
 
     static String exportCsv(SimulationRun simulationRun) {
         String fileName = GroovyUtils.getExportFileName(simulationRun)
-        if (new File(fileName).exists()) return fileName
+        File file = new File(fileName)
+        if (file.exists())  {
+            file.delete()
+        }
         Sql sql = new Sql(simulationRun.dataSource)
         try {
-            sql.execute("select concat_ws(',',cast(s.iteration as char),cast(s.period as char),mapping.path_name, cast(s.value as char))  INTO OUTFILE ? from single_value_result as s, path_mapping as mapping  where s.simulation_run_id ='" + simulationRun.id + "' and mapping.id=s.path_id", [fileName])
+            sql.execute("select concat_ws(',',cast(s.iteration as char),cast(s.period as char),mapping.path_name, cast(s.value as char), cm.collector_name)  INTO OUTFILE ? from single_value_result as s, path_mapping as mapping, collector_mapping cm  where s.simulation_run_id ='" + simulationRun.id + "' and mapping.id=s.path_id and cm.id=s.collector_id", [fileName])
         } catch (Exception ex) {
             LOG.error "exception occured during export simulation as csv : $ex"
             return null

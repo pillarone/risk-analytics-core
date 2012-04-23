@@ -10,7 +10,8 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 abstract class AbstractNodeMappingStrategy implements INodeMappingStrategy {
 
-    public static final String STRATEGY_CLASS_KEY = "nodeMappingStrategy"
+    public static final String STRATEGY_CLASS_SYSTEM_PROPERTY = "nodeMappingStrategy"
+    public static final String STRATEGY_CLASS_KEY = STRATEGY_CLASS_SYSTEM_PROPERTY
 
     protected Grid grid
 
@@ -38,6 +39,10 @@ abstract class AbstractNodeMappingStrategy implements INodeMappingStrategy {
     public static INodeMappingStrategy getStrategy() {
         try {
             Class strategy = ConfigurationHolder.config.get(STRATEGY_CLASS_KEY)
+            if(System.getProperty(STRATEGY_CLASS_SYSTEM_PROPERTY) != null) {
+                String mappingClass = System.getProperty(STRATEGY_CLASS_SYSTEM_PROPERTY)
+                strategy = Thread.currentThread().contextClassLoader.loadClass(mappingClass)
+            }
             return strategy.newInstance()
         } catch (Exception e) {
             return new LocalNodesStrategy()

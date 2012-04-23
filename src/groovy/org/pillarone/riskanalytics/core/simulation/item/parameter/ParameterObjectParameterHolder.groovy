@@ -44,6 +44,9 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
     }
 
     IParameterObject getBusinessObject() {
+        if(classifier == null) {
+            throw new IllegalStateException("Classifier null in $path P$periodIndex")
+        }
         return classifier.getParameterObject(getParameterMap())
     }
 

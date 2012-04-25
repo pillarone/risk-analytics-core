@@ -240,7 +240,7 @@ abstract class ResultAccessor {
 
 
     public static Double getUltimatesForOneIteration(SimulationRun simulationRun, int periodIndex, String pathName, String collectorName, String fieldName, int iteration) {
-        return getSingleIterationValue(simulationRun, periodIndex, pathName, fieldName, iteration)
+        return getSingleIterationValue(simulationRun, periodIndex, pathName, fieldName, collectorName, iteration)
     }
 
     private static double[] fillWithZeroes(SimulationRun run, double[] results) {
@@ -317,9 +317,8 @@ abstract class ResultAccessor {
         return collectorId;
     }
 
-    public static Double getSingleIterationValue(SimulationRun simulationRun, int period, String path, String field, int iteration) {
-        File iterationFile = new File(getSimRunPath(simulationRun) + File.separator + getPathId(path, simulationRun.id)
-                + "_" + period + "_" + getFieldId(field, simulationRun.id));
+    public static Double getSingleIterationValue(SimulationRun simulationRun, int period, String path, String field, String collector, int iteration) {
+        File iterationFile = new File(GridHelper.getResultPathLocation(simulationRun.id, getPathId(path),getFieldId(field), getCollectorId(collector), period));
         IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
 
         while (ifa.fetchNext()) {

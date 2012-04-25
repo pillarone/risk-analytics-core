@@ -8,6 +8,7 @@ import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
 import org.pillarone.riskanalytics.core.wiring.WireCategory
 import org.pillarone.riskanalytics.core.wiring.WiringUtils
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
+import org.pillarone.riskanalytics.core.parameterization.IParameterObjectClassifier
 
 abstract class Model {
 
@@ -188,5 +189,9 @@ abstract class Model {
             versionNumber = instance.version.toString()
         }
         return new VersionNumber(versionNumber)
+    }
+
+    public List<IParameterObjectClassifier> configureClassifier(String path, List<IParameterObjectClassifier> classifiers) {
+        return classifiers
     }
 }

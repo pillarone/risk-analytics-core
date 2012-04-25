@@ -4,8 +4,9 @@ import org.pillarone.riskanalytics.core.model.IModelVisitor;
 import org.pillarone.riskanalytics.core.model.ModelPath;
 import org.pillarone.riskanalytics.core.model.ModelPathComponent;
 import org.pillarone.riskanalytics.core.parameterization.IParameterObject;
+import org.pillarone.riskanalytics.core.parameterization.IParameterObjectClassifier;
 import org.pillarone.riskanalytics.core.util.GroovyUtils;
-
+import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractResource implements IResource {
@@ -24,5 +25,9 @@ public abstract class AbstractResource implements IResource {
                 }
             }
         }
+    }
+
+    public List<IParameterObjectClassifier> configureClassifier(String path, List<IParameterObjectClassifier> classifiers) {
+        return classifiers;
     }
 }

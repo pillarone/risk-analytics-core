@@ -65,6 +65,8 @@ class SimulationJob extends GridJobAdapter<JobResult> {
         final IPeriodCounter periodCounter = runner.currentScope.iterationScope.periodScope.periodCounter
         if(periodCounter instanceof ILimitedPeriodCounter) {
             result.numberOfSimulatedPeriods = periodCounter.periodCount()
+        } else {
+            result.numberOfSimulatedPeriods = simulationConfiguration.simulation.periodCount
         }
         return result
     }

@@ -59,7 +59,8 @@ class SimulationJob extends GridJobAdapter<JobResult> {
         GridOutputStrategy outputStrategy = this.simulationConfiguration.outputStrategy
         final JobResult result = new JobResult(
                 totalMessagesSent: outputStrategy.totalMessages, start: start, end: new Date(),
-                nodeName: jobIdentifier.toString(), simulationException: runner.error?.error
+                nodeName: jobIdentifier.toString(), simulationException: runner.error?.error,
+                completedIterations: runner.currentScope.iterationsDone
         )
         final IPeriodCounter periodCounter = runner.currentScope.iterationScope.periodScope.periodCounter
         if(periodCounter instanceof ILimitedPeriodCounter) {

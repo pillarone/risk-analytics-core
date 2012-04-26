@@ -131,11 +131,13 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
     public Object reduce(List<GridJobResult> gridJobResults) {
         int totalMessageCount = 0;
         int periodCount = 1;
+        int completedIterations = 0;
         boolean error = false;
         for (GridJobResult res : gridJobResults) {
             JobResult jobResult = res.getData();
             periodCount = jobResult.getNumberOfSimulatedPeriods();
             totalMessageCount += jobResult.getTotalMessagesSent();
+            completedIterations += jobResult.getCompletedIterations();
 
             LOG.info("Job " + jobResult.getNodeName() + " executed in " + (jobResult.getEnd().getTime() - jobResult.getStart().getTime()) + " ms");
             Throwable simulationException = jobResult.getSimulationException();
@@ -181,6 +183,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         calculator.calculate();
 
         simulation.setEnd(new DateTime());
+        simulation.setNumberOfIterations(completedIterations);
         simulation.setPeriodCount(periodCount);
         simulation.save();
         setSimulationState(stopped ? SimulationState.STOPPED : SimulationState.FINISHED);

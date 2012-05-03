@@ -88,7 +88,7 @@ class ResultService implements IResultService {
     private List<String> getPathsOfResult(List<String> paths, SimulationRun run, int periodIndex) {
         if (!regExIsUsed(paths)) return paths
         Set<String> fullPaths = new HashSet<String>()
-        List<String> allPaths = PostSimulationCalculation.executeQuery("SELECT  path.pathName FROM ${PostSimulationCalculation.class.name} as p  WHERE p.run.id = ? ", [run.id])
+        List<String> allPaths = PostSimulationCalculation.executeQuery("SELECT distinct path.pathName FROM ${PostSimulationCalculation.class.name} as p  WHERE p.run.id = ? ", [run.id])
         if (allPaths.isEmpty()) {
             // try to get the pathnames from the symbolic single value results table instead -- a bit slower probably
             allPaths.addAll(getAllPaths(run, periodIndex))

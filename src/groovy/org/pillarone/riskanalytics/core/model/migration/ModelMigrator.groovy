@@ -18,8 +18,6 @@ public class ModelMigrator {
     Class<? extends MigratableModel> modelClass
     VersionNumber toVersion
 
-    protected ClassLoader currentModelClassLoader
-
     public ModelMigrator(Class<? extends MigratableModel> modelClass) {
         this.modelClass = modelClass
         toVersion = Model.getModelVersion(modelClass);
@@ -48,7 +46,7 @@ public class ModelMigrator {
                 for (AbstractMigration migration in instance.getMigrationChain(parameterization.modelVersionNumber, toVersion)) {
                     List<ParameterHolder> newParameters = []
                     for (int periodIndex = 0; periodIndex < parameterization.periodCount; periodIndex++) {
-                        currentModelClassLoader = new ModelMigrationClassLoader([migration.oldModelJarURL] as URL[], Thread.currentThread().getContextClassLoader())
+                        ClassLoader currentModelClassLoader = new ModelMigrationClassLoader([migration.oldModelJarURL] as URL[], Thread.currentThread().getContextClassLoader())
                         Model oldModel = createModel(parameterization, periodIndex, currentModelClassLoader)
                         Model newModel = createModel(parameterization, periodIndex, Thread.currentThread().contextClassLoader)
 

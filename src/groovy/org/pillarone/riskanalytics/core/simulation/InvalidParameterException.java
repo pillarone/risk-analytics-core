@@ -3,8 +3,9 @@ package org.pillarone.riskanalytics.core.simulation;
 /**
  * @author stefan.kunz (at) intuitive-collaboration (dot) com
  */
-public class AfterSimulationEndException extends NotInProjectionHorizon {
-    public AfterSimulationEndException(String message) {
+public class InvalidParameterException extends SimulationException {
+
+    public InvalidParameterException(String message) {
         super(message);
     }
 }

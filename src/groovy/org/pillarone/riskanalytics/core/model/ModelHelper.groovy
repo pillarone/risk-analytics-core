@@ -15,6 +15,7 @@ class ModelHelper {
     private static final String PERIOD = 'period'
     private static final String RESERVE_RISK = 'reserveRisk'
     private static final String PREMIUM_RISK = 'premiumRisk'
+    private static final String CALENDAR_YEAR_VOLATILITY = 'calendarYearVolatility'
     private static final String PERILS = "claimsGenerators"
     private static final String RESERVES = "claimsGenerators"
     private static final String CONTRACTS = "reinsuranceContracts"
@@ -32,16 +33,17 @@ class ModelHelper {
      * @param model A model with all parameters injected
      * @return All possible fields
      */
-    public static Set<String> getAllPossibleFields(Model model, boolean includeInceptionPeriodFields) {
+    public static Set<String> getAllPossibleFields(Model model, boolean includePremiumReserveRisk) {
         Set<String> results = []
         model.properties.each { String key, value ->
             if (value instanceof Component) {
                 results.addAll(getAllPossibleOutputFields(value))
             }
         }
-        if (includeInceptionPeriodFields) {
+        if (includePremiumReserveRisk) {
             results.add(RESERVE_RISK)
             results.add(PREMIUM_RISK)
+            results.add(CALENDAR_YEAR_VOLATILITY)
         }
         return results
     }

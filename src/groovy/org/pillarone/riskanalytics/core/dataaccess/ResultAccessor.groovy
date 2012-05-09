@@ -244,7 +244,7 @@ abstract class ResultAccessor {
     }
 
     private static double[] fillWithZeroes(SimulationRun run, double[] results) {
-        if (run.iterations <= results.length || results.length == 0) return results
+        if (run.iterations == results.length || results.length == 0) return results
 
         double[] result = new double[run.iterations]
         System.arraycopy(results, 0, result, 0, results.length)

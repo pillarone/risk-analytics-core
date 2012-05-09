@@ -31,6 +31,7 @@ public class MathUtils {
      */
     @Deprecated
     public static double calculatePercentile(double[] values, double severity) {
+        LOG.info("deprecated function used");
         return calculatePercentile(values, severity, QuantilePerspective.LOSS);
     }
 
@@ -140,7 +141,9 @@ public class MathUtils {
      * @param severity
      * @return
      */
+    @Deprecated
     public static double calculatePercentileOfSortedValues(double[] sortedValues, double severity) {
+        LOG.info("deprecated function used");
         return calculatePercentileOfSortedValues(sortedValues, severity, QuantilePerspective.LOSS);
     }
 
@@ -153,7 +156,6 @@ public class MathUtils {
      * @param perspective  distinction between random loss and random profit
      * @return
      */
-
     public static double calculatePercentileOfSortedValues(double[] sortedValues, double severity, QuantilePerspective perspective) {
         try {
             severity = severity / 100d;
@@ -187,8 +189,9 @@ public class MathUtils {
         }
     }
 
-
+    @Deprecated
     public static double calculateVar(double[] values, double severity) {
+        LOG.info("deprecated function used");
         return calculateVar(values, severity, calculateMean(values));
     }
 
@@ -196,7 +199,9 @@ public class MathUtils {
         return calculateVar(values, severity, calculateMean(values), perspective);
     }
 
+    @Deprecated
     public static double calculateVarOfSortedValues(double[] sortedValues, double severity, double mean) {
+        LOG.info("deprecated function used");
         return calculatePercentileOfSortedValues(sortedValues, severity) - mean;
     }
 
@@ -211,7 +216,9 @@ public class MathUtils {
         }
     }
 
+    @Deprecated
     public static double calculateVar(double[] values, double severity, double mean) {
+        LOG.info("deprecated function used");
         return calculateVar(values, severity, mean, QuantilePerspective.LOSS);
     }
 
@@ -220,7 +227,9 @@ public class MathUtils {
         return calculateVarOfSortedValues(values, severity, mean, perspective);
     }
 
+    @Deprecated
     public static double calculateTvar(double[] values, double severity) {
+        LOG.info("deprecated function used");
         return calculateTvar(values, severity, QuantilePerspective.LOSS);
     }
 
@@ -236,7 +245,9 @@ public class MathUtils {
      * @param severity
      * @return
      */
+    @Deprecated
     public static double calculateTvarOfSortedValues(double[] sortedValues, double severity) {
+        LOG.info("deprecated function used");
         return calculateTvarOfSortedValues(sortedValues, severity, QuantilePerspective.LOSS);
     }
 

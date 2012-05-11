@@ -13,9 +13,9 @@ class ModelHelper {
     // todo(sku): try to reuse same constants of PC project
     private static final String PATH_SEPARATOR = ':'
     private static final String PERIOD = 'period'
-    private static final String RESERVE_RISK = 'reserveRisk'
-    private static final String PREMIUM_RISK = 'premiumRisk'
-    private static final String CALENDAR_YEAR_VOLATILITY = 'calendarYearVolatility'
+    private static final String RESERVE_RISK_BASE = 'reserveRiskBase'
+    private static final String PREMIUM_RISK_BASE = 'premiumRiskBase'
+    private static final String PREMIUM_AND_RESERVE_RISK_BASE = "premiumAndReserveRiskBase";
     private static final String PERILS = "claimsGenerators"
     private static final String RESERVES = "claimsGenerators"
     private static final String CONTRACTS = "reinsuranceContracts"
@@ -41,9 +41,9 @@ class ModelHelper {
             }
         }
         if (includePremiumReserveRisk) {
-            results.add(RESERVE_RISK)
-            results.add(PREMIUM_RISK)
-            results.add(CALENDAR_YEAR_VOLATILITY)
+            results.add(RESERVE_RISK_BASE)
+            results.add(PREMIUM_RISK_BASE)
+            results.add(PREMIUM_AND_RESERVE_RISK_BASE)
         }
         return results
     }

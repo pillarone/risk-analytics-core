@@ -104,7 +104,7 @@ abstract class MultiPhaseComposedComponent extends ComposedComponent implements 
 
                     Set<ITransmitter> replicationTransmitters = replicationInputTransmitterPerPhase.get(phase)
                     if (!replicationTransmitters) {
-                        replicationTransmitters = new HashSet<ITransmitter>()
+                        replicationTransmitters = new LinkedHashSet<ITransmitter>()
                         replicationInputTransmitterPerPhase.put(phase, replicationTransmitters)
                     }
                     for (ITransmitter replicationTransmitter : getAllInputReplicationTransmitter()) {

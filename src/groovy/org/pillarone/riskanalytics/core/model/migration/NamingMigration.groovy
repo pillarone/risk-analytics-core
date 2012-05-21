@@ -17,11 +17,12 @@ class NamingMigration extends MigrationSupport {
 
     NamingMigration(VersionNumber from, VersionNumber to, Class modelClass) {
         super(from, to, modelClass)
-        oldComponentUtils = getOldModelClassLoader().loadClass(ComponentUtils.name) //TODO: included in jar?
+        oldComponentUtils = ComponentUtils//getOldModelClassLoader().loadClass(ComponentUtils.name) //TODO: included in jar?
     }
 
     @Override
     void doMigrateParameterization(Model source, Model target) {
+        target.injectComponentNames()
         MarkerBasedMultiDimensionalParameterCollector collector = new MarkerBasedMultiDimensionalParameterCollector()
         target.accept(collector)
 
@@ -47,8 +48,12 @@ class NamingMigration extends MigrationSupport {
                 List newList = []
 
                 columnValues.each { def value ->
-                    Component component = components.find { oldComponentUtils.getNormalizedName(it.name) == value }
-                    newList << component.name
+                    if (value != "") {
+                        Component component = components.find { oldComponentUtils.getNormalizedName(it.name) == value }
+                        newList << component.name
+                    } else {
+                        newList << ""
+                    }
                 }
 
                 parameter.values.set(i, newList)
@@ -69,8 +74,12 @@ class NamingMigration extends MigrationSupport {
             newValues << newList
 
             list.each { def value ->
-                Component component = components.find { oldComponentUtils.getNormalizedName(it.name) == value }
-                newList << component.name
+                if (value != "") {
+                    Component component = components.find { oldComponentUtils.getNormalizedName(it.name) == value }
+                    newList << component.name
+                } else {
+                    newList << ""
+                }
             }
         }
 
@@ -88,8 +97,12 @@ class NamingMigration extends MigrationSupport {
         List newList = []
 
         rowNames.each { def value ->
-            Component component = components.find { oldComponentUtils.getNormalizedName(it.name) == value }
-            newList << component.name
+            if (value != "") {
+                Component component = components.find { oldComponentUtils.getNormalizedName(it.name) == value }
+                newList << component.name
+            } else {
+                newList << ""
+            }
         }
 
         rowNames.clear()

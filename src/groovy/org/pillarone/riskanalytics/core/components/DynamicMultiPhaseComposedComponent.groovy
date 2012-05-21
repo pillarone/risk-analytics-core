@@ -12,7 +12,7 @@ abstract class DynamicMultiPhaseComposedComponent extends DynamicComposedCompone
 
     private Map<ITransmitter, String> phasePerTransmitterInput = new HashMap<ITransmitter, String>()
     private Map<ITransmitter, String> phasePerTransmitterOutput = new HashMap<ITransmitter, String>()
-    private Map<String, List<ITransmitter>> replicationInputTransmitterPerPhase = new HashMap<String, List<ITransmitter>>()
+    private Map<String, Set<ITransmitter>> replicationInputTransmitterPerPhase = new HashMap<String, Set<ITransmitter>>()
     private Map<String, Integer> numberOfTransmitterPerPhaseInput = new HashMap<String, Integer>()
     private Map<String, Integer> numberOfTransmitterPerPhaseOutput = new HashMap<String, Integer>()
     private Map<String, Integer> numberOfNotifiedTransmittersPerPhase = new HashMap<String, Integer>()
@@ -100,9 +100,9 @@ abstract class DynamicMultiPhaseComposedComponent extends DynamicComposedCompone
                     phasePerTransmitterInput.put(transmitter, phase)
                     increaseNumberOfTransmitter(numberOfTransmitterPerPhaseInput, phase)
 
-                    List<ITransmitter> replicationTransmitters = replicationInputTransmitterPerPhase.get(phase)
+                    Set<ITransmitter> replicationTransmitters = replicationInputTransmitterPerPhase.get(phase)
                     if (!replicationTransmitters) {
-                        replicationTransmitters = new ArrayList<ITransmitter>()
+                        replicationTransmitters = new HashSet<ITransmitter>()
                         replicationInputTransmitterPerPhase.put(phase, replicationTransmitters)
                     }
                     for (ITransmitter replicationTransmitter : getAllInputReplicationTransmitter()) {

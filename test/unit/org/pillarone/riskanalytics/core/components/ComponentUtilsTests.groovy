@@ -12,10 +12,6 @@ class ComponentUtilsTests extends GroovyTestCase {
         assertEquals " > heinecken >  brewery >  ale", ComponentUtils.getNormalizedPath(":heinecken:subBrewery:outAle", " > ")
     }
 
-    void testGetModelName() {
-        assertEquals 'subClaimsGenerator', ComponentUtils.getModelName('claims generator', 'sub')
-    }
-
     void testGetNormalizedName() {
         assertEquals 'claims generator', ComponentUtils.getNormalizedName('subClaimsGenerator')
     }
@@ -31,8 +27,8 @@ class ComponentUtilsTests extends GroovyTestCase {
     }
 
     void testGetComponentNormalizedName() {
-        assertEquals "europe", ComponentUtils.getComponentNormalizedName("Universe:subMilkyWay:subSolarSystem:subEarth:subEurope")
-        assertEquals "solar system", ComponentUtils.getComponentNormalizedName("Universe:subMilkyWay:subSolarSystem")
+        assertEquals "subEurope", ComponentUtils.getComponentNormalizedName("Universe:subMilkyWay:subSolarSystem:subEarth:subEurope")
+        assertEquals "subSolarSystem", ComponentUtils.getComponentNormalizedName("Universe:subMilkyWay:subSolarSystem")
     }
 
     void testInsertBlanks() {

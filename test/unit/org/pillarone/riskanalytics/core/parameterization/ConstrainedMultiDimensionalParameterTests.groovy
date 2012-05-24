@@ -30,7 +30,7 @@ class ConstrainedMultiDimensionalParameterTests extends GroovyTestCase {
                 getColumnType: { int index -> return index == 0 ? ITestComponentMarker : BigDecimal }
         ] as IMultiDimensionalConstraints
 
-        ConstrainedMultiDimensionalParameter constrainedMultiDimensionalParameter = new ConstrainedMultiDimensionalParameter([['example output component', 'hierarchy output component'], [1.0, 0.0]], ['component', 'values'], markerConstraint)
+        ConstrainedMultiDimensionalParameter constrainedMultiDimensionalParameter = new ConstrainedMultiDimensionalParameter([['exampleOutputComponent', 'hierarchyOutputComponent'], [1.0, 0.0]], ['component', 'values'], markerConstraint)
         constrainedMultiDimensionalParameter.simulationModel = model
         List components = constrainedMultiDimensionalParameter.getValuesAsObjects(0)
         assertEquals 2, components.size()
@@ -45,23 +45,23 @@ class ConstrainedMultiDimensionalParameterTests extends GroovyTestCase {
     void testReferencePaths() {
         IMultiDimensionalConstraints markerConstraint = new ExampleMultiDimensionalConstraints()
         ConstrainedMultiDimensionalParameter parameter = new ConstrainedMultiDimensionalParameter(
-                [['example output component', 'hierarchy output component'], [1.0, 0.0]], ['component', 'values'], markerConstraint
+                [['exampleOutputComponent', 'hierarchyOutputComponent'], [1.0, 0.0]], ['component', 'values'], markerConstraint
         )
-        assertTrue 'hierarchy output component', parameter.referencePaths(ITestComponentMarker, 'hierarchy output component')
-        assertTrue 'hierarchy output component', parameter.referencePaths(ITestComponentMarker, 'example output component')
-        assertFalse 'hierarchy output component', parameter.referencePaths(ITest2ComponentMarker, 'hierarchy output component')
-        assertFalse 'hierarchy output component', parameter.referencePaths(ITestComponentMarker, '1.0')
+        assertTrue 'hierarchyOutputComponent', parameter.referencePaths(ITestComponentMarker, 'hierarchyOutputComponent')
+        assertTrue 'hierarchyOutputComponent', parameter.referencePaths(ITestComponentMarker, 'exampleOutputComponent')
+        assertFalse 'hierarchyOutputComponent', parameter.referencePaths(ITest2ComponentMarker, 'hierarchyOutputComponent')
+        assertFalse 'hierarchyOutputComponent', parameter.referencePaths(ITestComponentMarker, '1.0')
     }
 
 
     void testUpdateReferenceValues() {
         IMultiDimensionalConstraints markerConstraint = new ExampleMultiDimensionalConstraints()
         ConstrainedMultiDimensionalParameter parameter = new ConstrainedMultiDimensionalParameter(
-                [['example output component', 'hierarchy output component'], [1.0, 0.0]], ['component', 'values'], markerConstraint
+                [['exampleOutputComponent', 'hierarchyOutputComponent'], [1.0, 0.0]], ['component', 'values'], markerConstraint
         )
-        assertTrue 'hierarchy output component', parameter.updateReferenceValues(ITestComponentMarker, 'hierarchy output component', 'flat output component')
-        assertTrue 'hierarchy output component', parameter.updateReferenceValues(ITestComponentMarker, 'example output component', 'flat output component')
-        assertFalse 'hierarchy output component', parameter.updateReferenceValues(ITest2ComponentMarker, 'hierarchy output component', 'flat output component')
-        assertFalse 'hierarchy output component', parameter.updateReferenceValues(ITestComponentMarker, '1.0', '5.0')
+        assertTrue 'hierarchyOutputComponent', parameter.updateReferenceValues(ITestComponentMarker, 'hierarchyOutputComponent', 'flatOutputComponent')
+        assertTrue 'hierarchyOutputComponent', parameter.updateReferenceValues(ITestComponentMarker, 'exampleOutputComponent', 'flatOutputComponent')
+        assertFalse 'hierarchyOutputComponent', parameter.updateReferenceValues(ITest2ComponentMarker, 'hierarchyOutputComponent', 'flatOutputComponent')
+        assertFalse 'hierarchyOutputComponent', parameter.updateReferenceValues(ITestComponentMarker, '1.0', '5.0')
     }
 }

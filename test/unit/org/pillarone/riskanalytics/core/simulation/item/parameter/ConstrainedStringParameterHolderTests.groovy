@@ -23,15 +23,15 @@ class ConstrainedStringParameterHolderTests extends GroovyTestCase {
         assertEquals 'verify original value', 'apple', parameterHolder.getBusinessObject().stringValue
 
         assertEquals 'one reference path found', ['europe:suisse'], parameterHolder.updateReferenceValues(ITestComponentMarker, 'apple', 'banana')
-        assertEquals 'correct modification: apple -> banana', 'subBanana', parameterHolder.getBusinessObject().stringValue
+        assertEquals 'correct modification: apple -> banana', 'banana', parameterHolder.getBusinessObject().stringValue
 
         assertEquals 'reference not found', [], parameterHolder.updateReferenceValues(ITestComponentMarker, 'apple', 'cherry')
-        assertEquals 'correct modification: apple -> cherry', 'subBanana', parameterHolder.getBusinessObject().stringValue
+        assertEquals 'correct modification: apple -> cherry', 'banana', parameterHolder.getBusinessObject().stringValue
 
         assertEquals 'reference banana found', ['europe:suisse'], parameterHolder.updateReferenceValues(ITestComponentMarker, 'banana', 'cherry')
-        assertEquals 'correct modification: banana -> cherry', 'subCherry', parameterHolder.getBusinessObject().stringValue
+        assertEquals 'correct modification: banana -> cherry', 'cherry', parameterHolder.getBusinessObject().stringValue
 
         assertEquals 'reference not found, wrong marker', [], parameterHolder.updateReferenceValues(ITest2ComponentMarker, 'banana', 'apple')
-        assertEquals 'reference not found, banana -> apple', 'subCherry', parameterHolder.getBusinessObject().stringValue
+        assertEquals 'reference not found, banana -> apple', 'cherry', parameterHolder.getBusinessObject().stringValue
     }
 }

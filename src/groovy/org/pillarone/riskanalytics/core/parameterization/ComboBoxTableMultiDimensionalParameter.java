@@ -11,7 +11,7 @@ public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensiona
 
     static Log LOG = LogFactory.getLog(ComboBoxTableMultiDimensionalParameter.class);
 
-    private Map comboBoxValues = new HashMap();
+    private Map<String, Component> comboBoxValues = new HashMap<String, Component>();
     private Class markerClass;
 
     public ComboBoxTableMultiDimensionalParameter(List cellValues, List titles, Class markerClass) {
@@ -25,7 +25,7 @@ public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensiona
         if (simulationModel != null) {
             List<Component> markedComponents = simulationModel.getMarkedComponents(markerClass);
             for (Component c : markedComponents) {
-                comboBoxValues.put(normalizeName(c.getName()), c);
+                comboBoxValues.put(c.getName(), c);
             }
             LOG.debug("Marker: " + markerClass + ", comboBoxValues: " + comboBoxValues.values());
         } else {
@@ -52,9 +52,10 @@ public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensiona
         if (row == 0) {
             return getValueAt(row, column);
         } else {
-            List names = new LinkedList();
-            for (Object c : comboBoxValues.values()) {
-                names.add(normalizeName(((Component) c).getName()));
+            List<String> names = new ArrayList<String>();
+            List<Component> markedComponents = simulationModel.getMarkedComponents(markerClass);
+            for (Component c : markedComponents) {
+                names.add(c.getName());
             }
             return names;
         }
@@ -117,7 +118,7 @@ public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensiona
     @Override
     public ComboBoxTableMultiDimensionalParameter clone() throws CloneNotSupportedException {
         final ComboBoxTableMultiDimensionalParameter clone = (ComboBoxTableMultiDimensionalParameter) super.clone();
-        clone.comboBoxValues = new HashMap();
+        clone.comboBoxValues = new HashMap<String, Component>();
         clone.markerClass = markerClass;
         if (simulationModel != null) {
             setSimulationModel(simulationModel);

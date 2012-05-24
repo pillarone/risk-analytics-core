@@ -63,7 +63,7 @@ public class ComboBoxMatrixMultiDimensionalParameter extends MatrixMultiDimensio
         if (simulationModel != null) {
             List<Component> components = simulationModel.getMarkedComponents(markerClass);
             for (Component component : components) {
-                comboBoxValues.put(component.getNormalizedName(), component);
+                comboBoxValues.put(component.getName(), component);
             }
         } else {
             comboBoxValues.clear();
@@ -100,9 +100,10 @@ public class ComboBoxMatrixMultiDimensionalParameter extends MatrixMultiDimensio
         }
 
         if (row == 0 || column == 0) {
-            List names = new LinkedList();
-            for (String c : comboBoxValues.keySet()) {
-                names.add(c);
+            List<String> names = new ArrayList<String>();
+            List<Component> markedComponents = simulationModel.getMarkedComponents(markerClass);
+            for (Component c : markedComponents) {
+                names.add(c.getName());
             }
             return names;
         } else {

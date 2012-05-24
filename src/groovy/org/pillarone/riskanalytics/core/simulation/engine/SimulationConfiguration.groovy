@@ -106,7 +106,8 @@ public class SimulationConfiguration implements Serializable, Cloneable {
         Set<String> inceptionPeriodPaths = getSplitByInceptionDateDrillDownPaths(drillDownCollectors, model)
         paths.addAll(inceptionPeriodPaths)
 
-        Set fields = ModelHelper.getAllPossibleFields(model, !inceptionPeriodPaths.empty)
+        boolean includePremiumReserveRisk = collectorsIncludingPremiumReserveRisk(drillDownCollectors, model)
+        Set fields = ModelHelper.getAllPossibleFields(model, !inceptionPeriodPaths.empty || includePremiumReserveRisk)
         MappingCache cache = MappingCache.instance
 
         for (String path in paths) {
@@ -145,9 +146,21 @@ public class SimulationConfiguration implements Serializable, Cloneable {
         ICollectingModeStrategy splitPerInceptionDateCollector = CollectingModeFactory.getStrategy('SPLIT_BY_INCEPTION_DATE')
         List<String> splitByInceptionDatePaths = []
         addMatchingCollector(splitPerInceptionDateCollector, collectors, splitByInceptionDatePaths)
+        ICollectingModeStrategy premiumReserveRiskTriangleCollector = CollectingModeFactory.getStrategy('PREMIUM_RESERVE_RISK_TRIANGLE')
+        addMatchingCollector(premiumReserveRiskTriangleCollector, collectors, splitByInceptionDatePaths)
         Set<String> periodLabels = model.periodLabelsBeforeProjectionStart()
         periodLabels.addAll PeriodLabelsUtil.getPeriodLabels(simulation, model)
         return ModelHelper.pathsExtendedWithPeriod(splitByInceptionDatePaths, periodLabels.toList())
+    }
+
+    private boolean collectorsIncludingPremiumReserveRisk(List<PacketCollector> collectors, Model model) {
+        // todo: requires a proper refactoring as the core plugin itself knows nothing about the aggregate drill down collector
+        ICollectingModeStrategy premiumReserveRiskCollector = CollectingModeFactory.getStrategy('PREMIUM_RESERVE_RISK')
+        List<String> pathsIncludingPremiumReserveRisk = []
+        addMatchingCollector(premiumReserveRiskCollector, collectors, pathsIncludingPremiumReserveRisk)
+        premiumReserveRiskCollector = CollectingModeFactory.getStrategy('INCLUDING_PREMIUM_RESERVE_RISK')
+        addMatchingCollector(premiumReserveRiskCollector, collectors, pathsIncludingPremiumReserveRisk)
+        return !pathsIncludingPremiumReserveRisk.isEmpty()
     }
 
 }

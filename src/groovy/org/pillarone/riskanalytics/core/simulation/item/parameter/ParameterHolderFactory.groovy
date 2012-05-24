@@ -158,7 +158,7 @@ class ParameterHolderFactory {
         if (cloned instanceof ParameterObjectParameterHolder) {
             // recursive step down
             cloned.getClassifierParameters().clear()
-            for (Map.Entry<String, ParameterHolder> nestedParameterHolder: ((ParameterObjectParameterHolder) parameterHolder).getClassifierParameters().entrySet()) {
+            for (Map.Entry<String, ParameterHolder> nestedParameterHolder : ((ParameterObjectParameterHolder) parameterHolder).getClassifierParameters().entrySet()) {
                 ParameterHolder clonedNested = renamePathOfParameter(nestedParameterHolder.value, removedParameters, clonedParameters, oldPath, newPath, true)
                 cloned.getClassifierParameters().putAt(nestedParameterHolder.key, clonedNested)
             }
@@ -176,14 +176,20 @@ class ParameterHolderFactory {
     private static List<String> renameReferencingParameters(Parameterization parameterization, String oldComponentPath, String newComponentPath, Component renamedComponent) {
         String oldComponentName = ComponentUtils.getComponentNormalizedName(oldComponentPath)
         String newComponentName = ComponentUtils.getComponentNormalizedName(newComponentPath)
-        Class markerInterface = getMarkerInterface(renamedComponent)
-        List<ParameterHolder> markerParameterHolders = affectedParameterHolders(parameterization, markerInterface, oldComponentName)
+        List<Class> markerInterfaces = getMarkerInterface(renamedComponent)
+        List<ParameterHolder> markerParameterHolders = []
+        for (Class markerClass in markerInterfaces) {
+            markerParameterHolders.addAll(affectedParameterHolders(parameterization, markerClass, oldComponentName))
+        }
         List<String> referencingPaths = []
-        for (ParameterHolder parameterHolder: markerParameterHolders) {
+        for (ParameterHolder parameterHolder : markerParameterHolders) {
             if (!parameterHolder.removed) {
-                List<String> paths = parameterHolder.updateReferenceValues(markerInterface, oldComponentName, newComponentName)
-                if (paths.size() > 0) {
-                    referencingPaths.addAll paths
+                for (Class markerClass in markerInterfaces) {
+
+                    List<String> paths = parameterHolder.updateReferenceValues(markerClass, oldComponentName, newComponentName)
+                    if (paths.size() > 0) {
+                        referencingPaths.addAll paths
+                    }
                 }
             }
         }
@@ -197,14 +203,19 @@ class ParameterHolderFactory {
      */
     public static List<String> referencingParametersPaths(Parameterization parameterization, String componentPath, Component component) {
         String componentName = ComponentUtils.getComponentNormalizedName(componentPath)
-        Class markerInterface = getMarkerInterface(component)
-        List<ParameterHolder> markerParameterHolders = affectedParameterHolders(parameterization, markerInterface, componentPath)
+        List<Class> markerInterfaces = getMarkerInterface(component)
+        List<ParameterHolder> markerParameterHolders = []
+        for (Class markerClass in markerInterfaces) {
+            markerParameterHolders.addAll(affectedParameterHolders(parameterization, markerClass, componentPath))
+        }
         List<String> referencingPaths = []
-        for (ParameterHolder parameterHolder: markerParameterHolders) {
+        for (ParameterHolder parameterHolder : markerParameterHolders) {
             if (!parameterHolder.removed) {
-                List<String> paths = parameterHolder.referencePaths(markerInterface, componentName)
-                if (paths.size() > 0) {
-                    referencingPaths.addAll paths
+                for (Class markerClass in markerInterfaces) {
+                    List<String> paths = parameterHolder.referencePaths(markerClass, componentName)
+                    if (paths.size() > 0) {
+                        referencingPaths.addAll paths
+                    }
                 }
             }
         }
@@ -214,7 +225,7 @@ class ParameterHolderFactory {
     private static List<ParameterHolder> affectedParameterHolders(Parameterization parameterization, Class markerInterface, String componentPath) {
         List<ParameterHolder> referencedParameterHolders = new ArrayList<ParameterHolder>()
         if (markerInterface) {
-            for (ParameterHolder parameterHolder: parameterization.parameterHolders) {
+            for (ParameterHolder parameterHolder : parameterization.parameterHolders) {
                 if (parameterHolder instanceof IMarkerValueAccessor) {
                     referencedParameterHolders.add parameterHolder
                 }
@@ -228,13 +239,14 @@ class ParameterHolderFactory {
      * @param path of component
      * @return class of the marker interface the component @path is implementing or <tt>null</tt> if not found
      */
-    private static Class getMarkerInterface(Component component) {
-        for (Class intf: component.class.interfaces) {
+    private static List<Class> getMarkerInterface(Component component) {
+        List<Class> result = []
+        for (Class intf : component.class.interfaces) {
             if (IComponentMarker.isAssignableFrom(intf)) {
-                return intf
+                result << intf
             }
         }
-        return null
+        return result
     }
 
     public static void duplicateParameters(Parameterization parameterization, String oldPath, String newPath) {

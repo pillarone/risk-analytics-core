@@ -69,8 +69,15 @@ abstract class MultiPhaseComposedComponent extends ComposedComponent implements 
         String transmitterPhase = phasePerTransmitterInput.get(transmitter)
         increaseNumberOfTransmitter(numberOfNotifiedTransmittersPerPhase, transmitterPhase)
         if (numberOfNotifiedTransmittersPerPhase[transmitterPhase] == numberOfTransmitterPerPhaseInput[transmitterPhase]) {
-            for (ITransmitter replicationTransmitter : replicationInputTransmitterPerPhase.get(transmitterPhase)) {
-                replicationTransmitter.transmit()
+            Set<ITransmitter> replicationTransmitters = replicationInputTransmitterPerPhase.get(transmitterPhase)
+            if (replicationTransmitters.isEmpty()) {
+                // use case: composed component does not contain any internal wiring, it's used for structuring purposes only
+                doCalculation transmitterPhase
+            }
+            else {
+                for (ITransmitter replicationTransmitter : replicationTransmitters) {
+                    replicationTransmitter.transmit()
+                }
             }
             publishResults transmitterPhase
         }

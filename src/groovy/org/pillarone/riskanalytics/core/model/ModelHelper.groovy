@@ -6,6 +6,7 @@ import org.pillarone.riskanalytics.core.packets.PacketList
 import org.pillarone.riskanalytics.core.packets.Packet
 import org.pillarone.riskanalytics.core.components.IComponentMarker
 import org.pillarone.riskanalytics.core.components.ComposedComponent
+import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
 
 
 class ModelHelper {
@@ -26,6 +27,7 @@ class ModelHelper {
     private static final String RESERVE_MARKER = "IReserveMarker"
     private static final String CONTRACT_MARKER = "IReinsuranceContractMarker"
     private static final String LEGAL_ENTITY_MARKER = "ILegalEntityMarker"
+    private static final String STRUCTURE_MARKER = "IStructureMarker"
 
 
     /**
@@ -49,7 +51,7 @@ class ModelHelper {
     }
 
     /**
-     * A static helper method which obtains all possible output fields of this model
+     * A static helper method which obtains all possible output paths of this model
      * @param model A model with all parameters injected
      * @return All possible paths
      */
@@ -116,7 +118,7 @@ class ModelHelper {
 
     private static void findDrillDownCandidates(Component component, String path,
                                                 Map<Class, List<String>> outputPathsByMarkerInterface) {
-        for (Class intf : component.class.interfaces) {
+        for (Class intf : getInterfaces(component)) {
             if (IComponentMarker.isAssignableFrom(intf)) {
                 List components = outputPathsByMarkerInterface.get(intf)
                 if (components) {
@@ -130,19 +132,35 @@ class ModelHelper {
     }
 
     /**
+     * @param component
+     * @return interfaces of the component or of its sub component if it is a DynamicComposedComponent
+     */
+    private static List<Class> getInterfaces(Component component) {
+        if (component instanceof DynamicComposedComponent) {
+            Component subComponent = ((DynamicComposedComponent) component).createDefaultSubComponent()
+            return subComponent.class.interfaces
+        }
+        else {
+            return component.class.interfaces
+        }
+    }
+
+    /**
      * @param components
      * @param componentNameByMarkerInterface this map is filled by traversing all components including nested and checking
      *                                          for every component if it implements a marker interface
      */
     public static void collectComponentNamesByMarkerInterface(List<Component> components, Map<Class, List<String>> componentNameByMarkerInterface) {
         for (Component component : components) {
-            for (Class intf : component.class.interfaces) {
+            for (Class intf : getInterfaces(component)) {
+//            for (Class intf : component.class.interfaces) {
                 if (IComponentMarker.isAssignableFrom(intf)) {
                     List<String> componentNames = componentNameByMarkerInterface.get(intf)
                     if (componentNames == null) {
                         componentNames = new ArrayList<String>()
                         componentNameByMarkerInterface.put(intf, componentNames)
                     }
+                    // component.name is null for DCC
                     componentNames.add(component.name)
                 }
             }
@@ -160,6 +178,7 @@ class ModelHelper {
         Class reserveMarker = componentNameByMarkerInterface.keySet().find { clazz -> clazz.name.contains(RESERVE_MARKER)}
         Class contractMarker = componentNameByMarkerInterface.keySet().find { clazz -> clazz.name.contains(CONTRACT_MARKER) }
         Class legalEntityMarker = componentNameByMarkerInterface.keySet().find { clazz -> clazz.name.contains(LEGAL_ENTITY_MARKER) }
+        Class structureMarker = componentNameByMarkerInterface.keySet().find { clazz -> clazz.name.contains(STRUCTURE_MARKER) }
 
         for (String path : outputPathsByMarkerInterface.get(lobMarker)) {
             String pathWithoutChannel = getPathBase(path)
@@ -175,10 +194,17 @@ class ModelHelper {
             extendedPaths(componentNameByMarkerInterface, lobMarker, SEGMENTS, pathWithoutChannel, channel, results)
             extendedPaths(componentNameByMarkerInterface, perilMarker, PERILS, pathWithoutChannel, channel, results)
             extendedPaths(componentNameByMarkerInterface, reserveMarker, RESERVES, pathWithoutChannel, channel, results)
-            extendedPaths(componentNameByMarkerInterface, lobMarker, LOB, contractMarker, PERILS, pathWithoutChannel, channel, results)
-            extendedPaths(componentNameByMarkerInterface, lobMarker, SEGMENTS, contractMarker, PERILS, pathWithoutChannel, channel, results)
+            extendedPaths(componentNameByMarkerInterface, lobMarker, LOB, perilMarker, PERILS, pathWithoutChannel, channel, results)
+            extendedPaths(componentNameByMarkerInterface, lobMarker, SEGMENTS, perilMarker, PERILS, pathWithoutChannel, channel, results)
         }
         for (String path : outputPathsByMarkerInterface.get(legalEntityMarker)) {
+            String pathWithoutChannel = getPathBase(path)
+            String channel = getChannel(path)
+            extendedPaths(componentNameByMarkerInterface, perilMarker, PERILS, pathWithoutChannel, channel, results)
+            extendedPaths(componentNameByMarkerInterface, contractMarker, CONTRACTS, pathWithoutChannel, channel, results)
+            extendedPaths(componentNameByMarkerInterface, lobMarker, SEGMENTS, pathWithoutChannel, channel, results)
+        }
+        for (String path : outputPathsByMarkerInterface.get(structureMarker)) {
             String pathWithoutChannel = getPathBase(path)
             String channel = getChannel(path)
             extendedPaths(componentNameByMarkerInterface, perilMarker, PERILS, pathWithoutChannel, channel, results)
@@ -192,6 +218,7 @@ class ModelHelper {
                                        String markerPath, String pathWithoutChannel, String channel, Set<String> results) {
         for (String drillDownComponentName: componentNameByMarkerInterface.get(markerClass)) {
             StringBuilder builder = new StringBuilder(pathWithoutChannel)
+            if (!drillDownComponentName) continue
             builder.append(PATH_SEPARATOR)
             builder.append(markerPath)
             builder.append(PATH_SEPARATOR)
@@ -225,6 +252,7 @@ class ModelHelper {
                                        String markerPath1, Class markerClass2, String markerPath2, String pathWithoutChannel,
                                        String channel, Set<String> results) {
         for (String drillDownComponentName1: componentNameByMarkerInterface.get(markerClass1)) {
+            if (!drillDownComponentName1) continue
             StringBuilder builder = new StringBuilder(pathWithoutChannel)
             builder.append(PATH_SEPARATOR)
             builder.append(markerPath1)
@@ -232,6 +260,7 @@ class ModelHelper {
             builder.append(drillDownComponentName1)
             builder.append(PATH_SEPARATOR)
             for (String drillDownComponentName2 : componentNameByMarkerInterface.get(markerClass2)) {
+                if (!drillDownComponentName2) continue
                 StringBuilder builder2 = new StringBuilder(builder.toString());
                 builder2.append(markerPath2)
                 builder2.append(PATH_SEPARATOR)

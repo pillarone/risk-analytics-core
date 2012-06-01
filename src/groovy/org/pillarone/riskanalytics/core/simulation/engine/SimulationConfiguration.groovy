@@ -128,6 +128,8 @@ public class SimulationConfiguration implements Serializable, Cloneable {
         addMatchingCollector(drillDownCollector, collectors, paths)
         ICollectingModeStrategy splitPerSourceCollector = CollectingModeFactory.getStrategy("SPLIT_PER_SOURCE")
         addMatchingCollector(splitPerSourceCollector, collectors, paths)
+        ICollectingModeStrategy splitPerSourceCollectorReduced = CollectingModeFactory.getStrategy("SPLIT_PER_SOURCE_REDUCED")
+        addMatchingCollector(splitPerSourceCollectorReduced, collectors, paths)
         return paths
     }
 

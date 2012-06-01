@@ -286,11 +286,11 @@ class ResultAccessorTests extends GroovyTestCase {
         iterations.add(3)
         iterations.add(1)
         iterations.add(2)
-        List values = ResultAccessor.getIterationConstrainedValues(simulationRun, 0, path1.pathName, field.fieldName, collector.collectorName, iterations);
-
-        assertEquals 20, values[0]
-        assertEquals 10, values[1]
-        assertEquals 5, values[2]
+        Map<Integer, Double> values = ResultAccessor.getIterationConstrainedValues(simulationRun, 0, path1.pathName, field.fieldName, collector.collectorName, iterations);
+        values = values.sort { it.key }
+        assertEquals 20, values.values().toList()[0]
+        assertEquals 10, values.values().toList()[1]
+        assertEquals 5, values.values().toList()[2]
     }
 
     // todo(sku): migration needed to work on kti branch

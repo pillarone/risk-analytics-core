@@ -122,9 +122,21 @@ abstract class ResultAccessor {
         }
     }
 
+    /**
+     * Calculates the rank and gets the value for it
+     * @param simulationRun
+     * @param periodIndex
+     * @param path
+     * @param collectorName
+     * @param fieldName
+     * @param percentage
+     * @param compareOperator
+     * @return value at percentage or null if there exist no values for the path or the percentage is out of range
+     */
     static Double getNthOrderStatistic(SimulationRun simulationRun, int periodIndex, String path, String collectorName,
                                        String fieldName, double percentage, CompareOperator compareOperator) {
         double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
+        if (values.length == 0) return null
         double lowestPercentage = 100d / values.size()
         if ((compareOperator.equals(CompareOperator.LESS_THAN) && percentage <= lowestPercentage)
                 || compareOperator.equals(CompareOperator.GREATER_THAN) && percentage == 100) {
@@ -372,8 +384,9 @@ abstract class ResultAccessor {
         });
     }
 
-    public static List getCriteriaConstrainedIterations(SimulationRun simulationRun, int period, String path, String field, String collector,
-                                                        String criteria, double conditionValue) {
+    public static List getCriteriaConstrainedIterations(SimulationRun simulationRun, int period, String path, String field,
+                                                        String collector, String criteria, Double conditionValue) {
+        if (conditionValue == null) return []
         initComparators();
         File iterationFile = new File(GridHelper.getResultPathLocation(simulationRun.id, getPathId(path), getFieldId(field), getCollectorId(collector), period))
         HashMap<Integer, Double> tmpValues = new HashMap<Integer, Double>(10000);
@@ -385,10 +398,10 @@ abstract class ResultAccessor {
         }
         CompareValues currentComparator = comparators.get(criteria);
         if (currentComparator != null) {
-
-            for (int i = 1; i <= tmpValues.size(); i++) {
-                if (currentComparator.compareValues(tmpValues.get(i), conditionValue))
-                    iterations.add(i);
+            for (Map.Entry<Integer, Double> valueByIteration : tmpValues.entrySet()) {
+                if (currentComparator.compareValues(valueByIteration.value, conditionValue)) {
+                    iterations.add(valueByIteration.key);
+                }
             }
         }
         return iterations;

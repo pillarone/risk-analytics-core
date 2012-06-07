@@ -24,6 +24,7 @@ public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensiona
         super.setSimulationModel(simulationModel);
         if (simulationModel != null) {
             List<Component> markedComponents = simulationModel.getMarkedComponents(markerClass);
+            comboBoxValues.clear();
             for (Component c : markedComponents) {
                 comboBoxValues.put(normalizeName(c.getName()), c);
             }

@@ -129,9 +129,11 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
     List<String> referencePaths(Class markerInterface, String refValue) {
         if (classifierParameters.size() > 0) {
             List<String> references = new ArrayList<String>()
-            for (ParameterHolder parameterHolder: classifierParameters.values()) {
+            for (ParameterHolder parameterHolder : classifierParameters.values()) {
                 if (parameterHolder instanceof MultiDimensionalParameterHolder) {
                     references.addAll parameterHolder.referencePaths(markerInterface, refValue)
+                } else if (parameterHolder instanceof ParameterObjectParameterHolder) {
+                    references.addAll(parameterHolder.referencePaths(markerInterface, refValue))
                 }
             }
             return references
@@ -142,8 +144,11 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
     List<String> updateReferenceValues(Class markerInterface, String oldValue, String newValue) {
         if (classifierParameters.size() > 0) {
             List<String> referencePaths = new ArrayList<String>()
-            for (ParameterHolder parameterHolder: classifierParameters.values()) {
+            for (ParameterHolder parameterHolder : classifierParameters.values()) {
                 if (parameterHolder instanceof MultiDimensionalParameterHolder) {
+                    referencePaths.addAll parameterHolder.updateReferenceValues(markerInterface, oldValue, newValue)
+                }
+                if (parameterHolder instanceof ParameterObjectParameterHolder) {
                     referencePaths.addAll parameterHolder.updateReferenceValues(markerInterface, oldValue, newValue)
                 }
             }
@@ -153,7 +158,7 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
     }
 
     private void check() {
-        if(classifier == null) { //TODO: would like to throw an exception here, but then migration fails
+        if (classifier == null) { //TODO: would like to throw an exception here, but then migration fails
             LOG.error("Classifier null in path $path period $periodIndex")
         }
     }

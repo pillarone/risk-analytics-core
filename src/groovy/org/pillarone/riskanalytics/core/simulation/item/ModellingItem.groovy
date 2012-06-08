@@ -75,7 +75,9 @@ abstract class ModellingItem implements Serializable {
     abstract protected def loadFromDB()
 
     public void rename(String newName) {
-        load()
+        if (!isLoaded()) {
+            load()
+        }
         String oldName = name
         name = newName
         if (!save()) {

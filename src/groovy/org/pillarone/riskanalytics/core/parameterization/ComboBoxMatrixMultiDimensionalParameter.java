@@ -62,6 +62,7 @@ public class ComboBoxMatrixMultiDimensionalParameter extends MatrixMultiDimensio
         super.setSimulationModel(simulationModel);
         if (simulationModel != null) {
             List<Component> components = simulationModel.getMarkedComponents(markerClass);
+            comboBoxValues.clear();
             for (Component component : components) {
                 comboBoxValues.put(component.getName(), component);
             }

@@ -20,6 +20,8 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workfl
 import org.pillarone.riskanalytics.core.workflow.Status
 import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.EnumTagType
+import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObjectClassifier
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjectParameterHolder
 
 class ParameterizationTests extends GroovyTestCase {
 
@@ -518,6 +520,20 @@ class ParameterizationTests extends GroovyTestCase {
         assertSame(holder, parameterization.parameterHolders[0])
         assertEquals(2, holder.businessObject)
 
+    }
+
+    void testSafeNestedReload() {
+        Parameterization parameterization = new Parameterization("testSafeNestedReload", CoreModel)
+        ParameterObjectParameterHolder holder = ParameterHolderFactory.getHolder("testSafeNestedReload", 0, ExampleParameterObjectClassifier.getStrategy(ExampleParameterObjectClassifier.NESTED_PARAMETER_OBJECT, ExampleParameterObjectClassifier.NESTED_PARAMETER_OBJECT.parameters))
+        parameterization.addParameter(holder)
+
+        ParameterHolder veryNestedHolder = holder.classifierParameters["nested"].classifierParameters["a"]
+
+        parameterization.save()
+        assertNotNull(parameterization.id)
+        parameterization.load()
+
+        assertSame(veryNestedHolder, parameterization.parameterHolders[0].classifierParameters["nested"].classifierParameters["a"])
     }
 
 

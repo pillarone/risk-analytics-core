@@ -58,6 +58,7 @@ public class SimulationConfiguration implements Serializable, Cloneable {
 
         //clone parameters to make sure they don't have any model or component references
         preparedSimulation.parameterization.parameterHolders = simulation.parameterization.parameterHolders.collect { it.clone() }
+        simulation.parameterization.parameterHolders*.clearCachedValues()
 
 
         preparedSimulation.template = new ResultConfiguration(simulation.template.name)

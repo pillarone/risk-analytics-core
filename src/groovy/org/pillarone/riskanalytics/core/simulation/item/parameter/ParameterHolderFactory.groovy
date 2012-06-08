@@ -242,12 +242,23 @@ class ParameterHolderFactory {
         parameterization.parameters.each {ParameterHolder parameterHolder ->
             if (parameterHolder.path.startsWith(oldPath + ":")) {
                 ParameterHolder cloned = parameterHolder.clone()
-                cloned.path = cloned.path.replace("${oldPath}", "${newPath}")
+                renamePath(cloned, oldPath, newPath)
                 clonedParameters << cloned
             }
         }
         clonedParameters.each {ParameterHolder parameterHolder ->
             parameterization.addParameter parameterHolder
+        }
+    }
+
+    private static void renamePath(ParameterHolder holder, String oldPath, String newPath) {
+        holder.path = holder.path.replace(oldPath, newPath)
+    }
+
+    private static void renamePath(ParameterObjectParameterHolder holder, String oldPath, String newPath) {
+        holder.path = holder.path.replace("${oldPath}", "${newPath}")
+        for (ParameterHolder param in holder.classifierParameters.values()) {
+            renamePath(param, oldPath, newPath)
         }
     }
 

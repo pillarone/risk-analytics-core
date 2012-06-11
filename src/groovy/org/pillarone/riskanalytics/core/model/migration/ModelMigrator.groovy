@@ -69,6 +69,12 @@ public class ModelMigrator {
             }
 
         }
+
+        try {
+            LogFactory.releaseAll() //ART-850
+        } catch (Exception e) {
+            LOG.warn("Failed to release log factory for class loader - possible memory leak: ${e.message}")
+        }
     }
 
     protected Model createModel(Parameterization parameterization, int periodIndex, ClassLoader loader) {

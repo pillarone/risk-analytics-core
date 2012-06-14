@@ -29,7 +29,7 @@ import org.pillarone.riskanalytics.core.simulation.engine.MappingCache
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.6-ALPHA-3.8"
+    def version = "1.6-ALPHA-3.9"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.7 > *"
     // the other plugins this plugin depends on

@@ -20,6 +20,14 @@ public class SimulationException extends RuntimeException {
         super(message);
     }
 
+    public SimulationException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public SimulationException(Throwable cause) {
+        super(cause);
+    }
+
     public void addPathElement(String pathElement) {
         // always insert at position 0 to get the path in the correct order
         pathElements.add(0, pathElement);

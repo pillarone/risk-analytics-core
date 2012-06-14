@@ -104,7 +104,7 @@ class Parameterization extends ParametrizedItem {
             def daoToBeSaved = getDao()
             validate()
             if (!validationErrors.empty) {
-                LOG.warn("${daoToBeSaved} is not valid\n" + validationErrors.join("\n"))
+                LOG.warn("${daoToBeSaved} is not valid")
             }
 
             setChangeUserInfo()

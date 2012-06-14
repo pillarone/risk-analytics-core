@@ -10,24 +10,43 @@ import java.io.ByteArrayOutputStream;
 
 public abstract class ReportFactory {
 
+    private interface JRExporterCreator {
+        JRExporter createExporter();
+    }
+
     public enum ReportFormat {
 
-        PDF (new JRPdfExporter(), "PDF", "pdf"),
-        PPT  (new JRPptxExporter(), "PowerPoint", "pptx"),
-        XLS  (new JRXlsExporter(), "Excel", "xls");
+        PDF(new JRExporterCreator() {
+            @Override
+            public JRExporter createExporter() {
+                return new JRPdfExporter();
+            }
+        }, "PDF", "pdf"),
+        PPT(new JRExporterCreator() {
+            @Override
+            public JRExporter createExporter() {
+                return new JRPptxExporter();
+            }
+        }, "PowerPoint", "pptx"),
+        XLS(new JRExporterCreator() {
+            @Override
+            public JRExporter createExporter() {
+                return new JRXlsExporter();
+            }
+        }, "Excel", "xls");
 
-        private final JRExporter jrExporter;
+        private final JRExporterCreator jrExporter;
         private final String renderedFormatSuchAsPDF;
         private final String fileExtension;
 
-        ReportFormat(JRExporter jrExporter, String renderedFormatSuchAsPDF, String fileExtension) {
+        private ReportFormat(JRExporterCreator jrExporter, String renderedFormatSuchAsPDF, String fileExtension) {
             this.jrExporter = jrExporter;
             this.renderedFormatSuchAsPDF = renderedFormatSuchAsPDF;
             this.fileExtension = fileExtension;
         }
 
         public JRExporter getExporter() {
-            return jrExporter;
+            return jrExporter.createExporter();
         }
 
         public String getRenderedFormatSuchAsPDF() {

@@ -1,8 +1,12 @@
 package org.pillarone.riskanalytics.core.simulation.item.parameter
 
 import org.pillarone.riskanalytics.core.parameter.Parameter
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 
-abstract class ParameterHolder implements Cloneable{
+abstract class ParameterHolder implements Cloneable {
+
+    private static final Log LOG = LogFactory.getLog(ParameterHolder)
 
     String path
     int periodIndex
@@ -29,6 +33,7 @@ abstract class ParameterHolder implements Cloneable{
     abstract Object getBusinessObject()
 
     final void setValue(Object newValue) {
+        LOG.debug("ParameterHolder.setValue: ${path} P${periodIndex}: $newValue Current state: added: ${added} modified: ${modified} removed: ${removed}")
         if (!added) {
             modified = true
         }

@@ -5,6 +5,7 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolde
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjectParameterHolder
 
 abstract class ParametrizedItem extends CommentableItem {
 
@@ -37,7 +38,7 @@ abstract class ParametrizedItem extends CommentableItem {
                 LOG.debug("Parameter ${parameterHolder.path} P${parameterHolder.periodIndex} is marked as changed and will be updated.")
                 Parameter parameter = parameters.find { it.path == parameterHolder.path && it.periodIndex == parameterHolder.periodIndex }
                 parameterHolder.applyToDomainObject(parameter)
-                parameterHolder.modified = false
+                clearModifiedFlag(parameterHolder)
             } else if (parameterHolder.added) {
                 LOG.debug("Parameter ${parameterHolder.path} P${parameterHolder.periodIndex} is marked as added and will be added.")
                 Parameter newParameter = parameterHolder.createEmptyParameter()
@@ -51,6 +52,17 @@ abstract class ParametrizedItem extends CommentableItem {
                 parameter.delete()
                 iterator.remove()
             }
+        }
+    }
+
+    private void clearModifiedFlag(ParameterHolder holder) {
+        holder.modified = false
+    }
+
+    private void clearModifiedFlag(ParameterObjectParameterHolder holder) {
+        holder.modified = false
+        for(ParameterHolder parameterHolder in holder.classifierParameters.values()) {
+            clearModifiedFlag(parameterHolder)
         }
     }
 

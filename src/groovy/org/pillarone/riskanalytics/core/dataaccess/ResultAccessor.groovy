@@ -410,18 +410,7 @@ abstract class ResultAccessor {
 
     public static Map<Integer, Double> getIterationConstrainedValues(SimulationRun simulationRun, int period, String path, String field, String collector,
                                                      List<Integer> iterations) {
-        File iterationFile = new File(GridHelper.getResultPathLocation(simulationRun.id, getPathId(path), getFieldId(field), getCollectorId(collector), period))
-        HashMap<Integer, Double> values = new HashMap<Integer, Double>(10000);
-        IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
-        Collections.sort(iterations);
-
-        while (ifa.fetchNext()) {
-            int iteration = ifa.getIteration()
-            if (iterations.contains(iteration)) {
-                values.put(iteration, ifa.getValue());
-            }
-        }
-        return values;
+        return IterationFileAccessor.getIterationConstrainedValues(simulationRun.id, period, getPathId(path), getFieldId(field), getCollectorId(collector), new HashSet<Integer>(iterations))
     }
 
     public static List getSingleValueResults(String collector, String path, String field, SimulationRun run) {

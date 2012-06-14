@@ -3,9 +3,7 @@ package org.pillarone.riskanalytics.core.dataaccess;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class IterationFileAccessor {
     protected DataInputStream dis;
@@ -80,6 +78,21 @@ public class IterationFileAccessor {
             values.add(ifa.getValue());
         }
         Collections.sort(values);
+        return values;
+    }
+
+    public static Map<Integer, Double> getIterationConstrainedValues(long runId, int period, long path, long field, long collector,
+                                                                     Collection<Integer> iterations) throws Exception {
+        File iterationFile = new File(GridHelper.getResultPathLocation(runId, path, field, collector, period));
+        HashMap<Integer, Double> values = new HashMap<Integer, Double>(10000);
+        IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
+
+        while (ifa.fetchNext()) {
+            int iteration = ifa.getIteration();
+            if (iterations.contains(iteration)) {
+                values.put(iteration, ifa.getValue());
+            }
+        }
         return values;
     }
 }

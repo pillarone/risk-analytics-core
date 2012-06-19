@@ -2,9 +2,11 @@ package org.pillarone.riskanalytics.core.report;
 
 import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRPptxExporter;
+import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.export.JRXlsExporter;
+
 
 import java.io.ByteArrayOutputStream;
 
@@ -28,6 +30,12 @@ public abstract class ReportFactory {
                 return new JRPptxExporter();
             }
         }, "PowerPoint", "pptx"),
+        XLSX(new JRExporterCreator() {
+            @Override
+            public JRExporter createExporter() {
+                return new JRXlsxExporter();
+            }
+        }, "Excel 2010", "xlsx"),
         XLS(new JRExporterCreator() {
             @Override
             public JRExporter createExporter() {

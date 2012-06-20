@@ -54,6 +54,7 @@ public class ModelMigrator {
                         newParameters.addAll(ParameterizationHelper.extractParameterHoldersFromModel(newModel, periodIndex))
 
                         try {
+                            currentModelClassLoader.close()
                             LogFactory.releaseAll() //ART-850
                         } catch (Exception e) {
                             LOG.warn("Failed to release log factory for class loader - possible memory leak: ${e.message}")

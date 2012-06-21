@@ -168,7 +168,7 @@ class ParameterWriterTests extends GroovyTestCase {
         parameterWriter.writeLine("key", "a.b.c.key", bufferedWriter, "$value")
         bufferedWriter.flush()
 
-        assertEquals("toString on value should be called", "\"1\"", writer.toString().tokenize("=")[1].trim())
+        assertEquals("toString on value should be called", "\'1\'", writer.toString().tokenize("=")[1].trim())
 
         writer = new StringWriter()
         bufferedWriter = new BufferedWriter(writer)

@@ -76,4 +76,8 @@ public class PacketCollector extends Component {
         WireCategory.doSetProperty(this, "inPackets", WireCategory.doGetProperty(component, outChannel))
     }
 
+    @Override
+    String toString() {
+        return "$path ${mode?.identifier}"
+    }
 }

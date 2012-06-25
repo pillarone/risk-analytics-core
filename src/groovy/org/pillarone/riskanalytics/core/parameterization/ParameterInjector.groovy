@@ -71,6 +71,8 @@ import org.pillarone.riskanalytics.core.util.ModelInjector
                     target.addSubComponent(subComponent)
                 }
                 injectConfig(value, subComponent, period)
+            } else {
+                throw new IllegalArgumentException("$name does not contain any parameters.")
             }
         }
     }

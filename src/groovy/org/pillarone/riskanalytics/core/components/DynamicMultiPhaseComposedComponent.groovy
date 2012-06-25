@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.components
 
 import org.pillarone.riskanalytics.core.wiring.ITransmitter
 import org.pillarone.riskanalytics.core.packets.PacketList
+import org.pillarone.riskanalytics.core.simulation.SimulationException
 
 /**
  * Even if this code looks very similar to MultiPhaseComponent it's not!
@@ -43,7 +44,14 @@ abstract class DynamicMultiPhaseComposedComponent extends DynamicComposedCompone
      */
     protected final void calculateAndPublish(String phase){
         init()
-        doCalculation(phase)
+        try {
+            doCalculation(phase)
+        }
+        catch (SimulationException ex) {
+            // extend the path with every recursive call of execute()
+            ex.addPathElement(getName());
+            throw ex;
+        }
         publishResults(phase)
     }
 

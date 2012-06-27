@@ -25,7 +25,10 @@ abstract class ResultAccessor {
         StringBuilder fileContent = new StringBuilder()
         Sql sql = new Sql(simulationRun.dataSource)
         try {
-            List<GroovyRowResult> rows = sql.rows("select concat_ws(',',cast(s.iteration as char),cast(s.period as char),mapping.path_name, cast(s.value as char), cm.collector_name, from_unixtime(date / 1000))  AS data from single_value_result as s, path_mapping as mapping, collector_mapping cm  where s.simulation_run_id ='" + simulationRun.id + "' and mapping.id=s.path_id and cm.id=s.collector_id")
+            List<GroovyRowResult> rows = sql.rows(
+                    """select concat_ws(',',cast(s.iteration as char),cast(s.period as char),mapping.path_name, fmapping.field_name, cast(s.value as char), cm.collector_name, from_unixtime(date / 1000))
+
+                        AS data from single_value_result as s, field_mapping as fmapping, path_mapping as mapping, collector_mapping cm  where s.simulation_run_id ='""" + simulationRun.id + "' and mapping.id=s.path_id and cm.id=s.collector_id and fmapping.id=s.field_id ")
             for (GroovyRowResult rowResult in rows) {
                 fileContent.append(rowResult["data"]).append("\n")
             }

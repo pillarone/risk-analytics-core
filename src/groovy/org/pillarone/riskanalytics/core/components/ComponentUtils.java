@@ -2,7 +2,7 @@ package org.pillarone.riskanalytics.core.components;
 
 /**
  * Contains utility methods for conversion between model and display names. Usage examples can be found in the
- * corresponding test class {@link ComponentUtilsTests}.
+ * corresponding test class ComponentUtilsTests.
  *
  * @author stefan.kunz (at) intuitive-collaboration (dot) com
  */
@@ -19,37 +19,57 @@ public class ComponentUtils {
         String[] pathElements = path.split(PATH_SEPARATOR);
         StringBuilder normalizedPath = new StringBuilder();
         for (String pathElement : pathElements) {
-            if (pathElement == null) {
-            }
-            else {
-                normalizedPath.append(pathSeparator);
-                normalizedPath.append(removeNamingConventions(pathElement));
+            if (pathElement != null) {
+                if (!normalizedPath.toString().isEmpty()) {
+                    normalizedPath.append(pathSeparator);
+                }
+                normalizedPath.append(getNormalizedName(pathElement));
             }
         }
-        return insertBlanks(normalizedPath.substring(pathSeparator.length()));
+        return normalizedPath.toString();
     }
 
     public static String getNormalizedName(String componentName) {
-        return insertBlanks(removeNamingConventions(componentName));
+        String value = removeNamingConventions(componentName);
+        StringBuilder displayNameBuffer = new StringBuilder();
+        for(int characterIndex = 0; characterIndex < value.length(); characterIndex++) {
+            displayNameBuffer.append(addSpaceIfRequired(value, characterIndex)).append(value.charAt(characterIndex));
+        }
+        return displayNameBuffer.toString();
+    }
+
+    private static final String VOID_STRING = "";
+    private static final String SPACE = " ";
+
+    private static String addSpaceIfRequired(String value, int index) {
+        if (index == 0) return VOID_STRING;
+        char precedingChar = value.charAt(index - 1);
+        char thisChar = value.charAt(index);
+        if (Character.isLowerCase(precedingChar) && Character.isUpperCase(thisChar)
+                || Character.isLetter(precedingChar) && Character.isDigit(thisChar)
+                || Character.isDigit(precedingChar) && Character.isLetter(thisChar)) {
+            return SPACE;
+        }
+        if (index + 1 == value.length()) return VOID_STRING;
+        char nextChar = value.charAt(index + 1);
+        if (Character.isUpperCase(precedingChar) && Character.isUpperCase(thisChar) && Character.isLowerCase(nextChar)) {
+            return SPACE;
+        }
+        return VOID_STRING;
     }
 
     public static String removeNamingConventions(String componentName) {
         if (componentName == null) {
             return null;
-        }
-        else if (componentName.startsWith(SUB)) {
+        } else if (componentName.startsWith(SUB)) {
             return componentName.substring(3);
-        }
-        else if (componentName.startsWith(PARM)) {
+        } else if (componentName.startsWith(PARM)) {
             return componentName.substring(4);
-        }
-        else if (componentName.startsWith(OUT)) {
+        } else if (componentName.startsWith(OUT)) {
             return componentName.substring(3);
-        }
-        else if (componentName.startsWith(GLOBAL)) {
+        } else if (componentName.startsWith(GLOBAL)) {
             return componentName.substring(6);
-        }
-        else if (componentName.startsWith(RUNTIME)) {
+        } else if (componentName.startsWith(RUNTIME)) {
             return componentName.substring(7);
         }
         return componentName;
@@ -60,23 +80,4 @@ public class ComponentUtils {
         return subComponents[subComponents.length - 1];
     }
 
-    public static String insertBlanks(String componentName) {
-        if (componentName == null) {
-            return null;
-        }
-        StringBuffer displayNameBuffer = new StringBuffer();
-
-        int index = 0;
-        for (char c : componentName.toCharArray()) {
-            if (Character.isUpperCase(c) && index == 0) {
-                displayNameBuffer.append(Character.toLowerCase(c));
-            } else if (Character.isUpperCase(c)) {
-                displayNameBuffer.append(" ").append(Character.toLowerCase(c));
-            } else {
-                displayNameBuffer.append(c);
-            }
-            index++;
-        }
-        return displayNameBuffer.toString();
-    }
 }

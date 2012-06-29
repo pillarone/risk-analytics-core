@@ -1,7 +1,5 @@
 package org.pillarone.riskanalytics.core.parameterization
 
-import org.pillarone.riskanalytics.core.ParameterizationDAO
-import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
 import org.pillarone.riskanalytics.core.model.Model
@@ -78,22 +76,25 @@ public class ParameterApplicator {
     }
 
     protected void prepareParameter(Model model, ApplicableParameter parameter) {
-        prepareParameter(model, parameter.parameterValue)
+        prepareParameter(model, parameter.parameterValue, parameter.parameterPropertyName)
     }
 
-    protected void prepareParameter(Model model, def parameterValue) {}
+    protected void prepareParameter(Model model, def parameterValue, String context) {}
 
-    protected void prepareParameter(Model model, AbstractMultiDimensionalParameter parameterValue) {
+    protected void prepareParameter(Model model, AbstractMultiDimensionalParameter parameterValue, String context) {
         parameterValue.simulationModel = model
     }
 
-    protected void prepareParameter(Model model, IParameterObject parameterValue) {
-        for (def value in parameterValue.getParameters().values()) {
-            prepareParameter(model, value)
+    protected void prepareParameter(Model model, IParameterObject parameterValue, String context) {
+        if (parameterValue == null) {
+            throw new IllegalStateException("Parameter object null in ${context}")
+        }
+        for (Map.Entry entry in parameterValue.getParameters()) {
+            prepareParameter(model, entry.value, context + ":" + entry.key.toString())
         }
     }
 
-    protected void prepareParameter(Model model, ConstrainedString parameterValue) {
+    protected void prepareParameter(Model model, ConstrainedString parameterValue, String context) {
         List<Component> allMarkedComponents = model.getMarkedComponents(parameterValue.markerClass)
         parameterValue.selectedComponent = allMarkedComponents.find {Component c -> c.name == parameterValue.stringValue }
     }

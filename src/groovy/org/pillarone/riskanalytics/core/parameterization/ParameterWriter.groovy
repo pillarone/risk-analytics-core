@@ -90,11 +90,11 @@ class ParameterWriter implements IConfigObjectWriter {
     }
 
     private void appendValue(BufferedWriter out, String value) {
-        out << "'$value'"
+        out << "'${value.replaceAll("'","\\\\'")}'"
     }
 
     private void appendValue(BufferedWriter out, GString value) {
-        out << "\"$value\""
+        appendValue(out, value.toString())
     }
 
     private void appendValue(BufferedWriter out, Boolean value) {

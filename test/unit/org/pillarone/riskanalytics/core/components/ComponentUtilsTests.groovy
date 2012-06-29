@@ -6,18 +6,14 @@ package org.pillarone.riskanalytics.core.components
 class ComponentUtilsTests extends GroovyTestCase {
 
     void testGetNormalizedPath() {
-        assertEquals "universe >  milky way >  solar system >  earth >  europe >  switzerland",
+        assertEquals "Universe > Milky Way > Solar System > Earth > Europe > Switzerland",
             ComponentUtils.getNormalizedPath("Universe:subMilkyWay:subSolarSystem:subEarth:subEurope:parmSwitzerland", " > ")
-        assertEquals "heinecken ->  brewery ->  ale", ComponentUtils.getNormalizedPath("Heinecken:subBrewery:outAle", " -> ")
-        assertEquals " > heinecken >  brewery >  ale", ComponentUtils.getNormalizedPath(":heinecken:subBrewery:outAle", " > ")
-    }
-
-    void testGetModelName() {
-        assertEquals 'subClaimsGenerator', ComponentUtils.getModelName('claims generator', 'sub')
+        assertEquals "Heinecken -> Brewery -> Ale", ComponentUtils.getNormalizedPath("Heinecken:subBrewery:outAle", " -> ")
+        assertEquals "heinecken > Brewery > Ale", ComponentUtils.getNormalizedPath(":heinecken:subBrewery:outAle", " > ")
     }
 
     void testGetNormalizedName() {
-        assertEquals 'claims generator', ComponentUtils.getNormalizedName('subClaimsGenerator')
+        assertEquals 'Claims Generator', ComponentUtils.getNormalizedName('subClaimsGenerator')
     }
 
     void testRemoveNamingConventions() {
@@ -31,13 +27,8 @@ class ComponentUtilsTests extends GroovyTestCase {
     }
 
     void testGetComponentNormalizedName() {
-        assertEquals "europe", ComponentUtils.getComponentNormalizedName("Universe:subMilkyWay:subSolarSystem:subEarth:subEurope")
-        assertEquals "solar system", ComponentUtils.getComponentNormalizedName("Universe:subMilkyWay:subSolarSystem")
+        assertEquals "subEurope", ComponentUtils.getComponentNormalizedName("Universe:subMilkyWay:subSolarSystem:subEarth:subEurope")
+        assertEquals "subSolarSystem", ComponentUtils.getComponentNormalizedName("Universe:subMilkyWay:subSolarSystem")
     }
 
-    void testInsertBlanks() {
-        assertEquals "milky way", ComponentUtils.insertBlanks("milkyWay")
-        assertEquals "milky way", ComponentUtils.insertBlanks("MilkyWay")
-        assertEquals "m i l k y  w a y", ComponentUtils.insertBlanks("MILKY WAY")
-    }
 }

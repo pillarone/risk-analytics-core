@@ -2,32 +2,59 @@ package org.pillarone.riskanalytics.core.report;
 
 import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRPptxExporter;
+import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.export.JRXlsExporter;
+
 
 import java.io.ByteArrayOutputStream;
 
 public abstract class ReportFactory {
 
+    private interface JRExporterCreator {
+        JRExporter createExporter();
+    }
+
     public enum ReportFormat {
 
-        PDF (new JRPdfExporter(), "PDF", "pdf"),
-        PPT  (new JRPptxExporter(), "PowerPoint", "pptx"),
-        XLS  (new JRXlsExporter(), "Excel", "xls");
+        PDF(new JRExporterCreator() {
+            @Override
+            public JRExporter createExporter() {
+                return new JRPdfExporter();
+            }
+        }, "PDF", "pdf"),
+        PPT(new JRExporterCreator() {
+            @Override
+            public JRExporter createExporter() {
+                return new JRPptxExporter();
+            }
+        }, "PowerPoint", "pptx"),
+        XLSX(new JRExporterCreator() {
+            @Override
+            public JRExporter createExporter() {
+                return new JRXlsxExporter();
+            }
+        }, "Excel 2010", "xlsx"),
+        XLS(new JRExporterCreator() {
+            @Override
+            public JRExporter createExporter() {
+                return new JRXlsExporter();
+            }
+        }, "Excel", "xls");
 
-        private final JRExporter jrExporter;
+        private final JRExporterCreator jrExporter;
         private final String renderedFormatSuchAsPDF;
         private final String fileExtension;
 
-        ReportFormat(JRExporter jrExporter, String renderedFormatSuchAsPDF, String fileExtension) {
+        private ReportFormat(JRExporterCreator jrExporter, String renderedFormatSuchAsPDF, String fileExtension) {
             this.jrExporter = jrExporter;
             this.renderedFormatSuchAsPDF = renderedFormatSuchAsPDF;
             this.fileExtension = fileExtension;
         }
 
         public JRExporter getExporter() {
-            return jrExporter;
+            return jrExporter.createExporter();
         }
 
         public String getRenderedFormatSuchAsPDF() {

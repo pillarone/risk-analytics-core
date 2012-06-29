@@ -6,6 +6,7 @@ import org.pillarone.riskanalytics.core.model.ModelPath;
 import org.pillarone.riskanalytics.core.model.ModelPathComponent;
 import org.pillarone.riskanalytics.core.packets.PacketList;
 import org.pillarone.riskanalytics.core.parameterization.IParameterObject;
+import org.pillarone.riskanalytics.core.simulation.SimulationException;
 import org.pillarone.riskanalytics.core.simulation.engine.id.IIdGenerator;
 import org.pillarone.riskanalytics.core.util.GroovyUtils;
 import org.pillarone.riskanalytics.core.wiring.ITransmitter;
@@ -78,7 +79,14 @@ abstract public class Component implements Cloneable {
     }
 
     protected void execute() {
-        doCalculation();
+        try {
+            doCalculation();
+        }
+        catch (SimulationException ex) {
+            // extend the path with every recursive call of execute()
+            ex.addPathElement(getName());
+            throw ex;
+        }
         publishResults();
         reset();
     }

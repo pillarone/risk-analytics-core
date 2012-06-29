@@ -1,12 +1,13 @@
 package org.pillarone.riskanalytics.core.dataaccess
 
-import org.pillarone.riskanalytics.core.util.MathUtils
-import org.pillarone.riskanalytics.core.output.*
 import groovy.sql.Sql
 import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper
-import org.pillarone.riskanalytics.core.util.GroovyUtils
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.util.GroovyUtils
+import org.pillarone.riskanalytics.core.util.MathUtils
+import org.pillarone.riskanalytics.core.output.*
+import groovy.sql.GroovyRowResult
 
 abstract class ResultAccessor {
 
@@ -37,14 +38,25 @@ abstract class ResultAccessor {
 
     static String exportCsv(SimulationRun simulationRun) {
         String fileName = GroovyUtils.getExportFileName(simulationRun)
-        if (new File(fileName).exists()) return fileName
+        File file = new File(fileName)
+        if (file.exists()) {
+            file.delete()
+        }
+        StringBuilder fileContent = new StringBuilder()
         Sql sql = new Sql(simulationRun.dataSource)
         try {
-            sql.execute("select concat_ws(',',cast(s.iteration as char),cast(s.period as char),mapping.path_name, cast(s.value as char))  INTO OUTFILE ? from single_value_result as s, path_mapping as mapping  where s.simulation_run_id ='" + simulationRun.id + "' and mapping.id=s.path_id", [fileName])
+            List<GroovyRowResult> rows = sql.rows(
+                    """select concat_ws(',',cast(s.iteration as char),cast(s.period as char),mapping.path_name, fmapping.field_name, cast(s.value as char), cm.collector_name, from_unixtime(date / 1000))
+
+                        AS data from single_value_result as s, field_mapping as fmapping, path_mapping as mapping, collector_mapping cm  where s.simulation_run_id ='""" + simulationRun.id + "' and mapping.id=s.path_id and cm.id=s.collector_id and fmapping.id=s.field_id ")
+            for (GroovyRowResult rowResult in rows) {
+                fileContent.append(rowResult["data"]).append("\n")
+            }
         } catch (Exception ex) {
-            LOG.error "exception occured during export simulation as csv : $ex"
+            LOG.error("CSV export failed : ${ex.message}", ex)
             return null
         }
+        file.text = fileContent.toString()
         return fileName
     }
 

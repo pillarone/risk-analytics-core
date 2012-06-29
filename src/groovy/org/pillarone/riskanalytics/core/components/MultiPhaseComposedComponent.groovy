@@ -1,7 +1,7 @@
 package org.pillarone.riskanalytics.core.components
 
-import org.pillarone.riskanalytics.core.wiring.ITransmitter
 import org.pillarone.riskanalytics.core.packets.PacketList
+import org.pillarone.riskanalytics.core.wiring.ITransmitter
 import org.pillarone.riskanalytics.core.simulation.SimulationException
 
 /**
@@ -9,7 +9,8 @@ import org.pillarone.riskanalytics.core.simulation.SimulationException
  *
  * @author stefan.kunz (at) intuitive-collaboration (dot) com
  */
-abstract class DynamicMultiPhaseComposedComponent extends DynamicComposedComponent implements IChannelAllocation {
+// todo(msp): this code is identical with DMPCC due to restriction regarding multiple inheritance, refactor
+abstract class MultiPhaseComposedComponent extends ComposedComponent implements IChannelAllocation {
 
     private Map<ITransmitter, String> phasePerTransmitterInput = new HashMap<ITransmitter, String>()
     private Map<ITransmitter, String> phasePerTransmitterOutput = new HashMap<ITransmitter, String>()
@@ -32,7 +33,8 @@ abstract class DynamicMultiPhaseComposedComponent extends DynamicComposedCompone
     }
 
     /**
-     * Nothing happens as doCalculation(phase) is used in the context of a MultiPhaseComponent.
+     * Nothing happens as doCalculation(phase) is used in the context of a MultiPhaseComponent. Therefore the modifier
+     * final is applied.
      * Replicating transmitters are fire ...
      */
     @Override
@@ -75,8 +77,15 @@ abstract class DynamicMultiPhaseComposedComponent extends DynamicComposedCompone
         String transmitterPhase = phasePerTransmitterInput.get(transmitter)
         increaseNumberOfTransmitter(numberOfNotifiedTransmittersPerPhase, transmitterPhase)
         if (numberOfNotifiedTransmittersPerPhase[transmitterPhase] == numberOfTransmitterPerPhaseInput[transmitterPhase]) {
-            for (ITransmitter replicationTransmitter : replicationInputTransmitterPerPhase.get(transmitterPhase)) {
-                replicationTransmitter.transmit()
+            Set<ITransmitter> replicationTransmitters = replicationInputTransmitterPerPhase.get(transmitterPhase)
+            if (replicationTransmitters.isEmpty()) {
+                // use case: composed component does not contain any internal wiring, it's used for structuring purposes only
+                doCalculation transmitterPhase
+            }
+            else {
+                for (ITransmitter replicationTransmitter : replicationTransmitters) {
+                    replicationTransmitter.transmit()
+                }
             }
             publishResults transmitterPhase
         }
@@ -135,7 +144,7 @@ abstract class DynamicMultiPhaseComposedComponent extends DynamicComposedCompone
     /**
      * nothing happens as publishResults(phase) is used in the context of a multi phase component
      */
-    protected void publishResults() {
+    protected final void publishResults() {
     }
     /**
      * Publish results of transmitters belonging to the phase and call reset if all phases have been executed

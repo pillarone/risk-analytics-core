@@ -8,6 +8,7 @@ import org.pillarone.riskanalytics.core.parameterization.IParameterObject
 import org.pillarone.riskanalytics.core.parameterization.IParameterObjectClassifier
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.simulation.InvalidParameterException
 
 class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerValueAccessor {
 
@@ -51,6 +52,9 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
     }
 
     IParameterObject getBusinessObject() {
+        if(classifier == null) {
+            throw new IllegalStateException("Classifier null in $path P$periodIndex")
+        }
         return classifier.getParameterObject(getParameterMap())
     }
 
@@ -97,7 +101,7 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
         for (Map.Entry entry in classifier.parameters) {
             ParameterHolder holder = null
             ParameterHolder oldEntry = classifierParameters.get(entry.key)
-            if (oldEntry != null && oldEntry.businessObject.class.name == entry.value.class.name) {
+            if (oldParametersReusable(oldEntry, entry.value.class.name)) {
                 holder = classifierParameters.get(entry.key)
             } else {
                 holder = ParameterHolderFactory.getHolder(path + ":$entry.key", periodIndex, entry.value)
@@ -105,6 +109,18 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
             newClassifierParameters.put(entry.key, holder)
         }
         classifierParameters = newClassifierParameters
+    }
+
+    private boolean oldParametersReusable(ParameterHolder oldEntry, String newClassName) {
+        if (oldEntry == null) return false
+        try {
+            String oldClassName = oldEntry.businessObject.class.name
+            return oldClassName == newClassName
+        }
+        catch (InvalidParameterException ex) {
+            // the exception is thrown if oldEntry.businessObject fails due to invalid parameters
+            return false;
+        }
     }
 
     boolean hasParameterChanged() {

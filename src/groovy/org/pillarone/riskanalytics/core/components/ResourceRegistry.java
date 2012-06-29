@@ -37,4 +37,8 @@ public abstract class ResourceRegistry {
         return resourceInstance;
     }
 
+    public static void clear() {
+        resources.get().clear();
+    }
+
 }

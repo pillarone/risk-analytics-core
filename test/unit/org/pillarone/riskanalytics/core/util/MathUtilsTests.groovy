@@ -14,16 +14,16 @@ class MathUtilsTests extends GroovyTestCase {
     }
 
     void testPercentile() {
-        assertEquals 0, MathUtils.calculatePercentile((double[]) [0, 10, 20], 0)
-        assertEquals 10, MathUtils.calculatePercentile((double[]) [0, 10, 20], 50)
-        assertEquals 20, MathUtils.calculatePercentile((double[]) [0, 10, 20], 100)
-        assertEquals 18.33333333, MathUtils.calculatePercentile((double[]) [0, 10, 20], 75), 1E-8
-        assertEquals 20, MathUtils.calculatePercentile((double[]) [0, 10, 20], 90)
+        assertEquals 0, MathUtils.calculatePercentile((double[]) [0, 10, 20], 0, QuantilePerspective.LOSS)
+        assertEquals 10, MathUtils.calculatePercentile((double[]) [0, 10, 20], 50, QuantilePerspective.LOSS)
+        assertEquals 20, MathUtils.calculatePercentile((double[]) [0, 10, 20], 100, QuantilePerspective.LOSS)
+        assertEquals 18.33333333, MathUtils.calculatePercentile((double[]) [0, 10, 20], 75, QuantilePerspective.LOSS), 1E-8
+        assertEquals 20, MathUtils.calculatePercentile((double[]) [0, 10, 20], 90, QuantilePerspective.LOSS)
     }
 
     void testVar() {
-        assertEquals 0, MathUtils.calculateVar((double[]) [0, 10, 20], 50)
-        assertEquals 10, MathUtils.calculateVar((double[]) [0, 10, 20], 90)
+        assertEquals 0, MathUtils.calculateVar((double[]) [0, 10, 20], 50, QuantilePerspective.LOSS)
+        assertEquals 10, MathUtils.calculateVar((double[]) [0, 10, 20], 90, QuantilePerspective.LOSS)
     }
 
     void testTvar() {

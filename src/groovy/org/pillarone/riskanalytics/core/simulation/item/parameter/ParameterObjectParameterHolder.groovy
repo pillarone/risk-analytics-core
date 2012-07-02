@@ -24,6 +24,10 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
 
     public ParameterObjectParameterHolder(String path, int periodIndex, IParameterObject value) {
         super(path, periodIndex);
+        if(value == null) {
+            throw new IllegalArgumentException("Parameter object is null at $path P$periodIndex")
+        }
+
         classifierParameters = new HashMap<String, ParameterHolder>()
         this.classifier = value.type
 

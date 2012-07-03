@@ -2,12 +2,12 @@ package org.pillarone.riskanalytics.core.output
 
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pillarone.riskanalytics.core.dataaccess.ResultAccessor
 import org.pillarone.riskanalytics.core.output.batch.calculations.AbstractCalculationsBulkInsert
 import org.pillarone.riskanalytics.core.util.MathUtils
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.dataaccess.ResultPathDescriptor
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
 class Calculator {
 
@@ -25,12 +25,12 @@ class Calculator {
 
     boolean stopped = false
 
-    public Calculator(SimulationRun run) {
+    public Calculator(Simulation simulation) {
         bulkInsert = AbstractCalculationsBulkInsert.getBulkInsertInstance()
+        run = simulation.simulationRun
         bulkInsert.simulationRun = run
-        this.run = run
         pathDescriptors = ResultAccessor.getDistinctPaths(run)
-        keyFigures = ApplicationHolder.application.config.keyFiguresToCalculate
+        keyFigures = simulation.keyFiguresToPreCalculate
         keyFigureCount = 0 //isStochastic + mean
         keyFigures.entrySet().each {Map.Entry entry ->
             if (entry.value instanceof List) {

@@ -14,6 +14,7 @@ import org.pillarone.riskanalytics.core.parameter.comment.ResultCommentDAO
 import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.FunctionComment
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 
 class Simulation extends ParametrizedItem {
 
@@ -21,6 +22,7 @@ class Simulation extends ParametrizedItem {
     ResultConfiguration template
     private ModelStructure structure // TODO (Sep 9, 2009, msh): implement as query
     VersionNumber modelVersionNumber // TODO (Sep 9, 2009, msh): use ModelItem
+    Map keyFiguresToPreCalculate
 
     DateTime beginOfFirstPeriod
     int numberOfIterations
@@ -41,6 +43,7 @@ class Simulation extends ParametrizedItem {
 
     public Simulation(String name) {
         super(name)
+        keyFiguresToPreCalculate = ApplicationHolder.application?.config?.keyFiguresToCalculate
         tags = []
     }
 

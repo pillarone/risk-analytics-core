@@ -142,6 +142,11 @@ class Simulation extends ParametrizedItem {
         parameter.modified = false
     }
 
+    @Override
+    protected List<ParameterHolder> getAllParameterHolders() {
+        return runtimeParameters
+    }
+
     public Object getParameter(String path) {
         for (int i = 0; i < runtimeParameters.size(); i++) {
             ParameterHolder parameterHolder = runtimeParameters.get(i);

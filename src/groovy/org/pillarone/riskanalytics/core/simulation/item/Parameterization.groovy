@@ -399,6 +399,10 @@ class Parameterization extends ParametrizedItem {
         parameter.modified = false
     }
 
+    @Override
+    protected List<ParameterHolder> getAllParameterHolders() {
+        return parameterHolders
+    }
 
     public List<Tag> getTags() {
         return tags

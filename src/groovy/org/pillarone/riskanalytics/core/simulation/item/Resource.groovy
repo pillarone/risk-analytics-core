@@ -66,6 +66,11 @@ class Resource extends ParametrizedItem {
     }
 
     @Override
+    protected List<ParameterHolder> getAllParameterHolders() {
+        return parameterHolders
+    }
+
+    @Override
     protected createDao() {
         return new ResourceDAO(name: name, resourceClassName: modelClass.name)
     }

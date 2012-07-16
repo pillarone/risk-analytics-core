@@ -55,6 +55,7 @@ public class SimulationConfiguration implements Serializable, Cloneable {
         preparedSimulation.parameterization.periodCount = simulation.parameterization.periodCount
         preparedSimulation.parameterization.versionNumber = simulation.parameterization.versionNumber
         preparedSimulation.parameterization.modelVersionNumber = simulation.parameterization.modelVersionNumber
+        preparedSimulation.parameterization.dealId = simulation.parameterization.dealId
 
         //clone parameters to make sure they don't have any model or component references
         preparedSimulation.parameterization.parameterHolders = simulation.parameterization.parameterHolders.collect { it.clone() }

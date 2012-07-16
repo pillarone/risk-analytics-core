@@ -152,5 +152,19 @@ abstract class ParametrizedItem extends CommentableItem {
 
     abstract protected void removeFromDao(Parameter parameter, def dao)
 
-    abstract protected List<ParameterHolder> getAllParameterHolders()
+    abstract List<ParameterHolder> getAllParameterHolders()
+
+    void addParameter(ParameterHolder parameter) {
+        getAllParameterHolders().add(parameter)
+        parameter.added = true
+    }
+
+    void removeParameter(ParameterHolder parameter) {
+        if (parameter.added) {
+            getAllParameterHolders().remove(parameter)
+            return
+        }
+        parameter.removed = true
+        parameter.modified = false
+    }
 }

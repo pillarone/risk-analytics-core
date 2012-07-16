@@ -66,7 +66,7 @@ class Resource extends ParametrizedItem {
     }
 
     @Override
-    protected List<ParameterHolder> getAllParameterHolders() {
+    List<ParameterHolder> getAllParameterHolders() {
         return parameterHolders
     }
 
@@ -135,20 +135,6 @@ class Resource extends ParametrizedItem {
     @Override
     protected loadFromDB() {
         return ResourceDAO.findWhere([name: name, resourceClassName: modelClass.name, itemVersion: versionNumber.toString()])
-    }
-
-    void addParameter(ParameterHolder parameter) {
-        parameterHolders << parameter
-        parameter.added = true
-    }
-
-    void removeParameter(ParameterHolder parameter) {
-        if (parameter.added) {
-            parameterHolders.remove(parameter)
-            return
-        }
-        parameter.removed = true
-        parameter.modified = false
     }
 
     protected void saveTags(ResourceDAO dao) {

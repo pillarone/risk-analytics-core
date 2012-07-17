@@ -47,6 +47,7 @@ class SimulationJob extends GridJobAdapter<JobResult> {
         for(Map.Entry<Class, IPacketAggregator> entry in aggregatorMap) {
             PacketAggregatorRegistry.registerAggregator(entry.key, entry.value)
         }
+        ResourceRegistry.clear()
         ResourceRegistry.preLoad(loadedResources)
 
         Date start = new Date()

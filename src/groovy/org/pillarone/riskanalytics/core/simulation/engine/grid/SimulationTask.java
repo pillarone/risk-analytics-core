@@ -177,7 +177,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
             return false;
         }
         LOG.info("Received " + messageCount + " messages. Sent " + totalMessageCount + " messages.");
-        calculator = new Calculator(simulation.getSimulationRun());
+        calculator = new Calculator(simulation);
         setSimulationState(SimulationState.POST_SIMULATION_CALCULATIONS);
         BatchRunInfoService.getService().batchSimulationStateChanged(simulation, currentState);
         calculator.calculate();

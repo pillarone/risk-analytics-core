@@ -32,6 +32,8 @@ public class PacketCollector extends Component {
 
     SimulationScope simulationScope
 
+    boolean globalSanityChecks = true
+
     String path
 
     public PacketCollector() { }
@@ -44,7 +46,7 @@ public class PacketCollector extends Component {
     protected void doCalculation() {
         if (inPackets.empty) {return}
 
-        outputStrategy << mode.collect(inPackets)
+        outputStrategy << mode.collect(inPackets, globalSanityChecks)
     }
 
     /**

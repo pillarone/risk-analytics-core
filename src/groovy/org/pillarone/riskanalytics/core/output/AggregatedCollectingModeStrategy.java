@@ -16,16 +16,11 @@ public class AggregatedCollectingModeStrategy extends AbstractCollectingModeStra
     private static final String RESOURCE_BUNDLE = "org.pillarone.riskanalytics.core.output.applicationResources";
     private String displayName;
 
-    public AggregatedCollectingModeStrategy(boolean crashSimOnError) {
-        super(crashSimOnError);
-    }
 
-    public AggregatedCollectingModeStrategy() {}
-
-    public List<SingleValueResultPOJO> collect(PacketList packets) throws IllegalAccessException {
+    public List<SingleValueResultPOJO> collect(PacketList packets, boolean crashSimulationOnError) throws IllegalAccessException {
         IPacketAggregator<Packet> sumAggregator = PacketAggregatorRegistry.getAggregator(packets.get(0).getClass());
         Packet aggregatedPacket = sumAggregator.aggregate(packets);
-        return createSingleValueResults((Packet) packets.get(0), aggregatedPacket.getValuesToSave(), 0);
+        return createSingleValueResults((Packet) packets.get(0), aggregatedPacket.getValuesToSave(), 0, crashSimulationOnError);
     }
 
     public String getDisplayName(Locale locale) {

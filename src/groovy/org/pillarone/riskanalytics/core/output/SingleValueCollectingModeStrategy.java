@@ -21,6 +21,11 @@ public class SingleValueCollectingModeStrategy extends AbstractCollectingModeStr
         aggregatedCollectingMode = new AggregatedWithSingleAvailableCollectingModeStrategy();
     }
 
+    public SingleValueCollectingModeStrategy(boolean crashSimOnError) {
+        super(crashSimOnError);
+        aggregatedCollectingMode = new AggregatedWithSingleAvailableCollectingModeStrategy();
+    }
+
     public List<SingleValueResultPOJO> collect(PacketList results) throws IllegalAccessException {
         List<SingleValueResultPOJO> result = new ArrayList<SingleValueResultPOJO>(results.size());
         int valueIndex = 0;

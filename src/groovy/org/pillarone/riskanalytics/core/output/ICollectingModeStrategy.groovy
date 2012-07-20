@@ -15,4 +15,6 @@ public interface ICollectingModeStrategy {
 
   boolean isCompatibleWith(Class packetClass)
 
+  boolean checkInvalidValues( String name, Double value, int period, int iteration )
+
 }

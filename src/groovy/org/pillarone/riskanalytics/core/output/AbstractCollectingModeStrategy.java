@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 import org.pillarone.riskanalytics.core.packets.Packet;
+import org.pillarone.riskanalytics.core.simulation.SimulationException;
 import org.pillarone.riskanalytics.core.simulation.engine.PeriodScope;
 
 import java.util.ArrayList;
@@ -14,7 +15,17 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
 
     protected PacketCollector packetCollector;
 
+    final boolean crashSimulationOnError;
+
     private Log LOG = LogFactory.getLog(AbstractCollectingModeStrategy.class);
+
+    AbstractCollectingModeStrategy(boolean crashSimOnError) {
+        this.crashSimulationOnError = crashSimOnError;
+    }
+
+    AbstractCollectingModeStrategy() {
+        this.crashSimulationOnError = true;
+    }
 
     /**
      * @param packet        Period information in following packets is ignored. If no period information is found the
@@ -73,7 +84,7 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
             String name = entry.getKey();
             Double value = entry.getValue().doubleValue();
             SingleValueResultPOJO result = new SingleValueResultPOJO();
-            if (logInvalidValues(name, value, period, iteration)) continue;
+            if (checkInvalidValues(name, value, period, iteration)) continue;
             result.setSimulationRun(packetCollector.getSimulationScope().getSimulation().getSimulationRun());
             result.setIteration(iteration);
             result.setPeriod(period);
@@ -88,14 +99,17 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
         return results;
     }
 
-    private boolean logInvalidValues(String name, Double value, int period, int iteration) {
+    public boolean checkInvalidValues(String name, Double value, int period, int iteration) {
         if (value.isInfinite() || value.isNaN()) {
+            StringBuilder message = new StringBuilder();
+            message.append(value).append(" collected at ").append(packetCollector.getPath()).append(":").append(name);
+            message.append(" (period ").append(period).append(") in iteration ");
+            message.append(iteration).append(" - ignoring.");
             if (LOG.isErrorEnabled()) {
-                StringBuilder message = new StringBuilder();
-                message.append(value).append(" collected at ").append(packetCollector.getPath()).append(":").append(name);
-                message.append(" (period ").append(period).append(") in iteration ");
-                message.append(iteration).append(" - ignoring.");
                 LOG.info(message);
+            }
+            if(crashSimulationOnError) {
+                throw new SimulationException(message.toString());
             }
             return true;
         }
@@ -108,5 +122,9 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
 
     public void setPacketCollector(PacketCollector packetCollector) {
         this.packetCollector = packetCollector;
+    }
+
+    public boolean isCrashSimulationOnError() {
+        return crashSimulationOnError;
     }
 }

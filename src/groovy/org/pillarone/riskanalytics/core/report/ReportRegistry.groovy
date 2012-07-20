@@ -27,12 +27,13 @@ abstract class ReportRegistry {
      */
     public static List<IReportModel> getReportModel(List<Class> modelClasses) {
 
-        List<IReportModel> iReportModels = getAllReportModels()
+        List<IReportModel> iReportModels = new ArrayList<IReportModel>()
+        List<IReportModel> allReports = getAllReportModels()
         for (Class clazz in modelClasses) {
-            List<IReportModel> potentualReports = reportMap.get(clazz)
-            iReportModels = iReportModels.intersect(potentualReports)
+            List<IReportModel> potentialReports = reportMap.get(clazz)
+            iReportModels << potentialReports.intersect(allReports)
         }
-        return iReportModels
+        return iReportModels.flatten()
     }
 
     public static List<IReportModel> getAllReportModels() {

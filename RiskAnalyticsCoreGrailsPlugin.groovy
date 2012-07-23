@@ -2,8 +2,14 @@ import org.pillarone.riskanalytics.core.output.batch.results.GenericBulkInsert a
 import org.pillarone.riskanalytics.core.output.batch.calculations.GenericBulkInsert as GenericCalculationBulkInsert
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.codehaus.groovy.grails.orm.hibernate.HibernateEventListeners
+import org.gridgain.grid.GridConfigurationAdapter
+import org.gridgain.grid.GridSpringBean
 import org.joda.time.DateTimeZone
+import org.pillarone.riskanalytics.core.FileConstants
 import org.pillarone.riskanalytics.core.example.migration.TestConstrainedTable
+import org.pillarone.riskanalytics.core.example.parameter.ExampleResourceConstraints
+import org.pillarone.riskanalytics.core.listener.ModellingItemHibernateListener
 import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
 import org.pillarone.riskanalytics.core.output.AggregatedWithSingleAvailableCollectingModeStrategy
 import org.pillarone.riskanalytics.core.output.CollectingModeFactory
@@ -29,7 +35,7 @@ import org.pillarone.riskanalytics.core.simulation.engine.MappingCache
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.6-ALPHA-4.5"
+    def version = "1.6-ALPHA-4.6"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.7 > *"
     // the other plugins this plugin depends on
@@ -95,6 +101,21 @@ Persistence & Simulation engine.
         }
 
         resultServiceBean(ResultService) { }
+
+        "grid.cfg"(GridConfigurationAdapter) {
+            gridName = "pillarone"
+
+            String gridgainHomeDefault = FileConstants.GRIDGAIN_HOME
+            String ggHome = System.getProperty("GRIDGAIN_HOME")
+            if (ggHome != null) {
+                gridgainHomeDefault = new File(ggHome).absolutePath
+            }
+            gridGainHome = gridgainHomeDefault
+
+        }
+        grid(GridSpringBean) {
+            configuration = ref('grid.cfg')
+        }
 
         modellingItemListener(ModellingItemHibernateListener)
 

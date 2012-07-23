@@ -102,21 +102,6 @@ Persistence & Simulation engine.
 
         resultServiceBean(ResultService) { }
 
-        "grid.cfg"(GridConfigurationAdapter) {
-            gridName = "pillarone"
-
-            String gridgainHomeDefault = FileConstants.GRIDGAIN_HOME
-            String ggHome = System.getProperty("GRIDGAIN_HOME")
-            if (ggHome != null) {
-                gridgainHomeDefault = new File(ggHome).absolutePath
-            }
-            gridGainHome = gridgainHomeDefault
-
-        }
-        grid(GridSpringBean) {
-            configuration = ref('grid.cfg')
-        }
-
         modellingItemListener(ModellingItemHibernateListener)
 
         hibernateEventListeners(HibernateEventListeners) {

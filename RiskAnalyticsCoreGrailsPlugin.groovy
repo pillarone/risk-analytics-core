@@ -2,14 +2,8 @@ import org.pillarone.riskanalytics.core.output.batch.results.GenericBulkInsert a
 import org.pillarone.riskanalytics.core.output.batch.calculations.GenericBulkInsert as GenericCalculationBulkInsert
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
-import org.codehaus.groovy.grails.orm.hibernate.HibernateEventListeners
-import org.gridgain.grid.GridConfigurationAdapter
-import org.gridgain.grid.GridSpringBean
 import org.joda.time.DateTimeZone
-import org.pillarone.riskanalytics.core.FileConstants
 import org.pillarone.riskanalytics.core.example.migration.TestConstrainedTable
-import org.pillarone.riskanalytics.core.example.parameter.ExampleResourceConstraints
-import org.pillarone.riskanalytics.core.listener.ModellingItemHibernateListener
 import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
 import org.pillarone.riskanalytics.core.output.AggregatedWithSingleAvailableCollectingModeStrategy
 import org.pillarone.riskanalytics.core.output.CollectingModeFactory

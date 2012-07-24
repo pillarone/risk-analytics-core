@@ -7,7 +7,7 @@ import org.pillarone.riskanalytics.core.user.UserManagement
 import org.springframework.transaction.TransactionStatus
 
 abstract class ModellingItem {
-    final static Logger LOG = Logger.getLogger(ModellingItem)
+    protected final static Logger LOG = Logger.getLogger(ModellingItem)
 
     String name
     Class modelClass

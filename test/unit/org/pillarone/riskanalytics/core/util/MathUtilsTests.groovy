@@ -42,7 +42,7 @@ class MathUtilsTests extends GroovyTestCase {
     }
 
     void testVarProfit() {
-        assertEquals(-0d, MathUtils.calculateVar((double[]) [0, -10, -20], 50, QuantilePerspective.PROFIT))
+        assertEquals(-0d, MathUtils.calculateVar((double[]) [0, -10, -20], 50, QuantilePerspective.PROFIT), 0.0000001)
         assertEquals(10, MathUtils.calculateVar((double[]) [0, -10, -20], 90, QuantilePerspective.PROFIT))
     }
 

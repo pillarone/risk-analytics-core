@@ -29,16 +29,16 @@ import org.pillarone.riskanalytics.core.simulation.engine.MappingCache
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.6-ALPHA-4.7"
+    def version = "1.6-ALPHA-4.7-201"
     // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "1.3.7 > *"
+    def grailsVersion = "2.1.0 > *"
     // the other plugins this plugin depends on
     def dependsOn = [
             "backgroundThread": "1.3",
             "jodaTime": "0.5",
             "quartz": "0.4.2",
-            "springSecurityCore": "1.1.2",
-            "mavenPublisher": "0.7.5"
+            "springSecurityCore": "1.2.7.3",
+            "release": "2.0.3"
     ]
     // resources that are excluded from plugin packaging
     def pluginExcludes = [

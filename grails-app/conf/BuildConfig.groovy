@@ -9,19 +9,19 @@ grails.project.dependency.resolution = {
         grailsHome()
         grailsCentral()
         mavenCentral()
-    }
 
-    //even though this plugin does not need anything from this repo, it has to be added for the deploy script to check existing plugins
-    mavenRepo "https://repository.intuitive-collaboration.com/nexus/content/repositories/pillarone-public/"
+        //even though this plugin does not need anything from this repo, it has to be added for the deploy script to check existing plugins
+        mavenRepo "https://repository.intuitive-collaboration.com/nexus/content/repositories/pillarone-public/"
+    }
 
     plugins {
         runtime ":background-thread:1.3"
-        runtime ":hibernate:1.3.7"
+        runtime ":hibernate:2.1.0"
         runtime ":joda-time:0.5"
-        runtime ":maven-publisher:0.7.5"
+        runtime ":release:2.0.3"
         runtime ":quartz:0.4.2"
-        runtime ":spring-security-core:1.1.2"
-        runtime ":tomcat:1.3.7"
+        runtime ":spring-security-core:1.2.7.3"
+        runtime ":tomcat:2.1.0"
 
         test ":code-coverage:1.2.4"
     }

@@ -4,7 +4,7 @@ import org.apache.ivy.plugins.resolver.IBiblioResolver
 import org.apache.ivy.plugins.repository.url.URLRepository
 import org.apache.ivy.plugins.resolver.RepositoryResolver
 
-includeTargets << new File("${mavenPublisherPluginDir}/scripts/_GrailsMaven.groovy")
+includeTargets << new File("${releasePluginDir}/scripts/_GrailsMaven.groovy")
 
 target(main: "Checks if the plugin is already deployed to maven and deploys if necessary") {
     depends(parseArguments)

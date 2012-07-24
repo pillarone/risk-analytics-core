@@ -9,7 +9,6 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjec
 
 abstract class ParametrizedItem extends CommentableItem {
 
-    private static Log LOG = LogFactory.getLog(ParametrizedItem)
 
     ParametrizedItem(String name) {
         super(name)

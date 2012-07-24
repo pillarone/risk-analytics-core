@@ -1,10 +1,8 @@
 package org.pillarone.riskanalytics.core.parameterization
 
-import grails.test.GrailsUnitTestCase
-
 import org.pillarone.riskanalytics.core.example.component.TestComponent
 
-class ApplicableParameterTests extends GrailsUnitTestCase {
+class ApplicableParameterTests extends GroovyTestCase {
 
     void testApply() {
 

@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-class MysqlBulkInsert extends AbstractResultsBulkInsert {
+public class MysqlBulkInsert extends AbstractResultsBulkInsert {
 
     protected void writeResult(List values) {
         try {

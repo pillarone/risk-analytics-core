@@ -5,9 +5,12 @@ import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.user.UserManagement
 import org.springframework.transaction.TransactionStatus
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 
 abstract class ModellingItem {
-    protected final static Logger LOG = Logger.getLogger(ModellingItem)
+
+    protected final Log LOG = LogFactory.getLog(ModellingItem)
 
     String name
     Class modelClass

@@ -1,13 +1,12 @@
 package org.pillarone.riskanalytics.core.output
 
-import grails.test.GrailsUnitTestCase
 import models.core.CoreModel
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.parameterization.StructureInformation
 import org.pillarone.riskanalytics.core.parameterization.StructureInformationInjector
 import org.pillarone.riskanalytics.core.wiring.ITransmitter
 
-class PacketCollectorTests extends GrailsUnitTestCase {
+class PacketCollectorTests extends GroovyTestCase {
 
     void testDoNothingWhenNoPackets() {
 

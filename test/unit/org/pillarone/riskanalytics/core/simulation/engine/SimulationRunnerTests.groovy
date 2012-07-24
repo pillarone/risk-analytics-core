@@ -1,22 +1,8 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
-import grails.test.GrailsUnitTestCase
 import groovy.mock.interceptor.StubFor
-import org.apache.commons.logging.LogFactory
-import org.pillarone.riskanalytics.core.ParameterizationDAO
-import org.pillarone.riskanalytics.core.output.DeleteSimulationService
-import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
-import org.pillarone.riskanalytics.core.output.SimulationRun
-import org.pillarone.riskanalytics.core.simulation.SimulationState
-import org.pillarone.riskanalytics.core.simulation.engine.actions.Action
-import org.pillarone.riskanalytics.core.simulation.engine.actions.IterationAction
-import org.pillarone.riskanalytics.core.simulation.engine.actions.PeriodAction
-import org.pillarone.riskanalytics.core.simulation.engine.actions.SimulationAction
-import org.pillarone.riskanalytics.core.simulation.item.Simulation
-import org.pillarone.riskanalytics.core.simulation.item.ModellingItem
-import org.pillarone.riskanalytics.core.example.model.EmptyModel
 
-class SimulationRunnerTests extends GrailsUnitTestCase {
+class SimulationRunnerTests extends GroovyTestCase {
 
     StubFor transactionStub
     StubFor deletionServiceStub

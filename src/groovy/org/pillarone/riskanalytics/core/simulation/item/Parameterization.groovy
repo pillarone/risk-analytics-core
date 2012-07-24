@@ -100,7 +100,7 @@ class Parameterization extends ParametrizedItem {
 
     public save() {
         def result = null
-        daoClass.withTransaction {TransactionStatus status ->
+        ParameterizationDAO.withTransaction {TransactionStatus status ->
             def daoToBeSaved = getDao()
             validate()
             if (!validationErrors.empty) {

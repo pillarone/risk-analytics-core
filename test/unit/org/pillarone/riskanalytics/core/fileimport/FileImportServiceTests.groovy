@@ -1,9 +1,8 @@
 package org.pillarone.riskanalytics.core.fileimport
 
-import grails.test.GrailsUnitTestCase
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 
-class FileImportServiceTests extends GrailsUnitTestCase {
+class FileImportServiceTests extends GroovyTestCase {
 
     private File getModelFolder() {
         return new File(getClass().getResource("/models").toURI())

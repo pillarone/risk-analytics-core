@@ -1,12 +1,11 @@
 package org.pillarone.riskanalytics.core.simulation.engine.actions
 
-import grails.test.GrailsUnitTestCase
 import models.core.CoreModel
 import org.pillarone.riskanalytics.core.ModelStructureDAO
 import org.pillarone.riskanalytics.core.output.ConfigObjectHolder
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 
-class PrepareStructureInformationActionTests extends GrailsUnitTestCase {
+class PrepareStructureInformationActionTests extends GroovyTestCase {
 
     void testPerform() {
         CoreModel model = new CoreModel()

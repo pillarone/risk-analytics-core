@@ -12,7 +12,7 @@ public class CalculatorAction implements Action {
 
     public void perform() {
         if (!(simulationScope.model instanceof DeterministicModel)) {
-            calculator = new Calculator(simulationScope.simulation.simulationRun)
+            calculator = new Calculator(simulationScope.simulation)
             simulationScope.simulationState = SimulationState.POST_SIMULATION_CALCULATIONS
             calculator.calculate()
         }

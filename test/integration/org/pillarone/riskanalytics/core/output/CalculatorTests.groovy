@@ -4,6 +4,8 @@ import models.core.CoreModel
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.fileimport.ParameterizationImportService
 import org.pillarone.riskanalytics.core.fileimport.ResultConfigurationImportService
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
+import org.pillarone.riskanalytics.core.fileimport.ModelStructureImportService
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultDescriptor
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultTransferObject
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultWriter
@@ -18,11 +20,12 @@ class CalculatorTests extends GroovyTestCase {
         ResultAccessor.clearCaches()
 
         new ParameterizationImportService().compareFilesAndWriteToDB(['CoreParameters'])
-        new ResultConfigurationImportService().compareFilesAndWriteToDB(['CoreConfiguration'])
+        new ResultConfigurationImportService().compareFilesAndWriteToDB(['CoreResultConfiguration'])
+        new ModelStructureImportService().compareFilesAndWriteToDB(['CoreStructure'])
         run = new SimulationRun()
         run.name = 'testRun'
         run.parameterization = ParameterizationDAO.findByName('CoreParameters')
-        run.resultConfiguration = ResultConfigurationDAO.findByName('CoreConfiguration')
+        run.resultConfiguration = ResultConfigurationDAO.findByName('CoreResultConfiguration')
         run.model = CoreModel.name
         run.iterations = 1
         run.periodCount = 2
@@ -57,8 +60,10 @@ class CalculatorTests extends GroovyTestCase {
     void testResults() {
 
         int initialRecordCount = PostSimulationCalculation.count()
+        Simulation simulation = new Simulation(run.name)
+        simulation.load()
 
-        Calculator calculator = new Calculator(run)
+        Calculator calculator = new Calculator(simulation)
         calculator.calculate()
 
         assertEquals initialRecordCount + 14, PostSimulationCalculation.count()

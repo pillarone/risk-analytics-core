@@ -54,15 +54,19 @@ class PostSimulationCalculationAccessor {
         }
     }
 
-    static List getPercentiles(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
-        List res = PostSimulationCalculation.executeQuery("SELECT result FROM org.pillarone.riskanalytics.core.output.PostSimulationCalculation as p " +
+    static Map<Double, Double> getPercentiles(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
+        def res = PostSimulationCalculation.executeQuery("SELECT p.keyFigureParameter, p.result FROM org.pillarone.riskanalytics.core.output.PostSimulationCalculation as p " +
                 " WHERE p.path.pathName = ? AND " +
                 "p.collector.collectorName = ? AND " +
                 "p.field.fieldName = ? AND " +
                 "p.period = ? AND " +
                 "p.keyFigure ='percentile' AND " +
                 "p.run.id = ? order by p.keyFigureParameter asc", [pathName, collectorName, fieldName, periodIndex, simulationRun.id])
-        return res
+        Map<Double,Double> result = [:]
+        for(Object[] obj in res) {
+            result.put(obj[0].doubleValue(), obj[1].doubleValue())
+        }
+        return result
     }
 
     static List getPDFValues(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {

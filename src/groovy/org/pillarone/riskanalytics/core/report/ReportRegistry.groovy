@@ -20,8 +20,20 @@ abstract class ReportRegistry {
         reportMap.put(modelClass, report)
     }
 
-    public static List<IReportModel> getReportModel(Class modelClass) {
-        return reportMap.get(modelClass)
+    /**
+     * If we want to report on more than one model class, we only want reports valid for all model classes.
+     * @param modelClasses models we are asking for registered reports from.
+     * @return A list of reports which are registered against, and intersect with reports for the list of model classes.
+     */
+    public static List<IReportModel> getReportModel(List<Class> modelClasses) {
+
+        List<IReportModel> iReportModels = new ArrayList<IReportModel>()
+        List<IReportModel> allReports = getAllReportModels()
+        for (Class clazz in modelClasses) {
+            List<IReportModel> potentialReports = reportMap.get(clazz)
+            iReportModels << potentialReports.intersect(allReports)
+        }
+        return iReportModels.flatten()
     }
 
     public static List<IReportModel> getAllReportModels() {

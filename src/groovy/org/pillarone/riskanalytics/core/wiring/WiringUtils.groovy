@@ -6,6 +6,7 @@ import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.components.ComposedComponent
 import org.pillarone.riskanalytics.core.packets.PacketList
 import org.pillarone.riskanalytics.core.util.GroovyUtils
+import groovyx.gpars.agent.Agent
 
 public class WiringUtils {
 
@@ -63,26 +64,36 @@ public class WiringUtils {
         delegate."${GrailsClassUtils.getSetterName(name)}"(value)
     }
 
+
+    static Agent guard = new Agent()
+
     static void use(Class category, Closure work) {
         if (LOG.isDebugEnabled()) LOG.debug "starting wiring for ${work.delegate.getName()} with ${category.name}."
         def changedClasses = [] as Set
         boolean componentFound = GroovyUtils.getProperties(work.delegate).any { Map.Entry entry -> entry.value instanceof Component }
         assert componentFound, "Components to be wired must be properties of the callee!"
-        forAllComponents(work.delegate) { componentName, component ->
-            changedClasses << component.getClass()
-            ExpandoMetaClass emc = GrailsClassUtils.getExpandoMetaClass(component.getClass())
-            emc.getProperty = { name -> category.doGetProperty(delegate, name) }
-            emc.setProperty = { name, value -> category.doSetProperty(delegate, name, value) }
+
+        guard.send {
+            forAllComponents(work.delegate) { componentName, component ->
+                changedClasses << component.getClass()
+                ExpandoMetaClass emc = GrailsClassUtils.getExpandoMetaClass(component.getClass())
+                emc.getProperty = { name -> category.doGetProperty(delegate, name) }
+                emc.setProperty = { name, value -> category.doSetProperty(delegate, name, value) }
+            }
         }
+        guard.val
 
         try {
             work()
         } finally {
-            for (changedClass in changedClasses) {
-                ExpandoMetaClass emc = GrailsClassUtils.getExpandoMetaClass(changedClass)
-                emc.getProperty = defaultGetter
-                emc.setProperty = defaultSetter
+            guard.send {
+                for (changedClass in changedClasses) {
+                    ExpandoMetaClass emc = GrailsClassUtils.getExpandoMetaClass(changedClass)
+                    emc.getProperty = defaultGetter
+                    emc.setProperty = defaultSetter
+                }
             }
+            guard.val
             if (LOG.isDebugEnabled()) LOG.debug "restoring MCs done."
         }
     }

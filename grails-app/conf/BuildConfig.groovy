@@ -27,6 +27,7 @@ grails.project.dependency.resolution = {
     }
 
     dependencies {
+        runtime "org.codehaus.gpars:gpars:0.12"
         runtime 'net.sf.jasperreports:jasperreports:4.0.1', {
             exclude "xml-apis"
         }

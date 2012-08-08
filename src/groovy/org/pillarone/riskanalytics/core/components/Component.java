@@ -342,10 +342,11 @@ abstract public class Component implements Cloneable {
     }
 
     /**
-     * @return name of the component
+     * @return name of the component or "no name" if name is not set
      */
     @Override
     public String toString() {
+        if (null == name) return "no name";
         return name;
     }
 }

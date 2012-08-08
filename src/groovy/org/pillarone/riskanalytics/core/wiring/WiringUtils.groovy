@@ -6,7 +6,6 @@ import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.components.ComposedComponent
 import org.pillarone.riskanalytics.core.packets.PacketList
 import org.pillarone.riskanalytics.core.util.GroovyUtils
-import groovyx.gpars.agent.Agent
 
 public class WiringUtils {
 
@@ -52,49 +51,40 @@ public class WiringUtils {
         }
     }
 
-    static defaultGetter = { propName ->
-        try {
-            return delegate."${GrailsClassUtils.getGetterName(propName)}"()
-        } catch (MissingMethodException e) {
-            if (LOG.isDebugEnabled()) LOG.debug "resolving $propName via propertyMissing"
-            return delegate.propertyMissing(propName)
-        }
-    }
-    static defaultSetter = { name, value ->
-        delegate."${GrailsClassUtils.getSetterName(name)}"(value)
-    }
-
-
-    static Agent guard = new Agent()
-
     static void use(Class category, Closure work) {
         if (LOG.isDebugEnabled()) LOG.debug "starting wiring for ${work.delegate.getName()} with ${category.name}."
-        def changedClasses = [] as Set
         boolean componentFound = GroovyUtils.getProperties(work.delegate).any { Map.Entry entry -> entry.value instanceof Component }
         assert componentFound, "Components to be wired must be properties of the callee!"
 
-        guard.send {
-            forAllComponents(work.delegate) { componentName, component ->
-                changedClasses << component.getClass()
-                ExpandoMetaClass emc = GrailsClassUtils.getExpandoMetaClass(component.getClass())
-                emc.getProperty = { name -> category.doGetProperty(delegate, name) }
-                emc.setProperty = { name, value -> category.doSetProperty(delegate, name, value) }
-            }
+        def changedComponentsAndTheirMCs = []
+        forAllComponents(work.delegate) { componentName, component ->
+            changedComponentsAndTheirMCs << [comp:component, mc:component.metaClass]
+            component.metaClass.mixin AccessorOverrideMixin
+            component.mixinDelegate = component
+            component.mixinCategory = category
         }
-        guard.val
-
         try {
             work()
         } finally {
-            guard.send {
-                for (changedClass in changedClasses) {
-                    ExpandoMetaClass emc = GrailsClassUtils.getExpandoMetaClass(changedClass)
-                    emc.getProperty = defaultGetter
-                    emc.setProperty = defaultSetter
-                }
+            for (componentAndMC in changedComponentsAndTheirMCs) {
+                componentAndMC.comp.metaClass = componentAndMC.mc
             }
-            guard.val
             if (LOG.isDebugEnabled()) LOG.debug "restoring MCs done."
         }
+    }
+}
+
+class AccessorOverrideMixin {
+    def mixinDelegate
+    def mixinCategory
+    def getProperty (name) {
+        if (name == "mixinDelegate") { return mixinDelegate }
+        if (name == "mixinCategory") { return mixinCategory }
+        mixinCategory.doGetProperty(mixinDelegate, name)
+    }
+    void setProperty (name, value) {
+        if (name == "mixinDelegate") { mixinDelegate = value; return }
+        if (name == "mixinCategory") { mixinCategory = value; return }
+        mixinCategory.doSetProperty(mixinDelegate, name, value)
     }
 }

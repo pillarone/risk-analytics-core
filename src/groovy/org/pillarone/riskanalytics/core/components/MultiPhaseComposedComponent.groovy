@@ -115,6 +115,10 @@ abstract class MultiPhaseComposedComponent extends ComposedComponent implements 
             for (ITransmitter transmitter : getAllInputTransmitter()) {
                 if (transmitter.getTarget().is(packetList)) {
                     phasePerTransmitterInput.put(transmitter, phase)
+                    println numberOfNotifiedTransmittersPerPhase
+                    println numberOfNotifiedTransmittersPerPhase.dump()
+                    println phase
+                    println phase.dump()
                     increaseNumberOfTransmitter(numberOfTransmitterPerPhaseInput, phase)
 
                     Set<ITransmitter> replicationTransmitters = replicationInputTransmitterPerPhase.get(phase)
@@ -136,7 +140,7 @@ abstract class MultiPhaseComposedComponent extends ComposedComponent implements 
      * @param map key: phase, value: number of transmitters
      * @param phase the value of the corresponding phase will be increased by 1
      */
-    private void increaseNumberOfTransmitter(Map<String, Integer> map, String phase) {
+    protected void increaseNumberOfTransmitter(Map<String, Integer> map, String phase) {
         Integer numberOfTransmitter = map.get(phase)
         map.put(phase, numberOfTransmitter == null ? 1 : numberOfTransmitter + 1)
     }

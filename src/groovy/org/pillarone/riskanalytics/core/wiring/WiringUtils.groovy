@@ -58,6 +58,7 @@ public class WiringUtils {
 
         def changedComponentsAndTheirMCs = []
         forAllComponents(work.delegate) { componentName, component ->
+            if (component in changedComponentsAndTheirMCs.collect{ it.comp }) return
             changedComponentsAndTheirMCs << [comp:component, mc:component.metaClass]
             component.metaClass.mixin AccessorOverrideMixin
             component.mixinDelegate = component

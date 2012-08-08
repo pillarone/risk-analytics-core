@@ -44,7 +44,8 @@ class DynamicMultiPhaseComposedComponentTests extends GroovyTestCase {
         sourceComponent.inOrangePhase1 << orangeA << orangeB << orangeC
         sourceComponent.inOrangePhase2 << orangeD
 
-        List dynamicComponentApplePhase1 = new TestProbe(sub2, 'outApplePhase1').result
+        TestProbe probe = new TestProbe(sub2, 'outApplePhase1')
+        List dynamicComponentApplePhase1 = probe.result
         List dynamicComponentOrangePhase1 = new TestProbe(sub2, 'outOrangePhase1').result
         List dynamicComponentOrangePhase2 = new TestProbe(sub2, 'outOrangePhase2').result
         List targetComponentApplePhase1 = new TestProbe(targetComponent, 'outApplePhase1').result

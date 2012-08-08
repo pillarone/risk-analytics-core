@@ -127,7 +127,7 @@ abstract class DynamicMultiPhaseComposedComponent extends DynamicComposedCompone
      * @param map key: phase, value: number of transmitters
      * @param phase the value of the corresponding phase will be increased by 1
      */
-    private void increaseNumberOfTransmitter(Map<String, Integer> map, String phase) {
+    protected void increaseNumberOfTransmitter(Map<String, Integer> map, String phase) {
         Integer numberOfTransmitter = map.get(phase)
         map.put(phase, numberOfTransmitter == null ? 1 : numberOfTransmitter + 1)
     }

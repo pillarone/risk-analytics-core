@@ -11,6 +11,8 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolde
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.components.IResource
+import org.pillarone.riskanalytics.core.wiring.ITransmitter
+import org.pillarone.riskanalytics.core.output.PacketCollector
 
 
 class RuntimeParameterCollector implements IModelVisitor {
@@ -31,6 +33,11 @@ class RuntimeParameterCollector implements IModelVisitor {
 
     void visitComponent(Component component, ModelPath path) {
         createApplicableParameters(component)
+        for (ITransmitter transmitter in component.allOutputTransmitter) {
+            if (transmitter.receiver instanceof PacketCollector) {
+                visitComponent(transmitter.receiver, path)
+            }
+        }
     }
 
     protected createApplicableParameters(def component) {

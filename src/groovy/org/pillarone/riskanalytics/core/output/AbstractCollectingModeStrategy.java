@@ -95,13 +95,12 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
         if (value.isInfinite() || value.isNaN()) {
             StringBuilder message = new StringBuilder();
             message.append(value).append(" collected at ").append(packetCollector.getPath()).append(":").append(name);
-            message.append(" (period ").append(period).append(") in iteration ");
-            message.append(iteration).append(" - ignoring.");
+            message.append(" Period : ").append(period).append( " in Iteration : " ).append(iteration);
             if (LOG.isErrorEnabled()) {
-                LOG.info(message);
+                LOG.info(message.toString());
             }
             if(crashSimulationOnError) {
-                throw new SimulationException(message.toString());
+                throw new SimulationException(message.toString() + " : insanity detected; killing simulation.");
             }
             return true;
         }

@@ -9,6 +9,7 @@ grails.project.dependency.resolution = {
         grailsHome()
         grailsCentral()
         mavenCentral()
+
     }
 
     //even though this plugin does not need anything from this repo, it has to be added for the deploy script to check existing plugins

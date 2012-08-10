@@ -43,6 +43,7 @@ class BatchRunService {
         getSimulationRuns(batchRun)?.each {BatchRunSimulationRun batchRunSimulationRun ->
             runSimulation(batchRunSimulationRun)
         }
+        getRunnerRegistry().startTimer()
         BatchRun.executeUpdate("update org.pillarone.riskanalytics.core.BatchRun as b set b.executed=? where b.id=? ", [true, batchRun.id])
     }
 
@@ -180,6 +181,9 @@ class RunnerRegistry implements ActionListener {
 
     void put(SimulationConfiguration configuration) {
         queue.offer(["configuration": configuration])
+    }
+
+    void startTimer() {
         if (!timer.isRunning()) timer.start()
     }
 

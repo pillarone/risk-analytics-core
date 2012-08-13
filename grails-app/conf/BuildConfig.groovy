@@ -15,19 +15,18 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        runtime ":background-thread:1.3"
-        runtime ":hibernate:2.1.0"
-        runtime ":joda-time:0.5"
-        runtime ":release:2.0.3"
-        runtime ":quartz:0.4.2"
-        runtime ":spring-security-core:1.2.7.3"
-        runtime ":tomcat:2.1.0"
+        runtime(":background-thread:1.3")
+        runtime(":hibernate:2.1.0")
+        runtime(":joda-time:0.5")
+        runtime(":release:2.0.3") { excludes "groovy" }
+        runtime(":quartz:0.4.2")
+        runtime(":spring-security-core:1.2.7.3")
+        runtime(":tomcat:2.1.0")
 
-        test ":code-coverage:1.2.4"
+        test(":code-coverage:1.2.4")
     }
 
     dependencies {
-        runtime "org.codehaus.gpars:gpars:0.12"
         runtime 'net.sf.jasperreports:jasperreports:4.0.1', {
             exclude "xml-apis"
         }

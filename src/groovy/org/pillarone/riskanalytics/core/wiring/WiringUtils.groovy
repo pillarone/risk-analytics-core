@@ -28,7 +28,7 @@ public class WiringUtils {
     }
 
     public static String getSenderChannelName(Component sender, PacketList source) {
-        return GroovyUtils.getProperties(sender).find {Map.Entry entry -> entry.value.is(source)}.key
+        return GroovyUtils.getProperties(sender).find {Map.Entry entry -> source.is(entry.value)}.key
     }
 
     static void forAllComponents(Component target, Closure whatToDo) {

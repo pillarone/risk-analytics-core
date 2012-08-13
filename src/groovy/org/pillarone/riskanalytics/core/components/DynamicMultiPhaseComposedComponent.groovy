@@ -23,7 +23,7 @@ abstract class DynamicMultiPhaseComposedComponent extends DynamicComposedCompone
     /**
      * Executed once only per instance. Calls allocateChannelsToPhases() and initialized numberOfNotifiedTransmittersPerPhase
      */
-    private void init() {
+    protected void init() {
         if (numberOfPhases) return
         for (String phase : numberOfTransmitterPerPhaseInput.keySet()) {
             numberOfNotifiedTransmittersPerPhase.put(phase, 0)
@@ -71,7 +71,7 @@ abstract class DynamicMultiPhaseComposedComponent extends DynamicComposedCompone
 
     @Override
     public void notifyTransmitted(ITransmitter transmitter) {
-        init();
+        init()
         String transmitterPhase = phasePerTransmitterInput.get(transmitter)
         increaseNumberOfTransmitter(numberOfNotifiedTransmittersPerPhase, transmitterPhase)
         if (numberOfNotifiedTransmittersPerPhase[transmitterPhase] == numberOfTransmitterPerPhaseInput[transmitterPhase]) {

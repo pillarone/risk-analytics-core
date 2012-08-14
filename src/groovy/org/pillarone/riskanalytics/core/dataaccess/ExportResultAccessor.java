@@ -38,7 +38,7 @@ public class ExportResultAccessor {
         long collectorId = ResultAccessor.getCollectorId(collector);
 
         for (int i = 0; i < run.getPeriodCount(); i++) {
-            File f = new File(GridHelper.getResultPathLocation(run.id, pathId, fieldId, collectorId, i));
+            File f = new File(GridHelper.getResultPathLocation(ResultAccessor.getRunIDFromSimulation(run) , pathId, fieldId, collectorId, i));
             IterationFileAccessor ifa;
             try {
                 ifa = new IterationFileAccessor(f);

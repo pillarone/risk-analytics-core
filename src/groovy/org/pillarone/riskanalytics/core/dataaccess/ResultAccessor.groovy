@@ -317,6 +317,16 @@ abstract class ResultAccessor {
         return fieldId;
     }
 
+    /**
+     * When writing in Java, the ID field of simualtion run is not easily accessible. Wheel in some groovy...
+     *
+     * @param run the simulation run.
+     * @return the long ID of the simulation run
+     */
+    public static long getRunIDFromSimulation(SimulationRun run) {
+        run.id
+    }
+
     public static int getCollectorId(String collectorName) {
         Integer collectorId = collectorCache.get(collectorName)
         if (collectorId == null) {

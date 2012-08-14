@@ -17,6 +17,7 @@ import org.springframework.context.support.GenericApplicationContext
 import org.springframework.beans.factory.config.BeanDefinition
 import org.codehaus.groovy.grails.commons.DefaultGrailsApplication
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.joda.time.DateTimeZone
 
 class SimulationJob extends GridJobAdapter<JobResult> {
 
@@ -37,6 +38,11 @@ class SimulationJob extends GridJobAdapter<JobResult> {
     }
 
     JobResult execute() {
+
+        /** Setting the default time zone to UTC avoids problems in multi user context with different time zones
+         *  and switches off daylight saving capabilities and possible related problems.                */
+        DateTimeZone.setDefault(DateTimeZone.UTC)
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
 
         //***** https://issuetracking.intuitive-collaboration.com/jira/browse/KTI-15
         getClass().getClassLoader().loadClass("java.lang.Character")

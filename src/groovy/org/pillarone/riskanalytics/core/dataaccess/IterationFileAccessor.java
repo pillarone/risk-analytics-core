@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.dataaccess;
 
+import org.joda.time.DateTime;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper;
 
 import java.io.*;
@@ -8,7 +9,7 @@ import java.util.*;
 public class IterationFileAccessor {
     protected DataInputStream dis;
     protected int iteration;
-    protected List<Double> value;
+    protected List<DateTimeValuePair> value;
 
     public IterationFileAccessor(File f) throws Exception {
         if (f.exists()) {
@@ -43,12 +44,13 @@ public class IterationFileAccessor {
         if (dis != null && dis.available() > 4) {
             iteration = dis.readInt();
             int len = dis.readInt();
-            value = new ArrayList<Double>(len);
+            value = new ArrayList<DateTimeValuePair>(len);
             for (int i = 0; i < len; i++) {
-                value.add(dis.readDouble());
-                dis.readLong();
+                final double doubleValue = dis.readDouble();
+                final long dateTimeLong = dis.readLong();
+                DateTimeValuePair dateTimeValuePair = new DateTimeValuePair( dateTimeLong , doubleValue);
+                value.add(dateTimeValuePair);
             }
-
             return true;
         }
         return false;
@@ -60,13 +62,13 @@ public class IterationFileAccessor {
 
     public double getValue() {
         double result = 0;
-        for (Double d : value) {
-            result += d;
+        for (DateTimeValuePair d : value) {
+            result += d.aDouble;
         }
         return result;
     }
 
-    public List<Double> getSingleValues() {
+    public List<DateTimeValuePair> getSingleValues() {
         return value;
     }
 

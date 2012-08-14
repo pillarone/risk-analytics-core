@@ -247,22 +247,6 @@ abstract class ResultAccessor {
         return fillWithZeroes(simulationRun, values);
     }
 
-
-    public static List<SingleValueResult> getSingleValueResultsWithDateSkipZeroes(SimulationRun run, int periodIndex, String pathName, String collectorName, String fieldName) {
-        // todo: would have preferred to use SymbolicValueResult.findAll() here, but that didn't work since there
-        // was some kind of 'version' field that all of a sudden showed up in the resulting SQL... ? I am at loss.
-        return SingleValueResult.createCriteria().list {
-            eq("simulationRun", run)
-            eq("period", periodIndex)
-            eq("path", org.pillarone.riskanalytics.core.output.PathMapping.findByPathName(pathName))
-            eq("field", org.pillarone.riskanalytics.core.output.FieldMapping.findByFieldName(fieldName))
-            eq("collector", org.pillarone.riskanalytics.core.output.CollectorMapping.findByCollectorName(collectorName))
-            not { eq("value", 0.0d) }
-        }
-    }
-
-
-
     public static Double getUltimatesForOneIteration(SimulationRun simulationRun, int periodIndex, String pathName, String collectorName, String fieldName, int iteration) {
         return getSingleIterationValue(simulationRun, periodIndex, pathName, fieldName, collectorName, iteration)
     }
@@ -315,7 +299,7 @@ abstract class ResultAccessor {
         return result;
     }
 
-    private static int getPathId(String pathName) {
+    public static int getPathId(String pathName) {
         Integer pathId = pathCache.get(pathName)
         if (pathId == null) {
             pathId = PathMapping.findByPathName(pathName).id
@@ -324,7 +308,7 @@ abstract class ResultAccessor {
         return pathId;
     }
 
-    private static int getFieldId(String fieldName) {
+    public static int getFieldId(String fieldName) {
         Integer fieldId = fieldCache.get(fieldName)
         if (fieldId == null) {
             fieldId = FieldMapping.findByFieldName(fieldName).id
@@ -333,7 +317,7 @@ abstract class ResultAccessor {
         return fieldId;
     }
 
-    private static int getCollectorId(String collectorName) {
+    public static int getCollectorId(String collectorName) {
         Integer collectorId = collectorCache.get(collectorName)
         if (collectorId == null) {
             collectorId = CollectorMapping.findByCollectorName(collectorName).id
@@ -436,7 +420,7 @@ abstract class ResultAccessor {
             int index = 0
             while (ifa.fetchNext()) {
                 int iteration = ifa.iteration
-                List<Double> values = ifa.singleValues
+                List<Double> values = ifa.singleValues*.aDouble
                 for (Double val in values) {
                     result << [path, val, field, iteration, i, index++] as Object[]
                 }

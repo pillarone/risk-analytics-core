@@ -27,6 +27,12 @@ grails.project.dependency.resolution = {
     }
 
     dependencies {
+        runtime "colt:colt:1.2.0"
+        runtime "commons-cli:commons-cli:1.2"
+        runtime "com.google.collections:google-collections:1.0"
+        runtime "org.apache.poi:poi:3.7"
+        runtime "ca.umontreal.iro:ssj:2.4"
+        runtime "optimization:optimization:1.0"
         runtime 'net.sf.jasperreports:jasperreports:4.0.1', {
             exclude "xml-apis"
         }

@@ -9,6 +9,12 @@ includeTargets << new File("${releasePluginDir}/scripts/_GrailsMaven.groovy")
 target(main: "Checks if the plugin is already deployed to maven and deploys if necessary") {
     depends(parseArguments)
 
+    File oldPomFile = new File("./target/pom.xml")
+    if(oldPomFile.exists()) {
+        event("StatusUpdate", ["Deleting old POM file ${oldPomFile.absolutePath}"])
+        oldPomFile.delete()
+    }
+
     String pluginName = appClassName
     String version
     String groupId

@@ -55,7 +55,7 @@ public class ExportResultAccessor {
                         resultWithNullFieldsCollectorsSimRunAndPath.setDate(new DateTime(val.getDateTime()));
                         resultWithNullFieldsCollectorsSimRunAndPath.setValue(val.getaDouble());
                         resultWithNullFieldsCollectorsSimRunAndPath.setIteration(iteration);
-                        resultWithNullFieldsCollectorsSimRunAndPath.setPeriod(i++);
+                        resultWithNullFieldsCollectorsSimRunAndPath.setPeriod(i);
                         result.add(resultWithNullFieldsCollectorsSimRunAndPath);
                     }
                 }

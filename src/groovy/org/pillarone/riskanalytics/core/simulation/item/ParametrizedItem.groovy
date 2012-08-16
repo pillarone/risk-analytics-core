@@ -6,14 +6,48 @@ import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjectParameterHolder
+import org.pillarone.riskanalytics.core.components.Component
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 abstract class ParametrizedItem extends CommentableItem {
 
     private static Log LOG = LogFactory.getLog(ParametrizedItem)
 
+    private Set<IParametrizedItemListener> listeners = new HashSet<IParametrizedItemListener>()
+
     ParametrizedItem(String name) {
         super(name)
     }
+
+    void addComponent(String basePath, Component component) {
+        for (Map.Entry<String, Object> entry : GroovyUtils.getProperties(component).entrySet()) {
+            String fieldName = entry.key
+            def value = entry.value
+            if (fieldName.startsWith("parm")) {
+                for (int i = 0; i < getPeriodCount(); i++) {
+                    if (value instanceof Cloneable) {
+                        value = value.clone()
+                    }
+                    addParameter(ParameterHolderFactory.getHolder([basePath, fieldName].join(":"), i, value))
+                }
+            }
+        }
+        fireComponentAdded(basePath, component)
+    }
+
+    void addListener(IParametrizedItemListener listener) {
+        listeners.add(listener)
+    }
+
+    void removeListener(IParametrizedItemListener listener) {
+        listeners.remove(listener)
+    }
+
+    protected fireComponentAdded(String path, Component component) {
+        listeners*.componentAdded(path, component)
+    }
+
+    abstract Integer getPeriodCount()
 
     protected void loadParameters(List<ParameterHolder> parameterHolders, Collection<Parameter> parameters) {
         List<ParameterHolder> existingHolders = parameterHolders.clone()

@@ -80,6 +80,11 @@ class Resource extends ParametrizedItem {
         return ResourceDAO
     }
 
+    @Override
+    Integer getPeriodCount() {
+        return 1
+    }
+
     public List<String> getAllEditablePaths() {
         List result = []
         for (Comment comment in comments) {

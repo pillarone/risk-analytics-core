@@ -15,6 +15,11 @@ class ExampleParameterComponent extends GlobalParameterComponent {
         "string"
     }
 
+    @Global(identifier = "sanityChecks")
+    boolean getSanityChecks() {
+        true
+    }
+
     def nonGlobalMethod() {
         return new Object()
     }

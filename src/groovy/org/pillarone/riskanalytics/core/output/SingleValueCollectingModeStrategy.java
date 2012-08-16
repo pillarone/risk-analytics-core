@@ -21,14 +21,14 @@ public class SingleValueCollectingModeStrategy extends AbstractCollectingModeStr
         aggregatedCollectingMode = new AggregatedWithSingleAvailableCollectingModeStrategy();
     }
 
-    public List<SingleValueResultPOJO> collect(PacketList results) throws IllegalAccessException {
+    public List<SingleValueResultPOJO> collect(PacketList results, boolean crashSimulationOnError) throws IllegalAccessException {
         List<SingleValueResultPOJO> result = new ArrayList<SingleValueResultPOJO>(results.size());
         int valueIndex = 0;
         for (Object p : results) {
-            result.addAll(createSingleValueResults((Packet) p, ((Packet)p).getValuesToSave(), valueIndex));
+            result.addAll(createSingleValueResults((Packet) p, ((Packet)p).getValuesToSave(), valueIndex, crashSimulationOnError));
             valueIndex++;
         }
-        final List<SingleValueResultPOJO> aggregatedValues = aggregatedCollectingMode.collect(results);
+        final List<SingleValueResultPOJO> aggregatedValues = aggregatedCollectingMode.collect(results, crashSimulationOnError);
         for (SingleValueResultPOJO singleValueResult : aggregatedValues) {
             singleValueResult.setCollector(packetCollector.getSimulationScope().getMappingCache().lookupCollector(aggregatedCollectingMode.getIdentifier()));
         }

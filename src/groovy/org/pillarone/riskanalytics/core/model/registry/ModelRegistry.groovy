@@ -63,6 +63,14 @@ class ModelRegistry {
         }
     }
 
+    Class getModelClass(String className) {
+        Class modelClass = modelClasses.find { it.name == className }
+        if (modelClass == null) {
+            modelClass = Thread.currentThread().contextClassLoader.loadClass(className)
+        }
+        return modelClass
+    }
+
     private void createDefaultModelDao(Class modelClass) {
         ModelDAO dao = new ModelDAO()
         dao.name = modelClass.simpleName

@@ -5,7 +5,7 @@ import org.pillarone.riskanalytics.core.packets.PacketList
 public interface ICollectingModeStrategy {
 
   //do not use a grails domain class here (performance)
-  List<SingleValueResultPOJO> collect(PacketList results) throws Exception
+  List<SingleValueResultPOJO> collect(PacketList results, boolean crashSimulationOnError) throws Exception
 
   String getDisplayName(Locale locale)
 

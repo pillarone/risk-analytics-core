@@ -28,7 +28,7 @@ class SingleValueCollectingModeStrategyTests extends GroovyTestCase {
         PacketList<ITestPacketApple> list = new PacketList<ITestPacketApple>()
         list.add(new ITestPacketApple(value: 5))
         list.add(new ITestPacketApple(value: 10))
-        final List<SingleValueResultPOJO> results = mode.collect(list)
+        final List<SingleValueResultPOJO> results = mode.collect(list, true)
         assertEquals(3, results.size())
 
         assertEquals(5, results[0].value)

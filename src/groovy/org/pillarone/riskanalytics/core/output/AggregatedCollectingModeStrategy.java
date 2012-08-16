@@ -17,10 +17,10 @@ public class AggregatedCollectingModeStrategy extends AbstractCollectingModeStra
     private String displayName;
 
 
-    public List<SingleValueResultPOJO> collect(PacketList packets) throws IllegalAccessException {
+    public List<SingleValueResultPOJO> collect(PacketList packets, boolean crashSimulationOnError) throws IllegalAccessException {
         IPacketAggregator<Packet> sumAggregator = PacketAggregatorRegistry.getAggregator(packets.get(0).getClass());
         Packet aggregatedPacket = sumAggregator.aggregate(packets);
-        return createSingleValueResults((Packet) packets.get(0), aggregatedPacket.getValuesToSave(), 0);
+        return createSingleValueResults((Packet) packets.get(0), aggregatedPacket.getValuesToSave(), 0, crashSimulationOnError);
     }
 
     public String getDisplayName(Locale locale) {

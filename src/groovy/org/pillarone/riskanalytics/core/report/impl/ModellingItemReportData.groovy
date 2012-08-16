@@ -23,5 +23,11 @@ class ModellingItemReportData implements IReportData {
         return getClass().getName() + "[item: " + item + "]";
     }
 
+    ModellingItem getItem() {
+        return item
+    }
 
+    void setItem(ModellingItem item) {
+        this.item = item
+    }
 }

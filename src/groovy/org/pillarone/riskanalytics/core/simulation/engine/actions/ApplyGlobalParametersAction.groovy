@@ -10,6 +10,8 @@ import org.pillarone.riskanalytics.core.parameterization.IParameterObject
 import org.pillarone.riskanalytics.core.components.InitializingComponent
 import org.pillarone.riskanalytics.core.components.GlobalParameterComponent
 import java.lang.reflect.Method
+import org.pillarone.riskanalytics.core.wiring.ITransmitter
+import org.pillarone.riskanalytics.core.output.PacketCollector
 
 class ApplyGlobalParametersAction implements Action {
 
@@ -53,6 +55,11 @@ class ApplyGlobalParametersAction implements Action {
         }
         if (component instanceof InitializingComponent) {
             initializingComponents << component
+        }
+        for (ITransmitter transmitter in component.allOutputTransmitter) {
+            if (transmitter.receiver instanceof PacketCollector) {
+                traverseModel(transmitter.receiver)
+            }
         }
     }
 

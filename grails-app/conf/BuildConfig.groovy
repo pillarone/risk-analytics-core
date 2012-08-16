@@ -15,13 +15,13 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        runtime(":background-thread:1.3")
-        runtime(":hibernate:2.1.0")
-        runtime(":joda-time:0.5")
-        runtime(":release:2.0.3") { excludes "groovy" }
-        runtime(":quartz:0.4.2")
-        runtime(":spring-security-core:1.2.7.3")
-        runtime(":tomcat:2.1.0")
+        compile(":background-thread:1.3")
+        compile(":hibernate:2.1.0")
+        compile(":joda-time:0.5")
+        provided(":release:2.0.3") { excludes "groovy" }
+        compile(":quartz:0.4.2")
+        compile(":spring-security-core:1.2.7.3")
+        provided(":tomcat:2.1.0")
 
         test(":code-coverage:1.2.4")
     }

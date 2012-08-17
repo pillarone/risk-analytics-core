@@ -8,6 +8,7 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolde
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjectParameterHolder
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.util.GroovyUtils
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 
 abstract class ParametrizedItem extends CommentableItem {
 
@@ -35,6 +36,41 @@ abstract class ParametrizedItem extends CommentableItem {
         fireComponentAdded(basePath, component)
     }
 
+    void copyComponent(String oldPath, String newPath, Component component, boolean copyComments) {
+        ParameterHolderFactory.duplicateParameters(this, oldPath, newPath)
+        if (copyComments) {
+            for (Comment comment in comments.findAll { it.path.contains(oldPath) }) {
+                Comment clone = comment.clone()
+                clone.path = clone.path.replace(oldPath, newPath)
+                addComment(clone)
+            }
+        }
+        fireComponentAdded(newPath, component)
+    }
+
+    void renameComponent(String oldPath, String newPath, Component newComponent) {
+        List<String> changedPaths = ParameterHolderFactory.renamePathOfParameter(this, oldPath, newPath, newComponent)
+        for (Comment comment in comments.findAll { it.path.contains(oldPath) }) {
+            Comment clone = comment.clone()
+            clone.path = clone.path.replace(oldPath, newPath)
+            addComment(clone)
+            removeComment(comment)
+        }
+        fireComponentAdded(newPath, newComponent)
+        fireComponentRemoved(oldPath)
+        fireValuesChanged(changedPaths)
+    }
+
+    void removeComponent(String path) {
+        for (ParameterHolder holder in getAllParameterHolders().findAll { it.path.startsWith(path) }) {
+            removeParameter(holder)
+        }
+        for (Comment comment in comments.findAll { it.path.startsWith(path) }) {
+            removeComment(comment)
+        }
+        fireComponentRemoved(path)
+    }
+
     void addListener(IParametrizedItemListener listener) {
         listeners.add(listener)
     }
@@ -45,6 +81,14 @@ abstract class ParametrizedItem extends CommentableItem {
 
     protected fireComponentAdded(String path, Component component) {
         listeners*.componentAdded(path, component)
+    }
+
+    protected fireValuesChanged(List<String> paths) {
+        listeners*.parameterValuesChanged(paths)
+    }
+
+    protected fireComponentRemoved(String path) {
+        listeners*.componentRemoved(path)
     }
 
     abstract Integer getPeriodCount()

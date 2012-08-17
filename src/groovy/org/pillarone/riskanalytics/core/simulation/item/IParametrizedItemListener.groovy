@@ -7,4 +7,8 @@ public interface IParametrizedItemListener {
 
     void componentAdded(String path, Component component)
 
+    void componentRemoved(String path)
+
+    void parameterValuesChanged(List<String> paths)
+
 }

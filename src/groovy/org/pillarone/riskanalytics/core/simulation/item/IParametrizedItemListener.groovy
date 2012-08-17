@@ -11,4 +11,6 @@ public interface IParametrizedItemListener {
 
     void parameterValuesChanged(List<String> paths)
 
+    void classifierChanged(String path)
+
 }

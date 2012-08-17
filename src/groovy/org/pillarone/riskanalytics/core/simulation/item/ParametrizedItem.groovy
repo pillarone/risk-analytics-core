@@ -87,6 +87,10 @@ abstract class ParametrizedItem extends CommentableItem {
         listeners*.parameterValuesChanged(paths)
     }
 
+    protected fireClassifierChanged(String path) {
+        listeners*.classifierChanged(path)
+    }
+
     protected fireComponentRemoved(String path) {
         listeners*.componentRemoved(path)
     }
@@ -244,5 +248,22 @@ abstract class ParametrizedItem extends CommentableItem {
         }
         parameter.removed = true
         parameter.modified = false
+    }
+
+    void updateParameterValue(String path, int periodIndex, def newValue) {
+        updateParameterValue(getParameterHolder(path, periodIndex), newValue)
+    }
+
+    protected void updateParameterValue(ParameterHolder holder, def newValue) {
+        holder.setValue(newValue)
+        fireValuesChanged([holder.path])
+    }
+
+    protected void updateParameterValue(ParameterObjectParameterHolder holder, def newValue) {
+        holder.setValue(newValue)
+        for (Comment comment in comments.findAll { it.path.startsWith(holder.path) }) {
+            removeComment(comment)
+        }
+        fireClassifierChanged(holder.path)
     }
 }

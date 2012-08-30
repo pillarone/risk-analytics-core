@@ -56,6 +56,9 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
 
         INodeMappingStrategy strategy = AbstractNodeMappingStrategy.getStrategy();
         List<GridNode> nodes = new ArrayList<GridNode>(strategy.filterNodes(subgrid));
+        if (nodes.isEmpty()) {
+            throw new IllegalStateException("No grid gain nodes found! Contact support.");
+        }
         Map<SimulationJob, GridNode> jobsToNodes = new HashMap<SimulationJob, GridNode>(nodes.size());
         HashMap<Integer, List<SimulationJob>> jobCountPerGrid = new HashMap<Integer, List<SimulationJob>>();
 
@@ -277,7 +280,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
 
     private int nextOffset(int currentOffset) {
         currentOffset++;
-        while((currentOffset >= 100 && currentOffset % 100 < 10)) {
+        while ((currentOffset >= 100 && currentOffset % 100 < 10)) {
             currentOffset++;
         }
         return currentOffset;

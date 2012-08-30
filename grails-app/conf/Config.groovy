@@ -10,6 +10,7 @@ environments {
     resultBulkInsert = null
     calculationBulkInsert = null
     keyFiguresToCalculate = null
+    numberOfParallelJobsPerNode = 100
 
     transactionServiceUrl = "rmi://localhost:1099/TransactionService"
     resultServiceRegistryPort = 1099

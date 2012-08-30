@@ -32,10 +32,11 @@ import org.codehaus.groovy.grails.orm.hibernate.HibernateEventListeners
 import org.pillarone.riskanalytics.core.listener.ModellingItemHibernateListener
 import org.pillarone.riskanalytics.core.example.parameter.ExampleResourceConstraints
 import org.pillarone.riskanalytics.core.simulation.engine.MappingCache
+import org.gridgain.grid.spi.collision.fifoqueue.GridFifoQueueCollisionSpi
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.6-ALPHA-5.5-kti"
+    def version = "1.6-ALPHA-5.6-kti"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.7 > *"
     // the other plugins this plugin depends on
@@ -111,7 +112,12 @@ Persistence & Simulation engine.
                 gridgainHomeDefault = new File(ggHome).absolutePath
             }
             gridGainHome = gridgainHomeDefault
+            collisionSpi = ref("collisionSpi")
 
+        }
+        collisionSpi(GridFifoQueueCollisionSpi) {
+            parallelJobsNumber = ConfigurationHolder.config.containsKey("numberOfParallelJobsPerNode") ?
+                ConfigurationHolder.config."numberOfParallelJobsPerNode" : 100
         }
         grid(GridSpringBean) {
             configuration = ref('grid.cfg')
@@ -120,9 +126,9 @@ Persistence & Simulation engine.
         modellingItemListener(ModellingItemHibernateListener)
 
         hibernateEventListeners(HibernateEventListeners) {
-            listenerMap = ['post-insert':modellingItemListener,
-                    'post-update':modellingItemListener,
-                    'post-delete':modellingItemListener]
+            listenerMap = ['post-insert': modellingItemListener,
+                    'post-update': modellingItemListener,
+                    'post-delete': modellingItemListener]
         }
 
         mappingCache(MappingCache) {}

@@ -8,6 +8,7 @@ import org.pillarone.riskanalytics.core.packets.PacketList
 import org.pillarone.riskanalytics.core.parameterization.StructureInformation
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 import org.pillarone.riskanalytics.core.wiring.WireCategory
+import org.pillarone.riskanalytics.core.RiskAnalyticsInconsistencyException
 import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 /**
@@ -33,6 +34,13 @@ public class PacketCollector extends Component {
 
     SimulationScope simulationScope
 
+    /**
+     * globalSanityChecks is injected by the framework, but defaults to true. The modeller should provide a global variable
+     * which is set by the user on the run screen. This variable decides whether or not to halt the simulation should
+     * an insanity (NaN, infinity) etc be collected.
+     */
+    boolean globalSanityChecks = true
+
     String path
 
     public PacketCollector() {
@@ -50,10 +58,21 @@ public class PacketCollector extends Component {
 
     protected void doCalculation() {
         if (inPackets.empty) {return}
-        outputStrategy << mode.collect(inPackets)
+        outputStrategy << mode.collect(inPackets, globalSanityChecks)
     }
 
-    /**
+    @Override
+    String getName() {
+        return "Packet collector for path : " + path
+    }
+
+    @Override
+    public final void setName(String name) {
+        throw new RiskAnalyticsInconsistencyException("""The name of the packet collector cannot be set directly.
+            It is  defined as a function of it's path.
+        """)
+    }
+/**
      * Find the component matching the path information and wire to its outputChannel.
      */
     public attachToModel(Model model, StructureInformation structureInformation) {

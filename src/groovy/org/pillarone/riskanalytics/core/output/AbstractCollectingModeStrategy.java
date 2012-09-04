@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 import org.pillarone.riskanalytics.core.packets.Packet;
+import org.pillarone.riskanalytics.core.simulation.SimulationException;
 import org.pillarone.riskanalytics.core.simulation.engine.PeriodScope;
 
 import java.util.ArrayList;
@@ -17,15 +18,17 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
     private Log LOG = LogFactory.getLog(AbstractCollectingModeStrategy.class);
 
     /**
+     *
      * @param packet        Period information in following packets is ignored. If no period information is found the
      *                      current period of the packetCollector is used.
      * @param valueMap      field, value map
      * @param valueIndex    Used when aggregating single packets
+     * @param crashSimOnError
      * @return
      */
-    protected List<SingleValueResultPOJO> createSingleValueResults(Packet packet , Map<String, Number> valueMap, int valueIndex) {
+    protected List<SingleValueResultPOJO> createSingleValueResults(Packet packet, Map<String, Number> valueMap, int valueIndex, boolean crashSimOnError) {
         PeriodScope periodScope = packetCollector.getSimulationScope().getIterationScope().getPeriodScope();
-        return createSingleValueResults(valueMap, valueIndex, getPeriod(packet, periodScope), getDate(packet, periodScope));
+        return createSingleValueResults(valueMap, valueIndex, getPeriod(packet, periodScope), getDate(packet, periodScope), crashSimOnError);
     }
 
     /**
@@ -65,7 +68,7 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
      * The key of the value map is the field name.
      * If a value is infinite or NaN a log statement is created and the packet ignored.
      */
-    private List<SingleValueResultPOJO> createSingleValueResults(Map<String, Number> valueMap, int valueIndex, int period, DateTime date) {
+    private List<SingleValueResultPOJO> createSingleValueResults(Map<String, Number> valueMap, int valueIndex, int period, DateTime date, boolean crashSimOnError) {
         List<SingleValueResultPOJO> results = new ArrayList(valueMap.size());
         int iteration = packetCollector.getSimulationScope().getIterationScope().getCurrentIteration();
         PathMapping path = packetCollector.getSimulationScope().getMappingCache().lookupPath(packetCollector.getPath());
@@ -73,8 +76,8 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
             String name = entry.getKey();
             Double value = entry.getValue().doubleValue();
             SingleValueResultPOJO result = new SingleValueResultPOJO();
-            if (logInvalidValues(name, value, period, iteration)) continue;
-//            result.setSimulationRun(packetCollector.getSimulationScope().getSimulation().getSimulationRun());
+            if (checkInvalidValues(name, value, period, iteration, crashSimOnError)) continue;
+            result.setSimulationRun(packetCollector.getSimulationScope().getSimulation().getSimulationRun());
             result.setIteration(iteration);
             result.setPeriod(period);
             result.setPath(path);
@@ -88,14 +91,16 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
         return results;
     }
 
-    private boolean logInvalidValues(String name, Double value, int period, int iteration) {
+    public boolean checkInvalidValues(String name, Double value, int period, int iteration, boolean crashSimulationOnError) {
         if (value.isInfinite() || value.isNaN()) {
+            StringBuilder message = new StringBuilder();
+            message.append(value).append(" collected at ").append(packetCollector.getPath()).append(":").append(name);
+            message.append(" Period : ").append(period).append( " in Iteration : " ).append(iteration);
             if (LOG.isErrorEnabled()) {
-                StringBuilder message = new StringBuilder();
-                message.append(value).append(" collected at ").append(packetCollector.getPath()).append(":").append(name);
-                message.append(" (period ").append(period).append(") in iteration ");
-                message.append(iteration).append(" - ignoring.");
-                LOG.info(message);
+                LOG.info(message.toString());
+            }
+            if(crashSimulationOnError) {
+                throw new SimulationException(message.toString() + " : insanity detected; killing simulation.");
             }
             return true;
         }

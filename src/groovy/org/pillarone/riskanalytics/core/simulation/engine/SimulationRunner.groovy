@@ -284,11 +284,11 @@ public class SimulationRunner {
         runner.preSimulationActions << randomSeed
         //order important!
         runner.preSimulationActions << initParams //creates resource params
-        runner.preSimulationActions << runtimeParams //inject runtime params - resource params must be ready
-        runner.preSimulationActions << applyGlobalParams //distribute global params - resource params must already be injected
         runner.preSimulationActions << prepareStructure
         runner.preSimulationActions << injectResourceParams
         runner.preSimulationActions << wireModel
+        runner.preSimulationActions << runtimeParams //inject runtime params - resource params must be ready
+        runner.preSimulationActions << applyGlobalParams //distribute global params - resource params must already be injected
         runner.preSimulationActions << periodCounter
         runner.preSimulationActions << injectScopes
 

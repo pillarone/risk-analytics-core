@@ -19,7 +19,10 @@ class CoreModelTests extends ModelTest {
 
     @Override
     List<ParameterHolder> getRuntimeParameters() {
-        return [ParameterHolderFactory.getHolder("runtimeInt", 0, 10)]
+        return [
+                ParameterHolderFactory.getHolder("runtimeInt", 0, 10) ,
+                ParameterHolderFactory.getHolder("runtimeSanityChecks", 0, true) ,
+        ]
     }
 
     void postSimulationEvaluation() {

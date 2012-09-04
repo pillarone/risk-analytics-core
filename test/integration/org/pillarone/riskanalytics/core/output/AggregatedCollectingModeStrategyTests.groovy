@@ -67,7 +67,7 @@ class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
             claims << new ITestPacketApple(value: 1.1d)
             result += 1.1d
         }
-        List<SingleValueResultPOJO> aggregatedValues = strategy.collect(claims)
+        List<SingleValueResultPOJO> aggregatedValues = strategy.collect(claims, true)
         assertNotNull "no aggregatedValues", aggregatedValues
         assertFalse "empty values", aggregatedValues.isEmpty()
         assertEquals 1, aggregatedValues.size()
@@ -91,7 +91,7 @@ class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
             aResult += 1.5d
             bResult += 2.2d
         }
-        aggregatedValues = strategy.collect(underwritingInfos)
+        aggregatedValues = strategy.collect(underwritingInfos, true)
         assertNotNull "no aggregatedValues", aggregatedValues
         assertFalse "empty values", aggregatedValues.isEmpty()
         assertEquals aResult, aggregatedValues.find {it.field.fieldName == "a"}.value

@@ -10,6 +10,7 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolde
 import org.pillarone.riskanalytics.core.parameterization.ParameterizationHelper
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import java.beans.Introspector
 
 public class ModelMigrator {
 
@@ -56,8 +57,9 @@ public class ModelMigrator {
                         try {
                             currentModelClassLoader.close()
                             LogFactory.releaseAll() //ART-850
+                            Introspector.flushCaches()
                         } catch (Exception e) {
-                            LOG.warn("Failed to release log factory for class loader - possible memory leak: ${e.message}")
+                            LOG.warn("Failed to release class loader resources - possible memory leak: ${e.message}")
                         }
                     }
 

@@ -15,7 +15,7 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
 
     public ValuationDatePeriodCounter(List<DateTime> dates) {
         currentPeriod = 0
-        this.dates = dates.sort()
+        this.dates = Collections.unmodifiableList( dates.sort() )
     }
 
     void reset() {
@@ -168,5 +168,9 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
      */
     DateTime endOfLastPeriod() {
         return dates[-1]
+    }
+
+    List<DateTime> periodDates() {
+        return dates
     }
 }

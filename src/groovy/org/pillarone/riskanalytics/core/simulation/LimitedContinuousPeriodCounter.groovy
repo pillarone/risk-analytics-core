@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.simulation
 
 import org.joda.time.DateTime
 import org.joda.time.Period
+import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
 /**
  * A period counter with a fixed number of periods all of the same length.
@@ -31,4 +32,7 @@ class LimitedContinuousPeriodCounter extends ContinuousPeriodCounter implements 
         return startOfFirstPeriod().toString() + ", number of periods: " + periodCount()
     }
 
+    List<DateTime> periodDates() {
+        throw new NotImplementedException()
+    }
 }

@@ -52,82 +52,88 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
     public final Map<? extends GridJob, GridNode> map(List<GridNode> subgrid,
                                                       SimulationConfiguration simulationConfiguration)
             throws GridException {
-        this.simulationConfiguration = simulationConfiguration;
+        try {
+            this.simulationConfiguration = simulationConfiguration;
 
-        INodeMappingStrategy strategy = AbstractNodeMappingStrategy.getStrategy();
-        List<GridNode> nodes = new ArrayList<GridNode>(strategy.filterNodes(subgrid));
-        if (nodes.isEmpty()) {
-            throw new IllegalStateException("No grid gain nodes found! Contact support.");
-        }
-        Map<SimulationJob, GridNode> jobsToNodes = new HashMap<SimulationJob, GridNode>(nodes.size());
-        HashMap<Integer, List<SimulationJob>> jobCountPerGrid = new HashMap<Integer, List<SimulationJob>>();
-
-        setSimulationState(SimulationState.INITIALIZING);
-        time = System.currentTimeMillis();
-        simulationConfiguration.getSimulation().setStart(new DateTime());
-
-        resultTransferListener = new ResultTransferListener(this);
-
-        Grid grid = GridHelper.getGrid();
-        int cpuCount = strategy.getTotalCpuCount(nodes);
-
-        List<SimulationBlock> simulationBlocks = generateBlocks(SIMULATION_BLOCK_SIZE, simulationConfiguration.getSimulation().getNumberOfIterations());
-
-        LOG.info("Number of generated blocks: " + simulationBlocks.size());
-        List<SimulationJob> jobs = new ArrayList<SimulationJob>();
-        List<SimulationConfiguration> configurations = new ArrayList<SimulationConfiguration>(cpuCount);
-
-        for (int i = 0; i < cpuCount; i++) {
-            SimulationConfiguration newConfiguration = simulationConfiguration.clone();
-            configurations.add(newConfiguration);
-        }
-
-        for (int i = 0; i < simulationBlocks.size(); i++) {
-            configurations.get(i % cpuCount).addSimulationBlock(simulationBlocks.get(i));
-        }
-
-        List<Resource> allResources = ParameterizationHelper.collectUsedResources(simulationConfiguration.getSimulation().getRuntimeParameters());
-        allResources.addAll(ParameterizationHelper.collectUsedResources(simulationConfiguration.getSimulation().getParameterization().getParameters()));
-
-        for (Resource resource : allResources) {
-            resource.load();
-        }
-        for (int i = 0; i < Math.min(cpuCount, simulationBlocks.size()); i++) {
-            UUID jobId = UUID.randomUUID();
-            SimulationJob job = new SimulationJob(configurations.get(i), jobId, grid.localNode().id());
-            job.setAggregatorMap(PacketAggregatorRegistry.getAllAggregators());
-            job.setLoadedResources(allResources);
-            jobIds.add(jobId);
-            jobs.add(job);
-            LOG.info("Created a new job with block count " + configurations.get(i).getSimulationBlocks().size());
-        }
-
-        resultWriter = new ResultWriter((Long) simulationConfiguration.getSimulation().id);
-        //grid.addMessageListener(this);
-        grid.listen(resultTransferListener);
-
-        setSimulationState(SimulationState.RUNNING);
-        totalJobs = jobs.size();
-
-        for (int i = 0; i < jobs.size(); i++) {
-            int gridNumber = i % nodes.size();
-            jobsToNodes.put(jobs.get(i), nodes.get(gridNumber));
-            List<SimulationJob> tmpList;
-            if ((tmpList = jobCountPerGrid.get(gridNumber)) == null) {
-                tmpList = new ArrayList<SimulationJob>();
-                jobCountPerGrid.put(gridNumber, tmpList);
+            INodeMappingStrategy strategy = AbstractNodeMappingStrategy.getStrategy();
+            List<GridNode> nodes = new ArrayList<GridNode>(strategy.filterNodes(subgrid));
+            if (nodes.isEmpty()) {
+                throw new IllegalStateException("No grid gain nodes found! Contact support.");
             }
-            tmpList.add(jobs.get(i));
-        }
+            Map<SimulationJob, GridNode> jobsToNodes = new HashMap<SimulationJob, GridNode>(nodes.size());
+            HashMap<Integer, List<SimulationJob>> jobCountPerGrid = new HashMap<Integer, List<SimulationJob>>();
 
-        for (int i : jobCountPerGrid.keySet()) {
-            List<SimulationJob> tmpList = jobCountPerGrid.get(i);
-            for (SimulationJob simulationJob : tmpList) {
-                simulationJob.setJobCount(tmpList.size());
+            setSimulationState(SimulationState.INITIALIZING);
+            time = System.currentTimeMillis();
+            simulationConfiguration.getSimulation().setStart(new DateTime());
+
+            resultTransferListener = new ResultTransferListener(this);
+
+            Grid grid = GridHelper.getGrid();
+            int cpuCount = strategy.getTotalCpuCount(nodes);
+
+            List<SimulationBlock> simulationBlocks = generateBlocks(SIMULATION_BLOCK_SIZE, simulationConfiguration.getSimulation().getNumberOfIterations());
+
+            LOG.info("Number of generated blocks: " + simulationBlocks.size());
+            List<SimulationJob> jobs = new ArrayList<SimulationJob>();
+            List<SimulationConfiguration> configurations = new ArrayList<SimulationConfiguration>(cpuCount);
+
+            for (int i = 0; i < cpuCount; i++) {
+                SimulationConfiguration newConfiguration = simulationConfiguration.clone();
+                configurations.add(newConfiguration);
             }
-        }
 
-        return jobsToNodes;
+            for (int i = 0; i < simulationBlocks.size(); i++) {
+                configurations.get(i % cpuCount).addSimulationBlock(simulationBlocks.get(i));
+            }
+
+            List<Resource> allResources = ParameterizationHelper.collectUsedResources(simulationConfiguration.getSimulation().getRuntimeParameters());
+            allResources.addAll(ParameterizationHelper.collectUsedResources(simulationConfiguration.getSimulation().getParameterization().getParameters()));
+
+            for (Resource resource : allResources) {
+                resource.load();
+            }
+            for (int i = 0; i < Math.min(cpuCount, simulationBlocks.size()); i++) {
+                UUID jobId = UUID.randomUUID();
+                SimulationJob job = new SimulationJob(configurations.get(i), jobId, grid.localNode().id());
+                job.setAggregatorMap(PacketAggregatorRegistry.getAllAggregators());
+                job.setLoadedResources(allResources);
+                jobIds.add(jobId);
+                jobs.add(job);
+                LOG.info("Created a new job with block count " + configurations.get(i).getSimulationBlocks().size());
+            }
+
+            resultWriter = new ResultWriter((Long) simulationConfiguration.getSimulation().id);
+            //grid.addMessageListener(this);
+            grid.listen(resultTransferListener);
+
+            setSimulationState(SimulationState.RUNNING);
+            totalJobs = jobs.size();
+
+            for (int i = 0; i < jobs.size(); i++) {
+                int gridNumber = i % nodes.size();
+                jobsToNodes.put(jobs.get(i), nodes.get(gridNumber));
+                List<SimulationJob> tmpList;
+                if ((tmpList = jobCountPerGrid.get(gridNumber)) == null) {
+                    tmpList = new ArrayList<SimulationJob>();
+                    jobCountPerGrid.put(gridNumber, tmpList);
+                }
+                tmpList.add(jobs.get(i));
+            }
+
+            for (int i : jobCountPerGrid.keySet()) {
+                List<SimulationJob> tmpList = jobCountPerGrid.get(i);
+                for (SimulationJob simulationJob : tmpList) {
+                    simulationJob.setJobCount(tmpList.size());
+                }
+            }
+
+            return jobsToNodes;
+        } catch (Exception e) {
+            simulationErrors.add(e);
+            setSimulationState(SimulationState.ERROR);
+            throw new RuntimeException(e);
+        }
     }
 
     @SuppressWarnings({"ThrowableInstanceNeverThrown"})
@@ -191,7 +197,6 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         simulation.save();
         setSimulationState(stopped ? SimulationState.STOPPED : SimulationState.FINISHED);
         LOG.info("Task completed in " + (System.currentTimeMillis() - time) + "ms");
-        BatchRunInfoService.getService().batchSimulationStateChanged(simulation, currentState);
         return true;
     }
 

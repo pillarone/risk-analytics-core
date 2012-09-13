@@ -138,66 +138,70 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
 
     @SuppressWarnings({"ThrowableInstanceNeverThrown"})
     public Object reduce(List<GridJobResult> gridJobResults) {
-        int totalMessageCount = 0;
-        int periodCount = 1;
-        int completedIterations = 0;
-        boolean error = false;
-        for (GridJobResult res : gridJobResults) {
-            JobResult jobResult = res.getData();
-            periodCount = jobResult.getNumberOfSimulatedPeriods();
-            totalMessageCount += jobResult.getTotalMessagesSent();
-            completedIterations += jobResult.getCompletedIterations();
+        try {
+            int totalMessageCount = 0;
+            int periodCount = 1;
+            int completedIterations = 0;
+            boolean error = false;
+            for (GridJobResult res : gridJobResults) {
+                JobResult jobResult = res.getData();
+                periodCount = jobResult.getNumberOfSimulatedPeriods();
+                totalMessageCount += jobResult.getTotalMessagesSent();
+                completedIterations += jobResult.getCompletedIterations();
 
-            LOG.info("Job " + jobResult.getNodeName() + " executed in " + (jobResult.getEnd().getTime() - jobResult.getStart().getTime()) + " ms");
-            Throwable simulationException = jobResult.getSimulationException();
-            if (simulationException != null) {
-                LOG.error("Error in job " + jobResult.getNodeName(), simulationException);
-                simulationErrors.add(simulationException);
-                error = true;
-            }
-        }
-        Simulation simulation = simulationConfiguration.getSimulation();
-
-        synchronized (this) {
-            while (messageCount.get() < totalMessageCount) {
-                long timeout = System.currentTimeMillis();
-                LOG.info("Not all messages received yet - waiting");
-                try {
-                    wait(MESSAGE_TIMEOUT);
-                } catch (InterruptedException e) {
+                LOG.info("Job " + jobResult.getNodeName() + " executed in " + (jobResult.getEnd().getTime() - jobResult.getStart().getTime()) + " ms");
+                Throwable simulationException = jobResult.getSimulationException();
+                if (simulationException != null) {
+                    LOG.error("Error in job " + jobResult.getNodeName(), simulationException);
+                    simulationErrors.add(simulationException);
                     error = true;
-                    simulationErrors.add(e);
-                    break;
-                }
-                if (System.currentTimeMillis() - timeout > MESSAGE_TIMEOUT) {
-                    error = true;
-                    simulationErrors.add(new TimeoutException("Not all messages received - timeout reached"));
-                    break;
                 }
             }
-        }
-        resultWriter.close();
-        resultTransferListener.removeListener();
+            Simulation simulation = simulationConfiguration.getSimulation();
 
-        if (error || cancelled) {
-            BatchRunInfoService.getService().batchSimulationStateChanged(simulation, currentState);
-            simulation.delete();
-            setSimulationState(error ? SimulationState.ERROR : SimulationState.CANCELED);
-            return false;
-        }
-        LOG.info("Received " + messageCount + " messages. Sent " + totalMessageCount + " messages.");
-        calculator = new Calculator(simulation);
-        setSimulationState(SimulationState.POST_SIMULATION_CALCULATIONS);
-        BatchRunInfoService.getService().batchSimulationStateChanged(simulation, currentState);
-        calculator.calculate();
+            synchronized (this) {
+                while (messageCount.get() < totalMessageCount) {
+                    long timeout = System.currentTimeMillis();
+                    LOG.info("Not all messages received yet - waiting");
+                    try {
+                        wait(MESSAGE_TIMEOUT);
+                    } catch (InterruptedException e) {
+                        error = true;
+                        simulationErrors.add(e);
+                        break;
+                    }
+                    if (System.currentTimeMillis() - timeout > MESSAGE_TIMEOUT) {
+                        error = true;
+                        simulationErrors.add(new TimeoutException("Not all messages received - timeout reached"));
+                        break;
+                    }
+                }
+            }
+            resultWriter.close();
+            resultTransferListener.removeListener();
 
-        simulation.setEnd(new DateTime());
-        simulation.setNumberOfIterations(completedIterations);
-        simulation.setPeriodCount(periodCount);
-        simulation.save();
-        setSimulationState(stopped ? SimulationState.STOPPED : SimulationState.FINISHED);
-        LOG.info("Task completed in " + (System.currentTimeMillis() - time) + "ms");
-        return true;
+            if (error || cancelled) {
+                simulation.delete();
+                setSimulationState(error ? SimulationState.ERROR : SimulationState.CANCELED);
+                return false;
+            }
+            LOG.info("Received " + messageCount + " messages. Sent " + totalMessageCount + " messages.");
+            calculator = new Calculator(simulation);
+            setSimulationState(SimulationState.POST_SIMULATION_CALCULATIONS);
+            calculator.calculate();
+
+            simulation.setEnd(new DateTime());
+            simulation.setNumberOfIterations(completedIterations);
+            simulation.setPeriodCount(periodCount);
+            simulation.save();
+            setSimulationState(stopped ? SimulationState.STOPPED : SimulationState.FINISHED);
+            LOG.info("Task completed in " + (System.currentTimeMillis() - time) + "ms");
+            return true;
+        } catch (Exception e) {
+            simulationErrors.add(e);
+            setSimulationState(SimulationState.ERROR);
+            throw new RuntimeException(e);
+        }
     }
 
     public synchronized void onMessage(UUID uuid, Object serializable) {

@@ -120,4 +120,8 @@ public class ContinuousPeriodCounter implements IPeriodCounter {
     DateTime endOfLastPeriod() {
         throw new NotImplementedException("The ContinuousPeriodCounter has not a fixed number of periods.")
     }
+
+    public Period getPeriodLength() {
+        return periodLength
+    }
 }

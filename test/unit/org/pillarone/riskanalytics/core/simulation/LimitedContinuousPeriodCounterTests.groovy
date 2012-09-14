@@ -121,4 +121,13 @@ class LimitedContinuousPeriodCounterTests extends GroovyTestCase {
         assertEquals "last period ends at 2008-06-01", new DateTime(2008, 6, 1, 0,0,0,0), counter.endOfLastPeriod()
     }
 
+    void testPeriodDates() {
+        DateTime start = new DateTime(2008, 1, 5, 0, 0, 0, 0)
+        LimitedContinuousPeriodCounter counter = new LimitedContinuousPeriodCounter(start, PeriodBase.MONTHLY.toPeriod(), 4)
+
+        assertEquals "check size", 6, counter.periodDates().size()
+        assertEquals "check first date", counter.getPeriodStart(0), counter.periodDates()[0]
+        assertEquals "check final date", counter.endOfLastPeriod(), counter.periodDates()[-1]
+
+    }
 }

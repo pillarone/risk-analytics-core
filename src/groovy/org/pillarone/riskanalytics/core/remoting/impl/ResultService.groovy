@@ -82,9 +82,10 @@ class ResultService implements IResultService {
                                     periodDates[periodIndex],
                                     singleValueResult.getDate())
 
-                        }
+
                         info.values = values
                         result << info
+                        }
                     }
                 }
             }

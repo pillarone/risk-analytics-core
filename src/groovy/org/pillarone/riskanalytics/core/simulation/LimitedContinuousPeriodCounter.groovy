@@ -10,7 +10,7 @@ import org.joda.time.Period
  */
 class LimitedContinuousPeriodCounter extends ContinuousPeriodCounter implements ILimitedPeriodCounter {
 
-    private List<DateTime> dates = []
+    private List<DateTime> dates = new ArrayList<DateTime>()
     private int numberOfPeriods
 
     public LimitedContinuousPeriodCounter(DateTime simulationStartDate, Period periodLength, int numberOfPeriods) {
@@ -31,4 +31,16 @@ class LimitedContinuousPeriodCounter extends ContinuousPeriodCounter implements 
         return startOfFirstPeriod().toString() + ", number of periods: " + periodCount()
     }
 
+    List<DateTime> periodDates() {
+        if (dates.size() > 0) {
+            return dates
+        } else {
+            DateTime aDate = getPeriodStart(0)
+            for (int i = 0; i <= numberOfPeriods + 1; i++) {
+                dates << aDate
+                aDate = aDate.plus(getPeriodLength())
+            }
+        }
+        return dates
+    }
 }

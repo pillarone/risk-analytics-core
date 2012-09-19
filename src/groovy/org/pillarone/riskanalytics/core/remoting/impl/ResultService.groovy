@@ -20,8 +20,12 @@ import org.pillarone.riskanalytics.core.output.SymbolicValueResult
 import org.pillarone.riskanalytics.core.remoting.TagInfo
 import org.pillarone.riskanalytics.core.output.SingleValueResultPOJO
 import org.pillarone.riskanalytics.core.dataaccess.ExportResultAccessor
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 
 class ResultService implements IResultService {
+
+    private static Log LOG = LogFactory.getLog(ResultService.class)
 
     List<ParameterizationInfo> getParameterizationInfosForTransactionId(long dealId) {
         List<ParameterizationInfo> result = []
@@ -51,14 +55,15 @@ class ResultService implements IResultService {
                 periodDates << dateFormat.parse(label)
             }
         } catch (Exception e) {
-            //period label aren't dates
+            LOG.error(e)
         }
 
         for (String fullPath in getPathsOfResult(paths, run)) {
 
             String path = fullPath.substring(0, fullPath.lastIndexOf(":"))
             String field = fullPath.substring(fullPath.lastIndexOf(":") + 1)
-            List<SingleValueResultPOJO> results = ExportResultAccessor.getSingleValueResultsForExport(SingleValueCollectingModeStrategy.IDENTIFIER, path, field, run)
+            List<SingleValueResultPOJO> results = ExportResultAccessor.getSingleValueResultsForExport(
+                    SingleValueCollectingModeStrategy.IDENTIFIER, path, field, run)
 
             for (int periodIndex = 0; periodIndex < run.periodCount; periodIndex++) {
                 ResultInfo info = new ResultInfo(path: fullPath, periodIndex: periodIndex)
@@ -70,14 +75,17 @@ class ResultService implements IResultService {
 
                 if (!results.isEmpty()) {
                     for (SingleValueResultPOJO singleValueResult in resultsInPeriod) {
-                        values << new ResultInfo.IterationValuePair(
-                                singleValueResult.getIteration(),
-                                singleValueResult.getValue(),
-                                periodDates[periodIndex],
-                                singleValueResult.getDate())
+                        if (singleValueResult.getValue() != 0) {
+                            values << new ResultInfo.IterationValuePair(
+                                    singleValueResult.getIteration(),
+                                    singleValueResult.getValue(),
+                                    periodDates[periodIndex],
+                                    singleValueResult.getDate())
+
+                        }
+                        info.values = values
+                        result << info
                     }
-                    info.values = values
-                    result << info
                 }
             }
         }

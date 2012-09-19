@@ -27,9 +27,10 @@ public class ExportResultAccessor {
      * @param field field in question
      * @param run the simulation run
      * @return returns a list of @link{org.pillarone.riskanalytics.core.output.SingleValueResultPOJO}. Note that these objects have null
-     * fields set for their collector, simulationRun, path and fields member variables. The reason is that these should certainly be know by the calling function.
-     * Furthermore, they are grails domain objects, and grails will do funky stuff on their creation. We therefore return nuill values.
+     * fields set for their collector, simulationRun, path and fields member variables. The reason is that these should certainly be known by the calling function.
+     * Furthermore, they are grails domain objects, and grails will do funky stuff on their creation. We therefore return null values.
      * It is important the calling function handles this appropriately.
+     *
      */
     public static List<SingleValueResultPOJO> getSingleValueResultsForExport(String collector, String path, String field, SimulationRun run ) {
         List<SingleValueResultPOJO> result = new ArrayList<SingleValueResultPOJO>();

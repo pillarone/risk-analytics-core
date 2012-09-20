@@ -62,10 +62,7 @@ public class PeriodLabelsUtil {
             if (allPeriodStartFirstJanuary) {
                 Integer simulationStartYear = null;
                 if (beginOfFirstPeriod == null) {
-                    IPeriodCounter periodCounter = simulationModel.createPeriodCounter(beginOfFirstPeriod);
-                    if (periodCounter instanceof LimitedContinuousPeriodCounter) {
-                        simulationStartYear = Integer.valueOf(periodLabels.get(0).substring(0, 4));
-                    }
+                    simulationStartYear = Integer.valueOf(periodLabels.get(0).substring(0, 4));
                 }
                 else {
                     simulationStartYear = beginOfFirstPeriod.getYear();

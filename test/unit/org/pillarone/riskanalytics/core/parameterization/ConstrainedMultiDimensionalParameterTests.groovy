@@ -41,6 +41,28 @@ class ConstrainedMultiDimensionalParameterTests extends GroovyTestCase {
         assertTrue numbers.every { it instanceof Number }
     }
 
+    void testGetValueAtAsObject() {
+        Parameterization parameterization = getParameterization(new File("src/java/models/core/CoreParameters.groovy"))
+        Model model = new CoreModel()
+        model.init()
+        model.injectComponentNames()
+
+        ParameterApplicator applicator = new ParameterApplicator(parameterization: parameterization, model: model)
+        applicator.init()
+        applicator.applyParameterForPeriod(0)
+
+        IMultiDimensionalConstraints markerConstraint = [
+                getColumnType: { int index -> return index == 0 ? ITestComponentMarker : BigDecimal }
+        ] as IMultiDimensionalConstraints
+
+        ConstrainedMultiDimensionalParameter constrainedMultiDimensionalParameter = new ConstrainedMultiDimensionalParameter([['exampleOutputComponent', 'hierarchyOutputComponent'], [1.0, 0.0]], ['component', 'values'], markerConstraint)
+        constrainedMultiDimensionalParameter.simulationModel = model
+        assertTrue constrainedMultiDimensionalParameter.getValueAtAsObject(1, 0) instanceof ITestComponentMarker
+        assertTrue constrainedMultiDimensionalParameter.getValueAtAsObject(2, 0) instanceof ITestComponentMarker
+        assertTrue constrainedMultiDimensionalParameter.getValueAtAsObject(1, 1) instanceof Number
+        assertTrue constrainedMultiDimensionalParameter.getValueAtAsObject(2, 1) instanceof Number
+    }
+
 
     void testReferencePaths() {
         IMultiDimensionalConstraints markerConstraint = new ExampleMultiDimensionalConstraints()

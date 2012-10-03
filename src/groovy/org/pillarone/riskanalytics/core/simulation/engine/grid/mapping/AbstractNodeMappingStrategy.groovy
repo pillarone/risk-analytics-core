@@ -26,7 +26,7 @@ abstract class AbstractNodeMappingStrategy implements INodeMappingStrategy {
         List<String> usedHosts = new ArrayList<String>();
         int processorCount = 0;
         for (GridNode node: usableNodes) {
-            String ip = node.externalAddresses().iterator().next();
+            String ip = getAddress(node);
             if (!usedHosts.contains(ip)) {
                 processorCount += node.metrics().getTotalCpus();
                 usedHosts.add(ip);
@@ -48,6 +48,16 @@ abstract class AbstractNodeMappingStrategy implements INodeMappingStrategy {
             return new LocalNodesStrategy()
         }
 
+    }
+
+    protected String getAddress(GridNode node) {
+        if(!node.internalAddresses().empty) {
+            return node.internalAddresses().toList().get(0);
+        }
+        if(!node.externalAddresses().empty) {
+            return node.externalAddresses().toList().get(0);
+        }
+        throw new IllegalStateException("Grid node ${node} does not have a physical address.")
     }
 
 }

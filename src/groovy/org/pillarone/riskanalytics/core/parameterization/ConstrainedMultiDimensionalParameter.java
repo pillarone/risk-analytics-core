@@ -90,6 +90,10 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
         }
     }
 
+    /**
+     * @param column
+     * @return selected component or resource instances if column contains either of them or values.get(column) in all other cases
+     */
     public List getValuesAsObjects(int column) {
         final Class columnType = constraints.getColumnType(column);
         List result = new LinkedList();
@@ -109,6 +113,26 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
         }
 
         return result;
+    }
+
+    /**
+     * @param row number including title and value rows
+     * @param column
+     * @return selected component or resource instance if the column contains either of them or the same as getValueAt in all other cases
+     */
+    public Object getValueAtAsObject(int row, int column) {
+        int dataRow = row - getTitleRowCount();
+        final Class columnType = constraints.getColumnType(column);
+        if (IComponentMarker.class.isAssignableFrom(columnType)) {
+            String selectedValue = (String) values.get(column).get(dataRow);
+            Map<String, Component> componentsOfType = comboBoxValues.get(column);
+            return componentsOfType.get(selectedValue);
+        } else if (IResource.class.isAssignableFrom(columnType)) {
+            ResourceHolder selectedValue = (ResourceHolder) values.get(column).get(dataRow);
+            return ResourceRegistry.getResourceInstance(selectedValue);
+        } else {
+            return getValueAt(row, column);
+        }
     }
 
     @Override

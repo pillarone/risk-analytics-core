@@ -132,6 +132,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         } catch (Exception e) {
             simulationErrors.add(e);
             setSimulationState(SimulationState.ERROR);
+            LOG.error("Error setting up simulation task.", e);
             throw new RuntimeException(e);
         }
     }
@@ -200,6 +201,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         } catch (Exception e) {
             simulationErrors.add(e);
             setSimulationState(SimulationState.ERROR);
+            LOG.error("Error reducing simulation task.", e);
             throw new RuntimeException(e);
         }
     }

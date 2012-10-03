@@ -157,6 +157,13 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
     }
 
     /**
+     * @return false as this period counter is not used in a period ctx
+     */
+    @Override
+    boolean annualPeriodsOnly() {
+        return false
+    }
+/**
      * @return first valuation date
      */
     DateTime startOfFirstPeriod() {

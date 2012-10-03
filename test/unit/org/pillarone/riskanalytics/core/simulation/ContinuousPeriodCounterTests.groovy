@@ -198,4 +198,12 @@ class ContinuousPeriodCounterTests extends GroovyTestCase {
 
         assertEquals "start of projection horizon", date20100101, counter.startOfFirstPeriod()
     }
+
+    void testAnnualPeriodsOnly() {
+        ContinuousPeriodCounter counter = new ContinuousPeriodCounter(date20110101, PeriodBase.YEARLY.toPeriod())
+        assertTrue "annual period", counter.annualPeriodsOnly()
+
+        counter = new ContinuousPeriodCounter(date20110101, new Period(1, 1, 0, 0, 0, 0, 0, 0))
+        assertFalse "annual period", counter.annualPeriodsOnly()
+    }
 }

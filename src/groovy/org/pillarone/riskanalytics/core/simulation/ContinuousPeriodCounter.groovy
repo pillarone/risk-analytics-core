@@ -113,6 +113,11 @@ public class ContinuousPeriodCounter implements IPeriodCounter {
         return getPeriodStart(period + 1)
     }
 
+    @Override
+    boolean annualPeriodsOnly() {
+        return periodLength.years == 1 && periodLength.days == 0 && periodLength.months == 0 && periodLength.hours == 0 && periodLength.minutes == 0
+    }
+
     DateTime startOfFirstPeriod() {
         return startOfFirstPeriod
     }

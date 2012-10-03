@@ -111,7 +111,8 @@ public class MappingCache implements Serializable {
                 }
                 catch (HibernateException ex) {
                     throw new HibernateException("On KTI branch collectors have to be persisted before simulation run! Collector " + collector + " not found!" +
-                                                 "\nPlease contact development providing them the missing path.", ex)
+                                                 """\nPlease contact development providing them the missing path.
+                                                    Did you register your collector in the plugin bootstrap ?""", ex)
                 }
             }
             collectors.put(collector, collectorMapping)

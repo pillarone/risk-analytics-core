@@ -1,14 +1,13 @@
 package org.pillarone.riskanalytics.core.output
 
+import org.pillarone.riskanalytics.core.RiskAnalyticsInconsistencyException
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.model.Model
-import org.pillarone.riskanalytics.core.output.batch.AbstractBulkInsert
 import org.pillarone.riskanalytics.core.packets.Packet
 import org.pillarone.riskanalytics.core.packets.PacketList
 import org.pillarone.riskanalytics.core.parameterization.StructureInformation
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 import org.pillarone.riskanalytics.core.wiring.WireCategory
-import org.pillarone.riskanalytics.core.RiskAnalyticsInconsistencyException
 
 /**
  * A PacketCollector is a special component used for collecting other components output.

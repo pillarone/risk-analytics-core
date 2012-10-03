@@ -78,4 +78,8 @@ public interface IPeriodCounter {
      */
     DateTime endOfPeriod(int period) throws NotInProjectionHorizon
 
+    /**
+     * @return true if all periods are of annual length
+     */
+    boolean annualPeriodsOnly()
 }

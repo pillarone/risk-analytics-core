@@ -142,4 +142,14 @@ class VariableLengthPeriodCounterTests extends GroovyTestCase {
     void testEndOfLastPeriod() {
         assertEquals "end of projection horizon", date20110102, periodCounter.endOfLastPeriod()
     }
+
+    void testAnnualPeriodsOnly() {
+        assertFalse "unequal period lengths", periodCounter.annualPeriodsOnly
+
+        VariableLengthPeriodCounter counter = new VariableLengthPeriodCounter([date20080101, date20090101, date20100101, date20130101])
+        assertFalse "unequal period lengths, last period", counter.annualPeriodsOnly
+
+        counter = new VariableLengthPeriodCounter([date20080101, date20090101, date20100101, date20110101])
+        assertFalse "three annual periods", counter.annualPeriodsOnly
+    }
 }

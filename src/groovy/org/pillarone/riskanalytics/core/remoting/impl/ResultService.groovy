@@ -81,11 +81,11 @@ class ResultService implements IResultService {
                                     singleValueResult.getValue(),
                                     periodDates[periodIndex],
                                     singleValueResult.getDate())
-
-
+                        }
+                    }
+                    if(values.size() != 0) {
                         info.values = values
                         result << info
-                        }
                     }
                 }
             }

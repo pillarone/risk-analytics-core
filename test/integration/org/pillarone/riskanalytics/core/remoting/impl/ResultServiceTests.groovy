@@ -151,7 +151,7 @@ class ResultServiceTests extends GroovyTestCase {
     }
 
     //TODO: implement missing method in ResultAccessor
-    /*void testGetResults() {
+    void testGetResults() {
         Parameterization parameterization1 = new Parameterization("test1")
         parameterization1.modelClass = EmptyModel
         parameterization1.dealId = 1
@@ -244,7 +244,7 @@ class ResultServiceTests extends GroovyTestCase {
         resultsWithRegEx = resultService.getResults(simulation.id, [notMatched])
         assertEquals 0, resultsWithRegEx.size()
 
-    }*/
+    }
 
     private void writeResult(ResultWriter resultWriter, SingleValueResult result) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();

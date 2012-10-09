@@ -32,7 +32,8 @@ class ConstraintsFactory {
         IMultiDimensionalConstraints constraint = constraints.get(name)
         if (constraint != null) {
             //workaround for migration
-            Class clazz = Thread.currentThread().contextClassLoader.loadClass(constraint.class.name)
+            final String name1 = constraint.class.name
+            Class clazz = Thread.currentThread().contextClassLoader.loadClass(name1)
             if (clazz != constraint.class) {
                 return clazz.newInstance()
             }

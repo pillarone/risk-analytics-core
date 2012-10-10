@@ -29,7 +29,13 @@ class ConstraintsFactory {
     }
 
     protected static IMultiDimensionalConstraints loadConstraint(String name) {
+//        Horrible, horrible hack. See ART-938. I *think* the migration happens only on the 'main' thread.
+//        In gridgain simulations, threads are named 'gridgain'. Prevent those threads from doing anything with the classloader.
         IMultiDimensionalConstraints constraint = constraints.get(name)
+        if(!Thread.currentThread().getName().equals("main")) {
+            return constraint
+        }
+
         if (constraint != null) {
             //workaround for migration
             final String name1 = constraint.class.name

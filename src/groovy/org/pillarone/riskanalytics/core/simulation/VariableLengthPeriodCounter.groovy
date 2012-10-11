@@ -9,7 +9,7 @@ import org.joda.time.Period
  */
 class VariableLengthPeriodCounter extends ValuationDatePeriodCounter {
 
-    boolean annualPeriodsOnly
+    Boolean annualPeriodsOnly
 
     public VariableLengthPeriodCounter(List<DateTime> dates) {
         super(dates)

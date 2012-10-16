@@ -5,6 +5,10 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder
 abstract class DatabaseUtils {
 
     public static boolean isOracleDatabase() {
-        return ConfigurationHolder.config.dataSource.url.contains("oracle")
+        def url = ConfigurationHolder.config?.dataSource?.url
+        if (url instanceof String) {
+            return url.contains("oracle")
+        }
+        return false
     }
 }

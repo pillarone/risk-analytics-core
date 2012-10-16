@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.parameterization
 import com.google.common.collect.MapMaker
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.model.migration.ModelMigrator
 
 class ConstraintsFactory {
 
@@ -29,19 +30,15 @@ class ConstraintsFactory {
     }
 
     protected static IMultiDimensionalConstraints loadConstraint(String name) {
-//        Horrible, horrible hack. See ART-938. I *think* the migration happens only on the 'main' thread.
-//        In gridgain simulations, threads are named 'gridgain'. Prevent those threads from doing anything with the classloader.
         IMultiDimensionalConstraints constraint = constraints.get(name)
-        if(!Thread.currentThread().getName().equals("main")) {
-            return constraint
-        }
-
         if (constraint != null) {
-            //workaround for migration
-            final String name1 = constraint.class.name
-            Class clazz = Thread.currentThread().contextClassLoader.loadClass(name1)
-            if (clazz != constraint.class) {
-                return clazz.newInstance()
+            if (ModelMigrator.migrationClassLoaderBeingUsedInThisThread()) { //during migration we want to load the class in the context class loader, but during a kti run the context cl is not set to the grid class loader..
+                //workaround for migration
+                final String name1 = constraint.class.name
+                Class clazz = Thread.currentThread().contextClassLoader.loadClass(name1)
+                if (clazz != constraint.class) {
+                    return clazz.newInstance()
+                }
             }
         }
         return constraint

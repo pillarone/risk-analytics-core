@@ -19,9 +19,20 @@ public class ModelMigrator {
     Class<? extends MigratableModel> modelClass
     VersionNumber toVersion
 
+    private static ThreadLocal<Boolean> classLoaderBeingUsed = new ThreadLocal<Boolean>() {
+        @Override
+        protected Boolean initialValue() {
+            return false
+        }
+    }
+
     public ModelMigrator(Class<? extends MigratableModel> modelClass) {
         this.modelClass = modelClass
         toVersion = Model.getModelVersion(modelClass);
+    }
+
+    public static boolean migrationClassLoaderBeingUsedInThisThread() {
+        return classLoaderBeingUsed.get()
     }
 
     public void migrateParameterizations() {
@@ -102,11 +113,13 @@ public class ModelMigrator {
     public static void doWithContextClassLoader(ClassLoader cl, Closure closure) {
         Thread currentThread = Thread.currentThread()
         ClassLoader current = currentThread.contextClassLoader
+        classLoaderBeingUsed.set(true)
         currentThread.contextClassLoader = cl
         try {
             closure.call()
         } finally {
             currentThread.contextClassLoader = current
+            classLoaderBeingUsed.set(false)
         }
     }
 }

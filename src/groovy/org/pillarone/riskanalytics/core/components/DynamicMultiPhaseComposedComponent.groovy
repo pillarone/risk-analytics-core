@@ -76,7 +76,14 @@ abstract class DynamicMultiPhaseComposedComponent extends DynamicComposedCompone
         increaseNumberOfTransmitter(numberOfNotifiedTransmittersPerPhase, transmitterPhase)
         if (numberOfNotifiedTransmittersPerPhase[transmitterPhase] == numberOfTransmitterPerPhaseInput[transmitterPhase]) {
             for (ITransmitter replicationTransmitter : replicationInputTransmitterPerPhase.get(transmitterPhase)) {
-                replicationTransmitter.transmit()
+                try {
+                    replicationTransmitter.transmit()
+                }
+                catch (SimulationException ex) {
+                    // extend the path with every recursive call of execute()
+                    ex.addPathElement(getName());
+                    throw ex;
+                }
             }
             publishResults transmitterPhase
         }

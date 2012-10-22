@@ -43,8 +43,7 @@ public class PacketCollector extends Component {
 
     String path
 
-    public PacketCollector() {
-    }
+    public PacketCollector() { }
 
     public void setMode(ICollectingModeStrategy mode) {
         this.mode = mode;

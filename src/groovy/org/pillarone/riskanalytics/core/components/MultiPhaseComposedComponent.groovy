@@ -80,11 +80,25 @@ abstract class MultiPhaseComposedComponent extends ComposedComponent implements 
             Set<ITransmitter> replicationTransmitters = replicationInputTransmitterPerPhase.get(transmitterPhase)
             if (replicationTransmitters.isEmpty()) {
                 // use case: composed component does not contain any internal wiring, it's used for structuring purposes only
-                doCalculation transmitterPhase
+                try {
+                    doCalculation transmitterPhase
+                }
+                catch (SimulationException ex) {
+                    // extend the path with every recursive call of execute()
+                    ex.addPathElement(getName());
+                    throw ex;
+                }
             }
             else {
                 for (ITransmitter replicationTransmitter : replicationTransmitters) {
-                    replicationTransmitter.transmit()
+                    try {
+                        replicationTransmitter.transmit()
+                    }
+                    catch (SimulationException ex) {
+                        // extend the path with every recursive call of execute()
+                        ex.addPathElement(getName());
+                        throw ex;
+                    }
                 }
             }
             publishResults transmitterPhase

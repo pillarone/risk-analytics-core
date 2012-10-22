@@ -11,4 +11,13 @@ abstract class DatabaseUtils {
         }
         return false
     }
+
+    public static boolean isMsSqlDatabase() {
+        def url = ConfigurationHolder.config?.dataSource?.url
+        if (url instanceof String) {
+            return url.contains("jtds")
+        }
+        return false
+    }
+
 }

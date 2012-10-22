@@ -8,6 +8,10 @@ import org.pillarone.riskanalytics.core.util.GroovyUtils
 import org.pillarone.riskanalytics.core.util.MathUtils
 import org.pillarone.riskanalytics.core.output.*
 import groovy.sql.GroovyRowResult
+import org.joda.time.format.DateTimeFormatter
+import org.joda.time.format.DateTimeFormat
+import org.pillarone.riskanalytics.core.simulation.item.Parameterization
+import org.joda.time.DateTime
 
 abstract class ResultAccessor {
 
@@ -23,9 +27,9 @@ abstract class ResultAccessor {
         List<ResultPathDescriptor> paths = getDistinctPaths(simulationRun)
         List<SingleValueResultPOJO> result = []
 
-        for(ResultPathDescriptor descriptor in paths) {
+        for (ResultPathDescriptor descriptor in paths) {
             double[] values = getValues(simulationRun, descriptor.period, descriptor.path.pathName, descriptor.collector.collectorName, descriptor.field.fieldName)
-            for(double value in values) {
+            for (double value in values) {
                 result << new SingleValueResultPOJO(
                         path: descriptor.path, field: descriptor.field, collector: descriptor.collector,
                         period: descriptor.period, simulationRun: simulationRun, value: value
@@ -43,18 +47,21 @@ abstract class ResultAccessor {
             file.delete()
         }
         StringBuilder fileContent = new StringBuilder()
-        Sql sql = new Sql(simulationRun.dataSource)
-        try {
-            List<GroovyRowResult> rows = sql.rows(
-                    """select concat_ws(',',cast(s.iteration as char),cast(s.period as char),mapping.path_name, fmapping.field_name, cast(s.value as char), cm.collector_name, from_unixtime(date / 1000))
+        List<ResultPathDescriptor> paths = getDistinctPaths(simulationRun)
+        DateTimeFormatter formatter = DateTimeFormat.forPattern(Parameterization.PERIOD_DATE_FORMAT)
 
-                        AS data from single_value_result as s, field_mapping as fmapping, path_mapping as mapping, collector_mapping cm  where s.simulation_run_id ='""" + simulationRun.id + "' and mapping.id=s.path_id and cm.id=s.collector_id and fmapping.id=s.field_id ")
-            for (GroovyRowResult rowResult in rows) {
-                fileContent.append(rowResult["data"]).append("\n")
+        for (ResultPathDescriptor descriptor in paths) {
+            if(descriptor.collector.collectorName == AggregatedWithSingleAvailableCollectingModeStrategy.IDENTIFIER) { //get distinct path ignores single collectors
+                descriptor.collector = CollectorMapping.findByCollectorName(SingleValueCollectingModeStrategy.IDENTIFIER) //but we only want single values in CSV if they are available
             }
-        } catch (Exception ex) {
-            LOG.error("CSV export failed : ${ex.message}", ex)
-            return null
+            IterationFileAccessor ifa = new IterationFileAccessor(new File(GridHelper.getResultPathLocation(simulationRun.id, descriptor.path.id, descriptor.field.id, descriptor.collector.id, descriptor.period)));
+            while (ifa.fetchNext()) {
+                for (DateTimeValuePair pair in ifa.getSingleValues()) {
+                    fileContent.
+                            append([ifa.iteration, descriptor.period, descriptor.path.pathName, descriptor.field.fieldName, pair.aDouble, descriptor.collector.collectorName, formatter.print(new DateTime(pair.dateTime))].join(",")).
+                            append("\n")
+                }
+            }
         }
         file.text = fileContent.toString()
         return fileName
@@ -84,14 +91,14 @@ abstract class ResultAccessor {
         if (result != null) {
             return result.result
         } else {
-            List<Double> allValues = getValues(simulationRun, periodIndex,pathName, collectorName, fieldName)
+            List<Double> allValues = getValues(simulationRun, periodIndex, pathName, collectorName, fieldName)
             return allValues.sum() / simulationRun.iterations
         }
     }
 
     static Double getMin(SimulationRun simulationRun, int periodIndex, String pathName, String collectorName, String fieldName) {
         double[] sortedValues = getValuesSorted(simulationRun, periodIndex, pathName, collectorName, fieldName)
-        if(sortedValues.length == 0) {
+        if (sortedValues.length == 0) {
             return null
         }
         return sortedValues[0]
@@ -99,7 +106,7 @@ abstract class ResultAccessor {
 
     static Double getMax(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
         double[] sortedValues = getValuesSorted(simulationRun, periodIndex, pathName, collectorName, fieldName)
-        if(sortedValues.length == 0) {
+        if (sortedValues.length == 0) {
             return null
         }
         return sortedValues[-1]
@@ -271,7 +278,7 @@ abstract class ResultAccessor {
     public static List<Object[]> getAvgAndIsStochastic(SimulationRun simulationRun) {
         File simRun = new File(getSimRunPath(simulationRun));
         def result = []
-        for (File f: simRun.listFiles()) {
+        for (File f : simRun.listFiles()) {
             def array = new Object[7]
             IterationFileAccessor ifa = new IterationFileAccessor(f);
             double min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY, avg = 0;
@@ -337,7 +344,7 @@ abstract class ResultAccessor {
     }
 
     public static Double getSingleIterationValue(SimulationRun simulationRun, int period, String path, String field, String collector, int iteration) {
-        File iterationFile = new File(GridHelper.getResultPathLocation(simulationRun.id, getPathId(path),getFieldId(field), getCollectorId(collector), period));
+        File iterationFile = new File(GridHelper.getResultPathLocation(simulationRun.id, getPathId(path), getFieldId(field), getCollectorId(collector), period));
         IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
 
         while (ifa.fetchNext()) {
@@ -415,7 +422,7 @@ abstract class ResultAccessor {
     }
 
     public static Map<Integer, Double> getIterationConstrainedValues(SimulationRun simulationRun, int period, String path, String field, String collector,
-                                                     List<Integer> iterations) {
+                                                                     List<Integer> iterations) {
         return IterationFileAccessor.getIterationConstrainedValues(simulationRun.id, period, getPathId(path), getFieldId(field), getCollectorId(collector), new HashSet<Integer>(iterations))
     }
 

@@ -81,5 +81,5 @@ public interface IPeriodCounter {
     /**
      * @return true if all periods are of annual length
      */
-    boolean annualPeriodsOnly()
+    Boolean annualPeriodsOnly(boolean checkLastPeriodToo)
 }

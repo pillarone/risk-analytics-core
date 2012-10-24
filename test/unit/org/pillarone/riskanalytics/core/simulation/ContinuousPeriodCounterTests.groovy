@@ -201,9 +201,9 @@ class ContinuousPeriodCounterTests extends GroovyTestCase {
 
     void testAnnualPeriodsOnly() {
         ContinuousPeriodCounter counter = new ContinuousPeriodCounter(date20110101, PeriodBase.YEARLY.toPeriod())
-        assertTrue "annual period", counter.annualPeriodsOnly()
+        assertTrue "annual period", counter.annualPeriodsOnly(false)
 
         counter = new ContinuousPeriodCounter(date20110101, new Period(1, 1, 0, 0, 0, 0, 0, 0))
-        assertFalse "annual period", counter.annualPeriodsOnly()
+        assertFalse "annual period", counter.annualPeriodsOnly(false)
     }
 }

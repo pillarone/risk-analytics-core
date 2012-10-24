@@ -114,7 +114,7 @@ public class ContinuousPeriodCounter implements IPeriodCounter {
     }
 
     @Override
-    boolean annualPeriodsOnly() {
+    Boolean annualPeriodsOnly(boolean checkLastPeriodToo) {
         return periodLength.years == 1 && periodLength.days == 0 && periodLength.months == 0 && periodLength.hours == 0 && periodLength.minutes == 0
     }
 

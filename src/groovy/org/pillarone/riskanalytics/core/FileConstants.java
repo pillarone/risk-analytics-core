@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core;
 
+import org.pillarone.riskanalytics.core.util.Configuration;
 import org.pillarone.riskanalytics.core.util.PropertiesUtils;
 
 import java.io.File;
@@ -17,14 +18,19 @@ public class FileConstants {
     public static final String GRIDGAIN_HOME;
 
     static {
+        boolean appendVersion = !Configuration.getBoolean("dataDirectoryIndependentOfVersion", false);
+
         String baseDir = System.getProperty("p1.temp");
         StringBuilder builder = new StringBuilder(baseDir != null ? baseDir : System.getProperty("user.home"));
         builder.append(File.separatorChar);
         builder.append(".pillarone");
         builder.append(File.separatorChar);
-        builder.append("RiskAnalytics-");
-        String appVersion = new PropertiesUtils().getProperties("/version.properties").getProperty("version", "");
-        builder.append(appVersion);
+        builder.append("RiskAnalytics");
+        if (appendVersion) {
+            builder.append("-");
+            String appVersion = new PropertiesUtils().getProperties("/version.properties").getProperty("version", "");
+            builder.append(appVersion);
+        }
         BASE_DATA_DIRECTORY = builder.toString();
         File file = new File(BASE_DATA_DIRECTORY);
         file.mkdirs();

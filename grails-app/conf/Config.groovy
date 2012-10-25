@@ -12,6 +12,8 @@ environments {
     keyFiguresToCalculate = null
     numberOfParallelJobsPerNode = 100
 
+    dataDirectoryIndependentOfVersion = false
+
     transactionServiceUrl = "rmi://localhost:1099/TransactionService"
     resultServiceRegistryPort = 1099
 

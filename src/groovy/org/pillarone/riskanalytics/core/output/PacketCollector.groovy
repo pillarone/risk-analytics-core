@@ -39,7 +39,7 @@ public class PacketCollector extends Component {
      * which is set by the user on the run screen. This variable decides whether or not to halt the simulation should
      * an insanity (NaN, infinity) etc be collected.
      */
-    boolean globalSanityChecks = true
+    boolean runtimeSanityChecks = true
 
     String path
 
@@ -57,7 +57,7 @@ public class PacketCollector extends Component {
 
     protected void doCalculation() {
         if (inPackets.empty) {return}
-        outputStrategy << mode.collect(inPackets, globalSanityChecks)
+        outputStrategy << mode.collect(inPackets, runtimeSanityChecks)
     }
 
     @Override
@@ -72,8 +72,8 @@ public class PacketCollector extends Component {
         """)
     }
 /**
-     * Find the component matching the path information and wire to its outputChannel.
-     */
+ * Find the component matching the path information and wire to its outputChannel.
+ */
     public attachToModel(Model model, StructureInformation structureInformation) {
         def pathElements = path.split("\\:")
 

@@ -7,10 +7,12 @@ abstract class Configuration {
 
     public static boolean getBoolean(String key, boolean defaultValue) {
         ConfigObject config = ConfigurationHolder.config
-        if(config.containsKey(key)) {
-            def value = config[key]
-            if(value instanceof Boolean) {
-                return value
+        if (config != null) {
+            if(config.containsKey(key)) {
+                def value = config[key]
+                if(value instanceof Boolean) {
+                    return value
+                }
             }
         }
 

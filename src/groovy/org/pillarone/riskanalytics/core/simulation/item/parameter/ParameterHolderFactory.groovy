@@ -11,6 +11,7 @@ import org.pillarone.riskanalytics.core.parameterization.IParameterObject
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.Resource
 import org.pillarone.riskanalytics.core.parameter.*
+import org.pillarone.riskanalytics.core.simulation.item.ParametrizedItem
 
 class ParameterHolderFactory {
 
@@ -130,10 +131,10 @@ class ParameterHolderFactory {
      * This can be used to rename all parameters of a component inclusive all of their sub component parameters.
      * Furthermore all parameters referencing it are renamed accordingly.
      */
-    public static List<String> renamePathOfParameter(Parameterization parameterization, String oldPath, String newPath, Component renamedComponent) {
+    public static List<String> renamePathOfParameter(ParametrizedItem parameterization, String oldPath, String newPath, Component renamedComponent) {
         List removedParameters = []
         List clonedParameters = []
-        parameterization.parameters.each {ParameterHolder parameterHolder ->
+        parameterization.getAllParameterHolders().each {ParameterHolder parameterHolder ->
             if (parameterHolder.path.startsWith(oldPath + ":")) {
                 renamePathOfParameter(parameterHolder, removedParameters, clonedParameters, oldPath, newPath, false)
             }
@@ -173,7 +174,7 @@ class ParameterHolderFactory {
      * @return all referencing components being renamed from oldComponentPath to newComponentPath using the marker
      *          interface of the component @ oldComponentPath
      */
-    private static List<String> renameReferencingParameters(Parameterization parameterization, String oldComponentPath, String newComponentPath, Component renamedComponent) {
+    private static List<String> renameReferencingParameters(ParametrizedItem parameterization, String oldComponentPath, String newComponentPath, Component renamedComponent) {
         String oldComponentName = ComponentUtils.getComponentNormalizedName(oldComponentPath)
         String newComponentName = ComponentUtils.getComponentNormalizedName(newComponentPath)
         List<Class> markerInterfaces = getMarkerInterface(renamedComponent)
@@ -222,10 +223,10 @@ class ParameterHolderFactory {
         return referencingPaths
     }
 
-    private static List<ParameterHolder> affectedParameterHolders(Parameterization parameterization, Class markerInterface, String componentPath) {
+    private static List<ParameterHolder> affectedParameterHolders(ParametrizedItem parameterization, Class markerInterface, String componentPath) {
         List<ParameterHolder> referencedParameterHolders = new ArrayList<ParameterHolder>()
         if (markerInterface) {
-            for (ParameterHolder parameterHolder : parameterization.parameterHolders) {
+            for (ParameterHolder parameterHolder : parameterization.getAllParameterHolders()) {
                 if (parameterHolder instanceof IMarkerValueAccessor) {
                     referencedParameterHolders.add parameterHolder
                 }
@@ -249,9 +250,9 @@ class ParameterHolderFactory {
         return result
     }
 
-    public static void duplicateParameters(Parameterization parameterization, String oldPath, String newPath) {
+    public static void duplicateParameters(ParametrizedItem parameterization, String oldPath, String newPath) {
         List clonedParameters = []
-        parameterization.parameters.each {ParameterHolder parameterHolder ->
+        parameterization.getAllParameterHolders().each {ParameterHolder parameterHolder ->
             if (parameterHolder.path.startsWith(oldPath + ":")) {
                 ParameterHolder cloned = parameterHolder.clone()
                 renamePath(cloned, oldPath, newPath)

@@ -4,24 +4,24 @@ import models.core.CoreModel
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObject
+import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObjectClassifier
 import org.pillarone.riskanalytics.core.fileimport.ParameterizationImportService
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.StringParameter
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 import org.pillarone.riskanalytics.core.parameter.comment.ParameterizationCommentDAO
+import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowCommentDAO
 import org.pillarone.riskanalytics.core.parameterization.validation.TestValidationService
 import org.pillarone.riskanalytics.core.parameterization.validation.ValidatorRegistry
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjectParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.StringParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.EnumTagType
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
 import org.pillarone.riskanalytics.core.workflow.Status
-import org.pillarone.riskanalytics.core.parameter.comment.Tag
-import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.EnumTagType
-import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObjectClassifier
-import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjectParameterHolder
 
 class ParameterizationTests extends GroovyTestCase {
 
@@ -520,6 +520,25 @@ class ParameterizationTests extends GroovyTestCase {
         assertSame(holder, parameterization.parameterHolders[0])
         assertEquals(2, holder.businessObject)
 
+    }
+
+    void testGetParameterHolder() {
+        Parameterization parameterization = new Parameterization("testSafeNestedReload", CoreModel)
+        ParameterObjectParameterHolder holder = ParameterHolderFactory.getHolder("component:parmParameter", 0, ExampleParameterObjectClassifier.getStrategy(ExampleParameterObjectClassifier.NESTED_PARAMETER_OBJECT, ExampleParameterObjectClassifier.NESTED_PARAMETER_OBJECT.parameters))
+        parameterization.addParameter(holder)
+
+        assertSame(holder, parameterization.getParameterHolder("component:parmParameter", 0))
+        assertSame(holder.classifierParameters["nested"], parameterization.getParameterHolder("component:parmParameter:nested", 0))
+        assertSame(holder.classifierParameters["nested"].classifierParameters["a"], parameterization.getParameterHolder("component:parmParameter:nested:a", 0))
+
+        assertTrue(parameterization.hasParameterAtPath("component:parmParameter"))
+        assertTrue(parameterization.hasParameterAtPath("component:parmParameter",0))
+        assertFalse(parameterization.hasParameterAtPath("component:parmParameter",1))
+
+        parameterization.addParameter(ParameterHolderFactory.getHolder("component:parmParameter", 1, ExampleParameterObjectClassifier.getStrategy(ExampleParameterObjectClassifier.NESTED_PARAMETER_OBJECT, ExampleParameterObjectClassifier.NESTED_PARAMETER_OBJECT.parameters)))
+
+        List<ParameterHolder> parameterHolders = parameterization.getParameterHoldersForAllPeriods("component:parmParameter").sort { it.periodIndex }
+        assertEquals(2, parameterHolders.size())
     }
 
     void testSafeNestedReload() {

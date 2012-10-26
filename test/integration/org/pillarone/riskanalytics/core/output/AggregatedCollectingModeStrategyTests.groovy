@@ -42,6 +42,7 @@ class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
         resultConfiguration.load()
 
         run = new Simulation("name")
+        run.periodCount = 1
         run.template = resultConfiguration
         run.parameterization = parameterization
         run.save()

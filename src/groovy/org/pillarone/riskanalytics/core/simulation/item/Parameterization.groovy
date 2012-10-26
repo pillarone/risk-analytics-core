@@ -386,20 +386,10 @@ class Parameterization extends ParametrizedItem {
     }
 
 
-    void addParameter(ParameterHolder parameter) {
-        parameterHolders << parameter
-        parameter.added = true
+    @Override
+    List<ParameterHolder> getAllParameterHolders() {
+        return parameterHolders
     }
-
-    void removeParameter(ParameterHolder parameter) {
-        if (parameter.added) {
-            parameterHolders.remove(parameter)
-            return
-        }
-        parameter.removed = true
-        parameter.modified = false
-    }
-
 
     public List<Tag> getTags() {
         return tags

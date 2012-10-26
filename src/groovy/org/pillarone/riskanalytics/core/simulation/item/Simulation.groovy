@@ -30,7 +30,7 @@ class Simulation extends ParametrizedItem {
     /**
      * The number of periods run in this simulation. Might be different than the number of periods in the parameterization.
      */
-    int periodCount
+    Integer periodCount
     Integer randomSeed
     volatile DateTime start
     volatile DateTime end
@@ -131,18 +131,10 @@ class Simulation extends ParametrizedItem {
         dao.removeFromRuntimeParameters(parameter)
     }
 
-    void addParameter(ParameterHolder parameter) {
-        runtimeParameters << parameter
-        parameter.added = true
-    }
 
-    void removeParameter(ParameterHolder parameter) {
-        if (parameter.added) {
-            runtimeParameters.remove(parameter)
-            return
-        }
-        parameter.removed = true
-        parameter.modified = false
+    @Override
+    List<ParameterHolder> getAllParameterHolders() {
+        return runtimeParameters
     }
 
     public Object getParameter(String path) {

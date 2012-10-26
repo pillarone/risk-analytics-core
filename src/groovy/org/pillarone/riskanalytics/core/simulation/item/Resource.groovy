@@ -66,6 +66,11 @@ class Resource extends ParametrizedItem {
     }
 
     @Override
+    List<ParameterHolder> getAllParameterHolders() {
+        return parameterHolders
+    }
+
+    @Override
     protected createDao() {
         return new ResourceDAO(name: name, resourceClassName: modelClass.name)
     }
@@ -73,6 +78,11 @@ class Resource extends ParametrizedItem {
     @Override
     def getDaoClass() {
         return ResourceDAO
+    }
+
+    @Override
+    Integer getPeriodCount() {
+        return 1
     }
 
     public List<String> getAllEditablePaths() {
@@ -130,20 +140,6 @@ class Resource extends ParametrizedItem {
     @Override
     protected loadFromDB() {
         return ResourceDAO.findWhere([name: name, resourceClassName: modelClass.name, itemVersion: versionNumber.toString()])
-    }
-
-    void addParameter(ParameterHolder parameter) {
-        parameterHolders << parameter
-        parameter.added = true
-    }
-
-    void removeParameter(ParameterHolder parameter) {
-        if (parameter.added) {
-            parameterHolders.remove(parameter)
-            return
-        }
-        parameter.removed = true
-        parameter.modified = false
     }
 
     protected void saveTags(ResourceDAO dao) {

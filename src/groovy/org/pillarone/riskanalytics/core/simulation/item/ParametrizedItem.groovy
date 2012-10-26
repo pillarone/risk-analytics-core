@@ -21,6 +21,11 @@ abstract class ParametrizedItem extends CommentableItem {
     }
 
     void addComponent(String basePath, Component component) {
+        internalAddComponent(basePath, component)
+        fireComponentAdded(basePath, component)
+    }
+
+    private void internalAddComponent(String basePath, Component component) {
         for (Map.Entry<String, Object> entry : GroovyUtils.getProperties(component).entrySet()) {
             String fieldName = entry.key
             def value = entry.value
@@ -31,9 +36,10 @@ abstract class ParametrizedItem extends CommentableItem {
                     }
                     addParameter(ParameterHolderFactory.getHolder([basePath, fieldName].join(":"), i, value))
                 }
+            } else if(fieldName.startsWith("sub")) {
+                internalAddComponent([basePath, fieldName].join(":"), value as Component)
             }
         }
-        fireComponentAdded(basePath, component)
     }
 
     void copyComponent(String oldPath, String newPath, Component component, boolean copyComments) {

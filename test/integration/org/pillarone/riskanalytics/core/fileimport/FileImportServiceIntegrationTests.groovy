@@ -15,6 +15,12 @@ class FileImportServiceIntegrationTests extends GroovyTestCase {
         ModelRegistry.instance.clear()
     }
 
+    @Override
+    protected void tearDown() {
+        System.setProperty("skipImport", "false")
+        super.tearDown()
+    }
+
     void testImportModelsIfNeeded() {
         FileImportService.importModelsIfNeeded(["Core"])
         ParameterizationDAO dao = ParameterizationDAO.findByName("CoreParameters")

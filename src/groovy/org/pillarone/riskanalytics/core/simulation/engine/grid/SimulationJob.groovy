@@ -38,44 +38,52 @@ class SimulationJob extends GridJobAdapter<JobResult> {
     }
 
     JobResult execute() {
-
-        /** Setting the default time zone to UTC avoids problems in multi user context with different time zones
-         *  and switches off daylight saving capabilities and possible related problems.                */
-        DateTimeZone.setDefault(DateTimeZone.UTC)
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
-
-        //***** https://issuetracking.intuitive-collaboration.com/jira/browse/KTI-15
-        getClass().getClassLoader().loadClass("java.lang.Character")
-        getClass().getClassLoader().loadClass("java.lang.reflect.InvocationTargetException")
-        getClass().getClassLoader().loadClass("org.pillarone.riskanalytics.core.components.ComponentUtils")
-        //***** http://www.gridgainsystems.com/jiveforums/thread.jspa?threadID=1324&tstart=0
-
-        for(Map.Entry<Class, IPacketAggregator> entry in aggregatorMap) {
-            PacketAggregatorRegistry.registerAggregator(entry.key, entry.value)
-        }
-        ResourceRegistry.clear()
-        ResourceRegistry.preLoad(loadedResources)
-
         Date start = new Date()
-        initSpringContext()
-        ExpandoMetaClass.enableGlobally()
-        runner.setJobCount(jobCount)
-        runner.setSimulationConfiguration(simulationConfiguration)
-        runner.start()
 
-        GridOutputStrategy outputStrategy = this.simulationConfiguration.outputStrategy
-        final JobResult result = new JobResult(
-                totalMessagesSent: outputStrategy.totalMessages, start: start, end: new Date(),
-                nodeName: jobIdentifier.toString(), simulationException: runner.error?.error,
-                completedIterations: runner.currentScope.iterationsDone
-        )
-        final IPeriodCounter periodCounter = runner.currentScope.iterationScope.periodScope.periodCounter
-        if(periodCounter instanceof ILimitedPeriodCounter) {
-            result.numberOfSimulatedPeriods = periodCounter.periodCount()
-        } else {
-            result.numberOfSimulatedPeriods = simulationConfiguration.simulation.periodCount
+        try {
+/** Setting the default time zone to UTC avoids problems in multi user context with different time zones
+ *  and switches off daylight saving capabilities and possible related problems.                */
+            DateTimeZone.setDefault(DateTimeZone.UTC)
+            TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
+
+            //***** https://issuetracking.intuitive-collaboration.com/jira/browse/KTI-15
+            getClass().getClassLoader().loadClass("java.lang.Character")
+            getClass().getClassLoader().loadClass("java.lang.reflect.InvocationTargetException")
+            getClass().getClassLoader().loadClass("org.pillarone.riskanalytics.core.components.ComponentUtils")
+            //***** http://www.gridgainsystems.com/jiveforums/thread.jspa?threadID=1324&tstart=0
+
+            for(Map.Entry<Class, IPacketAggregator> entry in aggregatorMap) {
+                PacketAggregatorRegistry.registerAggregator(entry.key, entry.value)
+            }
+            ResourceRegistry.clear()
+            ResourceRegistry.preLoad(loadedResources)
+
+            initSpringContext()
+            ExpandoMetaClass.enableGlobally()
+            runner.setJobCount(jobCount)
+            runner.setSimulationConfiguration(simulationConfiguration)
+            runner.start()
+
+            GridOutputStrategy outputStrategy = this.simulationConfiguration.outputStrategy
+            final JobResult result = new JobResult(
+                    totalMessagesSent: outputStrategy.totalMessages, start: start, end: new Date(),
+                    nodeName: jobIdentifier.toString(), simulationException: runner.error?.error,
+                    completedIterations: runner.currentScope.iterationsDone
+            )
+            final IPeriodCounter periodCounter = runner.currentScope.iterationScope.periodScope.periodCounter
+            if(periodCounter instanceof ILimitedPeriodCounter) {
+                result.numberOfSimulatedPeriods = periodCounter.periodCount()
+            } else {
+                result.numberOfSimulatedPeriods = simulationConfiguration.simulation.periodCount
+            }
+            return result
+        } catch (Throwable e) {
+            return new JobResult(
+                    totalMessagesSent: 0, start: start, end: new Date(),
+                    nodeName: jobIdentifier.toString(), simulationException: e,
+                    completedIterations: runner.currentScope.iterationsDone
+            )
         }
-        return result
     }
 
     void cancel() {

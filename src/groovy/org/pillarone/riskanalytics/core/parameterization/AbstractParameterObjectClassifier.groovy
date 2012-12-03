@@ -38,8 +38,8 @@ abstract class AbstractParameterObjectClassifier implements IParameterObjectClas
     public String getConstructionString(Map parameters) {
         StringBuffer parameterString = new StringBuffer('[')
         parameters.each {k, v ->
-            if (v.class.isEnum()) {
-                parameterString << "\"$k\":${v.class.name}.$v,"
+            if (v instanceof Enum) {
+                parameterString << "\"$k\":${v.declaringClass.name}.$v,"
             }
             else if (v instanceof DateTime) {
                 parameterString << "\"$k\":${createConstructionString(v)},"

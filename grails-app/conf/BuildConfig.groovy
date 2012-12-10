@@ -31,6 +31,10 @@ grails.project.dependency.resolution = {
         runtime 'net.sf.jasperreports:jasperreports:4.0.1', {
             exclude "xml-apis"
         }
+        compile('org.apache.poi:poi:3.7')
+        compile('org.apache.poi:poi-ooxml:3.7') {
+            excludes 'xmlbeans'
+        }
     }
 }
 

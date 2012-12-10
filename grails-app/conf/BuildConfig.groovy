@@ -32,9 +32,7 @@ grails.project.dependency.resolution = {
             exclude "xml-apis"
         }
         compile('org.apache.poi:poi:3.7')
-        compile('org.apache.poi:poi-ooxml:3.7') {
-            excludes 'xmlbeans'
-        }
+        compile('org.apache.poi:poi-ooxml:3.7')
     }
 }
 

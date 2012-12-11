@@ -20,4 +20,12 @@ abstract class DatabaseUtils {
         return false
     }
 
+    public static boolean isMySqlDatabase() {
+        def url = ConfigurationHolder.config?.dataSource?.url
+        if (url instanceof String) {
+            return url.contains("mysql")
+        }
+        return false
+    }
+
 }

@@ -1,4 +1,5 @@
 import org.pillarone.riskanalytics.core.output.batch.results.SQLServerBulkInsert
+import org.pillarone.riskanalytics.core.output.batch.calculations.SQLServerCalculationBulkInsert
 import org.pillarone.riskanalytics.core.output.batch.results.MysqlBulkInsert
 import org.pillarone.riskanalytics.core.output.batch.calculations.MysqlCalculationsBulkInsert
 import grails.plugins.springsecurity.SecurityConfigType
@@ -59,7 +60,8 @@ environments {
     sqlserver {
         models = ["FiniteReModel"]
         resultBulkInsert = SQLServerBulkInsert
-        keyFiguresToCalculate = [
+        calculationBulkInsert = SQLServerCalculationBulkInsert
+            keyFiguresToCalculate = [
                 'stdev': true,
                 'percentile': [0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0],
                 'var': [99, 99.5],

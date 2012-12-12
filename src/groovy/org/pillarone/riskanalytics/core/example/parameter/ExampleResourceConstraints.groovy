@@ -23,4 +23,8 @@ class ExampleResourceConstraints implements IMultiDimensionalConstraints {
     Class getColumnType(int column) {
         return ExampleResource
     }
+
+    boolean emptyComponentSelectionAllowed(int column) {
+        return false
+    }
 }

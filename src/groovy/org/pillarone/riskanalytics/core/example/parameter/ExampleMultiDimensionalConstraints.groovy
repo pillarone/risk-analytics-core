@@ -37,4 +37,8 @@ class ExampleMultiDimensionalConstraints implements IMultiDimensionalConstraints
         }
         return null;
     }
+
+    boolean emptyComponentSelectionAllowed(int column) {
+        return false
+    }
 }

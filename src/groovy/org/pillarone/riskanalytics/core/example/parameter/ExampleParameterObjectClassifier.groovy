@@ -38,6 +38,10 @@ class ExampleParameterObjectClassifier extends AbstractParameterObjectClassifier
             "NESTED_MDP", ["mdp": new SimpleMultiDimensionalParameter([[1, 2], [5, 6]])]
     )
 
+    public static final ExampleParameterObjectClassifier NESTED_MDP2 = new ExampleParameterObjectClassifier(
+            "NESTED_MDP2", ["mdp": new ConstrainedMultiDimensionalParameter([],['1','2'], ConstraintsFactory.getConstraints("ExampleMultiMarkerConstraint"))]
+    )
+
     public static final ExampleParameterObjectClassifier RESOURCE = new ExampleParameterObjectClassifier(
             "RESOURCE", ["resource": new ConstrainedMultiDimensionalParameter([[new ResourceHolder(ExampleResource, "a", new VersionNumber("1"))]], ['title'], ConstraintsFactory.getConstraints(ExampleResourceConstraints.IDENTIFIER))]
     )
@@ -52,7 +56,7 @@ class ExampleParameterObjectClassifier extends AbstractParameterObjectClassifier
     }
 
     List<IParameterObjectClassifier> getClassifiers() {
-        return [TYPE0, TYPE1, TYPE2, NESTED_PARAMETER_OBJECT, NESTED_MDP, RESOURCE];
+        return [TYPE0, TYPE1, TYPE2, NESTED_PARAMETER_OBJECT, NESTED_MDP, NESTED_MDP2, RESOURCE];
     }
 
     IParameterObject getParameterObject(Map parameters) {

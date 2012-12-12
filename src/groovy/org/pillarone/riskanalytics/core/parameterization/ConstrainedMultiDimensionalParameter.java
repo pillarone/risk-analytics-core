@@ -101,7 +101,9 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
             Map<String, Component> componentsOfType = comboBoxValues.get(column);
             List<String> selectedValues = values.get(column);
             for (String selectedValue : selectedValues) {
-                result.add(componentsOfType.get(selectedValue));
+                if (!selectedValue.trim().isEmpty()) {
+                    result.add(componentsOfType.get(selectedValue));
+                }
             }
         } else if (IResource.class.isAssignableFrom(columnType)) {
             List<ResourceHolder> selectedValues = values.get(column);
@@ -146,6 +148,9 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
             List<Component> components = simulationModel.getMarkedComponents(columnClass);
             for (Component component : components) {
                 names.add(component.getName());
+            }
+            if(constraints.emptyComponentSelectionAllowed(column)) {
+                names.add(0, "");
             }
             return names;
         } else if (columnClass.isEnum()) {

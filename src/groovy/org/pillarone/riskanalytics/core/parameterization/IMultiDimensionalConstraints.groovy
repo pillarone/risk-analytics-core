@@ -7,6 +7,8 @@ interface IMultiDimensionalConstraints {
     String getName()
 
     Class getColumnType(int column)
+
+    boolean emptyComponentSelectionAllowed(int column)
     
     /**
      * @param marker should be an interface extending IComponentMarker

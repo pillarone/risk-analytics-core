@@ -1,3 +1,4 @@
+import org.pillarone.riskanalytics.core.components.ExampleMultiMarkerConstraint
 import org.pillarone.riskanalytics.core.output.batch.results.GenericBulkInsert as GenericResultBulkInsert
 import org.pillarone.riskanalytics.core.output.batch.calculations.GenericBulkInsert as GenericCalculationBulkInsert
 
@@ -36,7 +37,7 @@ import org.gridgain.grid.spi.collision.fifoqueue.GridFifoQueueCollisionSpi
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.6-ALPHA-7.5.1-kti"
+    def version = "1.6-ALPHA-8-kti"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.7 > *"
     // the other plugins this plugin depends on
@@ -168,6 +169,7 @@ Persistence & Simulation engine.
         ConstraintsFactory.registerConstraint(new SimpleConstraint())
         ConstraintsFactory.registerConstraint(new TestConstrainedTable())
         ConstraintsFactory.registerConstraint(new ExampleResourceConstraints())
+        ConstraintsFactory.registerConstraint(new ExampleMultiMarkerConstraint())
 
         PacketAggregatorRegistry.registerAggregator(Packet, new SumAggregator())
         PacketAggregatorRegistry.registerAggregator(SingleValuePacket, new SumAggregatorSingleValuePacket())

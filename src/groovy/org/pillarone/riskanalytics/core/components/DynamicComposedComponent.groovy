@@ -46,7 +46,7 @@ abstract class DynamicComposedComponent extends ComposedComponent {
             props = null
         }
         else {
-            throw new IllegalArgumentException("A component with the name ${component.name} already exists in this dynamic composed component")
+            throw new NonUniqueComponentNameException("A component with the name ${component.name} already exists in this dynamic composed component")
         }
     }
 

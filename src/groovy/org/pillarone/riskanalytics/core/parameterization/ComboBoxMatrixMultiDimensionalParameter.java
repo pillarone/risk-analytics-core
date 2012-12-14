@@ -40,13 +40,15 @@ public class ComboBoxMatrixMultiDimensionalParameter extends MatrixMultiDimensio
 
     protected void columnsAdded(int i) {
         for (int j = 0; j < i; j++) {
-            columnTitles.add(comboBoxValues.keySet().toArray()[0]);
+            String value = comboBoxValues.isEmpty() ? "" : comboBoxValues.keySet().toArray()[0].toString();
+            columnTitles.add(value);
         }
     }
 
     protected void rowsAdded(int i) {
         for (int j = 0; j < i; j++) {
-            rowTitles.add(comboBoxValues.keySet().toArray()[0]);
+            String value = comboBoxValues.isEmpty() ? "" : comboBoxValues.keySet().toArray()[0].toString();
+            rowTitles.add(value);
         }
     }
 

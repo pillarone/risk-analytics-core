@@ -163,6 +163,11 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
     Boolean annualPeriodsOnly(boolean checkLastPeriodToo) {
         return false
     }
+
+    @Override
+    int currentPeriodIndex() {
+        return currentPeriod;
+    }
 /**
      * @return first valuation date
      */

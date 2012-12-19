@@ -9,6 +9,8 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjec
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.util.GroovyUtils
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
+import org.pillarone.riskanalytics.core.model.Model
+import org.pillarone.riskanalytics.core.components.ComponentUtils
 
 abstract class ParametrizedItem extends CommentableItem {
 
@@ -68,7 +70,9 @@ abstract class ParametrizedItem extends CommentableItem {
     }
 
     void removeComponent(String path) {
-        for (ParameterHolder holder in getAllParameterHolders().findAll { it.path.startsWith(path) }) {
+        Model model = getModelClass().newInstance()
+        String pathWithoutModel = ComponentUtils.removeModelFromPath(path, model)
+        for (ParameterHolder holder in getAllParameterHolders().findAll { it.path.startsWith(pathWithoutModel) }) {
             removeParameter(holder)
         }
         for (Comment comment in comments.findAll { it.path.startsWith(path) }) {

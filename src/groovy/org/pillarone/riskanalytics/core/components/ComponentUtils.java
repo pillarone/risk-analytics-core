@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.components;
 
+import org.pillarone.riskanalytics.core.model.Model;
+
 /**
  * Contains utility methods for conversion between model and display names. Usage examples can be found in the
  * corresponding test class ComponentUtilsTests.
@@ -78,6 +80,13 @@ public class ComponentUtils {
     public static String getComponentNormalizedName(String path) {
         String[] subComponents = path.split(PATH_SEPARATOR);
         return subComponents[subComponents.length - 1];
+    }
+
+    public static String removeModelFromPath(String path, Model model) {
+        if (path != null && path.startsWith(model.getName())) {
+            return path.substring(model.getName().length() + 1);
+        }
+        return path;
     }
 
 }

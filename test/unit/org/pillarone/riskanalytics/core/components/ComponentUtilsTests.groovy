@@ -1,5 +1,8 @@
 package org.pillarone.riskanalytics.core.components
 
+import models.core.CoreModel
+import org.pillarone.riskanalytics.core.model.Model
+
 /**
  * @author stefan.kunz (at) intuitive-collaboration (dot) com
  */
@@ -29,6 +32,13 @@ class ComponentUtilsTests extends GroovyTestCase {
     void testGetComponentNormalizedName() {
         assertEquals "subEurope", ComponentUtils.getComponentNormalizedName("Universe:subMilkyWay:subSolarSystem:subEarth:subEurope")
         assertEquals "subSolarSystem", ComponentUtils.getComponentNormalizedName("Universe:subMilkyWay:subSolarSystem")
+    }
+
+    void testRemoveModelFromPath(){
+        Model model = new CoreModel()
+        assertEquals("Universe:subMilkyWay:subSolarSystem:subEarth:subEurope", ComponentUtils.removeModelFromPath("Core:Universe:subMilkyWay:subSolarSystem:subEarth:subEurope", model))
+        assertEquals("Universe:subMilkyWay:subSolarSystem:subEarth:subEurope", ComponentUtils.removeModelFromPath("Universe:subMilkyWay:subSolarSystem:subEarth:subEurope", model))
+
     }
 
 }

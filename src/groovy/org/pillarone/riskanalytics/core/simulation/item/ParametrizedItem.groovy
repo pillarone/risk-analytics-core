@@ -78,7 +78,7 @@ abstract class ParametrizedItem extends CommentableItem {
         for (Comment comment in comments.findAll { it.path.startsWith(path) }) {
             removeComment(comment)
         }
-        fireComponentRemoved(path)
+        fireComponentRemoved(pathWithoutModel)
     }
 
     void addListener(IParametrizedItemListener listener) {

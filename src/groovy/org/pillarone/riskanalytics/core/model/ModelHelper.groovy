@@ -17,6 +17,15 @@ class ModelHelper {
     private static final String RESERVE_RISK_BASE = 'reserveRiskBase'
     private static final String PREMIUM_RISK_BASE = 'premiumRiskBase'
     private static final String PREMIUM_AND_RESERVE_RISK_BASE = "premiumAndReserveRiskBase";
+    private static final String GROSS_RESERVE_RISK_BASE = 'grossReserveRiskBase'
+    private static final String GROSS_PREMIUM_RISK_BASE = 'grossPremiumRiskBase'
+    private static final String GROSS_PREMIUM_AND_RESERVE_RISK_BASE = "grossPremiumAndReserveRiskBase";
+    private static final String NET_RESERVE_RISK_BASE = 'netReserveRiskBase'
+    private static final String NET_PREMIUM_RISK_BASE = 'netPremiumRiskBase'
+    private static final String NET_PREMIUM_AND_RESERVE_RISK_BASE = "netPremiumAndReserveRiskBase";
+    private static final String CEDED_RESERVE_RISK_BASE = 'cededReserveRiskBase'
+    private static final String CEDED_PREMIUM_RISK_BASE = 'cededPremiumRiskBase'
+    private static final String CEDED_PREMIUM_AND_RESERVE_RISK_BASE = "cededPremiumAndReserveRiskBase";
     private static final String PERILS = "claimsGenerators"
     private static final String RESERVES = "claimsGenerators"
     private static final String CONTRACTS = "reinsuranceContracts"
@@ -46,6 +55,15 @@ class ModelHelper {
             results.add(RESERVE_RISK_BASE)
             results.add(PREMIUM_RISK_BASE)
             results.add(PREMIUM_AND_RESERVE_RISK_BASE)
+            results.add(GROSS_RESERVE_RISK_BASE)
+            results.add(GROSS_PREMIUM_RISK_BASE)
+            results.add(GROSS_PREMIUM_AND_RESERVE_RISK_BASE)
+            results.add(NET_RESERVE_RISK_BASE)
+            results.add(NET_PREMIUM_RISK_BASE)
+            results.add(NET_PREMIUM_AND_RESERVE_RISK_BASE)
+            results.add(CEDED_RESERVE_RISK_BASE)
+            results.add(CEDED_PREMIUM_RISK_BASE)
+            results.add(CEDED_PREMIUM_AND_RESERVE_RISK_BASE)
         }
         return results
     }

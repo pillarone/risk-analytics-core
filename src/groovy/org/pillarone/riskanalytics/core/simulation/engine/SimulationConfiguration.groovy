@@ -132,6 +132,8 @@ public class SimulationConfiguration implements Serializable, Cloneable {
         addMatchingCollector(splitPerSourceCollector, collectors, paths)
         ICollectingModeStrategy splitPerSourceCollectorReduced = CollectingModeFactory.getStrategy("SPLIT_PER_SOURCE_REDUCED")
         addMatchingCollector(splitPerSourceCollectorReduced, collectors, paths)
+        ICollectingModeStrategy splitCollector = CollectingModeFactory.getStrategy("AGGREGATE_bySource_byPeriod_reportedIncrementalIndexed_paidIncrementalIndexed")
+        addMatchingCollector(splitCollector, collectors, paths)
         return paths
     }
 

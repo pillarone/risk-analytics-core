@@ -113,4 +113,8 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
     public void setPacketCollector(PacketCollector packetCollector) {
         this.packetCollector = packetCollector;
     }
+
+    public List<DrillDownMode> getDrillDownModes() {
+        return new ArrayList<DrillDownMode>();
+    }
 }

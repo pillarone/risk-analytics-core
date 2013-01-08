@@ -5,6 +5,7 @@ import org.pillarone.riskanalytics.core.output.aggregation.PacketAggregatorRegis
 import org.pillarone.riskanalytics.core.packets.Packet;
 import org.pillarone.riskanalytics.core.packets.PacketList;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;

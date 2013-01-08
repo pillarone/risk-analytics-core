@@ -35,4 +35,13 @@ class CollectingModeFactory {
         return (ICollectingModeStrategy) strategy?.clone()
     }
 
+    static List<ICollectingModeStrategy> getDrillDownStrategies(DrillDownMode drillDownMode) {
+        List<ICollectingModeStrategy> result = []
+        for (ICollectingModeStrategy strategy: strategies.values()){
+            if (strategy.drillDownModes.contains(drillDownMode)){
+                result << strategy
+            }
+        }
+        return result
+    }
 }

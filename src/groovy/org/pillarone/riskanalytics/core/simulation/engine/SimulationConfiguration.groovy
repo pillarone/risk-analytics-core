@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.simulation.engine
 
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.output.DrillDownMode
 import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationBlock
 import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
@@ -103,13 +104,12 @@ public class SimulationConfiguration implements Serializable, Cloneable {
         SimulationRunner runner = SimulationRunner.createRunner()
         CollectorFactory collectorFactory = runner.currentScope.collectorFactory
         List<PacketCollector> drillDownCollectors = resultConfiguration.getResolvedCollectors(model, collectorFactory)
-        List<String> drillDownPaths = getDrillDownPaths(drillDownCollectors)
+        List<String> drillDownPaths = getDrillDownPaths(drillDownCollectors, DrillDownMode.BY_SOURCE)
         Set paths = ModelHelper.getAllPossibleOutputPaths(model, drillDownPaths)
         Set<String> inceptionPeriodPaths = getSplitByInceptionDateDrillDownPaths(drillDownCollectors, model)
         paths.addAll(inceptionPeriodPaths)
 
-        boolean includePremiumReserveRisk = collectorsIncludingPremiumReserveRisk(drillDownCollectors, model)
-        Set fields = ModelHelper.getAllPossibleFields(model, !inceptionPeriodPaths.empty || includePremiumReserveRisk)
+        Set fields = ModelHelper.getAllPossibleFields(model, !inceptionPeriodPaths.empty)
         MappingCache cache = MappingCache.instance
 
         for (String path in paths) {
@@ -123,17 +123,11 @@ public class SimulationConfiguration implements Serializable, Cloneable {
         this.mappingCache = cache
     }
 
-    private List<String> getDrillDownPaths(List<PacketCollector> collectors) {
+    private List<String> getDrillDownPaths(List<PacketCollector> collectors,DrillDownMode mode) {
         List<String> paths = []
-        // todo: requires a proper refactoring as the core plugin itself knows nothing about the aggregate drill down collector
-        ICollectingModeStrategy drillDownCollector = CollectingModeFactory.getStrategy("AGGREGATED_DRILL_DOWN")
-        addMatchingCollector(drillDownCollector, collectors, paths)
-        ICollectingModeStrategy splitPerSourceCollector = CollectingModeFactory.getStrategy("SPLIT_PER_SOURCE")
-        addMatchingCollector(splitPerSourceCollector, collectors, paths)
-        ICollectingModeStrategy splitPerSourceCollectorReduced = CollectingModeFactory.getStrategy("SPLIT_PER_SOURCE_REDUCED")
-        addMatchingCollector(splitPerSourceCollectorReduced, collectors, paths)
-        ICollectingModeStrategy splitCollector = CollectingModeFactory.getStrategy("AGGREGATE_bySource_byPeriod_reportedIncrementalIndexed_paidIncrementalIndexed")
-        addMatchingCollector(splitCollector, collectors, paths)
+        for (ICollectingModeStrategy strategy: CollectingModeFactory.getDrillDownStrategies(mode)){
+            addMatchingCollector(strategy,collectors,paths)
+        }
         return paths
     }
 
@@ -148,25 +142,9 @@ public class SimulationConfiguration implements Serializable, Cloneable {
     }
 
     private Set<String> getSplitByInceptionDateDrillDownPaths(List<PacketCollector> collectors, Model model) {
-        // todo: requires a proper refactoring as the core plugin itself knows nothing about the aggregate drill down collector
-        ICollectingModeStrategy splitPerInceptionDateCollector = CollectingModeFactory.getStrategy('SPLIT_BY_INCEPTION_DATE')
-        List<String> splitByInceptionDatePaths = []
-        addMatchingCollector(splitPerInceptionDateCollector, collectors, splitByInceptionDatePaths)
-        ICollectingModeStrategy premiumReserveRiskTriangleCollector = CollectingModeFactory.getStrategy('PREMIUM_RESERVE_RISK_TRIANGLE')
-        addMatchingCollector(premiumReserveRiskTriangleCollector, collectors, splitByInceptionDatePaths)
+        List<String> splitByInceptionDatePaths = getDrillDownPaths(collectors,DrillDownMode.BY_PERIOD)
         Set<String> periodLabels = model.periodLabelsBeforeProjectionStart()
         periodLabels.addAll PeriodLabelsUtil.getPeriodLabels(simulation, model)
         return ModelHelper.pathsExtendedWithPeriod(splitByInceptionDatePaths, periodLabels.toList())
     }
-
-    private boolean collectorsIncludingPremiumReserveRisk(List<PacketCollector> collectors, Model model) {
-        // todo: requires a proper refactoring as the core plugin itself knows nothing about the aggregate drill down collector
-        ICollectingModeStrategy premiumReserveRiskCollector = CollectingModeFactory.getStrategy('PREMIUM_RESERVE_RISK')
-        List<String> pathsIncludingPremiumReserveRisk = []
-        addMatchingCollector(premiumReserveRiskCollector, collectors, pathsIncludingPremiumReserveRisk)
-        premiumReserveRiskCollector = CollectingModeFactory.getStrategy('INCLUDING_PREMIUM_RESERVE_RISK')
-        addMatchingCollector(premiumReserveRiskCollector, collectors, pathsIncludingPremiumReserveRisk)
-        return !pathsIncludingPremiumReserveRisk.isEmpty()
-    }
-
 }

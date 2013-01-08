@@ -15,4 +15,6 @@ public interface ICollectingModeStrategy extends Cloneable {
 
   boolean isCompatibleWith(Class packetClass)
 
+  List<DrillDownMode> getDrillDownModes()
+
 }

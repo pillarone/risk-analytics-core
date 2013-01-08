@@ -32,7 +32,11 @@ class CollectingModeFactory {
 
     static ICollectingModeStrategy getStrategy(String identifier) {
         ICollectingModeStrategy strategy = strategies.get(identifier)
-        return (ICollectingModeStrategy) strategy?.clone()
+        return getNewInstance(strategy)
+    }
+
+    static ICollectingModeStrategy getNewInstance(ICollectingModeStrategy strategy) {
+        return (ICollectingModeStrategy) strategy.class.newInstance(strategy.arguments)
     }
 
     static List<ICollectingModeStrategy> getDrillDownStrategies(DrillDownMode drillDownMode) {

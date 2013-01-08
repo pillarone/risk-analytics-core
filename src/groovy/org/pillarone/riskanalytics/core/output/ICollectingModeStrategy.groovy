@@ -2,7 +2,7 @@ package org.pillarone.riskanalytics.core.output
 
 import org.pillarone.riskanalytics.core.packets.PacketList
 
-public interface ICollectingModeStrategy extends Cloneable {
+public interface ICollectingModeStrategy {
 
   //do not use a grails domain class here (performance)
   List<SingleValueResultPOJO> collect(PacketList results, boolean crashSimulationOnError) throws Exception
@@ -16,5 +16,7 @@ public interface ICollectingModeStrategy extends Cloneable {
   boolean isCompatibleWith(Class packetClass)
 
   List<DrillDownMode> getDrillDownModes()
+
+  Object[] getArguments()
 
 }

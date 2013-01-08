@@ -117,4 +117,8 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
     public List<DrillDownMode> getDrillDownModes() {
         return new ArrayList<DrillDownMode>();
     }
+
+    public Object[] getArguments() {
+        return new Object[0];
+    }
 }

@@ -87,7 +87,7 @@ public class CollectorFactory {
         List result = []
         component.allSubComponents().each {Component subComponent ->
             String newPath = collectorInformation.path.replace(wildCard, subComponent.name)
-            PacketCollector collector = new PacketCollector(collectorInformation.mode.clone())
+            PacketCollector collector = new PacketCollector(CollectingModeFactory.getNewInstance(collectorInformation.mode))
             collector.path = new PathMapping(pathName: newPath)
             result << collector
         }

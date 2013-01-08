@@ -56,4 +56,11 @@ public class SingleValueCollectingModeStrategy extends AbstractCollectingModeStr
     public boolean isCompatibleWith(Class packetClass) {
         return Packet.class.isAssignableFrom(packetClass);
     }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        SingleValueCollectingModeStrategy clone = (SingleValueCollectingModeStrategy) super.clone();
+        clone.aggregatedCollectingMode = new AggregatedCollectingModeStrategy();
+        return clone;
+    }
 }

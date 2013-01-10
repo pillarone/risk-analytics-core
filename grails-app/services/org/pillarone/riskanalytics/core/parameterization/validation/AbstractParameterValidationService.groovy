@@ -31,10 +31,15 @@ abstract class AbstractParameterValidationService {
     /**
      * @return list of validation errors or null if candidate is ok
      */
-    List<ParameterValidation> validate(Object classifier, Object candidate) {
+    List<ParameterValidation> validate(Object classifier, Object candidate, Map extraInfo = null) {
         List errors = []
         for (validator in findValidators(classifier)) {
-            def result = validator(candidate)
+            def result
+            if(extraInfo) {
+                result = validator(candidate, extraInfo)
+            } else {
+                result = validator(candidate)
+            }
             if (null == result || true == result) continue  // validation ok
             if (!(result[0] instanceof ValidationType)) throw new IllegalArgumentException("${result} doesn't contains ValidationType")
             ValidationType validationType = result.remove(0 as int)

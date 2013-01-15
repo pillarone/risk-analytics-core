@@ -30,8 +30,22 @@ class CollectingModeFactory {
         return results
     }
 
+    /**
+     * SCP 15.01.2012
+     * Note that I'm not that keen on returning null out of this. However, I need to get on. Disucssion with MSP indicates
+     * potential performance impact if we simply register a 'NONE' collecting strategy. I have to get on so I'm simply preserving
+     * the existing (pre-refactoring) behaviour. I think it's wrong however. At the least I think the method name should inform the caller
+     * that it must deal will a null return value. NullPointerExceptions are hard to explain to the userbase.
+     *
+     * Will lookup a CollectingModeStrategy against the list of registered collectors.
+     * @param identifier String identifying the collectors registered with this class
+     * @return either the collecting mode strategy or null
+     */
     static ICollectingModeStrategy getStrategy(String identifier) {
         ICollectingModeStrategy strategy = strategies.get(identifier)
+        if(strategy == null) {
+            return null
+        }
         return getNewInstance(strategy)
     }
 

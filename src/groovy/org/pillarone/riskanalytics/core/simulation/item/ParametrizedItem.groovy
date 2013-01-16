@@ -165,14 +165,14 @@ abstract class ParametrizedItem extends CommentableItem {
         if (!isNested) {
             ParameterHolder parameterHolder = getAllParameterHolders().find { it.path == path && it.periodIndex == periodIndex}
             if (parameterHolder == null) {
-                throw new IllegalArgumentException("Parameter $path does not exist for period $periodIndex")
+                throw new ParameterNotFoundException("Parameter $path does not exist for period $periodIndex")
             }
             return parameterHolder
         } else {
             String subPath = path.substring(0, nestedIndex)
             ParameterHolder parameterHolder = getAllParameterHolders().find { it.path == subPath && it.periodIndex == periodIndex }
             if (parameterHolder == null) {
-                throw new IllegalArgumentException("Parameter $path does not exist for period $periodIndex (base path $subPath not found)")
+                throw new ParameterNotFoundException("Parameter $path does not exist for period $periodIndex (base path $subPath not found)")
             }
             return getNestedParameterHolder(parameterHolder, path.substring(nestedIndex + 1).split(":"), periodIndex)
         }
@@ -185,14 +185,14 @@ abstract class ParametrizedItem extends CommentableItem {
         if (!isNested) {
             List<ParameterHolder> parameterHolder = getAllParameterHolders().findAll { it.path == path }
             if (parameterHolder.empty) {
-                throw new IllegalArgumentException("Parameter $path does not exist")
+                throw new ParameterNotFoundException("Parameter $path does not exist")
             }
             return parameterHolder
         } else {
             String subPath = path.substring(0, nestedIndex)
             List<ParameterHolder> parameterHolder = getAllParameterHolders().findAll { it.path == subPath }
             if (parameterHolder == null) {
-                throw new IllegalArgumentException("Parameter $path does not exist for period $periodIndex (base path $subPath not found)")
+                throw new ParameterNotFoundException("Parameter $path does not exist for period $periodIndex (base path $subPath not found)")
             }
 
             List<ParameterHolder> result = []
@@ -210,7 +210,7 @@ abstract class ParametrizedItem extends CommentableItem {
         try {
             getParameterHoldersForAllPeriods(path)
             return true
-        } catch (IllegalArgumentException iae) {
+        } catch (ParameterNotFoundException iae) {
             return false
         }
     }
@@ -219,7 +219,7 @@ abstract class ParametrizedItem extends CommentableItem {
         try {
             getParameterHolder(path, periodIndex)
             return true
-        } catch (IllegalArgumentException iae) {
+        } catch (ParameterNotFoundException iae) {
             return false
         }
     }
@@ -230,10 +230,10 @@ abstract class ParametrizedItem extends CommentableItem {
             if (current instanceof ParameterObjectParameterHolder) {
                 current = current.classifierParameters.find { it.key == path}?.value
                 if (current == null) {
-                    throw new IllegalArgumentException("Element $path does not exist for period $periodIndex")
+                    throw new ParameterNotFoundException("Element $path does not exist for period $periodIndex")
                 }
             } else {
-                throw new IllegalArgumentException("Element at $path expected to be a parameter object, but was ${current?.class}")
+                throw new ParameterNotFoundException("Element at $path expected to be a parameter object, but was ${current?.class}")
             }
         }
 

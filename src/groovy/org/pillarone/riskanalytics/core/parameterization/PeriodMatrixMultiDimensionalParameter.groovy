@@ -78,7 +78,7 @@ class PeriodMatrixMultiDimensionalParameter extends AbstractMultiDimensionalPara
             }
             return names;
         } else if (row == 1 || column == 1) {
-            return 1..10
+            return new ArrayList(1..10)
         } else {
             return getValueAt(row, column);
         }

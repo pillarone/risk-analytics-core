@@ -81,4 +81,74 @@ class PeriodMatrixMultiDimensionalParameterTests extends GroovyTestCase {
         assertFalse(parameter.getPossibleValues(2, 2) instanceof List)
 
     }
+
+    void testUpdateTable() {
+        parameter.updateTable(2, ["hierarchyOutputComponent"])
+        assertEquals(2, parameter.titles[0].size())
+        assertEquals(2, parameter.titles[1].size())
+        assertEquals(2, parameter.values.size())
+        assertEquals(2, parameter.values[0].size())
+        assertEquals(2, parameter.values[1].size())
+
+        assertEquals(1, parameter.getValueAt(2, 2))
+        assertEquals(1, parameter.getValueAt(3, 3))
+        assertEquals("hierarchyOutputComponent", parameter.getValueAt(2, 0))
+        assertEquals("hierarchyOutputComponent", parameter.getValueAt(3, 0))
+        assertEquals("1", parameter.getValueAt(2, 1))
+        assertEquals("2", parameter.getValueAt(3, 1))
+
+        parameter.updateTable(2, ["hierarchyOutputComponent", "exampleOutputComponent"])
+        assertEquals(4, parameter.titles[0].size())
+        assertEquals(4, parameter.titles[1].size())
+        assertEquals(4, parameter.values.size())
+        assertEquals(4, parameter.values[0].size())
+        assertEquals(4, parameter.values[1].size())
+
+        assertEquals(1, parameter.getValueAt(2, 2))
+        assertEquals(1, parameter.getValueAt(3, 3))
+        assertEquals(1, parameter.getValueAt(4, 4))
+        assertEquals(1, parameter.getValueAt(5, 5))
+        assertEquals("hierarchyOutputComponent", parameter.getValueAt(2, 0))
+        assertEquals("hierarchyOutputComponent", parameter.getValueAt(3, 0))
+        assertEquals("exampleOutputComponent", parameter.getValueAt(4, 0))
+        assertEquals("exampleOutputComponent", parameter.getValueAt(5, 0))
+        assertEquals("1", parameter.getValueAt(2, 1))
+        assertEquals("2", parameter.getValueAt(3, 1))
+        assertEquals("1", parameter.getValueAt(4, 1))
+        assertEquals("2", parameter.getValueAt(5, 1))
+    }
+
+    void testValidateValues() {
+        CoreModel model = new CoreModel()
+        model.init()
+        model.injectComponentNames()
+
+        parameter = new PeriodMatrixMultiDimensionalParameter([[1, 0], [0, 1]], [['hierarchyOutputComponent', 'LOB2'], ["1", "1"]], ITestComponentMarker)
+        parameter.setSimulationModel(model)
+
+        parameter.validateValues()
+
+        assertEquals(1, parameter.titles[0].size())
+        assertEquals(1, parameter.titles[1].size())
+        assertEquals(1, parameter.values.size())
+        assertEquals(1, parameter.values[0].size())
+
+        assertEquals("hierarchyOutputComponent", parameter.getValueAt(2, 0))
+        assertEquals("1", parameter.getValueAt(2, 1))
+
+        parameter = new PeriodMatrixMultiDimensionalParameter([[1, 0], [0, 1]], [['LOB1', 'LOB2'], ["1", "1"]], ITestComponentMarker)
+        parameter.setSimulationModel(model)
+
+        parameter.validateValues()
+
+        assertEquals(0, parameter.titles[0].size())
+        assertEquals(0, parameter.titles[1].size())
+        assertEquals(0, parameter.values.size())
+    }
+
+    void testGetCorrelations() {
+        parameter.updateTable(2, ['hierarchyOutputComponent', 'exampleOutputComponent'])
+        List<PeriodMatrixMultiDimensionalParameter.CorrelationInfo> correlations = parameter.getCorrelations()
+        assertEquals(12, correlations.size()) //TODO: remove duplicates
+    }
 }

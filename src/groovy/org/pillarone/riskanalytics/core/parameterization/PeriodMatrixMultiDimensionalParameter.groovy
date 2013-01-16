@@ -1,9 +1,14 @@
 package org.pillarone.riskanalytics.core.parameterization
 
+import org.apache.commons.lang.builder.EqualsBuilder
+import org.apache.commons.lang.builder.HashCodeBuilder
 import org.pillarone.riskanalytics.core.components.Component
+import org.pillarone.riskanalytics.core.model.Model
 
 
 class PeriodMatrixMultiDimensionalParameter extends AbstractMultiDimensionalParameter implements IComboBoxBasedMultiDimensionalParameter {
+
+    private Map<String, Component> componentMap = new HashMap<String, Component>();
 
     Class markerClass
     List titles
@@ -14,9 +19,37 @@ class PeriodMatrixMultiDimensionalParameter extends AbstractMultiDimensionalPara
         this.markerClass = markerClass
     }
 
+    public void setSimulationModel(Model simulationModel) {
+        super.setSimulationModel(simulationModel);
+        if (simulationModel != null) {
+            List<Component> components = simulationModel.getMarkedComponents(markerClass);
+            componentMap.clear();
+            for (Component component : components) {
+                componentMap.put(component.getName(), component);
+            }
+        } else {
+            componentMap.clear();
+        }
+    }
+
     @Override
     void validateValues() {
+        List<String> validValues = []
 
+        List componentList = titles[0]
+        for (String value in componentList) {
+            if (componentMap.keySet().contains(value)) {
+                validValues << value
+            }
+        }
+
+        if (validValues.size() < componentList.size()) {
+            updateTable(getMaxPeriod(), validValues)
+        }
+    }
+
+    int getMaxPeriod() {
+        return titles[1].collect { Integer.parseInt(it.toString()) }.max()
     }
 
     @Override
@@ -71,12 +104,7 @@ class PeriodMatrixMultiDimensionalParameter extends AbstractMultiDimensionalPara
         }
 
         if (row == 0 || column == 0) {
-            List<String> names = new ArrayList<String>();
-            List<Component> markedComponents = simulationModel.getMarkedComponents(markerClass);
-            for (Component c : markedComponents) {
-                names.add(c.getName());
-            }
-            return names;
+            return componentMap.keySet().toList()
         } else if (row == 1 || column == 1) {
             return new ArrayList(1..10)
         } else {
@@ -96,31 +124,102 @@ class PeriodMatrixMultiDimensionalParameter extends AbstractMultiDimensionalPara
 
     @Override
     protected void rowsAdded(int i) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     protected void columnsAdded(int i) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     protected void rowsRemoved(int i) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     protected void columnsRemoved(int i) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     boolean columnCountChangeable() {
-        return false  //To change body of implemented methods use File | Settings | File Templates.
+        return false
     }
 
     @Override
     boolean rowCountChangeable() {
-        return false  //To change body of implemented methods use File | Settings | File Templates.
+        return false
+    }
+
+    void updateTable(int periodCount, List<String> components) {
+        titles = [[], []]
+        values = []
+        int columns = periodCount * components.size()
+        for (int i = 0; i < columns; i++) {
+            List column = []
+            columns.times { column << 0 }
+            values << column
+            values[i][i] = 1
+        }
+
+        for (String component in components) {
+            for (int i = 0; i < periodCount; i++) {
+                titles[0] << component
+                titles[1] << String.valueOf(i + 1)
+            }
+        }
+        validateValues()
+    }
+
+    List<CorrelationInfo> getCorrelations() {
+        Set<CorrelationInfo> result = new HashSet<CorrelationInfo>()
+
+        int i = 0
+        for (List column in values) {
+            int j = 0
+            for (double cell in column) {
+                    if (i != j) {
+                        result << new CorrelationInfo(
+                                component1: componentMap.get(titles[0][i]),
+                                component2: componentMap.get(titles[0][j]),
+                                period1: Integer.parseInt(titles[1][i]),
+                                period2: Integer.parseInt(titles[1][j]),
+                                value: values[i][j]
+                        )
+                    }
+                j++
+            }
+            i++
+        }
+
+        return result.toList()
+    }
+
+    public static class CorrelationInfo {
+        Component component1
+        int period1
+        Component component2
+        int period2
+        double value
+
+        @Override
+        int hashCode() {
+            return new HashCodeBuilder().
+                    append(component1.name).append(component2.name).
+                    append(period1).append(period2).toHashCode()
+        }
+
+        @Override
+        boolean equals(Object obj) {
+            if (obj instanceof CorrelationInfo) {
+                return new EqualsBuilder().append(component1, obj.component1).append(component2, obj.component2).
+                        append(period1, obj.period1).append(period2, obj.period2).
+                        equals
+            }
+
+            return false
+        }
+
+        @Override
+        String toString() {
+            return "${component1.name} (P${period1}) ${component2.name} (P${period2}) ${value}"
+        }
     }
 }

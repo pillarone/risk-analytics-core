@@ -32,7 +32,10 @@ class CollectingModeFactory {
 
     static ICollectingModeStrategy getStrategy(String identifier) {
         ICollectingModeStrategy strategy = strategies.get(identifier)
-        return getNewInstance(strategy)
+        if (strategy != null) {
+            strategy = getNewInstance(strategy)
+        }
+        return strategy
     }
 
     static ICollectingModeStrategy getNewInstance(ICollectingModeStrategy strategy) {
@@ -41,8 +44,8 @@ class CollectingModeFactory {
 
     static List<ICollectingModeStrategy> getDrillDownStrategies(DrillDownMode drillDownMode) {
         List<ICollectingModeStrategy> result = []
-        for (ICollectingModeStrategy strategy: strategies.values()){
-            if (strategy.drillDownModes.contains(drillDownMode)){
+        for (ICollectingModeStrategy strategy : strategies.values()) {
+            if (strategy.drillDownModes.contains(drillDownMode)) {
                 result << strategy
             }
         }

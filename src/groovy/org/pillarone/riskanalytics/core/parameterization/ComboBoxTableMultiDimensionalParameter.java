@@ -7,6 +7,9 @@ import org.pillarone.riskanalytics.core.model.Model;
 
 import java.util.*;
 
+/**
+ * @deprecated Use {@link ConstrainedMultiDimensionalParameter} instead.
+ */
 public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensionalParameter implements IComboBoxBasedMultiDimensionalParameter {
 
     static Log LOG = LogFactory.getLog(ComboBoxTableMultiDimensionalParameter.class);

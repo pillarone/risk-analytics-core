@@ -118,7 +118,7 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
     }
 
     /**
-     * @param row number including title and value rows
+     * @param row    number including title and value rows
      * @param column
      * @return selected component or resource instance if the column contains either of them or the same as getValueAt in all other cases
      */
@@ -149,7 +149,7 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
             for (Component component : components) {
                 names.add(component.getName());
             }
-            if(constraints.emptyComponentSelectionAllowed(column)) {
+            if (constraints.emptyComponentSelectionAllowed(column)) {
                 names.add(0, "");
             }
             return names;
@@ -227,14 +227,17 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
     }
 
     public boolean updateReferenceValues(Class markerInterface, String oldValue, String newValue) {
-        Integer column = constraints.getColumnIndex(markerInterface);
-        if (column == null) return false;
         boolean atLeastOneUpdated = false;
-        for (int row = getTitleRowCount(); row < getRowCount(); row++) {
-            String value = (String) getValueAt(row, column);
-            if (value.equals(oldValue)) {
-                setValueAt(newValue, row, column);
-                atLeastOneUpdated = true;
+        for (int column = getTitleColumnCount(); column < getColumnCount(); column++) {
+            Class columnType = constraints.getColumnType(column);
+            if (markerInterface.isAssignableFrom(columnType)) {
+                for (int row = getTitleRowCount(); row < getRowCount(); row++) {
+                    String value = (String) getValueAt(row, column);
+                    if (value.equals(oldValue)) {
+                        setValueAt(newValue, row, column);
+                        atLeastOneUpdated = true;
+                    }
+                }
             }
         }
         return atLeastOneUpdated;

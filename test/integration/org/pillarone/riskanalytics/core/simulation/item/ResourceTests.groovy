@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
 import org.pillarone.riskanalytics.core.ResourceDAO
+import org.pillarone.riskanalytics.core.components.ResourceRegistry
 import org.pillarone.riskanalytics.core.example.component.ExampleResource
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.comment.CommentTag
@@ -13,6 +14,12 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Commen
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
 
 class ResourceTests extends GroovyTestCase {
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp()
+        ResourceRegistry.clear()
+    }
 
     void testSaveLoad() {
         Resource resource = new Resource("resource", ExampleResource)

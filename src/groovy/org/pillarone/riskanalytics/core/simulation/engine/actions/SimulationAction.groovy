@@ -19,7 +19,6 @@ public class SimulationAction implements Action {
 
     IterationAction iterationAction
     SimulationScope simulationScope
-    private volatile boolean stopped = false
     private volatile boolean canceled = false
     private int numberOfIterationsLocal=0;
 
@@ -31,7 +30,7 @@ public class SimulationAction implements Action {
         LOG.info "Using simulation blocks: ${simulationScope.simulationBlocks}"
         for (SimulationBlock simulationBlock: simulationScope.simulationBlocks) {
             initializeSimulationBlock(simulationBlock)
-            for (int iteration = 0; iteration < numberOfIterationsLocal && !stopped && !canceled; iteration++) {
+            for (int iteration = 0; iteration < numberOfIterationsLocal && !canceled; iteration++) {
                 iterationAction.perform()
                 simulationScope.iterationsDone = simulationScope.iterationsDone + 1 // do not use simulationScope.iterationsDone++ because of a issue in StubFor
             }
@@ -50,22 +49,9 @@ public class SimulationAction implements Action {
         numberOfIterationsLocal = simulationBlock.blockSize
     }
 
-    /**
-     * Stops the simulation at the end of the current point of execution. The stop is forwarded to the iterationAction.
-     */
-    void stop() {
-        stopped = true
-        iterationAction.stop()
-        simulationScope.updateNumberOfIterations(iterationAction.iterationScope.currentIteration)
-    }
-
     void cancel() {
         canceled = true
         iterationAction.stop()
-    }
-
-    boolean isStopped() {
-        return stopped
     }
 
     boolean isCancelled() {

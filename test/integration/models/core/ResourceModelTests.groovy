@@ -1,5 +1,6 @@
 package models.core
 
+import org.pillarone.riskanalytics.core.components.ResourceRegistry
 import org.pillarone.riskanalytics.core.simulation.engine.ModelTest
 import org.pillarone.riskanalytics.core.simulation.item.Resource
 import org.pillarone.riskanalytics.core.example.component.ExampleResource
@@ -11,6 +12,7 @@ class ResourceModelTests extends ModelTest {
 
     @Override
     protected void setUp() {
+        ResourceRegistry.clear()
         Resource resource = new Resource("myResource", ExampleResource)
         resource.addParameter(ParameterHolderFactory.getHolder("parmInteger", 0, 99))
         resource.addParameter(ParameterHolderFactory.getHolder("parmString", 0, "String"))

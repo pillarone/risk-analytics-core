@@ -145,16 +145,7 @@ public class SimulationRunner {
         currentScope?.simulation?.end = new DateTime(end)
 
         LOG.info "simulation took ${end - start} ms"
-        simulationState = simulationAction.isStopped() ? SimulationState.STOPPED : SimulationState.FINISHED
-        cleanup()
-    }
-
-    private void deleteFailedSimulation() {
-        try {
-            LOG.info "failed simulation ${currentScope.simulation.name} will be deleted"
-        } catch (Exception ex) {
-            LOG.error "failed deleting simulation ${currentScope.simulation.name}", ex
-        }
+        setSimulationState(SimulationState.FINISHED)
         cleanup()
     }
 
@@ -163,16 +154,6 @@ public class SimulationRunner {
             LOG.info "canceled simulation ${currentScope.simulation.name} will be deleted"
         }
         cleanup()
-    }
-
-    /**
-     * The current simulation will be stopped at the next iteration. The simulationState will indicate, that
-     * the simulation has been stopped.
-     */
-    public void stop() {
-        LOG.info("Simulation stopped by user")
-        simulationAction.stop()
-        simulationState = SimulationState.STOPPED
     }
 
     public synchronized void cancel() {

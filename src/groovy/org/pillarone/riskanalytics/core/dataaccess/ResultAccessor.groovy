@@ -460,5 +460,5 @@ abstract class ResultAccessor {
 }
 
 interface CompareValues {
-    public boolean compareValues(double d1, double d2)
+    boolean compareValues(double d1, double d2)
 }

@@ -86,7 +86,7 @@ class SimulationRunnerTests extends GrailsUnitTestCase {
 
         }
         Thread.sleep 2000
-        runner.stop()
+        runner.cancel()
     }
 
     void testCreateRunner() {

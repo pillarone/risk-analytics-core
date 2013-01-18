@@ -44,7 +44,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
     private long time;
     private int totalJobs = 0;
 
-    private boolean stopped, cancelled;
+    private boolean cancelled;
 
     private ResultTransferListener resultTransferListener;
     private List<UUID> jobIds = new ArrayList<UUID>();
@@ -195,7 +195,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
             simulation.setNumberOfIterations(completedIterations);
             simulation.setPeriodCount(periodCount);
             simulation.save();
-            setSimulationState(stopped ? SimulationState.STOPPED : SimulationState.FINISHED);
+            setSimulationState(SimulationState.FINISHED);
             LOG.info("Task completed in " + (System.currentTimeMillis() - time) + "ms");
             return true;
         } catch (Exception e) {
@@ -240,10 +240,6 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
 
     public void cancel() {
         cancelled = true;
-    }
-
-    public void stop() {
-        stopped = true;
     }
 
     public int getProgress() {

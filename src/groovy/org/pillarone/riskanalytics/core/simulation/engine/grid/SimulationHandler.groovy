@@ -16,11 +16,6 @@ class SimulationHandler {
         gridTaskFuture.cancel()
     }
 
-    void stop() {
-        simulationTask.stop()
-        gridTaskFuture.cancel()
-    }
-
     int getProgress() {
         simulationTask.getProgress()
     }

@@ -48,6 +48,10 @@ class PeriodMatrixMultiDimensionalParameter extends AbstractMultiDimensionalPara
         }
     }
 
+    public boolean isMarkerCell(int row, int column) {
+        return (row == 0 && column > 0) || (column == 0 && row > 0);
+    }
+
     int getMaxPeriod() {
         return titles[1].collect { Integer.parseInt(it.toString()) }.max()
     }

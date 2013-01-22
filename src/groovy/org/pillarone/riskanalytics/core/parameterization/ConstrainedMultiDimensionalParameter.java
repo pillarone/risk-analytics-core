@@ -11,7 +11,7 @@ import org.pillarone.riskanalytics.core.util.GroovyUtils;
 import java.math.BigDecimal;
 import java.util.*;
 
-public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalParameter {
+public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalParameter implements IMarkerBasedMultiDimensionalParameter {
 
     private IMultiDimensionalConstraints constraints;
     private Map<Integer, Map<String, Component>> comboBoxValues = new HashMap<Integer, Map<String, Component>>();
@@ -68,6 +68,15 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
             }
             col++;
         }
+    }
+
+    public boolean isMarkerCell(int row, int column) {
+        if (row > 0) {
+            Class columnType = constraints.getColumnType(column);
+            return IComponentMarker.class.isAssignableFrom(columnType);
+        }
+
+        return false;
     }
 
     protected void validate(Object value, List<String> validValues, List list, int currentRow) {

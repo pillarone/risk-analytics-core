@@ -97,6 +97,10 @@ public class ComboBoxMatrixMultiDimensionalParameter extends MatrixMultiDimensio
         }
     }
 
+    public boolean isMarkerCell(int row, int column) {
+        return (row == 0 && column > 0) || (column == 0 && row > 0);
+    }
+
     public Object getPossibleValues(int row, int column) {
         if (row == 0 && column == 0) {
             return "";

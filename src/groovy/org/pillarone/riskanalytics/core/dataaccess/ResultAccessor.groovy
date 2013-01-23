@@ -99,7 +99,7 @@ abstract class ResultAccessor {
     static Double getMin(SimulationRun simulationRun, int periodIndex, String pathName, String collectorName, String fieldName) {
         double[] sortedValues = getValuesSorted(simulationRun, periodIndex, pathName, collectorName, fieldName)
         if (sortedValues.length == 0) {
-            return 0 //TODO: check with sku
+            return null
         }
         return sortedValues[0]
     }
@@ -107,7 +107,7 @@ abstract class ResultAccessor {
     static Double getMax(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
         double[] sortedValues = getValuesSorted(simulationRun, periodIndex, pathName, collectorName, fieldName)
         if (sortedValues.length == 0) {
-            return 0 //TODO: check with sku
+            return null
         }
         return sortedValues[-1]
     }

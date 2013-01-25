@@ -2,7 +2,7 @@ package org.pillarone.riskanalytics.core.simulation.engine.grid
 
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.gridgain.grid.GridJobAdapter
+import org.gridgain.grid.GridJobAdapterEx
 import org.pillarone.riskanalytics.core.output.aggregation.PacketAggregatorRegistry
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationRunner
@@ -19,7 +19,7 @@ import org.codehaus.groovy.grails.commons.DefaultGrailsApplication
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.joda.time.DateTimeZone
 
-class SimulationJob extends GridJobAdapter<JobResult> {
+class SimulationJob extends GridJobAdapterEx {
 
     private SimulationConfiguration simulationConfiguration
     private SimulationRunner runner = SimulationRunner.createRunner()

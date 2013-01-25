@@ -10,10 +10,11 @@ class LocalNodesStrategy extends AbstractNodeMappingStrategy {
     Set<GridNode> filterNodes(List<GridNode> allNodes) {
         Set<GridNode> result = new HashSet<GridNode>()
         GridRichNode localNode = grid.localNode()
-        String localAddress = localNode.physicalAddress
+        Set<String> localAddresses = localNode.externalAddresses() + localNode.internalAddresses()
 
         for (GridRichNode node in allNodes) {
-            if (node.physicalAddress == localAddress) {
+            Set<String> remoteAddresses = node.externalAddresses() + node.internalAddresses()
+            if (remoteAddresses.any { localAddresses.contains(it) }) {
                 result.add(node)
             }
         }

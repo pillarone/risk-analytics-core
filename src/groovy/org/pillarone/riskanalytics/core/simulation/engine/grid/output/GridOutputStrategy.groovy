@@ -97,7 +97,7 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
             getGrid().send(new ResultTransferObject(resultDescriptor, jobIdentifier, stream.toByteArray(),
                     runner.getProgress()), new GridPredicate<GridRichNode>() {
                 @Override public boolean apply(GridRichNode n) {
-                    return (n.getId() == masterNodeId);
+                    return (n.id() == masterNodeId);
                 }
             }
             );

@@ -14,6 +14,7 @@ grails.project.dependency.resolution = {
 
     //even though this plugin does not need anything from this repo, it has to be added for the deploy script to check existing plugins
     mavenRepo "https://repository.intuitive-collaboration.com/nexus/content/repositories/pillarone-public/"
+    mavenRepo "http://www.gridgainsystems.com/maven2/"
 
     plugins {
         runtime ":background-thread:1.3"
@@ -36,6 +37,17 @@ grails.project.dependency.resolution = {
             exclude "xmlbeans"
         }
         compile("org.apache.xmlbeans:xmlbeans:2.3.0-without-w3c")
+
+        //gridgain & deps
+        compile("org.gridgain:gridgain:3.6.0c") {
+            transitive = false
+        }
+        runtime("javax.mail:mail:1.4.4")
+        runtime("net.sf.jtidy:jtidy:r938")
+        runtime("net.sf.cron4j:cron4j:2.2.5")
+        runtime("com.sun.grizzly:grizzly-utils:1.9.43")
+        runtime("jboss:jboss-serialization:4.2.2.GA")
+        runtime("trove:trove:1.0.2")
     }
 }
 

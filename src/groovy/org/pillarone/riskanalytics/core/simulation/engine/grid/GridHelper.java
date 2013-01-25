@@ -13,7 +13,7 @@ public class GridHelper {
         try {
             return (Grid) ApplicationHolder.getApplication().getMainContext().getBean("grid");
         } catch (Exception e) {
-            return GridFactory.getGrid();
+            return GridFactory.grid();
         }
     }
 

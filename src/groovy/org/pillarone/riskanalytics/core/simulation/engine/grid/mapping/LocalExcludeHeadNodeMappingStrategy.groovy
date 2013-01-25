@@ -4,7 +4,7 @@ import org.gridgain.grid.GridNode
 import org.gridgain.grid.GridRichNode
 
 
-class LocalExcludeHeadNodeMappingStrategy extends AbstractNodeMappingStrategy {
+class LocalExcludeHeadNodeMappingStrategy extends LocalNodesStrategy {
 
     @Override
     int getTotalCpuCount(List<GridNode> usableNodes) {
@@ -14,15 +14,7 @@ class LocalExcludeHeadNodeMappingStrategy extends AbstractNodeMappingStrategy {
     @Override
     Set<GridNode> filterNodes(List<GridNode> allNodes) {
 
-        Set<GridNode> result = new HashSet<GridNode>()
-        GridRichNode localNode = grid.localNode()
-        String localAddress = localNode.physicalAddress
-
-        for (GridRichNode node in allNodes) {
-            if (node.physicalAddress == localAddress) {
-                result.add(node)
-            }
-        }
+        Set<GridNode> result = super.filterNodes(allNodes)
 
 //        Remove the head node in the hopes that this preserves UI responsiveness.
         result.removeAll(allNodes.find { it.is(grid.localNode()) })

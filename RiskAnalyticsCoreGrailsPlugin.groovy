@@ -1,10 +1,9 @@
-import org.pillarone.riskanalytics.core.output.batch.results.GenericBulkInsert as GenericResultBulkInsert
-import org.pillarone.riskanalytics.core.output.batch.calculations.GenericBulkInsert as GenericCalculationBulkInsert
-
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.codehaus.groovy.grails.orm.hibernate.HibernateEventListeners
 import org.gridgain.grid.GridConfigurationAdapter
 import org.gridgain.grid.GridSpringBean
+import org.gridgain.grid.marshaller.jboss.GridJBossMarshaller
+import org.gridgain.grid.spi.collision.fifoqueue.GridFifoQueueCollisionSpi
 import org.joda.time.DateTimeZone
 import org.pillarone.riskanalytics.core.FileConstants
 import org.pillarone.riskanalytics.core.example.migration.TestConstrainedTable
@@ -17,6 +16,8 @@ import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
 import org.pillarone.riskanalytics.core.output.aggregation.PacketAggregatorRegistry
 import org.pillarone.riskanalytics.core.output.aggregation.SumAggregator
 import org.pillarone.riskanalytics.core.output.aggregation.SumAggregatorSingleValuePacket
+import org.pillarone.riskanalytics.core.output.batch.calculations.GenericBulkInsert as GenericCalculationBulkInsert
+import org.pillarone.riskanalytics.core.output.batch.results.GenericBulkInsert as GenericResultBulkInsert
 import org.pillarone.riskanalytics.core.packets.Packet
 import org.pillarone.riskanalytics.core.packets.SingleValuePacket
 import org.pillarone.riskanalytics.core.parameterization.ConstraintsFactory
@@ -24,15 +25,11 @@ import org.pillarone.riskanalytics.core.parameterization.SimpleConstraint
 import org.pillarone.riskanalytics.core.remoting.IResultService
 import org.pillarone.riskanalytics.core.remoting.ITransactionService
 import org.pillarone.riskanalytics.core.remoting.impl.ResultService
+import org.pillarone.riskanalytics.core.simulation.engine.MappingCache
 import org.pillarone.riskanalytics.core.util.GrailsConfigValidator
 import org.springframework.remoting.rmi.RmiProxyFactoryBean
 import org.springframework.remoting.rmi.RmiServiceExporter
 import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
-import org.codehaus.groovy.grails.orm.hibernate.HibernateEventListeners
-import org.pillarone.riskanalytics.core.listener.ModellingItemHibernateListener
-import org.pillarone.riskanalytics.core.example.parameter.ExampleResourceConstraints
-import org.pillarone.riskanalytics.core.simulation.engine.MappingCache
-import org.gridgain.grid.spi.collision.fifoqueue.GridFifoQueueCollisionSpi
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
@@ -113,8 +110,10 @@ Persistence & Simulation engine.
             }
             gridGainHome = gridgainHomeDefault
             collisionSpi = ref("collisionSpi")
+            marshaller = ref("jbossMarshaller")
 
         }
+        jbossMarshaller(GridJBossMarshaller) { }
         collisionSpi(GridFifoQueueCollisionSpi) {
             parallelJobsNumber = ConfigurationHolder.config.containsKey("numberOfParallelJobsPerNode") ?
                 ConfigurationHolder.config."numberOfParallelJobsPerNode" : 100

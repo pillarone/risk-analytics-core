@@ -73,15 +73,6 @@ class PeriodMatrixMultiDimensionalParameterTests extends GroovyTestCase {
         assertEquals("2", parameter.getValueAt(1, 3))
     }
 
-    void testGetPossibleValues() {
-        assertTrue(parameter.getPossibleValues(2, 0) instanceof List)
-        assertTrue(parameter.getPossibleValues(2, 1) instanceof List)
-        assertTrue(parameter.getPossibleValues(0, 2) instanceof List)
-        assertTrue(parameter.getPossibleValues(1, 2) instanceof List)
-        assertFalse(parameter.getPossibleValues(2, 2) instanceof List)
-
-    }
-
     void testUpdateTable() {
         parameter.updateTable(2, ["hierarchyOutputComponent"])
         assertEquals(2, parameter.titles[0].size())

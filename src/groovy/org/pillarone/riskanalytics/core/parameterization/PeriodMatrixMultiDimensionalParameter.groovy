@@ -102,20 +102,6 @@ class PeriodMatrixMultiDimensionalParameter extends AbstractMultiDimensionalPara
         }
     }
 
-    public Object getPossibleValues(int row, int column) {
-        if (row < getTitleRowCount() && column < getTitleColumnCount()) {
-            return "";
-        }
-
-        if (row == 0 || column == 0) {
-            return componentMap.keySet().toList()
-        } else if (row == 1 || column == 1) {
-            return new ArrayList(1..10)
-        } else {
-            return getValueAt(row, column);
-        }
-    }
-
     @Override
     List getRowNames() {
         return titles
@@ -158,9 +144,9 @@ class PeriodMatrixMultiDimensionalParameter extends AbstractMultiDimensionalPara
         int columns = periodCount * components.size()
         for (int i = 0; i < columns; i++) {
             List column = []
-            columns.times { column << 0 }
+            columns.times { column << 0d }
             values << column
-            values[i][i] = 1
+            values[i][i] = 1d
         }
 
         for (String component in components) {
@@ -179,15 +165,15 @@ class PeriodMatrixMultiDimensionalParameter extends AbstractMultiDimensionalPara
         for (List column in values) {
             int j = 0
             for (double cell in column) {
-                    if (i != j) {
-                        result << new CorrelationInfo(
-                                component1: componentMap.get(titles[0][i]),
-                                component2: componentMap.get(titles[0][j]),
-                                period1: Integer.parseInt(titles[1][i]),
-                                period2: Integer.parseInt(titles[1][j]),
-                                value: values[i][j]
-                        )
-                    }
+                if (i != j) {
+                    result << new CorrelationInfo(
+                            component1: componentMap.get(titles[0][i]),
+                            component2: componentMap.get(titles[0][j]),
+                            period1: Integer.parseInt(titles[1][i]),
+                            period2: Integer.parseInt(titles[1][j]),
+                            value: values[i][j]
+                    )
+                }
                 j++
             }
             i++

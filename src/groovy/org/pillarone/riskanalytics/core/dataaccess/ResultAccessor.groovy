@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.dataaccess
 
 import groovy.sql.Sql
+import org.apache.commons.lang.NotImplementedException
 import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
@@ -149,48 +150,30 @@ abstract class ResultAccessor {
      * @param collectorName
      * @param fieldName
      * @param percentage
-     * @param compareOperator
-     * @return value at percentage or null if there exist no values for the path or the percentage is out of range
+     * @return interpolated value at percentage or null if there exist no values for the path or the percentage is out of range
      */
     static Double getNthOrderStatistic(SimulationRun simulationRun, int periodIndex, String path, String collectorName,
-                                       String fieldName, double percentage, CompareOperator compareOperator) {
+                                       String fieldName, double percentage) {
         double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
         if (values.length == 0) return null
-        double lowestPercentage = 100d / values.size()
-        if ((compareOperator.equals(CompareOperator.LESS_THAN) && percentage <= lowestPercentage)
-                || compareOperator.equals(CompareOperator.GREATER_THAN) && percentage == 100) {
-            return null
-        }
         Double rank = simulationRun.getIterations() * percentage * 0.01
 
         Integer index = rank.toInteger()
-        if (rank - index > 0) {
-            switch (compareOperator) {
-                case CompareOperator.GREATER_THAN:
-                case CompareOperator.GREATER_EQUALS:
-                    index++
-                    break
-            }
+        if (rank == 0) {
+            return values[0]
+        } else if (index == 0) {
+            return null
+        } else if (rank - index > 0) {
+            // -1 as array index starts with 0
+            return (values[index] + values[index - 1]) / 2d
+        } else if (rank - index == 0) {
+            // -1 as array index starts with 0
+            return values[index - 1]
+        } else if (rank - index < 0 && index > 1) {
+            // -2 resp. -1 as array index starts with 0
+            return (values[index - 2] + values[index - 1]) / 2d
         }
-        else if (rank - index == 0) {
-            switch (compareOperator) {
-                case CompareOperator.GREATER_THAN:
-                    index++
-                    break
-                case CompareOperator.LESS_THAN:
-                    index--
-                    break
-            }
-        }
-        else if (rank - index < 0) {
-            switch (compareOperator) {
-                case CompareOperator.LESS_THAN:
-                case CompareOperator.LESS_EQUALS:
-                    index--
-                    break
-            }
-        }
-        return rank == 0 ? values[0] : values[--index]       // -1 as array index starts with 0
+        throw new NotImplementedException("unexpected usage $rank $index")
     }
 
 

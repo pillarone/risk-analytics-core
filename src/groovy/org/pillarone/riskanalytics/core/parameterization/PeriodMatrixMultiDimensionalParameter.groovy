@@ -53,7 +53,7 @@ class PeriodMatrixMultiDimensionalParameter extends AbstractMultiDimensionalPara
     }
 
     int getMaxPeriod() {
-        return titles[1].collect { Integer.parseInt(it.toString()) }.max()
+        return titles[1].isEmpty() ? 0 : titles[1].collect { Integer.parseInt(it.toString()) }.max()
     }
 
     @Override
@@ -78,11 +78,11 @@ class PeriodMatrixMultiDimensionalParameter extends AbstractMultiDimensionalPara
 
         if (row < getTitleRowCount()) {
             List titleRow = titles.get(row)
-            return titleRow.get(column - getTitleColumnCount())
+            return titleRow.isEmpty() ? "" : titleRow.get(column - getTitleColumnCount())
         }
         if (column < getTitleColumnCount()) {
             List titleColumn = titles.get(column)
-            return titleColumn.get(row - getTitleRowCount())
+            return titleColumn.isEmpty() ? "" : titleColumn.get(row - getTitleRowCount())
         }
         return super.getValueAt(row - getTitleRowCount(), column - getTitleColumnCount());
     }

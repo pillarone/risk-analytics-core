@@ -3,13 +3,7 @@ package org.pillarone.riskanalytics.core.parameterization
 import models.core.CoreModel
 import org.pillarone.riskanalytics.core.example.marker.ITestComponentMarker
 
-/**
- * Created with IntelliJ IDEA.
- * User: oandersson
- * Date: 1/15/13
- * Time: 1:17 PM
- * To change this template use File | Settings | File Templates.
- */
+
 class PeriodMatrixMultiDimensionalParameterTests extends GroovyTestCase {
 
     PeriodMatrixMultiDimensionalParameter parameter
@@ -141,5 +135,19 @@ class PeriodMatrixMultiDimensionalParameterTests extends GroovyTestCase {
         parameter.updateTable(2, ['hierarchyOutputComponent', 'exampleOutputComponent'])
         List<PeriodMatrixMultiDimensionalParameter.CorrelationInfo> correlations = parameter.getCorrelations()
         assertEquals(12, correlations.size()) //TODO: remove duplicates
+    }
+
+    void testEmptyParameter() {
+        CoreModel model = new CoreModel()
+        model.init()
+        model.injectComponentNames()
+        PeriodMatrixMultiDimensionalParameter pmmdp = new PeriodMatrixMultiDimensionalParameter([], [[], []], ITestComponentMarker)
+        pmmdp.setSimulationModel(model)
+        assertEquals(0, pmmdp.getMaxPeriod())
+        for (int row = 0; row < pmmdp.getRowCount(); row++) {
+            for (int col = 0; col < pmmdp.getColumnCount(); col++) {
+                assertEquals("", pmmdp.getValueAt(row, col))
+            }
+        }
     }
 }

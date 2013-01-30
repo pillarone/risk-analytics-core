@@ -134,7 +134,7 @@ class PeriodMatrixMultiDimensionalParameterTests extends GroovyTestCase {
     void testGetCorrelations() {
         parameter.updateTable(2, ['hierarchyOutputComponent', 'exampleOutputComponent'])
         List<PeriodMatrixMultiDimensionalParameter.CorrelationInfo> correlations = parameter.getCorrelations()
-        assertEquals(12, correlations.size()) //TODO: remove duplicates
+        assertEquals(16, correlations.size())
     }
 
     void testEmptyParameter() {

@@ -165,7 +165,6 @@ class PeriodMatrixMultiDimensionalParameter extends AbstractMultiDimensionalPara
         for (List column in values) {
             int j = 0
             for (double cell in column) {
-                if (i != j) {
                     result << new CorrelationInfo(
                             component1: componentMap.get(titles[0][i]),
                             component2: componentMap.get(titles[0][j]),
@@ -173,7 +172,6 @@ class PeriodMatrixMultiDimensionalParameter extends AbstractMultiDimensionalPara
                             period2: Integer.parseInt(titles[1][j]),
                             value: values[i][j]
                     )
-                }
                 j++
             }
             i++

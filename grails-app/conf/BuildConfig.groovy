@@ -48,6 +48,7 @@ grails.project.dependency.resolution = {
         runtime("com.sun.grizzly:grizzly-utils:1.9.43")
         runtime("jboss:jboss-serialization:4.2.2.GA")
         runtime("trove:trove:1.0.2")
+        runtime("org.fusesource.jansi:jansi:1.2.1")
     }
 }
 

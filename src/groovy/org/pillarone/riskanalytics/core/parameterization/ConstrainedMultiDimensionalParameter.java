@@ -231,8 +231,15 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
     }
 
     public boolean referencePaths(Class markerInterface, String value) {
-        Integer column = constraints.getColumnIndex(markerInterface);
-        return (column != null && values.get(column).indexOf(value) > -1);
+        for (int column = getTitleColumnCount(); column < getColumnCount(); column++) {
+            Class columnType = constraints.getColumnType(column);
+            if (markerInterface.isAssignableFrom(columnType)) {
+                if (values.get(column).contains(value)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public boolean updateReferenceValues(Class markerInterface, String oldValue, String newValue) {

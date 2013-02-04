@@ -131,7 +131,7 @@ class ParameterHolderFactory {
      * to the parameterization with the path replaced with newPath.
      * This can be used to rename all parameters of a component inclusive all of their sub component parameters.
      * Furthermore all parameters referencing it are renamed accordingly.
-     * If the new path can be found within the configurations already, the method throws an exception to prevent a valid state.
+     * If the new path can be found within the configurations already, the method throws an exception to prevent an invalid state.
      */
     public static List<String> renamePathOfParameter(ParametrizedItem parameterization, String oldPath, String newPath, Component renamedComponent) {
         parameterization.getAllParameterHolders().each {

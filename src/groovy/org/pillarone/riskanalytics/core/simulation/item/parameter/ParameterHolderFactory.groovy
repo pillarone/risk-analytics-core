@@ -4,6 +4,7 @@ import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.components.ComponentUtils
 import org.pillarone.riskanalytics.core.components.IComponentMarker
+import org.pillarone.riskanalytics.core.components.NonUniqueComponentNameException
 import org.pillarone.riskanalytics.core.components.ResourceHolder
 import org.pillarone.riskanalytics.core.parameterization.AbstractMultiDimensionalParameter
 import org.pillarone.riskanalytics.core.parameterization.ConstrainedString
@@ -130,8 +131,14 @@ class ParameterHolderFactory {
      * to the parameterization with the path replaced with newPath.
      * This can be used to rename all parameters of a component inclusive all of their sub component parameters.
      * Furthermore all parameters referencing it are renamed accordingly.
+     * If the new path can be found within the configurations already, the method throws an exception to prevent a valid state.
      */
     public static List<String> renamePathOfParameter(ParametrizedItem parameterization, String oldPath, String newPath, Component renamedComponent) {
+        parameterization.getAllParameterHolders().each {
+            if (it.path.startsWith(newPath)){
+                throw new NonUniqueComponentNameException("A component with the name ${renamedComponent.name} already exists in this dynamic composed component")
+            }
+        }
         List removedParameters = []
         List clonedParameters = []
         parameterization.getAllParameterHolders().each {ParameterHolder parameterHolder ->

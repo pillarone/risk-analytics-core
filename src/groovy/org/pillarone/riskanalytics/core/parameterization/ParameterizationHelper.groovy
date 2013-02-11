@@ -24,7 +24,7 @@ public class ParameterizationHelper {
     static Parameterization createDefaultParameterization(Model model, int periodCount = 1) {
         Parameterization result = new Parameterization(model.class.simpleName - "Model" + "-Default")
         result.modelClass = model.class
-        periodCount.times {index ->
+        periodCount.times { index ->
             model.init()
             List parameterList = extractParameterHoldersFromModel(model, index)
             parameterList.each {
@@ -46,11 +46,11 @@ public class ParameterizationHelper {
     }
 
     static List<ParameterHolder> extractParameterHoldersFromModel(Model model, int periodIndex) {
-        return getAllParameter(model).collect {Map.Entry entry -> ParameterHolderFactory.getHolder(entry.key, periodIndex, entry.value) }
+        return getAllParameter(model).collect { Map.Entry entry -> ParameterHolderFactory.getHolder(entry.key, periodIndex, entry.value) }
     }
 
     static List<ParameterHolder> extractParameterHoldersFromResource(IResource resource) {
-        return getAllParameter(resource).collect {Map.Entry entry -> ParameterHolderFactory.getHolder(entry.key, 0, entry.value) }
+        return getAllParameter(resource).collect { Map.Entry entry -> ParameterHolderFactory.getHolder(entry.key, 0, entry.value) }
     }
 
 
@@ -79,11 +79,11 @@ public class ParameterizationHelper {
     }
 
     static void addParameters(Parameterization result, ParameterInjector injector, Model model) {
-        injector.periodCount.times {index ->
+        injector.periodCount.times { index ->
             injector.injectConfiguration(model, index)
             Map parameterMap = [:]
             collectAllParameter(model, parameterMap)
-            List parameterList = parameterMap.collect {Map.Entry entry -> ParameterHolderFactory.getHolder(entry.key, index, entry.value) }
+            List parameterList = parameterMap.collect { Map.Entry entry -> ParameterHolderFactory.getHolder(entry.key, index, entry.value) }
             parameterList.each {
                 result.addParameter(it)
             }
@@ -116,10 +116,10 @@ public class ParameterizationHelper {
         if (configObject.containsKey("tags")) {
             List tagNames = configObject.tags as List
             List tags = []
-            tagNames.each {String name ->
+            tagNames.each { String name ->
                 Tag tag = Tag.findByNameAndTagType(name, EnumTagType.PARAMETERIZATION)
                 if (!tag) {
-                    Tag.withTransaction {TransactionStatus status ->
+                    Tag.withTransaction { TransactionStatus status ->
                         tag = new Tag(name: name, tagType: EnumTagType.PARAMETERIZATION).save()
                     }
                 }
@@ -138,7 +138,7 @@ public class ParameterizationHelper {
     }
 
     protected static void collectAllParameter(Model model, Map parameter) {
-        GroovyUtils.getProperties(model).each {propertyName, propertyValue ->
+        GroovyUtils.getProperties(model).each { propertyName, propertyValue ->
             if (propertyValue instanceof Component) {
                 collectAllParameter propertyValue, propertyName, parameter
             }
@@ -147,7 +147,7 @@ public class ParameterizationHelper {
 
     protected static void collectAllParameter(Component component, String prefix, Map parameter) {
 
-        GroovyUtils.getProperties(component).each {propertyName, propertyValue ->
+        GroovyUtils.getProperties(component).each { propertyName, propertyValue ->
             if (propertyName.startsWith("parm")) {
                 parameter[prefix + ":" + propertyName] = propertyValue
             }
@@ -159,20 +159,27 @@ public class ParameterizationHelper {
 
     protected static void collectAllParameter(IResource resource, Map parameter) {
 
-        resource.properties.each {String propertyName, propertyValue ->
+        resource.properties.each { String propertyName, propertyValue ->
             if (propertyName.startsWith("parm")) {
                 parameter[propertyName] = propertyValue
             }
         }
     }
 
+    //PMO-2371 do not copy parameters that are marked as 'removed'
     static List copyParameters(List parameters) {
-        return parameters.collect { it.clone() }
+        List result = []
+        parameters.each {
+            if (!it.removed) {
+                result << it.clone()
+            }
+        }
+        return result
     }
 
     static List<Resource> collectUsedResources(List<ParameterHolder> parameters) {
         List<Resource> result = new ArrayList<Resource>();
-        for (ParameterHolder parameter: parameters) {
+        for (ParameterHolder parameter : parameters) {
             if (parameter instanceof ResourceParameterHolder) {
                 ResourceParameterHolder parameterHolder = (ResourceParameterHolder) parameter;
                 Resource resource = new Resource(parameterHolder.getName(), parameterHolder.getResourceClass());
@@ -185,7 +192,7 @@ public class ParameterizationHelper {
                     for (int i = 0; i < constrainedMultiDimensionalParameter.getColumnCount(); i++) {
                         if (IResource.class.isAssignableFrom(constrainedMultiDimensionalParameter.getConstraints().getColumnType(i))) {
                             final List column = (List) constrainedMultiDimensionalParameter.getValues().get(i);
-                            for (Object entry: column) {
+                            for (Object entry : column) {
                                 if (entry instanceof ResourceHolder) {
                                     ResourceHolder holder = (ResourceHolder) entry;
                                     Resource resource = new Resource(holder.getName(), holder.getResourceClass());

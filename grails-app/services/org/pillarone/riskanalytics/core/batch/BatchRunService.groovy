@@ -102,7 +102,7 @@ class BatchRunService {
     void deleteSimulationRun(BatchRun batchRun, SimulationRun simulationRun) {
         BatchRun.withTransaction {
             BatchRunSimulationRun batchRunSimulationRun = BatchRunSimulationRun.findByBatchRunAndSimulationRun(batchRun, simulationRun)
-            batchRunSimulationRun.delete()
+            deleteBatchRunSimulationRun(batchRunSimulationRun)
         }
     }
 
@@ -122,14 +122,18 @@ class BatchRunService {
 
     boolean deleteBatchRun(BatchRun batchRun) {
         BatchRun.withTransaction {
-            try {
-                BatchRunSimulationRun.executeUpdate("delete from org.pillarone.riskanalytics.core.BatchRunSimulationRun as b where b.batchRun=?", [batchRun])
-                BatchRun.executeUpdate("delete from org.pillarone.riskanalytics.core.BatchRun as b where b.id=?", [batchRun.id])
-                return true
-            } catch (Exception ex) {
-                LOG.error "Exception occured during delete of BatchRun : ${batchRun.name}"
+            for(BatchRunSimulationRun toDelete in BatchRunSimulationRun.findAllByBatchRun(batchRun)) {
+                deleteBatchRunSimulationRun(toDelete)
             }
-            return false
+            BatchRun.get(batchRun.id).delete()
+        }
+        return true
+    }
+
+    protected void deleteBatchRunSimulationRun(BatchRunSimulationRun batchRunSimulationRun) {
+        batchRunSimulationRun.delete()
+        if (batchRunSimulationRun.simulationRun.endTime == null) {
+            SimulationRun.get(batchRunSimulationRun.simulationRun.id).delete()
         }
     }
 

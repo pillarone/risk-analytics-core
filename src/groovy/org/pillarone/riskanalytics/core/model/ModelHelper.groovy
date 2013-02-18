@@ -293,6 +293,23 @@ class ModelHelper {
         return results
     }
 
+    public static Set<String> pathsExtendedWithType(Collection<String> paths, Collection<String> typeLabels) {
+        Set<String> results = new HashSet<String>()
+        for (String path : paths) {
+            String pathWithoutChannel = getPathBase(path)
+            String channel = getChannel(path)
+            for (String type : typeLabels) {
+                StringBuilder builder = new StringBuilder(pathWithoutChannel)
+                builder.append(PATH_SEPARATOR)
+                builder.append(type)
+                builder.append(PATH_SEPARATOR)
+                builder.append(channel)
+                results.add(builder.toString())
+            }
+        }
+        return results
+    }
+
     private static String getPathBase(String path) {
         int separatorPositionBeforeChannel = path.lastIndexOf(":");
         return path.substring(0, separatorPositionBeforeChannel);

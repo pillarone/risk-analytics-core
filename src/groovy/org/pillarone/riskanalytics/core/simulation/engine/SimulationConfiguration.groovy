@@ -109,6 +109,8 @@ public class SimulationConfiguration implements Serializable, Cloneable {
         Set paths = ModelHelper.getAllPossibleOutputPaths(model, drillDownPaths)
         Set<String> inceptionPeriodPaths = getSplitByInceptionDateDrillDownPaths(drillDownCollectors, model)
         paths.addAll(inceptionPeriodPaths)
+        Set<String> typeDrillDownPaths = getPotentialTypeDrillDowns(drillDownCollectors)
+        paths.addAll(typeDrillDownPaths)
 
         Set fields = ModelHelper.getAllPossibleFields(model, !inceptionPeriodPaths.empty)
         MappingCache cache = MappingCache.instance
@@ -122,6 +124,12 @@ public class SimulationConfiguration implements Serializable, Cloneable {
         }
 
         this.mappingCache = cache
+    }
+
+    Set<String> getPotentialTypeDrillDowns(List<PacketCollector> collectors) {
+        List<String> splitByTypePaths = getDrillDownPaths(collectors, DrillDownMode.BY_TYPE)
+        Set<String> typelabels = hardcodedTypeSplitEnumRegistry()
+        return ModelHelper.pathsExtendedWithType(splitByTypePaths, typelabels)
     }
 
     private List<String> getDrillDownPaths(List<PacketCollector> collectors,DrillDownMode mode) {
@@ -147,5 +155,10 @@ public class SimulationConfiguration implements Serializable, Cloneable {
         Set<String> periodLabels = model.periodLabelsBeforeProjectionStart()
         periodLabels.addAll PeriodLabelsUtil.getPeriodLabels(simulation, model)
         return ModelHelper.pathsExtendedWithPeriod(splitByInceptionDatePaths, periodLabels.toList())
+    }
+
+    /* fugly */
+    private Set<String> hardcodedTypeSplitEnumRegistry(){
+        return ["ncb", "premium", "loss"]
     }
 }

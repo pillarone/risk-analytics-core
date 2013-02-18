@@ -14,6 +14,7 @@ class ModelHelper {
     // todo(sku): try to reuse same constants of PC project
     private static final String PATH_SEPARATOR = ':'
     private static final String PERIOD = 'period'
+    private static final String SPLIT = 'split'
     private static final String RESERVE_RISK_BASE = 'reserveRiskBase'
     private static final String PREMIUM_RISK_BASE = 'premiumRiskBase'
     private static final String PREMIUM_AND_RESERVE_RISK_BASE = "premiumAndReserveRiskBase";
@@ -300,6 +301,8 @@ class ModelHelper {
             String channel = getChannel(path)
             for (String type : typeLabels) {
                 StringBuilder builder = new StringBuilder(pathWithoutChannel)
+                builder.append(PATH_SEPARATOR)
+                builder.append(SPLIT)
                 builder.append(PATH_SEPARATOR)
                 builder.append(type)
                 builder.append(PATH_SEPARATOR)

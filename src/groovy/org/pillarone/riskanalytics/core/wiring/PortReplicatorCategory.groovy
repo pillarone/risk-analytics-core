@@ -41,7 +41,7 @@ class PortReplicatorCategory {
         PacketList targetProperty = GroovyUtils.getProperties(receiver).get(targetPropertyName)
 
         if (!sourceProperty.isCompatibleTo(targetProperty)) {
-            throw new IllegalArgumentException("Wiring only allowed with same types for input and output")
+            throw new IllegalArgumentException("Wiring only allowed with same types for input and output $sender -> $receiver ($targetPropertyName)")
         }
 
         replicateChannels(sourceProperty, targetProperty, sourcePropertyName, receiver, source, targetPropertyName)
@@ -57,7 +57,7 @@ class PortReplicatorCategory {
         // receiver                              = source
         if (sourcePropertyName.startsWith("in")) {
             if (!targetPropertyName.startsWith("in")) {
-                throw new UnsupportedOperationException("Only matching ports can be replicated. [in = in | out = out]")
+                throw new UnsupportedOperationException("Only matching ports can be replicated. [in = in | out = out] ($source.$sourcePropertyName -> $receiver.$targetPropertyName)")
             }
             if (!isSubcomponent(source, receiver)) {
                 throw new UnsupportedOperationException("Only port of subcomponents can be replicated")
@@ -76,10 +76,10 @@ class PortReplicatorCategory {
         // receiver       = source
         if (sourcePropertyName.startsWith("out")) {
             if (!targetPropertyName.startsWith("out")) {
-                throw new UnsupportedOperationException("Only matching ports can be replicated. [in = in | out = out]")
+                throw new UnsupportedOperationException("Only matching ports can be replicated. [in = in | out = out] ($source.$sourcePropertyName -> $receiver.$targetPropertyName)")
             }
             if (!isSubcomponent(receiver, source)) {
-                throw new UnsupportedOperationException("Only port of subcomponents can be replicated")
+                throw new UnsupportedOperationException("Only port of subcomponents can be replicated ($source.$sourcePropertyName -> $receiver.$targetPropertyName)")
             }
             ITransmitter transmitter = new SilentTransmitter(source, sourceProperty, receiver, targetProperty)
             if (packetListener.get() != null) {

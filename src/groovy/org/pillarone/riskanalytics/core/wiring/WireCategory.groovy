@@ -37,7 +37,7 @@ class WireCategory {
             PacketList sourceProperty = GroovyUtils.getProperties(source)[sourcePropertyName]
             PacketList targetProperty = GroovyUtils.getProperties(target)[targetPropertyName]
             if (!targetProperty.isCompatibleTo(sourceProperty)) {
-                throw new IllegalArgumentException("Wiring only allowed with same types for input and output")
+                throw new IllegalArgumentException("Wiring only allowed with same types for input and output $sender -> $target ($targetPropertyName)")
             }
             Transmitter transmitter = createTransmitter(sourceProperty, source, targetProperty, target)
             if (packetListener.get()!=null){
@@ -46,7 +46,7 @@ class WireCategory {
             target.allInputTransmitter << transmitter
             source.allOutputTransmitter << transmitter
         } catch (Throwable t) {
-            throw new WiringException("doSetProperty failed, sourcePropertyName: " + sourcePropertyName + ", targetPropertyName: " + targetPropertyName + ", msg: " + t.getMessage(), t);
+            throw new WiringException("doSetProperty failed, sourcePropertyName: " + sourcePropertyName + ", target: " + target + ", targetPropertyName: " + targetPropertyName + ", msg: " + t.getMessage(), t);
         }
     }
 

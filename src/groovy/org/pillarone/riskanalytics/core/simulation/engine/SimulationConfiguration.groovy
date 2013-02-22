@@ -159,6 +159,6 @@ public class SimulationConfiguration implements Serializable, Cloneable {
 
     /* fugly */
     private Set<String> hardcodedTypeSplitEnumRegistry(){
-        return ["ncb", "premium", "loss"]
+        return ["ncb", "premium", "loss", "term"]
     }
 }

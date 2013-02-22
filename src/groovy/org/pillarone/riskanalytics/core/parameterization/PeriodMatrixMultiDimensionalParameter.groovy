@@ -109,7 +109,11 @@ class PeriodMatrixMultiDimensionalParameter extends AbstractMultiDimensionalPara
 
     @Override
     protected void appendAdditionalConstructorArguments(StringBuffer buffer) {
-        buffer.append(",").append(titles.toListString()).append(",").append(markerClass.name)
+        buffer.append(",").append("[")
+        appendList(buffer, titles[0])
+        buffer.append(",")
+        appendList(buffer, titles[1])
+        buffer.append("]").append(",").append(markerClass.name)
     }
 
     @Override
@@ -165,13 +169,13 @@ class PeriodMatrixMultiDimensionalParameter extends AbstractMultiDimensionalPara
         for (List column in values) {
             int j = 0
             for (double cell in column) {
-                    result << new CorrelationInfo(
-                            component1: componentMap.get(titles[0][i]),
-                            component2: componentMap.get(titles[0][j]),
-                            period1: Integer.parseInt(titles[1][i]),
-                            period2: Integer.parseInt(titles[1][j]),
-                            value: values[i][j]
-                    )
+                result << new CorrelationInfo(
+                        component1: componentMap.get(titles[0][i]),
+                        component2: componentMap.get(titles[0][j]),
+                        period1: Integer.parseInt(titles[1][i]),
+                        period2: Integer.parseInt(titles[1][j]),
+                        value: values[i][j]
+                )
                 j++
             }
             i++

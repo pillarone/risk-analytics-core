@@ -88,8 +88,9 @@ public class MappingCache implements Serializable {
                     pathMapping = new PathMapping(pathName: path).save()
                 }
                 catch (HibernateException ex) {
-                    throw new HibernateException("On KTI branch paths have to be persisted before simulation run! Path " + path + " not found!" +
-                                                 "\nPlease contact development providing them the missing path.", ex)
+                    throw new HibernateException("Split collectors are not allowed in sub components only!" +
+                                                 "\nOn KTI branch paths have to be persisted before simulation run! Path " + path + " not found!" +
+                                                 "\nPlease contact development providing them the missing path if the error occurred in a sub component.", ex)
                 }
             }
             paths.put(path, pathMapping)

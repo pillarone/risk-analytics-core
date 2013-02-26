@@ -48,6 +48,7 @@ public interface IPeriodCounter {
      * @throws AfterSimulationEndException if the date is after endOfLastPeriod()
      */
     int belongsToPeriod(DateTime date) throws BeforeSimulationStartException, AfterSimulationEndException
+    boolean dateInSimulationScope(DateTime date)
 
     boolean belongsToCurrentPeriod(DateTime date)
 

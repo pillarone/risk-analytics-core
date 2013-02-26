@@ -82,7 +82,11 @@ public class ContinuousPeriodCounter implements IPeriodCounter {
         return period
     }
 
-    /**
+    boolean dateInSimulationScope(DateTime date) {
+        if (date.isBefore(startOfFirstPeriod)) return false
+        return true
+    }
+/**
      * @param date
      * @return true if date belongs to current period, false if not and if the date is throwing a
      *          NotInProjectionHorizon exception

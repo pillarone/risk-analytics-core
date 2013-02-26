@@ -22,6 +22,12 @@ class LimitedContinuousPeriodCounter extends ContinuousPeriodCounter implements 
         numberOfPeriods
     }
 
+    boolean dateInSimulationScope(DateTime date) {
+        if (date.isBefore(startOfFirstPeriod())) return false
+        if (date.isAfter(endOfLastPeriod())) return false
+        return true
+    }
+
     DateTime endOfLastPeriod() {
         endOfPeriod(numberOfPeriods)
     }

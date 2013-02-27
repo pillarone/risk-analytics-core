@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.model
 
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
 import org.pillarone.riskanalytics.core.packets.PacketList
@@ -7,6 +9,7 @@ import org.pillarone.riskanalytics.core.packets.Packet
 import org.pillarone.riskanalytics.core.components.IComponentMarker
 import org.pillarone.riskanalytics.core.components.ComposedComponent
 import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
+import sun.util.LocaleServiceProviderPool
 
 
 class ModelHelper {
@@ -38,6 +41,8 @@ class ModelHelper {
     private static final String CONTRACT_MARKER = "IReinsuranceContractMarker"
     private static final String LEGAL_ENTITY_MARKER = "ILegalEntityMarker"
     private static final String STRUCTURE_MARKER = "IStructureMarker"
+
+    private static Log LOG = LogFactory.getLog(ModelHelper.class);
 
 
     /**
@@ -229,7 +234,9 @@ class ModelHelper {
             extendedPaths(componentsByMarkerInterface, contractMarker, CONTRACTS, pathWithoutChannel, channel, results)
             extendedPaths(componentsByMarkerInterface, lobMarker, SEGMENTS, pathWithoutChannel, channel, results)
         }
-        results.each { println it }
+        if (LOG.isDebugEnabled()) {
+            results.each { LOG.debug it }
+        }
         return results
     }
 

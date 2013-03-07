@@ -40,10 +40,12 @@ class StatusChangeService {
                             eq("dealId", parameterization.dealId)
                             ne("id", parameterization.id)
                             ne("status", org.pillarone.riskanalytics.core.workflow.Status.NONE)
+                            //Check model class name as well
+                            eq("modelClassName", parameterization.modelClass.name)
                         }
                     }
 
-                    if (! p14nsInWorkflow.isEmpty()) {
+                    if (!p14nsInWorkflow.isEmpty()) {
                         throw new WorkflowException(parameterization.name, DATA_ENTRY, "Parameterization is already in workflow.")
                     }
                 }

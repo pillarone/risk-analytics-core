@@ -1,0 +1,68 @@
+<!--
+    LICENSE AGREEMENT
+    
+    GRIDGAIN - OPEN CLOUD PLATFORM.
+    COPYRIGHT (C) 2005-2008 GRIDGAIN SYSTEMS. ALL RIGHTS RESERVED.
+    
+    THIS IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR
+    MODIFY IT UNDER THE TERMS OF THE GNU LESSER GENERAL PUBLIC
+    LICENSE AS PUBLISHED BY THE FREE SOFTWARE FOUNDATION; EITHER
+    VERSION 2.1 OF THE LICENSE, OR (AT YOUR OPTION) ANY LATER 
+    VERSION.
+    
+    THIS LIBRARY IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL,
+    BUT WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF
+    MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.  SEE THE 
+    GNU LESSER GENERAL PUBLIC LICENSE FOR MORE DETAILS.
+    
+    YOU SHOULD HAVE RECEIVED A COPY OF THE GNU LESSER GENERAL PUBLIC
+    LICENSE ALONG WITH THIS LIBRARY; IF NOT, WRITE TO THE FREE 
+    SOFTWARE FOUNDATION, INC., 51 FRANKLIN ST, FIFTH FLOOR, BOSTON, MA  
+    02110-1301 USA
+-->
+
+
+<!DOCTYPE server PUBLIC "-//JBoss//DTD MBean Service 4.0//EN" "http://www.jboss.org/j2ee/dtd/jboss-service_4_0.dtd">
+
+<!--
+    JBoss service descriptor for GridGain JBoss Loader.
+
+    Classpath should contain the following libraries:
+    - $GRIDGAIN_HOME/libs/*.jar
+    - $GRIDGAIN_HOME/gridgain_x.x.x.jar
+
+    For example, if GridGain is installed on Linux into /opt/gridgain-2.1.0 then
+    you can use the following classpath settings to includes all
+    necessary JARs:
+
+    <classpath codebase="file:///opt/gridgain-2.1.0/gridgain-2.1.0.jar"/>
+    <classpath codebase="file:///opt/gridgain-2.1.0/libs" archives="*"/>
+
+    If GridGain is installed on Windows into C:/gridgain-2.1.0 then
+    you can use the following classpath settings to includes all
+    necessary JARs:
+
+    <classpath codebase="file:/C:/gridgain-2.1.0/gridgain-2.1.0.jar"/>
+    <classpath codebase="file:/C:/gridgain-2.1.0/libs" archives="*"/>
+-->
+<server>
+    <!--
+        TODO:
+        Replace ${GRIDGAIN_HOME} with actual path to GridGain
+        installation folder.
+    -->
+    <classpath codebase="file:/${GRIDGAIN_HOME}/gridgain-2.1.0.jar"/>
+    <classpath codebase="file:/${GRIDGAIN_HOME}/libs" archives="*"/>
+
+    <mbean code="org.gridgain.grid.loaders.jboss.GridJbossLoader" name="gridgain:service=loader">
+        <!--
+            This is specific configuration for JBoss HA. It will use JBoss SPIs for
+            communication and discovery. Note that JBoss HA is required.
+        -->
+        <attribute name="ConfigurationFile">config/jboss4/ha/jboss-gridgain-ha-spring.xml</attribute>
+
+        <!-- Change the partition name to whatever name is used in JBoss. -->
+        <depends>jboss:service=${jboss.partition.name:DefaultPartition}</depends>
+    </mbean>
+</server>
+

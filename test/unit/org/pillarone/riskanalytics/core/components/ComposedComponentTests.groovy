@@ -99,7 +99,7 @@ class ComposedComponentTests extends GroovyTestCase {
     }
 
     void testInnerStartComponentResolution() {
-        TestStartComposedComponent component = new TestStartComposedComponent()
+        TestStartComposedComponent component = new TestStartComposedComponent(name: 'outest')
         component.internalWiring()
         component.input1 << new SingleValuePacket(value:  1.5)
         component.doCalculation()

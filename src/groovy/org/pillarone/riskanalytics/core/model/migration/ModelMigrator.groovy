@@ -10,6 +10,7 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolde
 import org.pillarone.riskanalytics.core.parameterization.ParameterizationHelper
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import java.beans.Introspector
 
 public class ModelMigrator {
 
@@ -18,9 +19,20 @@ public class ModelMigrator {
     Class<? extends MigratableModel> modelClass
     VersionNumber toVersion
 
+    private static ThreadLocal<Boolean> classLoaderBeingUsed = new ThreadLocal<Boolean>() {
+        @Override
+        protected Boolean initialValue() {
+            return false
+        }
+    }
+
     public ModelMigrator(Class<? extends MigratableModel> modelClass) {
         this.modelClass = modelClass
         toVersion = Model.getModelVersion(modelClass);
+    }
+
+    public static boolean migrationClassLoaderBeingUsedInThisThread() {
+        return classLoaderBeingUsed.get()
     }
 
     public void migrateParameterizations() {
@@ -56,8 +68,9 @@ public class ModelMigrator {
                         try {
                             currentModelClassLoader.close()
                             LogFactory.releaseAll() //ART-850
+                            Introspector.flushCaches()
                         } catch (Exception e) {
-                            LOG.warn("Failed to release log factory for class loader - possible memory leak: ${e.message}")
+                            LOG.warn("Failed to release class loader resources - possible memory leak: ${e.message}")
                         }
                     }
 
@@ -100,11 +113,13 @@ public class ModelMigrator {
     public static void doWithContextClassLoader(ClassLoader cl, Closure closure) {
         Thread currentThread = Thread.currentThread()
         ClassLoader current = currentThread.contextClassLoader
+        classLoaderBeingUsed.set(true)
         currentThread.contextClassLoader = cl
         try {
             closure.call()
         } finally {
             currentThread.contextClassLoader = current
+            classLoaderBeingUsed.set(false)
         }
     }
 }

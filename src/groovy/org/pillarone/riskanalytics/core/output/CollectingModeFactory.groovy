@@ -5,19 +5,19 @@ import org.apache.commons.logging.LogFactory
 
 class CollectingModeFactory {
 
-    private static Map<String, Class> strategies = new HashMap()
+    private static Map<String, ICollectingModeStrategy> strategies = new HashMap()
     private static Log LOG = LogFactory.getLog(CollectingModeFactory)
 
     static void registerStrategy(ICollectingModeStrategy strategy) {
         String identifier = strategy.identifier
-        Class existingClass = strategies.get(identifier)
-        if (existingClass == null) {
-            strategies.put(identifier, strategy.getClass())
+        ICollectingModeStrategy existingStrategy = strategies.get(identifier)
+        if (existingStrategy == null) {
+            strategies.put(identifier, strategy)
         } else {
-            if (existingClass.name == strategy.getClass().name) {
+            if (existingStrategy.class.name == strategy.class.name) {
                 LOG.warn "Collecting mode strategy $identifier already exists - ignoring"
             } else {
-                throw new IllegalStateException("Identifier $identifier already associated with ${existingClass.name}")
+                throw new IllegalStateException("Identifier $identifier already associated with ${existingStrategy.class.name}")
             }
         }
     }
@@ -31,8 +31,24 @@ class CollectingModeFactory {
     }
 
     static ICollectingModeStrategy getStrategy(String identifier) {
-        Class clazz = strategies.get(identifier)
-        return (ICollectingModeStrategy) clazz?.newInstance()
+        ICollectingModeStrategy strategy = strategies.get(identifier)
+        if (strategy != null) {
+            strategy = getNewInstance(strategy)
+        }
+        return strategy
     }
 
+    static ICollectingModeStrategy getNewInstance(ICollectingModeStrategy strategy) {
+        return (ICollectingModeStrategy) strategy.class.newInstance(strategy.arguments)
+    }
+
+    static List<ICollectingModeStrategy> getDrillDownStrategies(DrillDownMode drillDownMode) {
+        List<ICollectingModeStrategy> result = []
+        for (ICollectingModeStrategy strategy : strategies.values()) {
+            if (strategy.drillDownModes.contains(drillDownMode)) {
+                result << strategy
+            }
+        }
+        return result
+    }
 }

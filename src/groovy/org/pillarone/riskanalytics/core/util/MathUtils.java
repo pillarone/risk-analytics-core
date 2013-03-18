@@ -97,6 +97,9 @@ public class MathUtils {
      * Clones the provided stream and selects defined subStream. If subStream is not positive, the stream
      * itselfs is returned.
      *
+     * There are reserved substream indices, which may be used by the business logic. These will not be assigned to a simulation block by the simulation engine:
+     * 100 - 109, 200 - 209 etc (i >= 100 && i % 100 <10)
+     *
      * @param stream
      * @param subStream
      * @return

@@ -8,6 +8,7 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Commen
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
 import static org.pillarone.riskanalytics.core.workflow.Status.*
 import org.pillarone.riskanalytics.core.remoting.impl.RemotingUtils
+import org.pillarone.riskanalytics.core.example.model.TracingTestModel
 
 class StatusChangeServiceTests extends GroovyTestCase {
 
@@ -46,6 +47,29 @@ class StatusChangeServiceTests extends GroovyTestCase {
         parameterization.save()
 
         shouldFail(WorkflowException, { statusChangeService.changeStatus(parameterization, DATA_ENTRY)})
+    }
+
+    void testToDataEntryFromNoneAlreadyInWorkflowDifferentModelClassName() {
+        Parameterization existingParameterization = new Parameterization("name")
+        existingParameterization.modelClass = TracingTestModel
+        existingParameterization.periodCount = 0
+        existingParameterization.dealId = 1
+        existingParameterization.status = org.pillarone.riskanalytics.core.workflow.Status.DATA_ENTRY
+        existingParameterization.versionNumber = new VersionNumber("R1")
+        existingParameterization.save()
+
+        Parameterization parameterization = new Parameterization("name")
+        //Different model class..
+        parameterization.modelClass = EmptyModel
+        parameterization.periodCount = 0
+        parameterization.dealId = 1
+        parameterization.save()
+        Parameterization param = statusChangeService.changeStatus(parameterization, DATA_ENTRY)
+
+        //Alora, this should magically work since the model class is different...
+        assertEquals DATA_ENTRY, param.status
+        assertEquals "R1", param.versionNumber.toString()
+
     }
 
     void testToProduction() {

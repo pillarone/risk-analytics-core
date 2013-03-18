@@ -8,6 +8,8 @@ import org.pillarone.riskanalytics.core.packets.PacketList
 import org.pillarone.riskanalytics.core.parameterization.StructureInformation
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 import org.pillarone.riskanalytics.core.wiring.WireCategory
+import org.pillarone.riskanalytics.core.RiskAnalyticsInconsistencyException
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 /**
  * A PacketCollector is a special component used for collecting other components output.
@@ -37,11 +39,16 @@ public class PacketCollector extends Component {
      * which is set by the user on the run screen. This variable decides whether or not to halt the simulation should
      * an insanity (NaN, infinity) etc be collected.
      */
-    boolean globalSanityChecks = true
+    boolean runtimeSanityChecks = true
 
     String path
 
     public PacketCollector() { }
+
+    public void setMode(ICollectingModeStrategy mode) {
+        this.mode = mode;
+        this.mode.packetCollector = this;
+    }
 
     public PacketCollector(ICollectingModeStrategy mode) {
         this.mode = mode
@@ -50,7 +57,7 @@ public class PacketCollector extends Component {
 
     protected void doCalculation() {
         if (inPackets.empty) {return}
-        outputStrategy << mode.collect(inPackets, globalSanityChecks)
+        outputStrategy << mode.collect(inPackets, runtimeSanityChecks)
     }
 
     @Override
@@ -65,8 +72,8 @@ public class PacketCollector extends Component {
         """)
     }
 /**
-     * Find the component matching the path information and wire to its outputChannel.
-     */
+ * Find the component matching the path information and wire to its outputChannel.
+ */
     public attachToModel(Model model, StructureInformation structureInformation) {
         def pathElements = path.split("\\:")
 
@@ -81,7 +88,7 @@ public class PacketCollector extends Component {
         def component = model
         def outChannel = pathElements[-1]
         pathElements[1..-2].each {propertyName ->
-            if (component.properties.containsKey(propertyName)) {
+            if (GroovyUtils.getProperties(component).containsKey(propertyName)) {
                 component = component[propertyName]
             } else {
                 component = structureInformation.componentPaths.inverse().get(pathElements[0..-2].join(":"))

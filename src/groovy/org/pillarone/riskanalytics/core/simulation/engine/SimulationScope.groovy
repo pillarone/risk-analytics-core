@@ -13,8 +13,10 @@ import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
+import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationBlock
 import org.pillarone.riskanalytics.core.simulation.engine.id.IIdGenerator
 import org.pillarone.riskanalytics.core.simulation.engine.id.CountingIdGenerator
+import org.pillarone.riskanalytics.core.output.FileOutput
 
 /**
  * The SimulationScope provides information, that is valid throughout the whole simulation.
@@ -42,6 +44,7 @@ public class SimulationScope {
 
     MappingCache mappingCache
 
+    List<SimulationBlock> simulationBlocks
     IIdGenerator idGenerator
 
     private volatile SimulationState simulationState = SimulationState.NOT_RUNNING
@@ -58,6 +61,9 @@ public class SimulationScope {
     }
 
     public CollectorFactory getCollectorFactory() {
+        if (outputStrategy instanceof FileOutput) {
+            outputStrategy.simulationScope = this
+        }
         return new CollectorFactory(outputStrategy)
     }
 
@@ -65,7 +71,7 @@ public class SimulationScope {
         if (model instanceof DeterministicModel) {
             return iterationScope.periodScope.currentPeriod / iterationScope.numberOfPeriods * 100.0
         } else {
-            return iterationsDone / numberOfIterations * 100.0
+            return iterationsDone / (simulationBlocks*.blockSize.sum()) * 100.0
         }
     }
 

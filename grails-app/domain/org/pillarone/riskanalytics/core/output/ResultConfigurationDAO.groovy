@@ -41,4 +41,17 @@ public class ResultConfigurationDAO {
             comment(column: 'comment_value')
         }
     }
+
+    /**
+     * Returns a persisted ResultConfigurationDAO.
+     * A parameterization can be uniquely identified by Name, Model & Version.
+     */
+    static ResultConfigurationDAO find(String name, String modelClassName, String versionNumber) {
+        def criteria = ResultConfigurationDAO.createCriteria()
+        return criteria.get {
+            eq('name', name)
+            eq('itemVersion', versionNumber)
+            eq('modelClassName', modelClassName)
+        }
+    }
 }

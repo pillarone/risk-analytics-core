@@ -4,10 +4,24 @@ import org.apache.log4j.Logger
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.packets.PacketList
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 class WireCategory {
 
     static final Logger LOG = Logger.getLogger(PortReplicatorCategory)
+
+    private static ThreadLocal<IPacketListener> packetListener = new ThreadLocal<IPacketListener>() {
+
+        @Override
+        protected IPacketListener initialValue() {
+            return null;
+        }
+
+    };
+
+    public static void setPacketListener(IPacketListener packetListener){
+        this.packetListener.set(packetListener);
+    }
 
     static void doSetProperty(Component target, String targetPropertyName, Object sender) {
         // guarded clause to check that only input input channels are wired
@@ -20,16 +34,19 @@ class WireCategory {
         def source = ((LinkedProperty) sender).source
         def sourcePropertyName = ((LinkedProperty) sender).name
         try {
-            PacketList sourceProperty = source.properties[sourcePropertyName]
-            PacketList targetProperty = target.properties[targetPropertyName]
+            PacketList sourceProperty = GroovyUtils.getProperties(source)[sourcePropertyName]
+            PacketList targetProperty = GroovyUtils.getProperties(target)[targetPropertyName]
             if (!targetProperty.isCompatibleTo(sourceProperty)) {
-                throw new IllegalArgumentException("Wiring only allowed with same types for input and output")
+                throw new IllegalArgumentException("Wiring only allowed with same types for input and output $sender -> $target ($targetPropertyName)")
             }
             Transmitter transmitter = createTransmitter(sourceProperty, source, targetProperty, target)
+            if (packetListener.get()!=null){
+                transmitter=new TraceableTransmitter(transmitter,packetListener.get());
+            }
             target.allInputTransmitter << transmitter
             source.allOutputTransmitter << transmitter
         } catch (Throwable t) {
-            throw new WiringException("doSetProperty failed, sourcePropertyName: " + sourcePropertyName + ", targetPropertyName: " + targetPropertyName + ", msg: " + t.getMessage(), t);
+            throw new WiringException("doSetProperty failed, sourcePropertyName: " + sourcePropertyName + ", target: " + target + ", targetPropertyName: " + targetPropertyName + ", msg: " + t.getMessage(), t);
         }
     }
 

@@ -6,9 +6,10 @@ import org.pillarone.riskanalytics.core.model.Model;
 import org.pillarone.riskanalytics.core.util.CloneSupport;
 import org.pillarone.riskanalytics.core.util.GroovyUtils;
 
+import java.io.Serializable;
 import java.util.*;
 
-public abstract class AbstractMultiDimensionalParameter implements Cloneable {
+public abstract class AbstractMultiDimensionalParameter implements Cloneable, Serializable {
 
     /**
      * Outer list contains the columns. In order to access the cell in column 5 and row 2, use values.get(5).get(2)
@@ -286,7 +287,7 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable {
     @Override
     public AbstractMultiDimensionalParameter clone() throws CloneNotSupportedException {
         final AbstractMultiDimensionalParameter clone = (AbstractMultiDimensionalParameter) super.clone();
-        clone.simulationModel = simulationModel;
+        clone.simulationModel = null;
         clone.values = new ArrayList<List>(values.size());
         for (List list : values) {
             clone.values.add(CloneSupport.deepClone(list));

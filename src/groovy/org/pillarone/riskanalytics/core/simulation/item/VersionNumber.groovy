@@ -47,25 +47,33 @@ class VersionNumber implements Comparable, Cloneable, Serializable {
         return newVersion
     }
 
-    static List getExistingVersions(ModellingItem item) {
+    static List<VersionNumber> getExistingVersions(ModellingItem item) {
         Collection existingVersions = item.daoClass.findAllByNameAndModelClassName(item.name, item.modelClass.name).collect {
             new VersionNumber(it.itemVersion)
         }
         return existingVersions
     }
 
-    static List getExistingVersions(Resource item) {
+    static List<VersionNumber> getExistingVersions(Resource item) {
         Collection existingVersions = ResourceDAO.findAllByNameAndResourceClassName(item.name, item.modelClass.name).collect {
             new VersionNumber(it.itemVersion)
         }
         return existingVersions
     }
 
-    static List getExistingVersions(ModelItem item) {
+    static List<VersionNumber> getExistingVersions(ModelItem item) {
         Collection existingVersions = item.daoClass.findAllByName(item.name).collect {
             new VersionNumber(it.itemVersion)
         }
         return existingVersions
+    }
+
+    static VersionNumber getHighestNonWorkflowVersion(ModellingItem item) {
+        List<VersionNumber> allVersions = getExistingVersions(item).findAll { !it.workflow }
+        if(allVersions.empty) {
+            return null
+        }
+        return allVersions.sort()[-1]
     }
 
     int getLevel() {

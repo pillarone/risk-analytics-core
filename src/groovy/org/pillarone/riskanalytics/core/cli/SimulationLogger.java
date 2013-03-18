@@ -20,7 +20,6 @@ public class SimulationLogger implements Runnable {
         this.simulationLog = simulationLog;
 
         stoppedStates.add(SimulationState.FINISHED);
-        stoppedStates.add(SimulationState.STOPPED);
         stoppedStates.add(SimulationState.ERROR);
 
         new Thread(this).start();

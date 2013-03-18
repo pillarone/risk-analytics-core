@@ -13,6 +13,9 @@ import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.output.*
 import org.pillarone.riskanalytics.core.workflow.Status
 import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultTransferObject
+import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultDescriptor
+import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultWriter
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
 import org.pillarone.riskanalytics.core.simulation.item.parameter.DateParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
@@ -147,6 +150,7 @@ class ResultServiceTests extends GroovyTestCase {
         assertEquals simulation.randomSeed, info.randomSeed
     }
 
+    //TODO: implement missing method in ResultAccessor
     void testGetResults() {
         Parameterization parameterization1 = new Parameterization("test1")
         parameterization1.modelClass = EmptyModel
@@ -172,20 +176,24 @@ class ResultServiceTests extends GroovyTestCase {
         simulation.comment = "comment"
         simulation.save()
 
-        assertNotNull new SingleValueResult(simulationRun: simulation.simulationRun, period: 0, iteration: 0, path: path1, field: field, collector: collector1, valueIndex: 0, value: 10).save()
-        assertNotNull new SingleValueResult(simulationRun: simulation.simulationRun, period: 0, iteration: 1, path: path1, field: field, collector: collector1, valueIndex: 0, value: 20).save()
+        ResultWriter writer = new ResultWriter(simulation.id)
+
+        writeResult writer, new SingleValueResult(simulationRun: simulation.simulationRun, period: 0, iteration: 0, path: path1, field: field, collector: collector1, valueIndex: 0, value: 10).save()
+        writeResult writer, new SingleValueResult(simulationRun: simulation.simulationRun, period: 0, iteration: 1, path: path1, field: field, collector: collector1, valueIndex: 0, value: 20).save()
 
 
-        assertNotNull new SingleValueResult(simulationRun: simulation.simulationRun, period: 0, iteration: 0, path: path2, field: field, collector: collector1, valueIndex: 0, value: 10).save()
-        assertNotNull new SingleValueResult(simulationRun: simulation.simulationRun, period: 0, iteration: 1, path: path2, field: field, collector: collector1, valueIndex: 0, value: 20).save()
+        writeResult writer, new SingleValueResult(simulationRun: simulation.simulationRun, period: 0, iteration: 0, path: path2, field: field, collector: collector1, valueIndex: 0, value: 10).save()
+        writeResult writer, new SingleValueResult(simulationRun: simulation.simulationRun, period: 0, iteration: 1, path: path2, field: field, collector: collector1, valueIndex: 0, value: 20).save()
 
-        assertNotNull new SingleValueResult(simulationRun: simulation.simulationRun, period: 0, iteration: 0, path: path3, field: field, collector: collector1, valueIndex: 0, value: 10).save()
-        assertNotNull new SingleValueResult(simulationRun: simulation.simulationRun, period: 0, iteration: 1, path: path3, field: field, collector: collector1, valueIndex: 0, value: 20).save()
+        writeResult writer, new SingleValueResult(simulationRun: simulation.simulationRun, period: 0, iteration: 0, path: path3, field: field, collector: collector1, valueIndex: 0, value: 10).save()
+        writeResult writer, new SingleValueResult(simulationRun: simulation.simulationRun, period: 0, iteration: 1, path: path3, field: field, collector: collector1, valueIndex: 0, value: 20).save()
 
-        assertNotNull new SingleValueResult(simulationRun: simulation.simulationRun, period: 1, iteration: 0, path: path1, field: field, collector: collector1, valueIndex: 0, value: 100).save()
-        assertNotNull new SingleValueResult(simulationRun: simulation.simulationRun, period: 1, iteration: 1, path: path1, field: field, collector: collector1, valueIndex: 0, value: 200).save()
+        writeResult writer, new SingleValueResult(simulationRun: simulation.simulationRun, period: 1, iteration: 0, path: path1, field: field, collector: collector1, valueIndex: 0, value: 100).save()
+        writeResult writer, new SingleValueResult(simulationRun: simulation.simulationRun, period: 1, iteration: 1, path: path1, field: field, collector: collector1, valueIndex: 0, value: 200).save()
 
-        assertNotNull new PostSimulationCalculation(run: simulation.simulationRun, keyFigure: PostSimulationCalculation.MEAN, collector: collector1, path: path1, field: field, period: 0, result: 5).save()
+        writer.close()
+
+        assertNotNull new PostSimulationCalculation(run: simulation.simulationRun, keyFigure: PostSimulationCalculation.MEAN, collector: collector1, path: path1, field: field, period: 0, result: 0).save()
         assertNotNull new PostSimulationCalculation(run: simulation.simulationRun, keyFigure: PostSimulationCalculation.MEAN, collector: collector1, path: path1, field: field, period: 0, result: 10).save()
 
         assertNotNull new PostSimulationCalculation(run: simulation.simulationRun, keyFigure: PostSimulationCalculation.MEAN, collector: collector1, path: path2, field: field, period: 0, result: 5).save()
@@ -237,4 +245,16 @@ class ResultServiceTests extends GroovyTestCase {
         assertEquals 0, resultsWithRegEx.size()
 
     }
+
+    private void writeResult(ResultWriter resultWriter, SingleValueResult result) {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(bos);
+        dos.writeInt(result.iteration);
+        dos.writeInt(1);
+        dos.writeDouble(result.value);
+        dos.writeDouble(0);
+
+        resultWriter.writeResult(new ResultTransferObject(new ResultDescriptor(result.field.id, result.path.id, result.collector.id, result.period), null, bos.toByteArray(), 0));
+    }
+
 }

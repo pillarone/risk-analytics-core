@@ -1,9 +1,10 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
-import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.output.*
+import org.pillarone.riskanalytics.core.ModelDAO
+import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 
 class ResultConfiguration extends ModellingItem {
 
@@ -38,14 +39,7 @@ class ResultConfiguration extends ModellingItem {
     }
 
     protected ResultConfigurationDAO loadFromDB() {
-        def criteria = ResultConfigurationDAO.createCriteria()
-        def results = criteria.list {
-            eq('name', name)
-            eq('itemVersion', versionNumber.toString())
-            if (getModelClass() != null)
-                eq('modelClassName', getModelClass().name)
-        }
-        return results.size() > 0 ? results.get(0) : null
+        return ResultConfigurationDAO.find(name, modelClass.name, versionNumber.toString())
     }
 
     /**
@@ -54,16 +48,13 @@ class ResultConfiguration extends ModellingItem {
      * This is in contrast to getCollectors, which returns the collectors for UI use.
      */
     public List<PacketCollector> getResolvedCollectors(Model model, CollectorFactory collectorFactory) {
-        if (dao) {
-            return collectorFactory.createCollectors(dao, model)
-        }
-        return []
+        return collectorFactory.createCollectors(this, model)
     }
 
     protected void mapFromDao(Object dao, boolean completeLoad) {
         dao = dao as ResultConfigurationDAO
         name = dao.name
-        modelClass = getClass().getClassLoader().loadClass(dao.modelClassName)
+        modelClass = ModelRegistry.instance.getModelClass(dao.modelClassName)
         if (dao.model != null) {
             modelVersionNumber = new VersionNumber(dao.model.itemVersion)
         }
@@ -76,10 +67,9 @@ class ResultConfiguration extends ModellingItem {
 
         //These collectors are used by the UI only, therefore wildcard collectors must not be resolved here
         collectors = dao.collectorInformation.collect {CollectorInformation ci ->
-            new PacketCollector(
-                    path: ci.path.pathName,
-                    mode: CollectingModeFactory.getStrategy(ci.collectingStrategyIdentifier)
-            )
+            PacketCollector collector = new PacketCollector(CollectingModeFactory.getStrategy(ci.collectingStrategyIdentifier))
+            collector.path = ci.path.pathName
+            return collector
         }
     }
 

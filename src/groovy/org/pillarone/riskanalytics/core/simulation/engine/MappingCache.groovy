@@ -7,8 +7,8 @@ import org.pillarone.riskanalytics.core.output.FieldMapping;
 import org.pillarone.riskanalytics.core.output.PathMapping
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.pillarone.riskanalytics.core.model.Model
-import org.codehaus.groovy.grails.commons.ApplicationHolder;
+import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.hibernate.HibernateException;
 
 /**
  * A cache which enables fast access to PathMapping, FieldMapping & CollectorMapping objects.
@@ -17,7 +17,7 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder;
  * During initialization all existing field & collector mappings and all path mappings belonging to this model
  * are pre-loaded. This is more than necessary, but a lot faster than loading single objects.
  */
-public class MappingCache {
+public class MappingCache implements Serializable {
 
     private Map<String, PathMapping> paths;
     private Map<String, FieldMapping> fields;
@@ -84,7 +84,14 @@ public class MappingCache {
         if (pathMapping == null) {
             pathMapping = PathMapping.findByPathName(path)
             if (pathMapping == null) {
-                pathMapping = new PathMapping(pathName: path).save()
+                try {
+                    pathMapping = new PathMapping(pathName: path).save()
+                }
+                catch (HibernateException ex) {
+                    throw new HibernateException("Split collectors are allowed in sub components only! Please change the result template accordingly" +
+                                                 "\nOn KTI branch paths have to be persisted before simulation run! Path " + path + " not found!" +
+                                                 "\nPlease contact development providing them the missing path if the error occurred in a sub component.", ex)
+                }
             }
             paths.put(path, pathMapping)
         }
@@ -100,7 +107,14 @@ public class MappingCache {
         if (collectorMapping == null) {
             collectorMapping = CollectorMapping.findByCollectorName(collector)
             if (collectorMapping == null) {
-                collectorMapping = new CollectorMapping(collectorName: collector).save()
+                try {
+                    collectorMapping = new CollectorMapping(collectorName: collector).save()
+                }
+                catch (HibernateException ex) {
+                    throw new HibernateException("On KTI branch collectors have to be persisted before simulation run! Collector " + collector + " not found!" +
+                                                 """\nPlease contact development providing them the missing path.
+                                                    Did you register your collector in the plugin bootstrap ?""", ex)
+                }
             }
             collectors.put(collector, collectorMapping)
         }
@@ -116,7 +130,13 @@ public class MappingCache {
         if (fieldMapping == null) {
             fieldMapping = FieldMapping.findByFieldName(field)
             if (fieldMapping == null) {
-                fieldMapping = new FieldMapping(fieldName: field).save()
+                try {
+                    fieldMapping = new FieldMapping(fieldName: field).save()
+                }
+                catch (HibernateException ex) {
+                    throw new HibernateException("On KTI branch fields have to be persisted before simulation run! Field " + field + " not found!" +
+                                                 "\nPlease contact development providing them the missing path.", ex)
+                }
             }
             fields.put(field, fieldMapping)
         }

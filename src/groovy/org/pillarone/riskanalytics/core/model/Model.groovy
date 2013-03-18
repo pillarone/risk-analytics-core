@@ -4,11 +4,14 @@ import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.components.ComposedComponent
 import org.pillarone.riskanalytics.core.components.PeriodStore
+import org.pillarone.riskanalytics.core.parameterization.IParameterObjectClassifier
 import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
+import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 import org.pillarone.riskanalytics.core.wiring.WireCategory
 import org.pillarone.riskanalytics.core.wiring.WiringUtils
-import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
-import org.pillarone.riskanalytics.core.parameterization.IParameterObjectClassifier
+
+import java.lang.reflect.Field
 
 abstract class Model {
 
@@ -23,6 +26,7 @@ abstract class Model {
         return getName(this.getClass())
     }
 
+
     void init() {
         allComponents.clear()
         allComposedComponents.clear()
@@ -36,10 +40,31 @@ abstract class Model {
         return modelClass.simpleName - "Model"
     }
 
+    public List<Component> getAllComponentsRecursively() {
+        List<Component> result = []
+        if (allComponents == null) {
+            initAllComponents();
+        }
+        for (Component component : allComponents) {
+            addComponentsRecursively(component, result);
+        }
+
+        return result
+    }
+
+    private void addComponentsRecursively(Component component, List<Component> components) {
+        components.add(component);
+        if (component instanceof ComposedComponent) {
+            for (Component nestedComponent : component.allSubComponents()) {
+                addComponentsRecursively(nestedComponent, components);
+            }
+        }
+    }
+
     abstract void initComponents()
 
     void initAllComponents() {
-        for (prop in this.properties) {
+        for (prop in GroovyUtils.getProperties(this)) {
             if (prop.value instanceof Component && !allComponents.contains(prop.value)) {
                 allComponents << prop.value
             }
@@ -68,7 +93,7 @@ abstract class Model {
             wireComponents()
         }
         traverseSubComponents()
-        for (Component component: allComponents) {
+        for (Component component : allComponents) {
             component.validateWiring()
         }
     }
@@ -89,7 +114,7 @@ abstract class Model {
     }*/
 
     void traverseSubComponents() {
-        for (ComposedComponent composedComponent: allComposedComponents) {
+        for (ComposedComponent composedComponent : allComposedComponents) {
             composedComponent.internalWiring()
             composedComponent.internalChannelAllocation()  // MultipleCalculationPhaseComposedComponent
         }
@@ -105,15 +130,17 @@ abstract class Model {
     // todo : ask DK why this has to be at least protected (private won't work)
 
     protected void injectNames(def target) {
-        WiringUtils.forAllComponents(target) {propertyName, Component component ->
-            if (component.name == null) {component.name = propertyName}
+        WiringUtils.forAllComponents(target) { propertyName, Component component ->
+            if (component.name == null) {
+                component.name = propertyName
+            }
         }
     }
 
 
 
     public void optimizeComposedComponentWiring() {
-        WiringUtils.forAllComponents(this) {propertyName, Component component ->
+        WiringUtils.forAllComponents(this) { propertyName, Component component ->
             if (component instanceof ComposedComponent) {
                 component.optimizeWiring()
             }
@@ -166,7 +193,7 @@ abstract class Model {
         if (clazz.isAssignableFrom(c.class)) {
             lobs << c
         } else if (c instanceof ComposedComponent) {
-            c.properties.each {key, val ->
+            GroovyUtils.getProperties(c).each { key, val ->
                 if (key.startsWith('sub')) {
                     traverseModel(val, lobs, clazz)
                 }
@@ -194,4 +221,36 @@ abstract class Model {
     public List<IParameterObjectClassifier> configureClassifier(String path, List<IParameterObjectClassifier> classifiers) {
         return classifiers
     }
+
+    List<String> getSortedProperties() {
+        def names = getClass().metaClass.properties.name - ['class', 'metaClass']
+        List<String> sortedProps = []
+        orderNamesByDeclaredFields(getClass(), names, sortedProps)
+        return sortedProps
+    }
+
+    private orderNamesByDeclaredFields(Class clazz, List<String> fieldNames, List sortedProp) {
+        if (clazz.superclass) {
+            orderNamesByDeclaredFields(clazz.superclass, fieldNames, sortedProp)
+        }
+        clazz.declaredFields.each { Field field ->
+            if (field.name in fieldNames) {
+                sortedProp << field.name
+            }
+        }
+    }
+
+    Closure createResultNavigatorMapping() {
+        return null
+    }
+
+    /**
+     * This method is required as the period counter provides only the projection labels and the inception date of
+     * reserves may be before the projection start.
+     * @return period labels before the projection start
+     */
+    Set<String> periodLabelsBeforeProjectionStart() {
+        []
+    }
+
 }

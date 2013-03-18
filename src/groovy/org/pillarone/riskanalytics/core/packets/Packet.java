@@ -2,9 +2,9 @@ package org.pillarone.riskanalytics.core.packets;
 
 import org.joda.time.DateTime;
 import org.pillarone.riskanalytics.core.components.Component;
+import org.pillarone.riskanalytics.core.components.IComponentMarker;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Packet implements Cloneable, Comparable {
     public Component origin;
@@ -12,6 +12,10 @@ public class Packet implements Cloneable, Comparable {
     // to associate the packet with its sender (as the origin gets modified by components only in some cases)
     public Component sender;
     public String senderChannelName;
+
+    private Map<Class<? extends IComponentMarker>, IComponentMarker> markers = new HashMap<Class<? extends IComponentMarker>, IComponentMarker>();
+
+    public UUID id;
 
     /**
      *  Setting the period property allows to persist a packet in a different period than the period it is created.
@@ -28,6 +32,7 @@ public class Packet implements Cloneable, Comparable {
         this.setOrigin(original.origin);
         this.setSender(original.sender);
         this.setSenderChannelName(original.senderChannelName);
+        this.id=id;
     }
 
     @Override
@@ -90,5 +95,16 @@ public class Packet implements Cloneable, Comparable {
 
     public void setDate(DateTime date) {
         this.date = date;
+    }
+
+    public void addMarker(Class<? extends IComponentMarker> marker, IComponentMarker sender) {
+        markers.put(marker, sender);
+    }
+
+    public IComponentMarker getMarkedSender(Class<? extends IComponentMarker> marker) {
+        return markers.get(marker);
+    }
+
+    public void initDefaultPacket(){
     }
 }

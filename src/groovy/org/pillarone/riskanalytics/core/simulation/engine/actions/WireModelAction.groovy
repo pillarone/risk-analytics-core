@@ -15,8 +15,10 @@ public class WireModelAction implements Action {
     SimulationScope simulationScope
 
     public void perform() {
-        LOG.debug "Wiring model"
+        //wiring is not thread safe
         synchronized (this.getClass()) {
+            LOG.debug "Wiring model"
+
             Model model = simulationScope.model
             ResultConfiguration resultConfig = simulationScope.resultConfiguration
 

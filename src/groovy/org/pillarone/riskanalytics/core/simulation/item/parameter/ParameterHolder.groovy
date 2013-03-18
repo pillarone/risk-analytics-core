@@ -4,7 +4,7 @@ import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 
-abstract class ParameterHolder implements Cloneable {
+abstract class ParameterHolder implements Cloneable, Serializable {
 
     private static final Log LOG = LogFactory.getLog(ParameterHolder)
 

@@ -13,6 +13,19 @@ import org.pillarone.riskanalytics.core.util.GroovyUtils
 class PortReplicatorCategory {
     static final Logger LOG = Logger.getLogger(PortReplicatorCategory)
 
+    private static ThreadLocal<IPacketListener> packetListener = new ThreadLocal<IPacketListener>() {
+
+        @Override
+        protected IPacketListener initialValue() {
+            return null;
+        }
+
+    };
+
+    public static void setPacketListener(IPacketListener packetListener) {
+        this.packetListener.set(packetListener);
+    }
+
     static void doSetProperty(Component receiver, String targetPropertyName, Object sender) {
         // guarded clause to check that only input - input channels are wired
         if (!targetPropertyName.startsWith("in") && !targetPropertyName.startsWith("out")) {
@@ -28,7 +41,7 @@ class PortReplicatorCategory {
         PacketList targetProperty = GroovyUtils.getProperties(receiver).get(targetPropertyName)
 
         if (!sourceProperty.isCompatibleTo(targetProperty)) {
-            throw new IllegalArgumentException("Wiring only allowed with same types for input and output")
+            throw new IllegalArgumentException("Wiring only allowed with same types for input and output $sender -> $receiver ($targetPropertyName)")
         }
 
         replicateChannels(sourceProperty, targetProperty, sourcePropertyName, receiver, source, targetPropertyName)
@@ -44,12 +57,15 @@ class PortReplicatorCategory {
         // receiver                              = source
         if (sourcePropertyName.startsWith("in")) {
             if (!targetPropertyName.startsWith("in")) {
-                throw new UnsupportedOperationException("Only matching ports can be replicated. [in = in | out = out]")
+                throw new UnsupportedOperationException("Only matching ports can be replicated. [in = in | out = out] ($source.$sourcePropertyName -> $receiver.$targetPropertyName)")
             }
             if (!isSubcomponent(source, receiver)) {
                 throw new UnsupportedOperationException("Only port of subcomponents can be replicated")
             }
             ITransmitter transmitter = new Transmitter(source, sourceProperty, receiver, targetProperty)
+            if (packetListener.get() != null) {
+                transmitter = new TraceableTransmitter(transmitter, packetListener.get());
+            }
             receiver.allInputTransmitter << transmitter
             source.allInputReplicationTransmitter << transmitter
         }
@@ -60,20 +76,23 @@ class PortReplicatorCategory {
         // receiver       = source
         if (sourcePropertyName.startsWith("out")) {
             if (!targetPropertyName.startsWith("out")) {
-                throw new UnsupportedOperationException("Only matching ports can be replicated. [in = in | out = out]")
+                throw new UnsupportedOperationException("Only matching ports can be replicated. [in = in | out = out] ($source.$sourcePropertyName -> $receiver.$targetPropertyName)")
             }
             if (!isSubcomponent(receiver, source)) {
-                throw new UnsupportedOperationException("Only port of subcomponents can be replicated")
+                throw new UnsupportedOperationException("Only port of subcomponents can be replicated ($source.$sourcePropertyName -> $receiver.$targetPropertyName)")
             }
             ITransmitter transmitter = new SilentTransmitter(source, sourceProperty, receiver, targetProperty)
+            if (packetListener.get() != null) {
+                transmitter = new TraceableTransmitter(transmitter, packetListener.get());
+            }
             source.allOutputTransmitter << transmitter
             receiver.allOutputReplicationTransmitter << transmitter
         }
     }
 
     static boolean isSubcomponent(Component compound, Component component) {
-        for (p in compound.properties.values()) {
-            if (p && (p.is(component) || (Collection.isAssignableFrom(p.class) && p.contains(component)))) {
+        for (p in GroovyUtils.getProperties(compound).values()) {
+            if (p && (p.is(component) || (Collection.isAssignableFrom(p.getClass()) && p.contains(component)))) {
                 return true
             }
         }

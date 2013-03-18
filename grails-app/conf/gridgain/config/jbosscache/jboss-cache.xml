@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+     GRIDGAIN - OPEN CLOUD PLATFORM.
+     COPYRIGHT (C) 2005-2008 GRIDGAIN SYSTEMS. ALL RIGHTS RESERVED.
+
+     THIS IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR
+     MODIFY IT UNDER THE TERMS OF THE GNU LESSER GENERAL PUBLIC
+     LICENSE AS PUBLISHED BY THE FREE SOFTWARE FOUNDATION; EITHER
+     VERSION 2.1 OF THE LICENSE, OR (AT YOUR OPTION) ANY LATER
+     VERSION.
+
+     THIS LIBRARY IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL,
+     BUT WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF
+     MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.  SEE THE
+     GNU LESSER GENERAL PUBLIC LICENSE FOR MORE DETAILS.
+
+     YOU SHOULD HAVE RECEIVED A COPY OF THE GNU LESSER GENERAL PUBLIC
+     LICENSE ALONG WITH THIS LIBRARY; IF NOT, WRITE TO THE FREE
+     SOFTWARE FOUNDATION, INC., 51 FRANKLIN ST, FIFTH FLOOR, BOSTON, MA
+     02110-1301 USA
+-->
+<server>
+    <mbean code="org.jboss.cache.jmx.CacheJmxWrapper"
+        name="jboss.cache:service=testTreeCache">
+
+        <!--
+            The JMX object name of the service that defines the JGroups multiplexer.
+            In JBoss AS 5.0 this service is normally defined in the jgroups-multiplexer.sar.
+            This XML attribute can only be handled by the JBoss AS MBean deployment
+            services; if it is included in a file passed to a CacheFactory the factory's
+            creation of the cache will fail. Inside JBoss AS, the attribute should be
+            specified using the "depends optional-attribute-name" syntax shown below.
+            Inside the AS if this attribute is defined, an instance of
+            org.jgroups.jmx.JChannelFactoryMBean  will be injected into the
+            CacheJmxWrapper which will use it to obtain a multiplexed JGroups channel.
+            The configuration of the channel will be that associated with MultiplexerStack.
+            The ClusterConfig attribute will be ignored.
+        -->
+        <!--
+       <depends optional-attribute-name="MultiplexerService"
+              proxy-type="attribute">org.gridgain:name=GridJgroupsChannelFactory</depends>
+        -->
+
+        <!--
+            Following attributes specify using of multiplexer and protocols stack name.
+        -->
+        <attribute name="MultiplexerStack">grid.jgroups.stack</attribute>
+        <attribute name="UsingMultiplexer">true</attribute>
+
+        <!--
+            Node locking isolation level : SERIALIZABLE, REPEATABLE_READ (default),
+            READ_COMMITTED, READ_UNCOMMITTED, and NONE. Note that this is ignored
+            if NodeLockingScheme is OPTIMISTIC. Case doesn't matter.
+            See documentation on Transactions and Concurrency for more details.
+        -->
+        <attribute name="IsolationLevel">READ_COMMITTED</attribute>
+
+        <!-- Indicates whether state should be fetched on startup. -->
+        <attribute name="FetchInMemoryState">false</attribute>
+
+        <!--
+            This replication mode is cheapest with data affinity.
+        -->.
+        <attribute name="CacheMode">INVALIDATION_SYNC</attribute>
+
+        <!--
+            Name of cluster. Needs to be the same for all nodes in a cluster in order
+            for them to communicate with each other.
+        -->
+        <attribute name="ClusterName">JBossCache-Cluster</attribute>
+
+        <!--
+            Time in milliseconds to wait for state retrieval. This should be longer than
+            LockAcquisitionTimeout  as the node providing state may need to wait that
+            long to acquire necessary read locks on the cache. This property is dynamic.
+        <attribute name="StateRetrievalTimeout">20000</attribute>
+        -->
+
+        <!--
+            For synchronous replication: time in milliseconds to wait until replication
+            acks have been received from all nodes in the cluster. It is usually best
+            that this is greater than LockAcquisitionTimeout  . This property is dynamic.
+        -->
+        <attribute name="SyncReplTimeout">15000</attribute>
+
+        <!--
+            Time in milliseconds to wait for a lock to be acquired. If a lock cannot be
+            acquired an exception will be thrown. This property is dynamic.
+        -->
+        <attribute name="LockAcquisitionTimeout">15000</attribute>
+
+        <!--
+            Specific eviction policy configurations. This is LRU.
+        -->
+        <attribute name="EvictionPolicyConfig">
+            <config>
+                <attribute name="wakeUpIntervalSeconds">5</attribute>
+
+                <!-- This defaults to 200000 if not specified -->
+                <attribute name="eventQueueSize">200000</attribute>
+
+                <!-- Name of the DEFAULT eviction policy class. -->
+                <attribute name="policyClass">org.jboss.cache.eviction.LRUPolicy</attribute>
+
+                <!-- Cache wide default -->
+                <region name="/_default_">
+                    <attribute name="maxNodes">1000000</attribute>
+
+                    <!-- No limit. -->
+                    <attribute name="timeToLiveSeconds">0</attribute>
+                </region>
+
+                <region name="/gridgain/example">
+                   <attribute name="maxNodes">1000000</attribute>
+
+                    <!-- No limit. -->
+                    <attribute name="timeToLiveSeconds">0</attribute>
+                </region>
+            </config>
+        </attribute>
+    </mbean>
+</server>

@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.parameter.comment
 
 import org.pillarone.riskanalytics.core.output.SimulationRun
+import org.pillarone.riskanalytics.core.util.DatabaseUtils
 
 class ResultCommentDAO extends CommentDAO {
 
@@ -12,6 +13,12 @@ class ResultCommentDAO extends CommentDAO {
 
     static constraints = {
         function(nullable: true)
+    }
+
+    static mapping = {
+        if (DatabaseUtils.isMsSqlDatabase()) {
+            function(column: 'funct')
+        }
     }
 
 }

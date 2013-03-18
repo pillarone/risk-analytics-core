@@ -18,5 +18,9 @@ public class SilentTransmitter extends Transmitter {
         // be silent
     }
 
+    protected void notifyReceiver(Transmitter transmitter) {
+        // be silent
+    }
+
 
 }

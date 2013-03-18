@@ -11,9 +11,8 @@ import org.pillarone.riskanalytics.core.simulation.engine.id.IIdGenerator;
 import org.pillarone.riskanalytics.core.util.GroovyUtils;
 import org.pillarone.riskanalytics.core.wiring.ITransmitter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Field;
+import java.util.*;
 
 /**
  * todo: description of general concept
@@ -27,6 +26,19 @@ abstract public class Component implements Cloneable {
     private List<PacketList> outChannels = new ArrayList<PacketList>();
     private int transmitCount = 0;
     private IIdGenerator idGenerator;
+    // todo(mwy): how to make sure that only classes derived of IComponentMarker are part of the list?
+    private List<Class> markerList = new ArrayList<Class>();
+
+    protected Component() {
+        for (Class intf : this.getClass().getInterfaces()) {
+            if (IComponentMarker.class.isAssignableFrom(intf)) {
+                markerList.add(intf);
+            }
+        }
+    }
+
+    /** this constant is used for annotating PacketList */
+    protected final static Integer N = Integer.MAX_VALUE;
 
     abstract protected void doCalculation();
 
@@ -142,10 +154,25 @@ abstract public class Component implements Cloneable {
         }
     }
 
+    public List<Class> getMarkerClasses() {
+        return markerList;
+    }
+
     protected void publishResults() {
         for (ITransmitter output : allOutputTransmitter) {
             output.transmit();
         }
+    }
+
+    /**
+     *  This method adds all packet of the source to the inChannel. Overwrite it in order to apply filters
+     *  on incoming packets.
+     *
+     *  @inChannel of this component
+     *  @source outChannel of the sending component
+     */
+    public void filterInChannel(PacketList inChannel, PacketList source) {
+        inChannel.addAll(source);
     }
 
     protected void resetInputTransmitters() {
@@ -178,7 +205,26 @@ abstract public class Component implements Cloneable {
 
 
     protected Map allComponentProperties() {
-        return DefaultGroovyMethods.getProperties(this);
+        Class currentClass = this.getClass();
+        Map<String, Object> fields = new HashMap<String, Object>();
+
+        while (currentClass != Component.class) {
+            Field[] declaredFields = currentClass.getDeclaredFields();
+            for (Field field : declaredFields) {
+                String fieldName = field.getName();
+                if (fieldName.startsWith("in") || fieldName.startsWith("out") || fieldName.startsWith("parm") || fieldName.startsWith("sub")) {
+                    field.setAccessible(true);
+                    try {
+                        fields.put(fieldName, field.get(this));
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+
+            currentClass = currentClass.getSuperclass();
+        }
+        return fields;
     }
 
     protected Map propertyCache = null;

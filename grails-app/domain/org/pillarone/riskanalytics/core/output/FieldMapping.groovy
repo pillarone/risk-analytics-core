@@ -1,6 +1,6 @@
 package org.pillarone.riskanalytics.core.output
 
-class FieldMapping {
+class FieldMapping implements Serializable {
 
     String fieldName
 

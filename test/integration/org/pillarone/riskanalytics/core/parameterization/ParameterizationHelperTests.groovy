@@ -12,6 +12,11 @@ import models.core.ResourceModel
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ResourceParameterHolder
 import org.pillarone.riskanalytics.core.example.component.ExampleResource
 import org.pillarone.riskanalytics.core.simulation.item.Resource
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
+import org.pillarone.riskanalytics.core.components.ResourceHolder
+import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
+import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObject
+import org.pillarone.riskanalytics.core.example.parameter.ExampleResourceConstraints
 
 class ParameterizationHelperTests extends GroovyTestCase {
 
@@ -132,6 +137,54 @@ class ParameterizationHelperTests extends GroovyTestCase {
         assertNotNull newP2
         assertEquals p2.periodIndex, newP2.periodIndex
         assertEquals p2.businessObject, newP2.businessObject
+    }
+
+    void testCollectResources() {
+        List<ParameterHolder> parameters = [ParameterHolderFactory.getHolder("res", 0, new ResourceHolder<ExampleResource>(ExampleResource, "example", new VersionNumber("1"))), ParameterHolderFactory.getHolder("double", 0, 1d)]
+        List<Resource> resources = ParameterizationHelper.collectUsedResources(parameters)
+
+        assertEquals(1, resources.size())
+        Resource resource = resources[0]
+        assertEquals("example", resource.name)
+        assertEquals("1", resource.versionNumber.toString())
+        assertEquals(ExampleResource, resource.modelClass)
+    }
+
+    void testCollectResourcesPO() {
+        ExampleParameterObject parameterObject = ExampleParameterObjectClassifier.getStrategy(ExampleParameterObjectClassifier.RESOURCE, [resource:
+                new ConstrainedMultiDimensionalParameter([[new ResourceHolder<ExampleResource>(ExampleResource, "example", new VersionNumber("1"))]], ["title"], new ExampleResourceConstraints())])
+
+        List<ParameterHolder> parameters = [ParameterHolderFactory.getHolder("a", 0, parameterObject)]
+        List<Resource> resources = ParameterizationHelper.collectUsedResources(parameters)
+
+        assertEquals(1, resources.size())
+        Resource resource = resources[0]
+        assertEquals("example", resource.name)
+        assertEquals("1", resource.versionNumber.toString())
+        assertEquals(ExampleResource, resource.modelClass)
+    }
+
+    void testCollectResourcesMDP() {
+
+
+        List<ParameterHolder> parameters = [ParameterHolderFactory.getHolder(
+                "a", 0, new ConstrainedMultiDimensionalParameter(
+                        [
+                                [new ResourceHolder<ExampleResource>(ExampleResource, "example", new VersionNumber("1"))],
+                                [new ResourceHolder<ExampleResource>(ExampleResource, "example2", new VersionNumber("2"))]
+                        ], ["title", "title2"], new ExampleResourceConstraints())
+        )]
+        List<Resource> resources = ParameterizationHelper.collectUsedResources(parameters).sort { it.name }
+
+        assertEquals(2, resources.size())
+        Resource resource = resources[0]
+        assertEquals("example", resource.name)
+        assertEquals("1", resource.versionNumber.toString())
+        assertEquals(ExampleResource, resource.modelClass)
+        resource = resources[1]
+        assertEquals("example2", resource.name)
+        assertEquals("2", resource.versionNumber.toString())
+        assertEquals(ExampleResource, resource.modelClass)
     }
 
 }

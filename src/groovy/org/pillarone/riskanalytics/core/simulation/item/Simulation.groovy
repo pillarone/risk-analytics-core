@@ -15,12 +15,13 @@ import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.FunctionComment
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 
 class Simulation extends ParametrizedItem {
 
     Parameterization parameterization
     ResultConfiguration template
-    private ModelStructure structure // TODO (Sep 9, 2009, msh): implement as query
+    ModelStructure structure // TODO (Sep 9, 2009, msh): implement as query
     VersionNumber modelVersionNumber // TODO (Sep 9, 2009, msh): use ModelItem
     Map keyFiguresToPreCalculate
 
@@ -29,7 +30,7 @@ class Simulation extends ParametrizedItem {
     /**
      * The number of periods run in this simulation. Might be different than the number of periods in the parameterization.
      */
-    int periodCount
+    Integer periodCount
     Integer randomSeed
     volatile DateTime start
     volatile DateTime end
@@ -66,7 +67,7 @@ class Simulation extends ParametrizedItem {
         run.comment = comment
         run.model = getModelClass()?.name
         run.parameterization = ParameterizationDAO.find(parameterization.name, run.model, parameterization.versionNumber.toString())
-        run.resultConfiguration = ResultConfigurationDAO.findByNameAndItemVersion(template.name, template.versionNumber.toString())
+        run.resultConfiguration = ResultConfigurationDAO.find(template.name, run.model, template.versionNumber.toString())
         run.startTime = start
         run.endTime = end
         run.iterations = numberOfIterations
@@ -87,14 +88,16 @@ class Simulation extends ParametrizedItem {
 
     protected void mapFromDao(def source, boolean completeLoad) {
         SimulationRun run = source as SimulationRun
+        this.run = run
         comment = run.comment
-        modelClass = this.class.classLoader.loadClass(run.model)
+        modelClass = ModelRegistry.instance.getModelClass(run.model)
         Parameterization parameterization = new Parameterization(run.parameterization.name)
         parameterization.versionNumber = new VersionNumber(run.parameterization.itemVersion)
         parameterization.modelClass = modelClass
         this.parameterization = parameterization
         ResultConfiguration resultConfiguration = new ResultConfiguration(run.resultConfiguration.name)
         resultConfiguration.versionNumber = new VersionNumber(run.resultConfiguration.itemVersion)
+        resultConfiguration.modelClass = modelClass
         template = resultConfiguration
         structure = ModelStructure.getStructureForModel(modelClass)
         numberOfIterations = run.iterations
@@ -128,18 +131,10 @@ class Simulation extends ParametrizedItem {
         dao.removeFromRuntimeParameters(parameter)
     }
 
-    void addParameter(ParameterHolder parameter) {
-        runtimeParameters << parameter
-        parameter.added = true
-    }
 
-    void removeParameter(ParameterHolder parameter) {
-        if (parameter.added) {
-            runtimeParameters.remove(parameter)
-            return
-        }
-        parameter.removed = true
-        parameter.modified = false
+    @Override
+    List<ParameterHolder> getAllParameterHolders() {
+        return runtimeParameters
     }
 
     public Object getParameter(String path) {

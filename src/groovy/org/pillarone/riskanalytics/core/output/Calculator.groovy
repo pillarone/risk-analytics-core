@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.dataaccess.ResultAccessor
 import org.pillarone.riskanalytics.core.output.batch.calculations.AbstractCalculationsBulkInsert
 import org.pillarone.riskanalytics.core.util.MathUtils
+import org.pillarone.riskanalytics.core.dataaccess.ResultDescriptor
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.dataaccess.ResultPathDescriptor
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
@@ -111,6 +112,8 @@ class Calculator {
                 if (pdf) {
                     calculatePDF(periodIndex, path, collector, field, values, pdf)
                 }
+            } else {
+                totalCalculations -= (keyFigureCount - 2)
             }
         }
         bulkInsert.saveToDB()
@@ -130,6 +133,26 @@ class Calculator {
         return results
     }
 
+
+    private double calculateMean(int periodIndex, long pathId, long collectorId, long fieldId, double[] results) {
+        long time = System.currentTimeMillis()
+
+        double mean = results.toList().sum() / results.size()
+        bulkInsert.addResults(periodIndex, PostSimulationCalculation.MEAN, null, pathId, fieldId, collectorId, mean)
+
+        LOG.debug("Calculated mean ($pathId, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
+        return mean
+    }
+
+    private boolean calculateIsStochastic(int periodIndex, long pathId, long collectorId, long fieldId, double[] results) {
+        long time = System.currentTimeMillis()
+
+        boolean isStochastic = results[0] == results[-1]
+        bulkInsert.addResults(periodIndex, PostSimulationCalculation.IS_STOCHASTIC, null, pathId, fieldId, collectorId, isStochastic ? 1 : 0)
+
+        LOG.debug("Calculated is stochastic ($pathId, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
+        return isStochastic
+    }
 
     private double calculateMean(int periodIndex, PathMapping path, CollectorMapping collector, FieldMapping field, double[] results) {
         long time = System.currentTimeMillis()

@@ -15,7 +15,6 @@ public class InitModelAction implements Action {
 
     public void perform() {
         LOG.debug "Initializing model"
-        ResourceRegistry.clear()
         Model instance = simulationScope.model
         instance.init()
         instance.injectComponentNames()

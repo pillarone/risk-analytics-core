@@ -1,11 +1,14 @@
 package org.pillarone.riskanalytics.core.output
 
+import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.DateTimeFormat
 
 public class FileOutput implements ICollectorOutputStrategy {
 
     String resultLocation
+    SimulationScope simulationScope
+    String filename = null;
 
     public ICollectorOutputStrategy leftShift(List results) {
 
@@ -28,7 +31,9 @@ public class FileOutput implements ICollectorOutputStrategy {
     }
 
     private String getFileName(SingleValueResultPOJO result) {
-        return "${resultLocation}${File.separator}${replaceChars(result.simulationRun.name)}.tsl"
+        if (filename == null)
+            filename = "${resultLocation}${File.separator}${replaceChars(simulationScope.simulation.name)}.tsl"
+        return filename;
     }
 
     private String replaceChars(String s) {

@@ -11,9 +11,11 @@ class TestProbe implements ITransmitter {
 
     Component sender
     PacketList source
+    String propertyName
 
     public TestProbe(Component theSender, String propertyName) {
         sender = theSender
+        this.propertyName = propertyName
         source = sender[propertyName]
         result = []
         sender.allOutputTransmitter << this
@@ -40,4 +42,8 @@ class TestProbe implements ITransmitter {
         transmitted = newTransmitted
     }
 
+    @Override
+    String toString() {
+        "Sender $sender, channel $propertyName"
+    }
 }

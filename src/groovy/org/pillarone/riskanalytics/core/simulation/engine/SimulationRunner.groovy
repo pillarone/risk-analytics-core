@@ -1,19 +1,17 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
+import java.util.concurrent.atomic.AtomicInteger
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.batch.BatchRunInfoService
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.output.PacketCollector
-import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.util.GroovyUtils
-import org.pillarone.riskanalytics.core.wiring.ITransmitter
-import org.pillarone.riskanalytics.core.wiring.WiringUtils
-import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.simulation.engine.actions.*
-import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.wiring.*
 
 /**
  * This is the main entity to run a simulation. To do this, create a runner object (SimulationRunner.createRunner()).
@@ -48,6 +46,15 @@ public class SimulationRunner {
 
     BatchRunInfoService batchRunInfoService
 
+    private int threadCount;
+    private static AtomicInteger messageCount;
+    private static Object lockObj = new Object();
+    private static final int WAIT_TIMEOUT = 30000;
+
+    private IPacketListener packetListener;
+
+    List<Action> removeActions = new ArrayList<Action>();
+
     /**
      * Starting a simulation run by performing the
      *
@@ -58,9 +65,14 @@ public class SimulationRunner {
      * Any exception occuring during the simulation is caught and the error object will be initialized.
      */
     public void start() {
+        synchronized (lockObj) {
+            if (messageCount == null) {
+                messageCount = new AtomicInteger(0);
+            }
+        }
         simulationState = SimulationState.INITIALIZING
-        notifySimulationStateChanged(currentScope?.simulation, simulationState)
         LOG.debug "start simulation"
+
         start = System.currentTimeMillis()
         DateTime startDate = new DateTime(start)
         currentScope?.simulation?.start = startDate
@@ -71,27 +83,39 @@ public class SimulationRunner {
                     return
                 }
             }
-            long initializationTime = System.currentTimeMillis() - start
-            LOG.info "Initialization completed in ${initializationTime}ms"
-            notifySimulationStateChanged(currentScope?.simulation, SimulationState.RUNNING)
+            if (packetListener != null) {
+                packetListener.initComponentCache(currentScope.model);
+            }
 
-            boolean shouldReturn = false
-            //Transaction is necessary because PathMappings etc might be inserted when writing bulk insert files
-            SimulationRun.withTransaction {TransactionStatus status ->
-                if (!performAction(simulationAction, SimulationState.RUNNING)) {
-                    deleteCancelledSimulation()
-                    shouldReturn = true
+            messageCount.incrementAndGet();
+            LOG.info("Thread count:" + threadCount + " current:" + messageCount.get());
+            synchronized (lockObj) {
+                lockObj.notifyAll();
+            }
+
+            synchronized (lockObj) {
+                while (messageCount.get() < threadCount) {
+                    lockObj.wait(WAIT_TIMEOUT)
                 }
             }
+
+            LOG.info("Finished Initialization of Thread " + Thread.currentThread().getId());
+
+            long initializationTime = System.currentTimeMillis() - start
+            LOG.info "Initialization completed in ${initializationTime}ms"
+
+            boolean shouldReturn = false
+            if (!performAction(simulationAction, SimulationState.RUNNING)) {
+                deleteCancelledSimulation()
+                shouldReturn = true
+            }
+            messageCount.set(0);
             if (shouldReturn) return
-            LOG.info "${currentScope?.numberOfIterations} iterations completed in ${System.currentTimeMillis() - (start + initializationTime)}ms"
-            notifySimulationStateChanged(currentScope?.simulation, SimulationState.POST_SIMULATION_CALCULATIONS)
-            //Transaction because of saving results to db
-            SimulationRun.withTransaction {TransactionStatus status ->
-                for (Action action in postSimulationActions) {
-                    if (!performAction(action, null)) {
-                        shouldReturn = true
-                    }
+            LOG.info "${currentScope?.simulationBlocks?.blockSize.sum()} iterations completed in ${System.currentTimeMillis() - (start + initializationTime)}ms"
+
+            for (Action action in postSimulationActions) {
+                if (!performAction(action, null)) {
+                    shouldReturn = true
                 }
             }
             if (shouldReturn) {
@@ -100,7 +124,7 @@ public class SimulationRunner {
             }
 
         } catch (Throwable t) {
-            notifySimulationStateChanged(currentScope?.simulation, SimulationState.ERROR)
+            messageCount.set(0);
             simulationState = SimulationState.ERROR
             error = new SimulationError(
                     simulationRunID: currentScope.simulation?.id,
@@ -110,7 +134,6 @@ public class SimulationRunner {
             )
             LOG.error this, t
             LOG.debug error.dump()
-            deleteFailedSimulation()
             return
         }
         if (simulationAction.isCancelled()) {
@@ -120,40 +143,17 @@ public class SimulationRunner {
         LOG.debug "end simulation"
         long end = System.currentTimeMillis()
         currentScope?.simulation?.end = new DateTime(end)
-        currentScope?.simulation?.save()
 
         LOG.info "simulation took ${end - start} ms"
-        simulationState = simulationAction.isStopped() ? SimulationState.STOPPED : SimulationState.FINISHED
-        notifySimulationStateChanged(currentScope?.simulation, simulationState)
-        cleanup()
-    }
-
-    private void deleteFailedSimulation() {
-        try {
-            LOG.info "failed simulation ${currentScope.simulation.name} will be deleted"
-            currentScope.simulation.delete()
-        } catch (Exception ex) {
-            LOG.error "failed deleting simulation ${currentScope.simulation.name}", ex
-        }
+        setSimulationState(SimulationState.FINISHED)
         cleanup()
     }
 
     private void deleteCancelledSimulation() {
         if (simulationAction.isCancelled()) {
             LOG.info "canceled simulation ${currentScope.simulation.name} will be deleted"
-            currentScope.simulation.delete()
         }
         cleanup()
-    }
-
-    /**
-     * The current simulation will be stopped at the next iteration. The simulationState will indicate, that
-     * the simulation has been stopped.
-     */
-    public void stop() {
-        LOG.info("Simulation stopped by user")
-        simulationAction.stop()
-        simulationState = SimulationState.STOPPED
     }
 
     public synchronized void cancel() {
@@ -211,10 +211,17 @@ public class SimulationRunner {
         currentScope.model = simulation.modelClass.newInstance()
         currentScope.outputStrategy = configuration.outputStrategy
         currentScope.iterationScope.numberOfPeriods = simulation.periodCount
+        currentScope.simulationBlocks = configuration.simulationBlocks
 
         simulationAction.iterationAction.periodAction.model = currentScope.model
 
-        currentScope.mappingCache = MappingCache.instance
+        currentScope.mappingCache = configuration.mappingCache
+        this.packetListener = configuration.packetListener;
+        if (packetListener != null) {
+            this.preSimulationActions.removeAll(removeActions);
+            WireCategory.setPacketListener(packetListener);
+            PortReplicatorCategory.setPacketListener(packetListener);
+        }
     }
 
     /**
@@ -247,7 +254,6 @@ public class SimulationRunner {
         IterationAction iterationAction = new IterationAction(periodAction: periodAction, iterationScope: iterationScope)
         SimulationAction simulationAction = new SimulationAction(iterationAction: iterationAction, simulationScope: simulationScope)
 
-        Action calculatorAction = new CalculatorAction(simulationScope: simulationScope)
         Action finishOutputAction = new FinishOutputAction(simulationScope: simulationScope)
 
         SimulationRunner runner = new SimulationRunner()
@@ -270,10 +276,10 @@ public class SimulationRunner {
         runner.simulationAction = simulationAction
 
         runner.postSimulationActions << finishOutputAction
-        runner.postSimulationActions << calculatorAction
 
         runner.currentScope = simulationScope
-
+        runner.removeActions.add(prepareStructure);
+        runner.removeActions.add(injectResourceParams);
         return runner
     }
 
@@ -286,11 +292,16 @@ public class SimulationRunner {
     }
 
     protected void notifySimulationStateChanged(Simulation simulation, SimulationState simulationState) {
-        batchRunInfoService?.batchSimulationStateChanged(simulation, simulationState)
+        if (!batchRunInfoService)
+            batchRunInfoService = BatchRunInfoService.getService()
+        batchRunInfoService.batchSimulationStateChanged(simulation, simulationState)
+    }
+
+    public void setJobCount(int jobCount) {
+        threadCount = jobCount;
     }
 
     //cleanup
-
     protected void cleanup() {
         WiringUtils.forAllComponents(currentScope.model) {originName, Component component ->
             clearScope "simulationScope", component

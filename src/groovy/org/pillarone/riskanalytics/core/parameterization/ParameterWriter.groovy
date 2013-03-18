@@ -70,7 +70,13 @@ class ParameterWriter implements IConfigObjectWriter {
             out << "]"
         }
         else {
-            appendValue out, value
+            if (key == 'model' && !(value instanceof Class)) {
+                // this is the case for p14n of a GraphModel
+                out << value
+            }
+            else {
+                appendValue out, value
+            }
         }
         out.newLine()
     }

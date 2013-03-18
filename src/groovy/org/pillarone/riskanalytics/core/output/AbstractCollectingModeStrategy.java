@@ -77,7 +77,6 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
             Double value = entry.getValue().doubleValue();
             SingleValueResultPOJO result = new SingleValueResultPOJO();
             if (checkInvalidValues(name, value, period, iteration, crashSimOnError)) continue;
-            result.setSimulationRun(packetCollector.getSimulationScope().getSimulation().getSimulationRun());
             result.setIteration(iteration);
             result.setPeriod(period);
             result.setPath(path);
@@ -113,5 +112,13 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
 
     public void setPacketCollector(PacketCollector packetCollector) {
         this.packetCollector = packetCollector;
+    }
+
+    public List<DrillDownMode> getDrillDownModes() {
+        return new ArrayList<DrillDownMode>();
+    }
+
+    public Object[] getArguments() {
+        return new Object[0];
     }
 }

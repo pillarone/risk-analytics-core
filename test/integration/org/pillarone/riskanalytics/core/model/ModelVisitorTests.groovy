@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.model
 
+import org.pillarone.riskanalytics.core.components.ResourceRegistry
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.parameterization.IParameterObject
@@ -21,6 +22,7 @@ class ModelVisitorTests extends GroovyTestCase {
     Model model
 
     void setUp() {
+        ResourceRegistry.clear()
         FileImportService.importModelsIfNeeded(['Core'])
         Parameterization parameterization = new Parameterization("CoreParameters")
         parameterization.load()

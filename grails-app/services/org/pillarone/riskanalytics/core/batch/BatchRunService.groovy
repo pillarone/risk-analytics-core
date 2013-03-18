@@ -17,6 +17,7 @@ import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.engine.RunSimulationService
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationRunner
+import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationHandler
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.joda.time.DateTime
 
@@ -42,23 +43,20 @@ class BatchRunService {
         getSimulationRuns(batchRun)?.each {BatchRunSimulationRun batchRunSimulationRun ->
             runSimulation(batchRunSimulationRun)
         }
+        getRunnerRegistry().startTimer()
         BatchRun.executeUpdate("update org.pillarone.riskanalytics.core.BatchRun as b set b.executed=? where b.id=? ", [true, batchRun.id])
     }
 
     public synchronized void runSimulation(BatchRunSimulationRun batchRunSimulationRun) {
-        if (batchRunSimulationRun.simulationRun.endTime == null && !batchRunInfoService.runningSimulations.contains(batchRunSimulationRun.simulationRun.id)) {
-            batchRunInfoService.runningSimulations << batchRunSimulationRun.simulationRun.id
-            batchRunInfoService.addActiveSimulationRun batchRunSimulationRun.simulationRun
+        if (batchRunSimulationRun.simulationRun.endTime == null && !batchRunInfoService.runningBatchSimulationRuns.contains(batchRunSimulationRun)) {
             ICollectorOutputStrategy strategy = OutputStrategyFactory.getInstance(batchRunSimulationRun.strategy)
 
-            SimulationRunner runner = SimulationRunner.createRunner()
             Simulation simulation = createSimulation(batchRunSimulationRun.simulationRun.name)
             SimulationConfiguration configuration = new SimulationConfiguration(simulation: simulation, outputStrategy: strategy)
 
-            runner.batchRunInfoService = batchRunInfoService
-
             ImportStructureInTransaction.importStructure(configuration);
-            getRunnerRegistry().put(runner, configuration)
+            getRunnerRegistry().put(configuration)
+            notifySimulationStart(simulation, SimulationState.NOT_RUNNING)
         } else {
             LOG.info "simulation ${batchRunSimulationRun.simulationRun.name} is already executed at ${batchRunSimulationRun.simulationRun.endTime}"
         }
@@ -104,7 +102,7 @@ class BatchRunService {
     void deleteSimulationRun(BatchRun batchRun, SimulationRun simulationRun) {
         BatchRun.withTransaction {
             BatchRunSimulationRun batchRunSimulationRun = BatchRunSimulationRun.findByBatchRunAndSimulationRun(batchRun, simulationRun)
-            batchRunSimulationRun.delete()
+            deleteBatchRunSimulationRun(batchRunSimulationRun)
         }
     }
 
@@ -124,14 +122,18 @@ class BatchRunService {
 
     boolean deleteBatchRun(BatchRun batchRun) {
         BatchRun.withTransaction {
-            try {
-                BatchRunSimulationRun.executeUpdate("delete from org.pillarone.riskanalytics.core.BatchRunSimulationRun as b where b.batchRun=?", [batchRun])
-                BatchRun.executeUpdate("delete from org.pillarone.riskanalytics.core.BatchRun as b where b.id=?", [batchRun.id])
-                return true
-            } catch (Exception ex) {
-                LOG.error "Exception occured during delete of BatchRun : ${batchRun.name}"
+            for(BatchRunSimulationRun toDelete in BatchRunSimulationRun.findAllByBatchRun(batchRun)) {
+                deleteBatchRunSimulationRun(toDelete)
             }
-            return false
+            BatchRun.get(batchRun.id).delete()
+        }
+        return true
+    }
+
+    protected void deleteBatchRunSimulationRun(BatchRunSimulationRun batchRunSimulationRun) {
+        batchRunSimulationRun.delete()
+        if (batchRunSimulationRun.simulationRun.endTime == null) {
+            SimulationRun.get(batchRunSimulationRun.simulationRun.id).delete()
         }
     }
 
@@ -157,6 +159,11 @@ class BatchRunService {
         return runnerRegistry
     }
 
+    protected void notifySimulationStart(Simulation simulation, SimulationState simulationState) {
+        LOG.info " notifySimulationStart ${simulation.name} : ${simulationState.toString()}"
+        batchRunInfoService?.batchSimulationStart(simulation)
+    }
+
 }
 
 class RunnerRegistry implements ActionListener {
@@ -164,6 +171,7 @@ class RunnerRegistry implements ActionListener {
     Queue queue = new LinkedList()
     private javax.swing.Timer timer
     SimulationRunner simulationRunner
+    SimulationHandler simulationHandler
 
 
     Log LOG = LogFactory.getLog(RunnerRegistry)
@@ -175,38 +183,47 @@ class RunnerRegistry implements ActionListener {
         timer.setRepeats(true)
     }
 
-    void put(SimulationRunner runner, SimulationConfiguration configuration) {
-        queue.offer(["runner": runner, "configuration": configuration])
+    void put(SimulationConfiguration configuration) {
+        queue.offer(["configuration": configuration])
+    }
+
+    void startTimer() {
         if (!timer.isRunning()) timer.start()
     }
 
+
     void actionPerformed(ActionEvent e) {
-        if (!simulationRunner) {
-            simulationRunner = pollAndRun()
-        } else if (simulationRunner.simulationState == SimulationState.FINISHED || simulationRunner.simulationState == SimulationState.ERROR) {
-            simulationRunner = pollAndRun()
-            if (!simulationRunner) {
-                timer.stop()
+        if (!simulationHandler) {
+            simulationHandler = pollAndRun()
+        } else if (simulationHandler.simulationState == SimulationState.FINISHED || simulationHandler.simulationState == SimulationState.ERROR) {
+            simulationHandler = pollAndRun()
+            if (!simulationHandler) {
+                stop()
                 LOG.info "no simulation to execute "
             }
         }
     }
 
-    private SimulationRunner pollAndRun() {
-        SimulationRunner simulationRunner = null
+
+    private SimulationHandler pollAndRun() {
+        SimulationHandler simulationHandler = null
         def item = queue.poll()
         if (item) {
-            simulationRunner = item["runner"]
             SimulationConfiguration configuration = item["configuration"]
-            RunSimulationService.getService().runSimulation(simulationRunner, configuration)
+            simulationHandler = RunSimulationService.getService().runSimulationOnGrid(configuration, configuration.simulation.template)
             LOG.info "executing a simulation ${configuration.simulation.name} at ${new DateTime()}"
         }
-        return simulationRunner
+        return simulationHandler
     }
 
-    protected void notifySimulationStart(Simulation simulation, SimulationState simulationState) {
-        batchRunInfoService?.batchSimulationStart(simulation)
+    void stop() {
+        timer.stop()
     }
+
+//    protected void notifySimulationStart(SimulationHandler simulationHandler) {
+//        if (simulationHandler)
+//            batchRunInfoService?.batchSimulationStart(simulationHandler)
+//    }
 
 
 }

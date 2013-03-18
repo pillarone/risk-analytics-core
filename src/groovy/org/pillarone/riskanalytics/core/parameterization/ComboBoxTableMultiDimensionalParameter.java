@@ -7,6 +7,9 @@ import org.pillarone.riskanalytics.core.model.Model;
 
 import java.util.*;
 
+/**
+ * @deprecated Use {@link ConstrainedMultiDimensionalParameter} instead.
+ */
 public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensionalParameter implements IComboBoxBasedMultiDimensionalParameter {
 
     static Log LOG = LogFactory.getLog(ComboBoxTableMultiDimensionalParameter.class);
@@ -47,6 +50,10 @@ public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensiona
                 i++;
             }
         }
+    }
+
+    public boolean isMarkerCell(int row, int column) {
+        return row > 0 && column >= 0;
     }
 
     public Object getPossibleValues(int row, int column) {
@@ -121,9 +128,7 @@ public class ComboBoxTableMultiDimensionalParameter extends TableMultiDimensiona
         final ComboBoxTableMultiDimensionalParameter clone = (ComboBoxTableMultiDimensionalParameter) super.clone();
         clone.comboBoxValues = new HashMap<String, Component>();
         clone.markerClass = markerClass;
-        if (simulationModel != null) {
-            setSimulationModel(simulationModel);
-        }
+        clone.comboBoxValues.clear();
         return clone;
     }
 }

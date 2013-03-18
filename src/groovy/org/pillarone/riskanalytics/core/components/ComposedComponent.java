@@ -3,10 +3,7 @@ package org.pillarone.riskanalytics.core.components;
 import org.pillarone.riskanalytics.core.model.IModelVisitor;
 import org.pillarone.riskanalytics.core.model.ModelPath;
 import org.pillarone.riskanalytics.core.model.ModelPathComponent;
-import org.pillarone.riskanalytics.core.wiring.ITransmitter;
-import org.pillarone.riskanalytics.core.wiring.SilentTransmitter;
-import org.pillarone.riskanalytics.core.wiring.WiringException;
-import org.pillarone.riskanalytics.core.wiring.WiringUtils;
+import org.pillarone.riskanalytics.core.wiring.*;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -151,5 +148,9 @@ abstract public class ComposedComponent extends Component {
 
     public void optimizeWiring() {
         WiringUtils.optimizeWiring(this);
+    }
+
+    public List<Component> getListedComponents() {
+        return new ArrayList<Component>();
     }
 }

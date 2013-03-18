@@ -18,8 +18,14 @@ import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
 import org.pillarone.riskanalytics.core.output.SymbolicValueResult
 import org.pillarone.riskanalytics.core.remoting.TagInfo
+import org.pillarone.riskanalytics.core.output.SingleValueResultPOJO
+import org.pillarone.riskanalytics.core.dataaccess.ExportResultAccessor
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 
 class ResultService implements IResultService {
+
+    private static Log LOG = LogFactory.getLog(ResultService.class)
 
     List<ParameterizationInfo> getParameterizationInfosForTransactionId(long dealId) {
         List<ParameterizationInfo> result = []
@@ -49,32 +55,38 @@ class ResultService implements IResultService {
                 periodDates << dateFormat.parse(label)
             }
         } catch (Exception e) {
-            //period label aren't dates
+            LOG.error(e)
         }
-        for (int periodIndex = 0; periodIndex < run.periodCount; periodIndex++) {
-            for (String fullPath in getPathsOfResult(paths, run, periodIndex)) {
+
+        for (String fullPath in getPathsOfResult(paths, run)) {
+
+            String path = fullPath.substring(0, fullPath.lastIndexOf(":"))
+            String field = fullPath.substring(fullPath.lastIndexOf(":") + 1)
+            List<SingleValueResultPOJO> results = ExportResultAccessor.getSingleValueResultsForExport(
+                    SingleValueCollectingModeStrategy.IDENTIFIER, path, field, run)
+
+            for (int periodIndex = 0; periodIndex < run.periodCount; periodIndex++) {
                 ResultInfo info = new ResultInfo(path: fullPath, periodIndex: periodIndex)
                 if (periodIndex < periodDates.size()) {
                     info.periodDate = periodDates[periodIndex]
                 }
                 List<ResultInfo.IterationValuePair> values = []
+                List<SingleValueResultPOJO> resultsInPeriod = results.findAll { it -> it.getPeriod() == periodIndex }
 
-                String path = fullPath.substring(0, fullPath.lastIndexOf(":"))
-                String field = fullPath.substring(fullPath.lastIndexOf(":") + 1)
-
-                List<SingleValueResult> results = ResultAccessor.getSingleValueResultsWithDateSkipZeroes(run, periodIndex, path, SingleValueCollectingModeStrategy.IDENTIFIER, field)
-
-                if (! results.isEmpty()) {
-                    for (SingleValueResult singleValueResult in results) {
-                        Double value = singleValueResult.getValue().toDouble()
-                        values << new ResultInfo.IterationValuePair(
-                                singleValueResult.getIteration(),
-                                value,
-                                periodDates[periodIndex],
-                        singleValueResult.getDate())
+                if (!results.isEmpty()) {
+                    for (SingleValueResultPOJO singleValueResult in resultsInPeriod) {
+                        if (singleValueResult.getValue() != 0) {
+                            values << new ResultInfo.IterationValuePair(
+                                    singleValueResult.getIteration(),
+                                    singleValueResult.getValue(),
+                                    periodDates[periodIndex],
+                                    singleValueResult.getDate())
+                        }
                     }
-                    info.values = values
-                    result << info
+                    if(values.size() != 0) {
+                        info.values = values
+                        result << info
+                    }
                 }
             }
         }
@@ -85,13 +97,13 @@ class ResultService implements IResultService {
      * @param paths
      * @return paths where with regEx is replaced with existing subcomponents in a specific result
      */
-    private List<String> getPathsOfResult(List<String> paths, SimulationRun run, int periodIndex) {
+    private List<String> getPathsOfResult(List<String> paths, SimulationRun run) {
         if (!regExIsUsed(paths)) return paths
         Set<String> fullPaths = new HashSet<String>()
         List<String> allPaths = PostSimulationCalculation.executeQuery("SELECT distinct path.pathName FROM ${PostSimulationCalculation.class.name} as p  WHERE p.run.id = ? ", [run.id])
         if (allPaths.isEmpty()) {
             // try to get the pathnames from the symbolic single value results table instead -- a bit slower probably
-            allPaths.addAll(getAllPaths(run, periodIndex))
+            allPaths.addAll(getAllPaths(run))
         }
         for (int i = 0; i < paths.size(); i++) {
             String field = paths[i].substring(paths[i].lastIndexOf(":") + 1)
@@ -110,19 +122,19 @@ class ResultService implements IResultService {
         return fullPaths as List<String>;
     }
 
-    private List<String> getAllPaths(SimulationRun simulationRun, int periodIndex) {
+    private List<String> getAllPaths(SimulationRun simulationRun) {
         List<String> paths = []
 
         def results = SymbolicValueResult.executeQuery("SELECT distinct(path) FROM ${SymbolicValueResult.name} " +
-                "WHERE simulation_run_id = ? and value <> 0.0 and period = ${periodIndex}", [simulationRun.id])
-        for (def s: results) {
+                "WHERE simulation_run_id = ? and value <> 0.0 ", [simulationRun.id])
+        for (def s : results) {
             paths << s
         }
         return paths
     }
 
     boolean regExIsUsed(List<String> paths) {
-        for (String searchedPath: paths) {
+        for (String searchedPath : paths) {
             if (searchedPath.indexOf("(.*)") != -1) {
                 return true
             }

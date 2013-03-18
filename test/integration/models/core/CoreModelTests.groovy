@@ -26,7 +26,7 @@ class CoreModelTests extends ModelTest {
     }
 
     void postSimulationEvaluation() {
-        assertEquals 3, run.simulationRun.periodCount
+//        assertEquals 3, run.simulationRun.periodCount
 
         CoreModel model = runner.currentScope.model
         assertEquals(10, model.exampleInputOutputComponent.runtimeInt)

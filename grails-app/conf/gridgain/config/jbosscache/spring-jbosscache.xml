@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+     GRIDGAIN - OPEN CLOUD PLATFORM.
+     COPYRIGHT (C) 2005-2008 GRIDGAIN SYSTEMS. ALL RIGHTS RESERVED.
+
+     THIS IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR
+     MODIFY IT UNDER THE TERMS OF THE GNU LESSER GENERAL PUBLIC
+     LICENSE AS PUBLISHED BY THE FREE SOFTWARE FOUNDATION; EITHER
+     VERSION 2.1 OF THE LICENSE, OR (AT YOUR OPTION) ANY LATER
+     VERSION.
+
+     THIS LIBRARY IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL,
+     BUT WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF
+     MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.  SEE THE
+     GNU LESSER GENERAL PUBLIC LICENSE FOR MORE DETAILS.
+
+     YOU SHOULD HAVE RECEIVED A COPY OF THE GNU LESSER GENERAL PUBLIC
+     LICENSE ALONG WITH THIS LIBRARY; IF NOT, WRITE TO THE FREE
+     SOFTWARE FOUNDATION, INC., 51 FRANKLIN ST, FIFTH FLOOR, BOSTON, MA
+     02110-1301 USA
+-->
+
+<!--
+    Grid configuration.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+    <description>Main Spring file for grid configuration.</description>
+
+    <!--
+        Grid configuration.
+    -->
+    <bean id="grid.cfg" class="org.gridgain.grid.GridConfigurationAdapter" scope="singleton">
+        <!--
+            We use affinity load balancing with JBoss Cache to make sure that
+            cache keys always get routed to the same nodes.
+        -->
+        <property name="loadBalancingSpi">
+            <bean class="org.gridgain.grid.spi.loadbalancing.affinity.GridAffinityLoadBalancingSpi">
+                <!--
+                    You can change virtualNodeCount property on different nodes.
+                    The more powerful the node is, the larger this value should be.
+                    Refer to GridAffinityLoadBalancingSpi Javadoc and Wiki documentation
+                    for more information about this property.
+                -->
+                <property name="virtualNodeCount" value="1000"/>
+            </bean>
+        </property>
+
+        <!--
+            Custom configuration for JGroups multicast based communication SPI.
+        -->
+        <property name="communicationSpi">
+            <bean class="org.gridgain.grid.spi.communication.jgroups.GridJgroupsCommunicationSpi">
+                <property name="configurationFile" value="config/jgroups/multicast/jgroups.xml"/>
+            </bean>
+        </property>
+
+        <!--
+            Custom multicast based JGroups discovery SPI with custom configuration.
+        -->
+        <property name="discoverySpi">
+            <bean class="org.gridgain.grid.spi.discovery.jgroups.GridJgroupsDiscoverySpi">
+                <property name="configurationFile" value="config/jgroups/multicast/jgroups.xml"/>
+            </bean>
+        </property>
+      </bean>
+</beans>

@@ -37,13 +37,13 @@ class StructureInformation implements IStructureInformation {
         ConfigObject extendedStructure = structure.merge(new ConfigObject())
         ConfigObject flatStructure = structure.flatten()
         if (model) {
-            model.properties.each {name, value ->
+            GroovyUtils.getProperties(model).each {name, value ->
                 if (value instanceof Component) {
                     if (!flatStructure.containsValue(value)) {
                         componentsOfLine[value] = name
                         ConfigObject line = extendedStructure.company[name]
                         ConfigObject components = line.components
-                        value.properties.each {subComponentName, subComponent ->
+                        GroovyUtils.getProperties(value).each {subComponentName, subComponent ->
                             if (subComponent instanceof Component) {
                                 components[subComponentName] = subComponent
                             }

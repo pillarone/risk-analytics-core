@@ -5,8 +5,9 @@ import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.user.UserManagement
 import org.springframework.transaction.TransactionStatus
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
-abstract class ModellingItem {
+abstract class ModellingItem implements Serializable {
     final static Logger LOG = Logger.getLogger(ModellingItem)
 
     String name
@@ -125,7 +126,7 @@ abstract class ModellingItem {
     }
 
     public void updateChangeUserAndDate() {
-        if (this.properties.keySet().contains("modificationDate")) {
+        if (GroovyUtils.getProperties(this).keySet().contains("modificationDate")) {
             this.modificationDate = new DateTime()
         }
     }

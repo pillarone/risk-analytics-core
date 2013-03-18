@@ -15,4 +15,8 @@ public interface ICollectingModeStrategy {
 
   boolean isCompatibleWith(Class packetClass)
 
+  List<DrillDownMode> getDrillDownModes()
+
+  Object[] getArguments()
+
 }

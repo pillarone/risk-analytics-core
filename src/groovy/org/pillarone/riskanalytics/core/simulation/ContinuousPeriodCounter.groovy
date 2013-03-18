@@ -82,7 +82,11 @@ public class ContinuousPeriodCounter implements IPeriodCounter {
         return period
     }
 
-    /**
+    boolean dateInSimulationScope(DateTime date) {
+        if (date.isBefore(startOfFirstPeriod)) return false
+        return true
+    }
+/**
      * @param date
      * @return true if date belongs to current period, false if not and if the date is throwing a
      *          NotInProjectionHorizon exception
@@ -116,6 +120,11 @@ public class ContinuousPeriodCounter implements IPeriodCounter {
     @Override
     Boolean annualPeriodsOnly(boolean checkLastPeriodToo) {
         return periodLength.years == 1 && periodLength.days == 0 && periodLength.months == 0 && periodLength.hours == 0 && periodLength.minutes == 0
+    }
+
+    @Override
+    int currentPeriodIndex() {
+        return periodCount
     }
 
     DateTime startOfFirstPeriod() {

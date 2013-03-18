@@ -1,11 +1,10 @@
 package org.pillarone.riskanalytics.core.output.aggregation
 
 import org.pillarone.riskanalytics.core.packets.Packet
-import org.pillarone.riskanalytics.core.packets.PacketList
 
 class SumAggregator implements IPacketAggregator<Packet> {
 
-    Packet aggregate(PacketList<Packet> packets) {
+    Packet aggregate(List<Packet> packets) {
 
         Packet aggregatedPacket = packets[0].class.newInstance()
         Map<String, Number> packetValues = [:]

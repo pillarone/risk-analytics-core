@@ -6,6 +6,7 @@ import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.components.ComposedComponent
 import org.pillarone.riskanalytics.core.packets.PacketList
 import org.pillarone.riskanalytics.core.util.GroovyUtils
+import org.pillarone.riskanalytics.core.model.Model
 
 public class WiringUtils {
 
@@ -77,6 +78,7 @@ public class WiringUtils {
 
         try {
             work()
+            if (LOG.isDebugEnabled()) logWiring (work.delegate)
         } finally {
             for (changedClass in changedClasses) {
                 ExpandoMetaClass emc = GrailsClassUtils.getExpandoMetaClass(changedClass)
@@ -86,4 +88,33 @@ public class WiringUtils {
             if (LOG.isDebugEnabled()) LOG.debug "restoring MCs done."
         }
     }
+
+    private static void logWiring(def target) {
+        String logMsg = "#Thread:" + Thread.currentThread().getId() + "\n";
+        if (target instanceof Model) {
+            Model model = (Model) target;
+            for (Component c: model.allComponents) {
+                logMsg += logTransmitter(c)
+            }
+        } else {
+            logMsg += logTransmitter(target);
+        }
+        LOG.info(logMsg);
+    }
+
+    private static String logTransmitter(Component c) {
+
+        String logMsg = "### Component ${c.getName()} (${c.getClass().getCanonicalName()}) \nINPUT TRANSMITTER:\n"
+        for (Transmitter t: c.allInputTransmitter) {
+            logMsg += "\t" + t + "\n"
+        }
+        logMsg += "OUTPUT TRANSMITTER:\n";
+
+        for (Transmitter t: c.allOutputTransmitter) {
+            logMsg += "\t" + t + "\n"
+        }
+
+        return logMsg;
+    }
+
 }

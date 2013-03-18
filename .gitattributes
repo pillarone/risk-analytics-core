@@ -1,0 +1,9 @@
+* text=auto
+*.java text diff=java
+*.groovy text diff=java
+*.txt text
+*.xml text diff=html
+*.properties text
+*.gsp text diff=html
+
+*.jar binary

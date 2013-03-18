@@ -4,6 +4,7 @@ import org.springframework.jdbc.datasource.DataSourceUtils
 import groovy.sql.Sql
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper
 import org.pillarone.riskanalytics.core.BatchRunSimulationRun
 
 
@@ -12,6 +13,7 @@ class MysqlDeleteStrategy extends DeleteSimulationStrategy {
     private static Log LOG = LogFactory.getLog(MysqlDeleteStrategy)
 
     void deleteSimulation(SimulationRun simulationRun) {
+        new File(GridHelper.getResultLocation(simulationRun.id)).deleteDir()
         SimulationRun.withTransaction {
             Sql sql = new Sql(DataSourceUtils.getConnection(simulationRun.dataSource))
             long time = System.currentTimeMillis()

@@ -29,6 +29,7 @@ import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.util.PropertiesUtils
 import org.pillarone.riskanalytics.core.workflow.Status
 import org.springframework.transaction.TransactionStatus
+import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 
 class Parameterization extends ParametrizedItem {
 
@@ -267,7 +268,7 @@ class Parameterization extends ParametrizedItem {
         creationDate = dao.creationDate
         modificationDate = dao.modificationDate
         valid = dao.valid
-        modelClass = getClass().getClassLoader().loadClass(dao.modelClassName)
+        modelClass = ModelRegistry.instance.getModelClass(dao.modelClassName)
         if (dao.model != null) {
             modelVersionNumber = new VersionNumber(dao.model.itemVersion)
         }
@@ -385,20 +386,10 @@ class Parameterization extends ParametrizedItem {
     }
 
 
-    void addParameter(ParameterHolder parameter) {
-        parameterHolders << parameter
-        parameter.added = true
+    @Override
+    List<ParameterHolder> getAllParameterHolders() {
+        return parameterHolders
     }
-
-    void removeParameter(ParameterHolder parameter) {
-        if (parameter.added) {
-            parameterHolders.remove(parameter)
-            return
-        }
-        parameter.removed = true
-        parameter.modified = false
-    }
-
 
     public List<Tag> getTags() {
         return tags

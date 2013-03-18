@@ -13,6 +13,7 @@ import org.pillarone.riskanalytics.core.wiring.PortReplicatorCategory as PRC
 
 import org.pillarone.riskanalytics.core.wiring.WiringUtils
 import org.pillarone.riskanalytics.core.packets.PacketList
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 abstract class DynamicComposedComponent extends ComposedComponent {
 
@@ -45,7 +46,7 @@ abstract class DynamicComposedComponent extends ComposedComponent {
             props = null
         }
         else {
-            throw new IllegalArgumentException("A component with the name ${component.name} already exists in this dynamic composed component")
+            throw new NonUniqueComponentNameException("A component with the name ${component.name} already exists in this dynamic composed component")
         }
     }
 
@@ -178,7 +179,7 @@ abstract class DynamicComposedComponent extends ComposedComponent {
     }
 
     private String channelName(Component dynamicComponent, PacketList receiver) {
-        for (Map.Entry entry: dynamicComponent.properties) {
+        for (Map.Entry entry: GroovyUtils.getProperties(dynamicComponent)) {
             if (entry.value.is(receiver)) {
                 return entry.key
             }

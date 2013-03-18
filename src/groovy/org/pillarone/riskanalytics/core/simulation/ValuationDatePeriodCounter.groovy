@@ -102,7 +102,12 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
         return period
     }
 
-    /**
+    boolean dateInSimulationScope(DateTime date) {
+        if (date.isBefore(startOfFirstPeriod())) return false
+        if (date.isAfter(endOfLastPeriod())) return false
+        return true
+    }
+/**
      * @param date
      * @return true if date belongs to current period, false if not and if the date is throwing a
      *          NotInProjectionHorizon exception
@@ -162,6 +167,11 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
     @Override
     Boolean annualPeriodsOnly(boolean checkLastPeriodToo) {
         return false
+    }
+
+    @Override
+    int currentPeriodIndex() {
+        return currentPeriod;
     }
 /**
      * @return first valuation date

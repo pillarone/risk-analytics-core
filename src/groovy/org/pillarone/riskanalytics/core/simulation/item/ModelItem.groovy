@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
 import org.pillarone.riskanalytics.core.ModelDAO
+import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 
 class ModelItem extends ModellingItem {
     VersionNumber versionNumber
@@ -31,7 +32,7 @@ class ModelItem extends ModellingItem {
             versionNumber = new VersionNumber(dao.itemVersion)
             srcCode = dao.srcCode
             name = dao.name
-            modelClass = getClass().getClassLoader().loadClass(dao.modelClassName)
+            modelClass = ModelRegistry.instance.getModelClass(dao.modelClassName)
         }
     }
 

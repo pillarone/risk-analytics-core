@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    LICENSE AGREEMENT
+    
+    GRIDGAIN - OPEN CLOUD PLATFORM.
+    COPYRIGHT (C) 2005-2008 GRIDGAIN SYSTEMS. ALL RIGHTS RESERVED.
+    
+    THIS IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR
+    MODIFY IT UNDER THE TERMS OF THE GNU LESSER GENERAL PUBLIC
+    LICENSE AS PUBLISHED BY THE FREE SOFTWARE FOUNDATION; EITHER
+    VERSION 2.1 OF THE LICENSE, OR (AT YOUR OPTION) ANY LATER 
+    VERSION.
+    
+    THIS LIBRARY IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL,
+    BUT WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF
+    MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.  SEE THE 
+    GNU LESSER GENERAL PUBLIC LICENSE FOR MORE DETAILS.
+    
+    YOU SHOULD HAVE RECEIVED A COPY OF THE GNU LESSER GENERAL PUBLIC
+    LICENSE ALONG WITH THIS LIBRARY; IF NOT, WRITE TO THE FREE 
+    SOFTWARE FOUNDATION, INC., 51 FRANKLIN ST, FIFTH FLOOR, BOSTON, MA  
+    02110-1301 USA
+-->
+
+
+<!--
+    Command line (default) grid configuration.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+    <description>Main Spring file for grid configuration.</description>
+
+    <!--
+        Grid default configuration.
+
+        All configuration properties are commented. Uncomment any property to
+        provide a non-default value for it.
+    -->
+    <bean id="grid.cfg" class="org.gridgain.grid.GridConfigurationAdapter" scope="singleton">
+        <!--
+            Uncomment to specify non-default grid instance name.
+            By default, grid name will be null.
+        -->
+        <!--
+        <property name="gridName" value="mygrid"/>
+        -->
+
+        <!--
+            Uncomment to disable peer class loading.
+        -->
+        <!--
+        <property name="peerClassLoadingEnabled" value="false"/>
+        -->
+
+        <!--
+            Uncomment to explicitely specify which packages should
+            be loaded from peer nodes even if they are present in
+            local classpath.
+        -->
+        <!--
+        <property name="p2PLocalClassPathExclude">
+            <list>
+                <value>org.springframework.*</value>
+                <value>org.openspaces.*</value>
+                <value>org.hibernate.*</value>
+            </list>
+        </property>
+        -->
+
+        <!--
+            Logger to use. By default 'config/default-log4j.xml' logger file will
+            be used. If such file is not found, then default GridGain configuration
+            for logging will be used.
+        -->
+        <!--
+        <property name="gridLogger">
+            <bean class="org.gridgain.grid.logger.log4j.GridLog4jLogger">
+                <constructor-arg type="java.lang.String" value="config/default-log4j.xml"/>
+            </bean>
+        </property>
+        -->
+
+        <!--
+            Uncomment the following section if you wish to add local node benchmark
+            to user attributes. You can also add any other node attribute specific
+            to your application. Attributes for this node will be available from any
+            other node in the grid.
+
+            Grid local node benchmark is a good example of a complex attribute that
+            can be added to the node at startup.
+
+            Note that you will have to use 'grid.node.benchmark' grid node attribute name
+            to get the benchmark for the given node.
+        -->
+        <!--
+        <property name="userAttributes">
+            <map>
+                <entry key="grid.node.benchmark">
+                    <bean class="org.gridgain.grid.benchmarks.GridLocalNodeBenchmark" init-method="start"/>
+                </entry>
+            </map>
+        </property>
+        -->
+
+        <!--
+            Uncomment to provide custom configuration for executor service.
+        -->
+        <!--
+        <property name="executorService">
+            <bean class="java.util.concurrent.ThreadPoolExecutor">
+                <constructor-arg type="int" value="200"/>
+                <constructor-arg type="int" value="200"/>
+                <constructor-arg type="long">
+                    <util:constant static-field="java.lang.Long.MAX_VALUE"/>
+                </constructor-arg>
+                <constructor-arg type="java.util.concurrent.TimeUnit">
+                    <util:constant static-field="java.util.concurrent.TimeUnit.SECONDS"/>
+                </constructor-arg>
+                <constructor-arg type="java.util.concurrent.BlockingQueue">
+                    <bean class="java.util.concurrent.LinkedBlockingQueue"/>
+                </constructor-arg>
+            </bean>
+        </property>
+        -->
+
+        <!--
+            Custom configuration for JGroups TCP based communication SPI.
+        -->
+        <property name="communicationSpi">
+            <bean class="org.gridgain.grid.spi.communication.jgroups.GridJgroupsCommunicationSpi">
+                <property name="configurationFile" value="config/jgroups/tcp/jgroups.xml"/>
+            </bean>
+        </property>
+
+        <!--
+            Custom TCP based JGroups discovery SPI with custom configuration.
+        -->
+        <property name="discoverySpi">
+            <bean class="org.gridgain.grid.spi.discovery.jgroups.GridJgroupsDiscoverySpi">
+                <property name="configurationFile" value="config/jgroups/tcp/jgroups.xml"/>
+            </bean>
+        </property>
+    </bean>
+</beans>

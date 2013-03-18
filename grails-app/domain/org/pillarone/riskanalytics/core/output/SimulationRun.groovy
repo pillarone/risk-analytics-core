@@ -33,7 +33,6 @@ class SimulationRun {
 
     // more to come here
 
-    DeleteSimulationService deleteSimulationService
     javax.sql.DataSource dataSource
 
     static transients = ['deleteSimulationService', 'dataSource']

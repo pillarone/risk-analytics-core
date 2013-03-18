@@ -5,7 +5,7 @@ import org.pillarone.riskanalytics.core.parameterization.IParameterObject
 /**
  * Note: all implementations must provide a static method valueOf(String)
  */
-interface IParameterObjectClassifier {
+interface IParameterObjectClassifier extends Serializable {
 
     List getParameterNames()
 

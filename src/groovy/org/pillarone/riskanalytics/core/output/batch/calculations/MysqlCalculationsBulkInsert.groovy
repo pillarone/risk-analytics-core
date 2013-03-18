@@ -1,6 +1,8 @@
 package org.pillarone.riskanalytics.core.output.batch.calculations
 
 import groovy.sql.Sql
+import org.pillarone.riskanalytics.core.output.SimulationRun
+import java.sql.SQLException
 
 
 class MysqlCalculationsBulkInsert extends AbstractCalculationsBulkInsert {
@@ -8,6 +10,29 @@ class MysqlCalculationsBulkInsert extends AbstractCalculationsBulkInsert {
     protected void writeResult(List values) {
         writer.append(values.join(","))
         writer.append(";")
+    }
+
+    @Override
+    void setSimulationRun(SimulationRun simulationRun) {
+        super.setSimulationRun(simulationRun)
+        Sql sql = new Sql(simulationRun.getDataSource());
+        try {
+            sql.execute("ALTER TABLE post_simulation_calculation ADD PARTITION (PARTITION P" + getSimulationRunId() + " VALUES IN (" + getSimulationRunId() + "))");
+        } catch (Exception ex) {
+            deletePartitionIfExist(sql, getSimulationRunId());
+            try {
+                sql.execute("ALTER TABLE post_simulation_calculation ADD PARTITION (PARTITION P" + getSimulationRunId() + " VALUES IN (" + getSimulationRunId() + "))");
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void deletePartitionIfExist(Sql sql, long partitionName) {
+        try {
+            sql.execute("ALTER TABLE post_simulation_calculation DROP PARTITION P" + partitionName);
+        } catch (Exception e) {//the partition was not created yet
+        }
     }
 
     protected void save() {

@@ -1,7 +1,9 @@
 import org.pillarone.riskanalytics.core.output.batch.results.SQLServerBulkInsert
+import org.pillarone.riskanalytics.core.output.batch.calculations.SQLServerCalculationBulkInsert
 import org.pillarone.riskanalytics.core.output.batch.results.MysqlBulkInsert
 import org.pillarone.riskanalytics.core.output.batch.calculations.MysqlCalculationsBulkInsert
 import grails.plugins.springsecurity.SecurityConfigType
+import org.pillarone.riskanalytics.core.simulation.engine.grid.mapping.OneNodeStrategy
 
 environments {
 
@@ -9,13 +11,23 @@ environments {
     resultBulkInsert = null
     calculationBulkInsert = null
     keyFiguresToCalculate = null
+    numberOfParallelJobsPerNode = 100
+
+    dataDirectoryIndependentOfVersion = false
 
     transactionServiceUrl = "rmi://localhost:1099/TransactionService"
     resultServiceRegistryPort = 1099
 
     development {
         log4j = {
-            info 'org.pillarone.riskanalytics.core'
+            appenders {
+                console name: 'stdout', layout: pattern(conversionPattern: '[%d] %-5p %c{1} %m%n')
+            }
+            root {
+                error 'stdout'
+                additivity = false
+            }
+            info 'org.pillarone.riskanalytics.core', 'org.gridgain'
         }
         keyFiguresToCalculate = [
                 'stdev': true,
@@ -43,11 +55,13 @@ environments {
                 'tvarProfitFunction': [99, 99.5],
                 'pdf': 200
         ]
+        nodeMappingStrategy = OneNodeStrategy
     }
     sqlserver {
         models = ["FiniteReModel"]
         resultBulkInsert = SQLServerBulkInsert
-        keyFiguresToCalculate = [
+        calculationBulkInsert = SQLServerCalculationBulkInsert
+            keyFiguresToCalculate = [
                 'stdev': true,
                 'percentile': [0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0],
                 'var': [99, 99.5],

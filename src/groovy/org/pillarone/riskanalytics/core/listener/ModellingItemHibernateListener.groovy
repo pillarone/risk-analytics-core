@@ -37,7 +37,7 @@ class ModellingItemHibernateListener implements PostInsertEventListener, PostUpd
     void onPostInsert(PostInsertEvent postInsertEvent) {
         ModellingItem item = getModellingItem(postInsertEvent.entity)
         if (item != null) {
-            for (ModellingItemListener listener: _listeners) {
+            for (ModellingItemListener listener : _listeners) {
                 listener.modellingItemAdded(item)
             }
         }
@@ -46,7 +46,7 @@ class ModellingItemHibernateListener implements PostInsertEventListener, PostUpd
     void onPostUpdate(PostUpdateEvent postUpdateEvent) {
         ModellingItem item = getModellingItem(postUpdateEvent.entity)
         if (item != null) {
-            for (ModellingItemListener listener: _listeners) {
+            for (ModellingItemListener listener : _listeners) {
                 listener.modellingItemChanged(item)
             }
         }
@@ -55,7 +55,7 @@ class ModellingItemHibernateListener implements PostInsertEventListener, PostUpd
     void onPostDelete(PostDeleteEvent postDeleteEvent) {
         ModellingItem item = getModellingItem(postDeleteEvent.entity)
         if (item != null) {
-            for (ModellingItemListener listener: _listeners) {
+            for (ModellingItemListener listener : _listeners) {
                 listener.modellingItemDeleted(item)
             }
         }
@@ -74,7 +74,7 @@ class ModellingItemHibernateListener implements PostInsertEventListener, PostUpd
     }
 
     private Parameterization toParameterization(ParameterizationDAO dao) {
-        Parameterization parameterization = new Parameterization(dao.name, getClass().getClassLoader().loadClass(dao.modelClassName))
+        Parameterization parameterization = new Parameterization(dao.name, Thread.currentThread().contextClassLoader.loadClass(dao.modelClassName))
         parameterization.versionNumber = new VersionNumber(dao.itemVersion)
 
         return parameterization
@@ -82,7 +82,7 @@ class ModellingItemHibernateListener implements PostInsertEventListener, PostUpd
 
     private ResultConfiguration toResultConfiguration(ResultConfigurationDAO dao) {
         ResultConfiguration resultConfiguration = new ResultConfiguration(dao.name)
-        resultConfiguration.modelClass = getClass().getClassLoader().loadClass(dao.modelClassName)
+        resultConfiguration.modelClass = Thread.currentThread().contextClassLoader.loadClass(dao.modelClassName)
         resultConfiguration.versionNumber = new VersionNumber(dao.itemVersion)
 
         return resultConfiguration
@@ -90,7 +90,7 @@ class ModellingItemHibernateListener implements PostInsertEventListener, PostUpd
 
     private Simulation toSimulation(SimulationRun dao) {
         Simulation simulation = new Simulation(dao.name)
-        simulation.modelClass = getClass().getClassLoader().loadClass(dao.model)
+        simulation.modelClass = Thread.currentThread().contextClassLoader.loadClass(dao.model)
 
         return simulation
     }

@@ -4,6 +4,8 @@ import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.parameterization.StructureInformation
+import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 /**
  * The CollectorFactory is resonsible for the creation of PacketCollectors as they are defined in the
@@ -29,8 +31,8 @@ public class CollectorFactory {
      * simulation has to be applied for one period. This ensures, that also dynamically composes components have their
      * subComponents initialized.
      */
-    public List createCollectors(ResultConfigurationDAO resultConfiguration, Model model) {
-        return enhanceCollectorInformationSet(resultConfiguration.collectorInformation as List, model).collect {
+    public List createCollectors(ResultConfiguration resultConfiguration, Model model) {
+        return enhanceCollectorInformationSet(resultConfiguration.collectors, model).collect {
             createCollector(it)
         }
     }
@@ -38,33 +40,31 @@ public class CollectorFactory {
 
 
 
-    protected PacketCollector createCollector(CollectorInformation collectorInformation) {
-        PacketCollector collector = new PacketCollector(CollectingModeFactory.getStrategy(collectorInformation.collectingStrategyIdentifier))
-        collector.outputStrategy = outputStrategy
-        collector.path = collectorInformation.path.pathName
+    protected PacketCollector createCollector(PacketCollector collectorInformation) {
+        collectorInformation.outputStrategy = outputStrategy
 
-        return collector
+        return collectorInformation
     }
 
 
     protected List enhanceCollectorInformationSet(List collectorInformations, Model model) {
         LinkedList enhancedCollectorInormation = new LinkedList()
-        collectorInformations.each {CollectorInformation collectorInformation ->
+        collectorInformations.each {PacketCollector collectorInformation ->
             def information = findOrCreateCollectorInformation(collectorInformation, model)
             enhancedCollectorInormation += information
         }
         return enhancedCollectorInormation
     }
 
-    protected def findOrCreateCollectorInformation(CollectorInformation collectorInformation, Model model) {
+    protected def findOrCreateCollectorInformation(PacketCollector collectorInformation, Model model) {
         def resultingCollectorInformation = collectorInformation
 
-        String[] pathElements = collectorInformation.path.pathName.split("\\:")
+        String[] pathElements = collectorInformation.path.split("\\:")
 
         def component = model
 
         for (String componentName in pathElements[1..-2]) {
-            if (component.properties.keySet().contains(componentName)) {
+            if (GroovyUtils.getProperties(component).keySet().contains(componentName)) {
                 component = component[componentName]
             } else {
                 if (component instanceof DynamicComposedComponent) {
@@ -83,13 +83,13 @@ public class CollectorFactory {
         return resultingCollectorInformation
     }
 
-    private List resolveWildcardPath(DynamicComposedComponent component, CollectorInformation collectorInformation, String wildCard) {
+    private List resolveWildcardPath(DynamicComposedComponent component, PacketCollector collectorInformation, String wildCard) {
         List result = []
         component.allSubComponents().each {Component subComponent ->
-            String newPath = collectorInformation.path.pathName.replace(wildCard, subComponent.name)
-            result << new CollectorInformation(
-                    path: new PathMapping(pathName: newPath),
-                    collectingStrategyIdentifier: collectorInformation.collectingStrategyIdentifier)
+            String newPath = collectorInformation.path.replace(wildCard, subComponent.name)
+            PacketCollector collector = new PacketCollector(CollectingModeFactory.getNewInstance(collectorInformation.mode))
+            collector.path = new PathMapping(pathName: newPath)
+            result << collector
         }
         return result
     }

@@ -11,7 +11,7 @@ import org.pillarone.riskanalytics.core.util.GroovyUtils;
 import java.math.BigDecimal;
 import java.util.*;
 
-public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalParameter {
+public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalParameter implements IMarkerBasedMultiDimensionalParameter {
 
     private IMultiDimensionalConstraints constraints;
     private Map<Integer, Map<String, Component>> comboBoxValues = new HashMap<Integer, Map<String, Component>>();
@@ -70,6 +70,15 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
         }
     }
 
+    public boolean isMarkerCell(int row, int column) {
+        if (row > 0) {
+            Class columnType = constraints.getColumnType(column);
+            return IComponentMarker.class.isAssignableFrom(columnType);
+        }
+
+        return false;
+    }
+
     protected void validate(Object value, List<String> validValues, List list, int currentRow) {
         if (value instanceof String) {
             if (!validValues.contains(value)) {
@@ -101,7 +110,9 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
             Map<String, Component> componentsOfType = comboBoxValues.get(column);
             List<String> selectedValues = values.get(column);
             for (String selectedValue : selectedValues) {
-                result.add(componentsOfType.get(selectedValue));
+                if (!selectedValue.trim().isEmpty()) {
+                    result.add(componentsOfType.get(selectedValue));
+                }
             }
         } else if (IResource.class.isAssignableFrom(columnType)) {
             List<ResourceHolder> selectedValues = values.get(column);
@@ -116,7 +127,7 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
     }
 
     /**
-     * @param row number including title and value rows
+     * @param row    number including title and value rows
      * @param column
      * @return selected component or resource instance if the column contains either of them or the same as getValueAt in all other cases
      */
@@ -146,6 +157,9 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
             List<Component> components = simulationModel.getMarkedComponents(columnClass);
             for (Component component : components) {
                 names.add(component.getName());
+            }
+            if (constraints.emptyComponentSelectionAllowed(column)) {
+                names.add(0, "");
             }
             return names;
         } else if (columnClass.isEnum()) {
@@ -217,19 +231,29 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
     }
 
     public boolean referencePaths(Class markerInterface, String value) {
-        Integer column = constraints.getColumnIndex(markerInterface);
-        return (column != null && values.get(column).indexOf(value) > -1);
+        for (int column = getTitleColumnCount(); column < getColumnCount(); column++) {
+            Class columnType = constraints.getColumnType(column);
+            if (markerInterface.isAssignableFrom(columnType)) {
+                if (values.get(column).contains(value)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public boolean updateReferenceValues(Class markerInterface, String oldValue, String newValue) {
-        Integer column = constraints.getColumnIndex(markerInterface);
-        if (column == null) return false;
         boolean atLeastOneUpdated = false;
-        for (int row = getTitleRowCount(); row < getRowCount(); row++) {
-            String value = (String) getValueAt(row, column);
-            if (value.equals(oldValue)) {
-                setValueAt(newValue, row, column);
-                atLeastOneUpdated = true;
+        for (int column = getTitleColumnCount(); column < getColumnCount(); column++) {
+            Class columnType = constraints.getColumnType(column);
+            if (markerInterface.isAssignableFrom(columnType)) {
+                for (int row = getTitleRowCount(); row < getRowCount(); row++) {
+                    String value = (String) getValueAt(row, column);
+                    if (value.equals(oldValue)) {
+                        setValueAt(newValue, row, column);
+                        atLeastOneUpdated = true;
+                    }
+                }
             }
         }
         return atLeastOneUpdated;

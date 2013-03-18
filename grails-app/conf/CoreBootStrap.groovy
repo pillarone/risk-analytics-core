@@ -4,6 +4,9 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pillarone.riskanalytics.core.BatchRunSimulationRun
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
+import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
+import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
+import org.pillarone.riskanalytics.core.output.CollectorMapping
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.report.IReportModel
@@ -13,8 +16,7 @@ import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.user.*
 import org.apache.commons.logging.LogFactory
 import org.apache.commons.logging.Log
-import org.pillarone.riskanalytics.core.output.CollectorMapping
-import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
+import org.pillarone.riskanalytics.core.output.AggregatedWithSingleAvailableCollectingModeStrategy
 
 class CoreBootStrap {
 
@@ -26,12 +28,19 @@ class CoreBootStrap {
 
         authenticateService = UserManagement.getSpringSecurityService()
 
-        CollectorMapping.withTransaction {
-            CollectorMapping single = new CollectorMapping(collectorName: SingleValueCollectingModeStrategy.IDENTIFIER)
-            if (CollectorMapping.find(single) == null) {
-                single.save()
-            } else {
-                single.discard()
+        //All mappings must be persistent before a simulation is started
+        CollectorMapping.withTransaction { status ->
+            CollectorMapping mapping = new CollectorMapping(collectorName: SingleValueCollectingModeStrategy.IDENTIFIER)
+            if (CollectorMapping.find(mapping) == null) {
+                mapping.save()
+            }
+            mapping = new CollectorMapping(collectorName: AggregatedCollectingModeStrategy.IDENTIFIER)
+            if (CollectorMapping.find(mapping) == null) {
+                mapping.save()
+            }
+            mapping = new CollectorMapping(collectorName: AggregatedWithSingleAvailableCollectingModeStrategy.IDENTIFIER)
+            if (CollectorMapping.find(mapping) == null) {
+                mapping.save()
             }
         }
 
@@ -123,10 +132,8 @@ class CoreBootStrap {
         if (modelFilter) {
             models = modelFilter.collect {it - "Model"}
         }
-        if (!Boolean.getBoolean("skipImport")) {
-            ParameterizationDAO.withTransaction {TransactionStatus status ->
-                FileImportService.importModelsIfNeeded(models)
-            }
+        ParameterizationDAO.withTransaction {TransactionStatus status ->
+            FileImportService.importModelsIfNeeded(models)
         }
     }
 

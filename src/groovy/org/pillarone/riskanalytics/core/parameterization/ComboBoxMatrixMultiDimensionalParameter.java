@@ -40,13 +40,15 @@ public class ComboBoxMatrixMultiDimensionalParameter extends MatrixMultiDimensio
 
     protected void columnsAdded(int i) {
         for (int j = 0; j < i; j++) {
-            columnTitles.add(comboBoxValues.keySet().toArray()[0]);
+            String value = comboBoxValues.isEmpty() ? "" : comboBoxValues.keySet().toArray()[0].toString();
+            columnTitles.add(value);
         }
     }
 
     protected void rowsAdded(int i) {
         for (int j = 0; j < i; j++) {
-            rowTitles.add(comboBoxValues.keySet().toArray()[0]);
+            String value = comboBoxValues.isEmpty() ? "" : comboBoxValues.keySet().toArray()[0].toString();
+            rowTitles.add(value);
         }
     }
 
@@ -95,6 +97,10 @@ public class ComboBoxMatrixMultiDimensionalParameter extends MatrixMultiDimensio
         }
     }
 
+    public boolean isMarkerCell(int row, int column) {
+        return (row == 0 && column > 0) || (column == 0 && row > 0);
+    }
+
     public Object getPossibleValues(int row, int column) {
         if (row == 0 && column == 0) {
             return "";
@@ -129,9 +135,7 @@ public class ComboBoxMatrixMultiDimensionalParameter extends MatrixMultiDimensio
         final ComboBoxMatrixMultiDimensionalParameter clone = (ComboBoxMatrixMultiDimensionalParameter) super.clone();
         clone.comboBoxValues = new HashMap<String, Component>();
         clone.markerClass = markerClass;
-        if (simulationModel != null) {
-            setSimulationModel(simulationModel);
-        }
+        clone.comboBoxValues.clear();
         return clone;
     }
 }

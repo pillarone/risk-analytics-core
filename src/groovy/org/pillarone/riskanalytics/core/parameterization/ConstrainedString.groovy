@@ -2,7 +2,7 @@ package org.pillarone.riskanalytics.core.parameterization
 
 import org.pillarone.riskanalytics.core.components.Component
 
-public class ConstrainedString {
+public class ConstrainedString implements Serializable {
 
     String stringValue
     Class markerClass

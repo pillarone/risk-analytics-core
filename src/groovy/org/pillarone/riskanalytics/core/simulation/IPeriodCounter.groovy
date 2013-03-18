@@ -48,6 +48,7 @@ public interface IPeriodCounter {
      * @throws AfterSimulationEndException if the date is after endOfLastPeriod()
      */
     int belongsToPeriod(DateTime date) throws BeforeSimulationStartException, AfterSimulationEndException
+    boolean dateInSimulationScope(DateTime date)
 
     boolean belongsToCurrentPeriod(DateTime date)
 
@@ -82,4 +83,6 @@ public interface IPeriodCounter {
      * @return true if all periods are of annual length
      */
     Boolean annualPeriodsOnly(boolean checkLastPeriodToo)
+
+    int currentPeriodIndex()
 }

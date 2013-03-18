@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.wiring;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pillarone.riskanalytics.core.components.Component;
+import org.pillarone.riskanalytics.core.components.IComponentMarker;
 import org.pillarone.riskanalytics.core.packets.Packet;
 import org.pillarone.riskanalytics.core.packets.PacketList;
 
@@ -27,19 +28,19 @@ public class Transmitter implements ITransmitter {
 
     /**
      * Transmits the packets to the receiver, setting their sender and senderChannelName equal to the values
-     * of the corresponding properties of the Transmitter.
+     * of the corresponding properties of the Transmitter. Furthermore the markers map is filled according to
+     * the implemented IComponentMarker interfaces of the sender component.
      */
     public void transmit() {
         if (isTransmitted()) { // TODO (msh): check case of retransmission and delete flag if unneccessary
             throw new IllegalStateException("No retransmission allowed: " + this);
         }
-        for (Object packet : source) {
-            ((Packet) packet).setSender(sender);
-            ((Packet) packet).setSenderChannelName(senderChannelName);
-        }
-        target.addAll(source);
+
+        setMarkers();
+        filterSource();
+        
         setTransmitted(true);
-        if (LOG.isDebugEnabled()) {
+        if (LOG.isDebugEnabled() && source.size() > 1) {
             StringBuffer buffer = new StringBuffer();
             buffer.append(senderChannelName);
             buffer.append(" [");
@@ -53,13 +54,32 @@ public class Transmitter implements ITransmitter {
             buffer.append(" -> ");
             buffer.append(receiver.getClass());
             buffer.append(")");
-            LOG.debug(buffer.toString());
+            LOG.info(buffer.toString());
         }
         notifyReceiver();
     }
 
     protected void notifyReceiver() {
         receiver.notifyTransmitted(this);
+    }
+
+    protected void notifyReceiver(Transmitter transmitter){
+        receiver.notifyTransmitted(transmitter);
+    }
+
+
+    protected void setMarkers() {
+        for (Object packet : source) {
+            ((Packet) packet).setSender(sender);
+            ((Packet) packet).setSenderChannelName(senderChannelName);
+            for (Class marker : sender.getMarkerClasses()) {
+                ((Packet) packet).addMarker(marker, (IComponentMarker) sender);
+            }
+        }
+    }
+
+    protected void filterSource() {
+        receiver.filterInChannel(target, source);
     }
 
     public boolean isTransmitted() {
@@ -87,13 +107,17 @@ public class Transmitter implements ITransmitter {
     }
 
     public String toString() {
-        return "" + sender.getClass().getSimpleName() +
+//        return "" + sender.getClass().getSimpleName() +
+//                " sends to " +
+//                receiver.getClass().getSimpleName() +
+//                ", packet type: " +
+//                source.getType().getSimpleName() +
+//                " using " +
+//                this.getClass().getSimpleName() +
+//                ", senderChannelName " + senderChannelName;
+        return "" + sender.getName() +
                 " sends to " +
-                receiver.getClass().getSimpleName() +
-                ", packet type: " +
-                source.getType().getSimpleName() +
-                " using " +
-                this.getClass().getSimpleName() +
+                receiver.getName() +
                 ", senderChannelName " + senderChannelName;
     }
 }

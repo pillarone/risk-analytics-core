@@ -1,10 +1,22 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.gridgain.grid.Grid
+
+import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationTask
+
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationHandler
+import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
+import org.pillarone.riskanalytics.core.simulation.engine.grid.SpringBeanDefinitionRegistry
 
 public class RunSimulationService {
 
+    private static Log LOG = LogFactory.getLog(RunSimulationService)
+
     def backgroundService
+    Grid grid
 
     public static RunSimulationService getService() {
         return ApplicationHolder.getApplication().getMainContext().getBean('runSimulationService')
@@ -25,4 +37,23 @@ public class RunSimulationService {
 
         return runner
     }
+
+    /**
+     * Runs a simulation on a GridGain grid
+     * @param configuration the simulation details
+     * @return the result of the grid gain task
+     */
+    public SimulationHandler runSimulationOnGrid(SimulationConfiguration configuration, ResultConfiguration resultConfiguration) {
+        configuration.createMappingCache(resultConfiguration)
+        configuration.prepareSimulationForGrid()
+        configuration.beans = SpringBeanDefinitionRegistry.getRequiredBeanDefinitions()
+
+        SimulationTask task = new SimulationTask()
+        SimulationHandler handler = new SimulationHandler(simulationTask: task)
+        handler.gridTaskFuture = grid.execute(task, configuration)
+
+        return handler
+    }
+
+
 }

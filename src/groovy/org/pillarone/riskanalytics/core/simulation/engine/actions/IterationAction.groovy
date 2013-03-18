@@ -22,14 +22,18 @@ public class IterationAction implements Action {
      * The periodAction.perform() is called for each period.
      */
     public void perform() {
-        LOG.debug "start perform"
+        if (LOG.isDebugEnabled()) {
+            LOG.debug "Start iteration ${iterationScope.currentIteration}"
+        }
         iterationScope.prepareNextIteration()
         int numberOfPeriods = iterationScope.numberOfPeriods
         for (int period = 1; period <= numberOfPeriods && !stopped; period++) {
             periodAction.perform()
         }
         periodAction.parameterValidationNeeded = false
-        LOG.debug "end perform"
+        if (LOG.isDebugEnabled()) {
+            LOG.debug "End iteration ${iterationScope.currentIteration}"
+        }
     }
 
     /**

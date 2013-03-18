@@ -49,4 +49,8 @@ class TestConstrainedTable implements IMultiDimensionalConstraints {
     Integer getColumnIndex(Class marker) {
         null
     }
+
+    boolean emptyComponentSelectionAllowed(int column) {
+        return false
+    }
 }

@@ -5,6 +5,7 @@ import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
 import org.pillarone.riskanalytics.core.util.ModelInjector
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 class StructureInformationInjector extends ModelInjector {
 
@@ -64,7 +65,7 @@ class StructureInformationInjector extends ModelInjector {
             configObject.company[line].each {propertyName, propertyValue ->
                 if (propertyName != 'components') {
                     configObject.company[line].components.each {componentName, Component component ->
-                        if (component.properties.containsKey(propertyName)) {
+                        if (GroovyUtils.getProperties(component).containsKey(propertyName)) {
                             component[propertyName] = propertyValue[period]
                         }
                     }

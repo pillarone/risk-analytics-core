@@ -1,6 +1,5 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
-import org.apache.commons.lang.builder.HashCodeBuilder
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.joda.time.DateTime
@@ -16,6 +15,9 @@ import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
+import org.apache.commons.lang.builder.HashCodeBuilder
+import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
+import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationBlock
 import org.pillarone.riskanalytics.core.util.MathUtils
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.output.CollectorMapping
@@ -89,7 +91,6 @@ abstract class ModelTest extends GroovyTestCase {
         MappingCache.instance.clear()
         MathUtils.initRandomStreamBase(1234)
 
-        assertNotNull(new CollectorMapping(collectorName: SingleValueCollectingModeStrategy.IDENTIFIER).save())
         new ParameterizationImportService().compareFilesAndWriteToDB([getParameterFileName()])
         new ResultConfigurationImportService().compareFilesAndWriteToDB([getResultConfigurationFileName()])
         new ModelStructureImportService().compareFilesAndWriteToDB([getStructureFileName()])
@@ -98,12 +99,14 @@ abstract class ModelTest extends GroovyTestCase {
         assertNotNull parameter
 
         Parameterization parameterization = new Parameterization(parameter.name)
+        parameterization.modelClass = getModelClass()
         parameterization.load()
 
         def resultConfig = ResultConfigurationDAO.findByName(getResultConfigurationDisplayName())
         assertNotNull resultConfig
 
         ResultConfiguration resultConfiguration = new ResultConfiguration(resultConfig.name)
+        resultConfiguration.modelClass = getModelClass()
         resultConfiguration.load()
 
         Class modelClass = getModelClass()
@@ -116,6 +119,7 @@ abstract class ModelTest extends GroovyTestCase {
         run.modelVersionNumber = new VersionNumber("1")
         run.periodCount = getPeriodCount()
         run.numberOfIterations = getIterationCount()
+        run.structure = ModelStructure.getStructureForModel(modelClass)
 
         if (modelInstance.requiresStartDate()) {
             run.beginOfFirstPeriod = new DateTime(2009, 1, 1, 0, 0, 0, 0)
@@ -134,7 +138,12 @@ abstract class ModelTest extends GroovyTestCase {
     final void testModelRun() {
         runner = SimulationRunner.createRunner()
         ICollectorOutputStrategy output = getOutputStrategy()
-        runner.simulationConfiguration = new SimulationConfiguration(simulation: run, outputStrategy: output)
+        SimulationConfiguration configuration = new SimulationConfiguration(
+                simulation: run, outputStrategy: output,
+                simulationBlocks: [new SimulationBlock(0, getIterationCount(), 0)]
+        )
+        configuration.createMappingCache(run.template)
+        runner.simulationConfiguration = configuration
 
 
         runner.start()

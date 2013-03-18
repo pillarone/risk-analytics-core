@@ -1,11 +1,12 @@
 package org.pillarone.riskanalytics.core.output.aggregation;
 
-import org.pillarone.riskanalytics.core.packets.PacketList;
 import org.pillarone.riskanalytics.core.packets.SingleValuePacket;
+
+import java.util.List;
 
 public class SumAggregatorSingleValuePacket implements IPacketAggregator<SingleValuePacket> {
 
-    public SingleValuePacket aggregate(PacketList<SingleValuePacket> packets) {
+    public SingleValuePacket aggregate(List<SingleValuePacket> packets) {
 
         SingleValuePacket aggregatedPacket = null;
         try {

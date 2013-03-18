@@ -153,6 +153,25 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
         }
     }
 
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+        String classifierClass = classifier.getClass().getName()
+        String classifierType = classifier.displayName
+
+        out.writeObject classifierClass
+        out.writeObject classifierType
+        out.writeObject classifierParameters
+    }
+
+    private void readObject(ObjectInputStream inStream) throws IOException, ClassNotFoundException {
+        String classifierClass = inStream.readObject()
+        String classifierType = inStream.readObject()
+
+        Class clazz = getClass().getClassLoader().loadClass(classifierClass)
+        this.classifier = clazz.valueOf(classifierType)
+
+        classifierParameters = inStream.readObject()
+    }
+
     List<String> referencePaths(Class markerInterface, String refValue) {
         if (classifierParameters.size() > 0) {
             List<String> references = new ArrayList<String>()

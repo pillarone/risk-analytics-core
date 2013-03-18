@@ -35,9 +35,8 @@ class MultiDimensionalParameter extends Parameter {
         value = value as AbstractMultiDimensionalParameter
         this.className = value.class.name
         extractValues(value.values)
-        int offset = value.titleColumnCount > 0 && value.titleRowCount > 0 ? 1 : 0
-        extractRowTitles(value.rowNames, offset)
-        extractColumnTitles(value.columnNames, offset)
+        extractRowTitles(value.rowNames, value.titleRowCount)
+        extractColumnTitles(value.columnNames, value.titleColumnCount)
         parameterObject = null
         markerClassName = value instanceof IComboBoxBasedMultiDimensionalParameter ? value.markerClass.name : null
         constraintName = value instanceof ConstrainedMultiDimensionalParameter ? value.constraints.name : null
@@ -46,14 +45,30 @@ class MultiDimensionalParameter extends Parameter {
     }
 
     private void extractRowTitles(List titles, int offset) {
+        boolean isNestedList = titles.any { it instanceof List }
+        if (!isNestedList) {
+            titles = [titles]
+        }
+
         for (int i = 0; i < titles.size(); i++) {
-            modifyOrCreateParameterTitle(i + offset, 0, titles[i])
+            List subList = titles[i]
+            for (int j = 0; j < subList.size(); j++) {
+                modifyOrCreateParameterTitle(j + offset, i, subList[j].toString())
+            }
         }
     }
 
     private void extractColumnTitles(List titles, int offset) {
+        boolean isNestedList = titles.any { it instanceof List }
+        if (!isNestedList) {
+            titles = [titles]
+        }
+
         for (int i = 0; i < titles.size(); i++) {
-            modifyOrCreateParameterTitle(0, i + offset, titles[i])
+            List subList = titles[i]
+            for (int j = 0; j < subList.size(); j++) {
+                modifyOrCreateParameterTitle(i, j + offset, subList[j].toString())
+            }
         }
     }
 
@@ -136,8 +151,6 @@ class MultiDimensionalParameter extends Parameter {
      * for performance reasons.
      */
     public Object getParameterInstance() {
-        //TODO: check how this affects performance
-        //        if (parameterObject == null) {
         Class clazz = Thread.currentThread().contextClassLoader.loadClass(className)
         Class markerClass
         if (markerClassName != null) {
@@ -163,9 +176,11 @@ class MultiDimensionalParameter extends Parameter {
             case ConstrainedMultiDimensionalParameter.name:
                 mdpInstance = clazz.newInstance([getCellValues(), getColumnTitles(), ConstraintsFactory.getConstraints(constraintName)] as Object[])
                 break;
+            case PeriodMatrixMultiDimensionalParameter.name:
+                mdpInstance = clazz.newInstance([getCellValues(), getRowTitlesForPeriodMatrix(), markerClass] as Object[])
+                break;
         }
         parameterObject = mdpInstance
-//        }
         return parameterObject
     }
 
@@ -175,6 +190,15 @@ class MultiDimensionalParameter extends Parameter {
 
     private List getRowTitles() {
         return multiDimensionalParameterTitles.findAll { it.col == 0 }.sort { it.row }.collect { it.title }
+    }
+
+    private List getRowTitlesForPeriodMatrix() {
+        List result = []
+        multiDimensionalParameterTitles*.col.unique().sort().each { int col ->
+            result << multiDimensionalParameterTitles.findAll { it.col == col }.sort { it.row }.collect { it.title }
+        }
+
+        return result
     }
 
     private List getCellValues() {

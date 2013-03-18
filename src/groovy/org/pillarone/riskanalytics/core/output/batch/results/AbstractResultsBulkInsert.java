@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.output.batch.results;
 
+import grails.util.Holders;
 import groovy.util.ConfigObject;
 import org.codehaus.groovy.grails.commons.ApplicationHolder;
 import org.pillarone.riskanalytics.core.output.SingleValueResultPOJO;
@@ -53,7 +54,7 @@ public abstract class AbstractResultsBulkInsert extends AbstractBulkInsert {
 
     public static AbstractBulkInsert getBulkInsertInstance() {
         try {
-            ConfigObject configObject = ApplicationHolder.getApplication().getConfig();
+            ConfigObject configObject = Holders.getGrailsApplication().getConfig();
             Class bulkClass = null;
             if (configObject.containsKey("resultBulkInsert")) {
                 bulkClass = (Class) configObject.get("resultBulkInsert");

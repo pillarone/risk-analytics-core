@@ -1,17 +1,19 @@
 package org.pillarone.riskanalytics.core.parameterization
 
-import groovy.mock.interceptor.StubFor
+import grails.test.GrailsMock
+import grails.test.mixin.TestMixin
+import grails.test.mixin.support.GrailsUnitTestMixin
 import models.core.CoreModel
 import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
 
-class StructureInformationInjectorTests extends GroovyTestCase {
+@TestMixin(GrailsUnitTestMixin)
+class StructureInformationInjectorTests {
 
-    StubFor structureStub
+    GrailsMock structureStub
 
-    protected void setUp() {
-        super.setUp()
-        structureStub = new StubFor(ModelStructure)
-        structureStub.demand.load {->}
+    void setUp() {
+        structureStub = mockFor(ModelStructure, true)
+        structureStub.demand.load {-> }
         structureStub.demand.getData {->
             ConfigObject config = new ConfigObject()
             config.model = CoreModel
@@ -20,20 +22,18 @@ class StructureInformationInjectorTests extends GroovyTestCase {
 
             return config
         }
-        structureStub.demand.getName {-> "CoreStructure"}
+        structureStub.demand.getName() { return "CoreStructure" }
     }
 
     void testWithModelStructureItem() {
-        structureStub.use {
-            ModelStructure modelStructure = new ModelStructure("CoreStructure")
-            CoreModel model = new CoreModel()
-            model.initComponents()
-            StructureInformationInjector injector = new StructureInformationInjector(modelStructure, model)
-            ConfigObject structure = injector.configObject
+        ModelStructure modelStructure = (ModelStructure) structureStub.createMock()
+        CoreModel model = new CoreModel()
+        model.initComponents()
+        StructureInformationInjector injector = new StructureInformationInjector(modelStructure, model)
+        ConfigObject structure = injector.configObject
 
-            assertSame structure.company.hierarchyLevel.components.hierarchyOutputComponent, model.hierarchyOutputComponent
+        assertSame structure.company.hierarchyLevel.components.hierarchyOutputComponent, model.hierarchyOutputComponent
 
-        }
     }
 
     void testLoadStructure() {

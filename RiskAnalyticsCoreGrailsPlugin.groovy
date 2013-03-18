@@ -41,7 +41,7 @@ class RiskAnalyticsCoreGrailsPlugin {
             "backgroundThread": "1.3",
             "jodaTime": "0.5",
             "quartz": "0.4.2",
-            "springSecurityCore": "1.1.2",
+            "springSecurityCore": "1.2.7.3",
             "mavenPublisher": "0.7.5"
     ]
     // resources that are excluded from plugin packaging

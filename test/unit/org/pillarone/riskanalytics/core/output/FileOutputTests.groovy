@@ -1,15 +1,9 @@
 package org.pillarone.riskanalytics.core.output
 
-import grails.test.GrailsUnitTestCase
-import org.pillarone.riskanalytics.core.output.FieldMapping
-import org.pillarone.riskanalytics.core.output.PathMapping
-import org.pillarone.riskanalytics.core.output.SimulationRun
-import org.pillarone.riskanalytics.core.output.SingleValueResult
-import org.pillarone.riskanalytics.core.output.FileOutput
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
-class FileOutputTests extends GrailsUnitTestCase {
+class FileOutputTests extends GroovyTestCase {
 
     File file
 

@@ -9,8 +9,6 @@ import org.pillarone.riskanalytics.core.packets.Packet
 import org.pillarone.riskanalytics.core.components.IComponentMarker
 import org.pillarone.riskanalytics.core.components.ComposedComponent
 import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
-import sun.util.LocaleServiceProviderPool
-
 
 class ModelHelper {
 
@@ -85,7 +83,7 @@ class ModelHelper {
         Set<String> results = []
         model.properties.each { String key, value ->
             if (value instanceof Component) {
-                results.addAll(getAllPossibleOutputPaths(prefix + ":${key}", value, outputPathsByMarkerInterface, drillDownPaths))
+                results.addAll(internalGetAllPossibleOutputPaths(prefix + ":${key}", value, outputPathsByMarkerInterface, drillDownPaths))
             }
         }
         Map<Class, List<Component>> componentsByMarkerInterface = new HashMap<Class, List<Component>>()
@@ -122,7 +120,7 @@ class ModelHelper {
         }
     }
 
-    private static Set<String> getAllPossibleOutputPaths(String prefix, Component component,
+    private static Set<String> internalGetAllPossibleOutputPaths(String prefix, Component component,
                                                          Map<Class, List<String>> outputPathsByMarkerInterface,
                                                          List<String> drillDownPaths) {
         Set<String> results = []
@@ -134,7 +132,7 @@ class ModelHelper {
                     findDrillDownCandidates component, path, outputPathsByMarkerInterface
                 }
             } else if (value instanceof Component) {
-                results.addAll(getAllPossibleOutputPaths(prefix + ":${key}", value, outputPathsByMarkerInterface, drillDownPaths))
+                results.addAll(internalGetAllPossibleOutputPaths(prefix + ":${key}", value, outputPathsByMarkerInterface, drillDownPaths))
             }
         }
         return results

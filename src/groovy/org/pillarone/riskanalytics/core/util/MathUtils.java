@@ -209,11 +209,12 @@ public class MathUtils {
     }
 
     public static double calculateVarOfSortedValues(double[] sortedValues, double severity, double mean, QuantilePerspective perspective) {
+        double result = calculatePercentileOfSortedValues(sortedValues, severity, perspective) - mean;
         switch (perspective) {
             case LOSS:
-                return calculatePercentileOfSortedValues(sortedValues, severity, perspective) - mean;
+                return result;
             case PROFIT:
-                return -(calculatePercentileOfSortedValues(sortedValues, severity, perspective) - mean);
+                return (result != 0.0) ? -result : result; //avoid negative zero
             default:
                 throw new IllegalArgumentException("percentile is calculated for loss or profit distribution: specify accordingly!");
         }

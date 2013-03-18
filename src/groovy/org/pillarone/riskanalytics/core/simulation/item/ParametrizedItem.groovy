@@ -14,7 +14,7 @@ import org.pillarone.riskanalytics.core.components.ComponentUtils
 
 abstract class ParametrizedItem extends CommentableItem {
 
-    private static Log LOG = LogFactory.getLog(ParametrizedItem)
+    protected static Log LOG = LogFactory.getLog(ParametrizedItem)
 
     private Set<IParametrizedItemListener> listeners = new HashSet<IParametrizedItemListener>()
 

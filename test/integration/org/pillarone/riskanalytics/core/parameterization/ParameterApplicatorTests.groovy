@@ -1,20 +1,17 @@
 package org.pillarone.riskanalytics.core.parameterization
 
-import grails.test.GrailsUnitTestCase
 import models.core.CoreModel
+import models.core.parameterApplicator.ParameterApplicatorModel
 import org.apache.commons.logging.LogFactory
-import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.example.component.ExampleDynamicComponent
 import org.pillarone.riskanalytics.core.example.component.ExampleInputOutputComponent
 import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObjectClassifier
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
-import models.core.parameterApplicator.ParameterApplicatorModel
-import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
-import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjectParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjectParameterHolder
 
-class ParameterApplicatorTests extends GrailsUnitTestCase {
+class ParameterApplicatorTests extends GroovyTestCase {
 
 
     private Parameterization getParameterization(File paramFile) {

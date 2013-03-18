@@ -16,7 +16,7 @@ class ParameterWriter implements IConfigObjectWriter {
 
     void printConfigObject(prefix, ConfigObject configObject, BufferedWriter out, boolean writePrefix, iteration) {
 
-        boolean prefixRequired = writePrefix && configObject.flatten().size() > 0
+        boolean prefixRequired = writePrefix && configObject.size() > 0 //TODO: was flatten().size(), but this no longer works
         if (prefixRequired) {
             writeTabs(iteration, out)
             out << "$prefix {\n"

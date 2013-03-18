@@ -1,16 +1,12 @@
 package org.pillarone.riskanalytics.core.simulation.engine.actions
 
-import grails.test.GrailsUnitTestCase
 import models.core.CoreModel
-import org.pillarone.riskanalytics.core.ModelStructureDAO
-import org.pillarone.riskanalytics.core.output.ConfigObjectHolder
-import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
-import umontreal.iro.lecuyer.simevents.Sim
-import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.fileimport.ModelStructureImportService
+import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
-class PrepareStructureInformationActionTests extends GrailsUnitTestCase {
+class PrepareStructureInformationActionTests extends GroovyTestCase {
 
     void testPerform() {
 

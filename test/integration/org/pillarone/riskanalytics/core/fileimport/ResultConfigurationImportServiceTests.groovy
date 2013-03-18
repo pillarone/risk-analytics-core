@@ -1,9 +1,8 @@
 package org.pillarone.riskanalytics.core.fileimport
 
-import grails.test.GrailsUnitTestCase
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 
-class ResultConfigurationImportServiceTests extends GrailsUnitTestCase {
+class ResultConfigurationImportServiceTests extends GroovyTestCase {
 
     ResultConfigurationImportService resultConfigurationImportService
 

@@ -1,40 +1,20 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
-import grails.test.GrailsUnitTestCase
-import groovy.mock.interceptor.StubFor
+import grails.test.mixin.TestMixin
+import grails.test.mixin.support.GrailsUnitTestMixin
 import org.apache.commons.logging.LogFactory
-import org.pillarone.riskanalytics.core.output.DeleteSimulationService
-import org.pillarone.riskanalytics.core.output.SimulationRun
+import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.engine.actions.Action
 import org.pillarone.riskanalytics.core.simulation.engine.actions.IterationAction
 import org.pillarone.riskanalytics.core.simulation.engine.actions.PeriodAction
 import org.pillarone.riskanalytics.core.simulation.engine.actions.SimulationAction
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
-import org.pillarone.riskanalytics.core.example.model.EmptyModel
 
-class SimulationRunnerTests extends GrailsUnitTestCase {
-
-    StubFor transactionStub
-    StubFor deletionServiceStub
-
-    void setUp() {
-        transactionStub = new StubFor(SimulationRun)
-        deletionServiceStub = new StubFor(DeleteSimulationService)
-    }
+@TestMixin(GrailsUnitTestMixin)
+class SimulationRunnerTests {
 
     void testSimulationRun() {
-        transactionStub.demand.withTransaction(2..2) {
-            Closure c -> c.call()
-        }
-        deletionServiceStub.demand.getInstance(1..1) {
-            return [
-                    deleteSimulation: {
-                        //should never be called
-                        assertTrue false
-                    }
-            ] as DeleteSimulationService
-        }
 
         PeriodScope periodScope = new PeriodScope()
         IterationScope iterationScope = new IterationScope(periodScope: periodScope, numberOfPeriods: 2)
@@ -44,8 +24,8 @@ class SimulationRunnerTests extends GrailsUnitTestCase {
         Action iterationAction = new IterationAction(iterationScope: iterationScope, periodAction: periodAction)
         Action simulationAction = new SimulationAction(simulationScope: simulationScope, iterationAction: iterationAction)
 
-        Action preSimulationAction = [perform: {LogFactory.getLog(Action).debug "performing preSimulationAction"}] as Action
-        Action postSimulationAction = [perform: {LogFactory.getLog(Action).debug "performing postSimulationAction"}] as Action
+        Action preSimulationAction = [perform: { LogFactory.getLog(Action).debug "performing preSimulationAction" }] as Action
+        Action postSimulationAction = [perform: { LogFactory.getLog(Action).debug "performing postSimulationAction" }] as Action
 
 
         SimulationRunner runner = getSimulationRunner(simulationScope)
@@ -53,12 +33,7 @@ class SimulationRunnerTests extends GrailsUnitTestCase {
         runner.simulationAction = simulationAction
         runner.postSimulationActions << postSimulationAction
 
-        transactionStub.use {
-            deletionServiceStub.use {
-                runner.start()
-            }
-        }
-
+        runner.start()
     }
 
     void testSimulationRunStopping() {
@@ -70,9 +45,9 @@ class SimulationRunnerTests extends GrailsUnitTestCase {
         Action iterationAction = new IterationAction(iterationScope: iterationScope, periodAction: periodAction)
         Action simulationAction = new SimulationAction(simulationScope: simulationScope, iterationAction: iterationAction)
 
-        volatile boolean postSimulationActionCalled = false
-        Action preSimulationAction = [perform: {LogFactory.getLog(Action).debug "performing preSimulationAction"}] as Action
-        Action postSimulationAction = [perform: {postSimulationActionCalled = true}] as Action
+        boolean postSimulationActionCalled = false
+        Action preSimulationAction = [perform: { LogFactory.getLog(Action).debug "performing preSimulationAction" }] as Action
+        Action postSimulationAction = [perform: { postSimulationActionCalled = true }] as Action
 
         SimulationRunner runner = getSimulationRunner(simulationScope)
         runner.preSimulationActions << preSimulationAction
@@ -105,7 +80,7 @@ class SimulationRunnerTests extends GrailsUnitTestCase {
 
     SimulationRunner getSimulationRunner(SimulationScope simulationScope) {
         SimulationRunner runner = new SimulationRunner(currentScope: simulationScope)
-        runner.metaClass.notifySimulationStateChanged = {Simulation simulation, SimulationState simulationState ->}
+        runner.metaClass.notifySimulationStateChanged = { Simulation simulation, SimulationState simulationState -> }
         return runner
 
     }

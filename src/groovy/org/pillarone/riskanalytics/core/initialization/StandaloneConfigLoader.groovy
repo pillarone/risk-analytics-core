@@ -1,26 +1,13 @@
 package org.pillarone.riskanalytics.core.initialization;
 
 import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.codehaus.groovy.grails.plugins.logging.Log4jConfig
-import org.apache.log4j.LogManager
+import org.codehaus.groovy.grails.plugins.log4j.Log4jConfig
 
 class StandaloneConfigLoader {
 
     static void loadLog4JConfig(String environment) {
-        Closure configuration = null
-
         ConfigObject configObject = loadConfig(environment)
-
-        if (configObject.containsKey("log4j") && configObject["log4j"] instanceof Closure) {
-            configuration = configObject["log4j"]
-        }
-
-        LogManager.resetConfiguration();
-        if (configuration != null) {
-            new Log4jConfig().configure((Closure) configuration);
-        } else {
-            new Log4jConfig().configure();
-        }
+        Log4jConfig.initialize(configObject);
     }
 
     static def getValue(String environment, String key) {

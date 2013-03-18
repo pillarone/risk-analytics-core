@@ -8,7 +8,7 @@ import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 abstract class ModellingItem implements Serializable {
-    final static Logger LOG = Logger.getLogger(ModellingItem)
+    protected static final Logger LOG = Logger.getLogger(ModellingItem)
 
     String name
     Class modelClass

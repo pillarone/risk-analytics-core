@@ -8,3 +8,4 @@ cobertura.ser
 exportParam.groovy
 .idea/*
 *.iml
+out/*

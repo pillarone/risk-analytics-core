@@ -1,5 +1,5 @@
 //Use a custom plugins dir, because different branches use different plugin versions
-grails.project.plugins.dir = "../local-plugins/RiskAnalyticsCore-kti"
+grails.project.plugins.dir = "../local-plugins/RiskAnalyticsCore-master"
 
 grails.project.dependency.resolution = {
     inherits "global" // inherit Grails' default dependencies

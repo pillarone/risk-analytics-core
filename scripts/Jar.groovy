@@ -1,3 +1,5 @@
+import org.codehaus.groovy.grails.project.packaging.GrailsProjectWarCreator
+
 includeTargets << grailsScript("_GrailsWar")
 
 stagingDir = null
@@ -45,9 +47,12 @@ Options:
         fileset(dir: resourcesDirPath, includes: "**/*")
     }
 
-    //Create a grails.xml file which is necessary to create a plugin manager (using _GrailsWar.groovy)
+    //Create a grails.xml file which is necessary to create a plugin manager
     ant.mkdir(dir: "${stagingDir}/WEB-INF")
-    createDescriptor()
+    def warCreator = new GrailsProjectWarCreator(grailsSettings, eventListener, projectPackager, ant, isInteractive)
+    warCreator.stagingDir = new File(stagingDir)
+    warCreator.createDescriptor()
+
 
     //Project ready to run in stagingDir, optionally create a jar or cmd file to run the application
     if (argsMap.buildJar) {

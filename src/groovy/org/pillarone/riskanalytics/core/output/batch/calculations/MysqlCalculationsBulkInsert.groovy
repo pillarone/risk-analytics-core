@@ -1,12 +1,14 @@
 package org.pillarone.riskanalytics.core.output.batch.calculations
 
 import groovy.sql.Sql
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import java.sql.SQLException
 
 
 class MysqlCalculationsBulkInsert extends AbstractCalculationsBulkInsert {
 
+    @CompileStatic
     protected void writeResult(List values) {
         writer.append(values.join(","))
         writer.append(";")

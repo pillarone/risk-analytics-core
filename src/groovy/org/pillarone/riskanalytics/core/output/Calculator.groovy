@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.output
 
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.dataaccess.ResultAccessor
@@ -45,20 +46,23 @@ class Calculator {
         completedCalculations = 0
     }
 
+    @CompileStatic
     int getProgress() {
         return (int) ((double) completedCalculations / (double) totalCalculations * 100d)
     }
 
+    @CompileStatic
     DateTime getEstimatedEnd() {
         if (startTime == null || completedCalculations == 0) {
             return null
         }
 
         long now = System.currentTimeMillis()
-        long timeForOneKeyFigure = (now - startTime) / completedCalculations
+        BigDecimal timeForOneKeyFigure = (now - startTime) / completedCalculations
         return new DateTime(now + (totalCalculations - completedCalculations) * timeForOneKeyFigure)
     }
 
+    @CompileStatic
     void calculate() {
         startTime = System.currentTimeMillis()
 
@@ -123,6 +127,7 @@ class Calculator {
     /**
      *  Values of path and periodIndex are loaded from the database and returned in a sorted double[]
      */
+    @CompileStatic
     private double[] loadValues(PathMapping path, int periodIndex, CollectorMapping collector, FieldMapping field) {
 
         long time = System.currentTimeMillis()
@@ -134,26 +139,29 @@ class Calculator {
     }
 
 
+    @CompileStatic
     private double calculateMean(int periodIndex, long pathId, long collectorId, long fieldId, double[] results) {
         long time = System.currentTimeMillis()
 
-        double mean = results.toList().sum() / results.size()
+        double mean = ((Double) results.toList().sum()) / (double) results.size()
         bulkInsert.addResults(periodIndex, PostSimulationCalculation.MEAN, null, pathId, fieldId, collectorId, mean)
 
         LOG.debug("Calculated mean ($pathId, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
         return mean
     }
 
+    @CompileStatic
     private boolean calculateIsStochastic(int periodIndex, long pathId, long collectorId, long fieldId, double[] results) {
         long time = System.currentTimeMillis()
 
         boolean isStochastic = results[0] == results[-1]
-        bulkInsert.addResults(periodIndex, PostSimulationCalculation.IS_STOCHASTIC, null, pathId, fieldId, collectorId, isStochastic ? 1 : 0)
+        bulkInsert.addResults(periodIndex, PostSimulationCalculation.IS_STOCHASTIC, null, pathId, fieldId, collectorId, isStochastic ? 1d : 0d)
 
         LOG.debug("Calculated is stochastic ($pathId, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
         return isStochastic
     }
 
+    @CompileStatic
     private double calculateMean(int periodIndex, PathMapping path, CollectorMapping collector, FieldMapping field, double[] results) {
         long time = System.currentTimeMillis()
 
@@ -166,11 +174,12 @@ class Calculator {
     }
 
 
+    @CompileStatic
     private boolean calculateIsStochastic(int periodIndex, PathMapping path, CollectorMapping collector, FieldMapping field, double[] results) {
         long time = System.currentTimeMillis()
 
         boolean isStochastic = results[0] != results[results.length - 1]
-        bulkInsert.addResults(periodIndex, PostSimulationCalculation.IS_STOCHASTIC, null, path.id, field.id, collector.id, isStochastic ? 0 : 1)
+        bulkInsert.addResults(periodIndex, PostSimulationCalculation.IS_STOCHASTIC, null, path.id, field.id, collector.id, isStochastic ? 0d : 1d)
 
         LOG.debug("Calculated is stochastic ($path.pathName, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
 
@@ -178,6 +187,7 @@ class Calculator {
     }
 
 
+    @CompileStatic
     private void calculateStandardDeviation(int periodIndex, PathMapping path, CollectorMapping collector, FieldMapping field, double[] results, double mean) {
         long time = System.currentTimeMillis()
 
@@ -187,10 +197,11 @@ class Calculator {
         LOG.debug("Calculated stdev (${path.pathName}, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
     }
 
+    @CompileStatic
     private void calculatePercentile(int periodIndex, PathMapping path, CollectorMapping collector, FieldMapping field, double[] results, double severity, QuantilePerspective perspective) {
         long time = System.currentTimeMillis()
 
-        BigDecimal p = MathUtils.calculatePercentileOfSortedValues(results, severity, perspective)
+        double p = MathUtils.calculatePercentileOfSortedValues(results, severity, perspective)
         bulkInsert.addResults(periodIndex, perspective.getPercentileAsString(), severity, path.id, field.id, collector.id, p)
 
 
@@ -200,8 +211,8 @@ class Calculator {
     private void calculatePDF(int periodIndex, PathMapping path, CollectorMapping collector, FieldMapping field, double[] results, def pdf) {
         long time = System.currentTimeMillis()
         PdfFromSample data = new PdfFromSample()
-        Map pdfData = data.createPdfData(results, pdf)
-        pdfData.each {BigDecimal k, v ->
+        Map<Double, Double> pdfData = data.createPdfData(results, pdf)
+        pdfData.each {Double k, v ->
             bulkInsert.addResults(periodIndex, PostSimulationCalculation.PDF, k, path.id, field.id, collector.id, v)
         }
 
@@ -209,24 +220,25 @@ class Calculator {
     }
 
 
+    @CompileStatic
     private void calculateVar(int periodIndex, PathMapping path, CollectorMapping collector, FieldMapping field, double[] results, double severity, double mean,
                               QuantilePerspective perspective) {
         long time = System.currentTimeMillis()
 
-        BigDecimal var = MathUtils.calculateVarOfSortedValues(results, severity, mean, perspective)
+        Double var = MathUtils.calculateVarOfSortedValues(results, severity, mean, perspective)
         bulkInsert.addResults(periodIndex, perspective.getVarAsString(), severity, path.id, field.id, collector.id, var)
 
 
         LOG.debug("Calculated var $severity (${path.pathName}, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
     }
 
+    @CompileStatic
     private void calculateTvar(int periodIndex, PathMapping path, CollectorMapping collector, FieldMapping field, double[] results, double severity,
                                QuantilePerspective perspective) {
         long time = System.currentTimeMillis()
 
-        BigDecimal tvar = MathUtils.calculateTvarOfSortedValues(results, severity, perspective)
-        bulkInsert.addResults(periodIndex, perspective.getTvarAsString(), severity, path.id, field.id, collector.id, tvar)
-
+        Double tvar = MathUtils.calculateTvarOfSortedValues(results, severity, perspective)
+        bulkInsert.addResults(periodIndex, perspective.getTvarAsString(), severity , path.id, field.id, collector.id, tvar)
 
         LOG.debug("Calculated tvar $severity (${path.pathName}, period: $periodIndex) in ${System.currentTimeMillis() - time}ms")
     }

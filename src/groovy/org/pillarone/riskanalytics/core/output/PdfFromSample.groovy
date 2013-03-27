@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.output
 
+import groovy.transform.CompileStatic
+
 /**
  * Created by IntelliJ IDEA.
  * User: fja
@@ -11,9 +13,10 @@ package org.pillarone.riskanalytics.core.output
  * with characteristic functions.
  *
  */
+@CompileStatic
 class PdfFromSample {
 
-    public Map createPdfData(double[] results, int pdf) {
+    public Map<Double, Double> createPdfData(double[] results, int pdf) {
         Map seriesPDF = [:]
         double upperBound = (Double) results[results.length - 1]
         double lowerBound = (Double) results[0]

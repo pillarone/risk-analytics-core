@@ -1,11 +1,13 @@
 package org.pillarone.riskanalytics.core.output.batch.calculations
 
+import groovy.transform.CompileStatic
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pillarone.riskanalytics.core.output.batch.AbstractBulkInsert
 
 abstract class AbstractCalculationsBulkInsert extends AbstractBulkInsert {
 
-    void addResults(int period, String keyFigure, BigDecimal keyFigureParameter, long path, long field, long collector, Double value) {
+    @CompileStatic
+    void addResults(int period, String keyFigure, Double keyFigureParameter, long path, long field, long collector, Double value) {
         List values = []
         values << simulationRun.id
         values << period

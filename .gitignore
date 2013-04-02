@@ -4,6 +4,7 @@ target/*
 web-app/plugins/*
 .idea/workspace.xml
 stacktrace.log
+atlassian-ide-plugin.xml
 cobertura.ser
 exportParam.groovy
 .idea/*

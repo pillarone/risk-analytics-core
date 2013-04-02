@@ -87,6 +87,7 @@
         <exec executable="${grails}" failonerror="true" resolveexecutable="true">
             <arg value="test-app"/>
             <arg value="-coverage"/>
+            <arg value="--non-interactive"/>
             <!--<arg value="-echoOut"/>-->
             <env key="GRAILS_HOME" value="${GRAILS_HOME}"/>
             <env key="JAVA_OPTS" value="${GRAILS_JVM_OPTS}"/>
@@ -100,6 +101,7 @@
             description="Releases the plugin in the configured repository.">
         <antcall target="_beforeReleasePlugin"/>
         <exec executable="${grails}" failonerror="true" resolveexecutable="true">
+            <arg value="--non-interactive"/>
             <arg value="deploy-plugin"/>
             <arg value="--repository=${release.repository}"/>
             <env key="GRAILS_HOME" value="${GRAILS_HOME}"/>
@@ -120,6 +122,7 @@
         <exec executable="${grails}" failonerror="true" resolveexecutable="true">
             <arg value="jar -destination=out/production/${app.name}"/>
             <env key="GRAILS_HOME" value="${GRAILS_HOME}"/>
+            <arg value="--non-interactive"/>
             <env key="JAVA_OPTS" value="${GRAILS_JVM_OPTS}"/>
         </exec>
     </target>

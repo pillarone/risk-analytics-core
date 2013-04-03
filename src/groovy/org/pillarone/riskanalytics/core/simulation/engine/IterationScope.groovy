@@ -1,12 +1,15 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.components.PeriodStore
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationTask
 
 /**
  * The IterationScope provides information that is valid throughout a single iteration.
  */
+@CompileStatic
 public class IterationScope {
 
     private static Log LOG = LogFactory.getLog(IterationScope)
@@ -16,7 +19,7 @@ public class IterationScope {
     int currentIteration = 0
     int numberOfPeriods
 
-    List periodStores = []
+    List<PeriodStore> periodStores = []
 
     public void prepareNextIteration() {
         LOG.debug "preparing next iteration"

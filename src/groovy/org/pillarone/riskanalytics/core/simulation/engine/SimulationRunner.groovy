@@ -36,9 +36,9 @@ public class SimulationRunner {
     private static Log LOG = LogFactory.getLog(SimulationRunner)
     private long start
 
-    List preSimulationActions = []
+    List<Action> preSimulationActions = []
     SimulationAction simulationAction
-    List postSimulationActions = []
+    List<Action> postSimulationActions = []
 
     SimulationScope currentScope
 
@@ -186,7 +186,7 @@ public class SimulationRunner {
             long estimatedEnd = now + (onePercentTime * (100 - progress))
             return new DateTime(estimatedEnd)
         } else if (simulationState == SimulationState.POST_SIMULATION_CALCULATIONS) {
-            CalculatorAction action = postSimulationActions.find { it instanceof CalculatorAction }
+            CalculatorAction action = (CalculatorAction) postSimulationActions.find { it instanceof CalculatorAction }
             return action?.calculator?.estimatedEnd
         }
         return null
@@ -194,7 +194,7 @@ public class SimulationRunner {
 
     int getProgress() {
         if (simulationState == SimulationState.POST_SIMULATION_CALCULATIONS) {
-            CalculatorAction action = postSimulationActions.find { it instanceof CalculatorAction }
+            CalculatorAction action = (CalculatorAction) postSimulationActions.find { it instanceof CalculatorAction }
             return action?.calculator?.progress
         } else {
             return currentScope.progress

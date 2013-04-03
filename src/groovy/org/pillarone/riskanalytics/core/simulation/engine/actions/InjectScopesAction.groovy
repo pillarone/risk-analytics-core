@@ -1,11 +1,13 @@
 package org.pillarone.riskanalytics.core.simulation.engine.actions
 
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.simulation.engine.IterationScope
 import org.pillarone.riskanalytics.core.simulation.engine.PeriodScope
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 
+@CompileStatic
 public class InjectScopesAction implements Action {
 
     private static Log LOG = LogFactory.getLog(InjectScopesAction)

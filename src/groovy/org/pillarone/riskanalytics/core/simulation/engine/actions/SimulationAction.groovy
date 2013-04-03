@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.engine.actions
 
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
@@ -13,6 +14,7 @@ import org.pillarone.riskanalytics.core.util.MathUtils
  * The performed iterations get logged to the SimulationScope.iterationsDone property.
  */
 
+@CompileStatic
 public class SimulationAction implements Action {
 
     private static Log LOG = LogFactory.getLog(SimulationAction)

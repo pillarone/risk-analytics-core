@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.joda.time.DateTime
@@ -10,6 +11,7 @@ import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
  * The PeriodScope provides information that is valid for a single period
  */
 
+@CompileStatic
 public class PeriodScope {
 
     private static Log LOG = LogFactory.getLog(PeriodScope)

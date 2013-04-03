@@ -1,12 +1,13 @@
 package org.pillarone.riskanalytics.core.simulation.engine.actions
 
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.pillarone.riskanalytics.core.components.ResourceRegistry
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 
+@CompileStatic
 public class InitModelAction implements Action {
 
     private static Log LOG = LogFactory.getLog(InitModelAction)

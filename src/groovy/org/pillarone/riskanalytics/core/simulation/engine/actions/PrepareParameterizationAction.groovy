@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.engine.actions
 
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.RiskAnalyticsInconsistencyException
@@ -13,6 +14,8 @@ import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
  * actions like  {@code ApplyGlobalParametersAction} ,  {@code PrepareResourceParameterizationAction}  and
  * {@code WireModelAction}  depend on parameters.
  */
+
+@CompileStatic
 public class PrepareParameterizationAction implements Action {
 
     private static Log LOG = LogFactory.getLog(PrepareParameterizationAction)

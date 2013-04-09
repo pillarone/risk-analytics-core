@@ -33,7 +33,7 @@ import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.6-RC-8-kti"
+    def version = "1.6.1-RC-1"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.7 > *"
     // the other plugins this plugin depends on
@@ -110,10 +110,10 @@ Persistence & Simulation engine.
             }
             gridGainHome = gridgainHomeDefault
             collisionSpi = ref("collisionSpi")
-            marshaller = ref("marshaller")
+            marshaller = ref("jbossMarshaller")
 
         }
-        marshaller(org.gridgain.grid.marshaller.optimized.GridOptimizedMarshaller) { }
+        jbossMarshaller(GridJBossMarshaller) { }
         collisionSpi(GridFifoQueueCollisionSpi) {
             parallelJobsNumber = ConfigurationHolder.config.containsKey("numberOfParallelJobsPerNode") ?
                 ConfigurationHolder.config."numberOfParallelJobsPerNode" : 100

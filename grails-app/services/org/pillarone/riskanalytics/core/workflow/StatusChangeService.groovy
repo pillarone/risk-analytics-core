@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.workflow
 
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.commons.ApplicationHolder
@@ -161,6 +162,7 @@ class StatusChangeService {
     }
 }
 
+@CompileStatic
 class WorkflowException extends RuntimeException {
 
     public WorkflowException(String itemName, Status to, String cause) {

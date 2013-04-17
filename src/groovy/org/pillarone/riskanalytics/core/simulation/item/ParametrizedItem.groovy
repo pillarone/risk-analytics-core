@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
+import groovy.transform.TypeChecked
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.parameter.Parameter
@@ -12,6 +13,7 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Commen
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.components.ComponentUtils
 
+@TypeChecked
 abstract class ParametrizedItem extends CommentableItem {
 
     protected static Log LOG = LogFactory.getLog(ParametrizedItem)
@@ -38,7 +40,7 @@ abstract class ParametrizedItem extends CommentableItem {
                     }
                     addParameter(ParameterHolderFactory.getHolder([basePath, fieldName].join(":"), i, value))
                 }
-            } else if(fieldName.startsWith("sub")) {
+            } else if (fieldName.startsWith("sub")) {
                 internalAddComponent([basePath, fieldName].join(":"), value as Component)
             }
         }
@@ -47,7 +49,7 @@ abstract class ParametrizedItem extends CommentableItem {
     void copyComponent(String oldPath, String newPath, Component component, boolean copyComments) {
         ParameterHolderFactory.duplicateParameters(this, oldPath, newPath)
         if (copyComments) {
-            for (Comment comment in comments.findAll { it.path.contains(oldPath) }) {
+            for (Comment comment in comments.findAll { Comment it -> it.path.contains(oldPath) }) {
                 Comment clone = comment.clone()
                 clone.path = clone.path.replace(oldPath, newPath)
                 addComment(clone)
@@ -58,7 +60,7 @@ abstract class ParametrizedItem extends CommentableItem {
 
     void renameComponent(String oldPath, String newPath, Component newComponent) {
         List<String> changedPaths = ParameterHolderFactory.renamePathOfParameter(this, oldPath, newPath, newComponent)
-        for (Comment comment in comments.findAll { it.path.contains(oldPath) }) {
+        for (Comment comment in comments.findAll { Comment it -> it.path.contains(oldPath) }) {
             Comment clone = comment.clone()
             clone.path = clone.path.replace(oldPath, newPath)
             addComment(clone)
@@ -70,12 +72,12 @@ abstract class ParametrizedItem extends CommentableItem {
     }
 
     void removeComponent(String path) {
-        Model model = getModelClass().newInstance()
+        Model model = (Model) getModelClass().newInstance()
         String pathWithoutModel = ComponentUtils.removeModelFromPath(path, model)
-        for (ParameterHolder holder in getAllParameterHolders().findAll { it.path.startsWith(pathWithoutModel) }) {
+        for (ParameterHolder holder in getAllParameterHolders().findAll { ParameterHolder it -> it.path.startsWith(pathWithoutModel) }) {
             removeParameter(holder)
         }
-        for (Comment comment in comments.findAll { it.path.startsWith(path) }) {
+        for (Comment comment in comments.findAll { Comment it -> it.path.startsWith(path) }) {
             removeComment(comment)
         }
         fireComponentRemoved(pathWithoutModel)
@@ -90,29 +92,37 @@ abstract class ParametrizedItem extends CommentableItem {
     }
 
     protected fireComponentAdded(String path, Component component) {
-        listeners*.componentAdded(path, component)
+        for (IParametrizedItemListener listener in listeners) {
+            listener.componentAdded(path, component)
+        }
     }
 
     protected fireValuesChanged(List<String> paths) {
-        listeners*.parameterValuesChanged(paths)
+        for (IParametrizedItemListener listener in listeners) {
+            listener.parameterValuesChanged(paths)
+        }
     }
 
     protected fireClassifierChanged(String path) {
-        listeners*.classifierChanged(path)
+        for (IParametrizedItemListener listener in listeners) {
+            listener.classifierChanged(path)
+        }
     }
 
     protected fireComponentRemoved(String path) {
-        listeners*.componentRemoved(path)
+        for (IParametrizedItemListener listener in listeners) {
+            listener.componentRemoved(path)
+        }
     }
 
     abstract Integer getPeriodCount()
 
     protected void loadParameters(List<ParameterHolder> parameterHolders, Collection<Parameter> parameters) {
-        List<ParameterHolder> existingHolders = parameterHolders.clone()
+        List<ParameterHolder> existingHolders = (List<ParameterHolder>) parameterHolders.clone()
         parameterHolders.clear()
 
         for (Parameter p in parameters) {
-            final ParameterHolder existingParameterHolder = existingHolders.find { it.path == p.path && it.periodIndex == p.periodIndex}
+            final ParameterHolder existingParameterHolder = existingHolders.find { ParameterHolder it -> it.path == p.path && it.periodIndex == p.periodIndex }
             if (existingParameterHolder != null) {
                 existingParameterHolder.setParameter(p)
                 parameterHolders << existingParameterHolder
@@ -128,7 +138,7 @@ abstract class ParametrizedItem extends CommentableItem {
             ParameterHolder parameterHolder = iterator.next()
             if (parameterHolder.hasParameterChanged()) {
                 LOG.debug("Parameter ${parameterHolder.path} P${parameterHolder.periodIndex} is marked as changed and will be updated.")
-                Parameter parameter = parameters.find { it.path == parameterHolder.path && it.periodIndex == parameterHolder.periodIndex }
+                Parameter parameter = parameters.find { Parameter it -> it.path == parameterHolder.path && it.periodIndex == parameterHolder.periodIndex }
                 parameterHolder.applyToDomainObject(parameter)
                 clearModifiedFlag(parameterHolder)
             } else if (parameterHolder.added) {
@@ -139,7 +149,7 @@ abstract class ParametrizedItem extends CommentableItem {
                 parameterHolder.added = false
             } else if (parameterHolder.removed) {
                 LOG.debug("Parameter ${parameterHolder.path} P${parameterHolder.periodIndex} is marked as deleted and will be removed.")
-                Parameter parameter = parameters.find { it.path == parameterHolder.path && it.periodIndex == parameterHolder.periodIndex }
+                Parameter parameter = parameters.find { Parameter it -> it.path == parameterHolder.path && it.periodIndex == parameterHolder.periodIndex }
                 removeFromDao(parameter, dao)
                 parameter.delete()
                 iterator.remove()
@@ -163,14 +173,14 @@ abstract class ParametrizedItem extends CommentableItem {
         int nestedIndex = path.indexOf(":", parmIndex + 1)
         boolean isNested = nestedIndex > -1
         if (!isNested) {
-            ParameterHolder parameterHolder = getAllParameterHolders().find { it.path == path && it.periodIndex == periodIndex}
+            ParameterHolder parameterHolder = getAllParameterHolders().find { ParameterHolder it -> it.path == path && it.periodIndex == periodIndex }
             if (parameterHolder == null) {
                 throw new ParameterNotFoundException("Parameter $path does not exist for period $periodIndex")
             }
             return parameterHolder
         } else {
             String subPath = path.substring(0, nestedIndex)
-            ParameterHolder parameterHolder = getAllParameterHolders().find { it.path == subPath && it.periodIndex == periodIndex }
+            ParameterHolder parameterHolder = getAllParameterHolders().find { ParameterHolder it -> it.path == subPath && it.periodIndex == periodIndex }
             if (parameterHolder == null) {
                 throw new ParameterNotFoundException("Parameter $path does not exist for period $periodIndex (base path $subPath not found)")
             }
@@ -183,16 +193,16 @@ abstract class ParametrizedItem extends CommentableItem {
         int nestedIndex = path.indexOf(":", parmIndex + 1)
         boolean isNested = nestedIndex > -1
         if (!isNested) {
-            List<ParameterHolder> parameterHolder = getAllParameterHolders().findAll { it.path == path }
+            Collection<ParameterHolder> parameterHolder = getAllParameterHolders().findAll { ParameterHolder it -> it.path == path }
             if (parameterHolder.empty) {
                 throw new ParameterNotFoundException("Parameter $path does not exist")
             }
             return parameterHolder
         } else {
             String subPath = path.substring(0, nestedIndex)
-            List<ParameterHolder> parameterHolder = getAllParameterHolders().findAll { it.path == subPath }
+            Collection<ParameterHolder> parameterHolder = getAllParameterHolders().findAll { ParameterHolder it -> it.path == subPath }
             if (parameterHolder == null) {
-                throw new ParameterNotFoundException("Parameter $path does not exist for period $periodIndex (base path $subPath not found)")
+                throw new ParameterNotFoundException("Parameter $path does not exist (base path $subPath not found)")
             }
 
             List<ParameterHolder> result = []
@@ -224,11 +234,11 @@ abstract class ParametrizedItem extends CommentableItem {
         }
     }
 
-    protected ParameterHolder getNestedParameterHolder(ParameterObjectParameterHolder baseParameter, String[] pathElements, int periodIndex) {
+    protected ParameterHolder getNestedParameterHolder(ParameterHolder baseParameter, String[] pathElements, int periodIndex) {
         ParameterHolder current = baseParameter
         for (String path in pathElements) {
             if (current instanceof ParameterObjectParameterHolder) {
-                current = current.classifierParameters.find { it.key == path}?.value
+                current = current.classifierParameters.entrySet().find { Map.Entry<String, ParameterHolder> it -> it.key == path }?.value
                 if (current == null) {
                     throw new ParameterNotFoundException("Element $path does not exist for period $periodIndex")
                 }
@@ -271,7 +281,7 @@ abstract class ParametrizedItem extends CommentableItem {
 
     protected void updateParameterValue(ParameterObjectParameterHolder holder, def newValue) {
         holder.setValue(newValue)
-        for (Comment comment in comments.findAll { it.path.startsWith(holder.path) }) {
+        for (Comment comment in comments.findAll { Comment it -> it.path.startsWith(holder.path) }) {
             removeComment(comment)
         }
         fireClassifierChanged(holder.path)

@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.item.parameter
 
+import groovy.transform.TypeChecked
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.components.ComponentUtils
@@ -14,6 +15,7 @@ import org.pillarone.riskanalytics.core.simulation.item.Resource
 import org.pillarone.riskanalytics.core.parameter.*
 import org.pillarone.riskanalytics.core.simulation.item.ParametrizedItem
 
+@TypeChecked
 class ParameterHolderFactory {
 
     public static ParameterHolder getHolder(String path, int periodIndex, ResourceHolder value) {
@@ -22,15 +24,19 @@ class ParameterHolderFactory {
         return new ResourceParameterHolder(path, periodIndex, resource)
     }
 
-    public static ParameterHolder getHolder(String path, int periodIndex, int value) {
+    public static ParameterHolder getHolder(String path, int periodIndex, Integer value) {
         return new IntegerParameterHolder(path, periodIndex, value)
     }
 
-    public static ParameterHolder getHolder(String path, int periodIndex, double value) {
+    public static ParameterHolder getHolder(String path, int periodIndex, Double value) {
         return new DoubleParameterHolder(path, periodIndex, value)
     }
 
-    public static ParameterHolder getHolder(String path, int periodIndex, boolean value) {
+    public static ParameterHolder getHolder(String path, int periodIndex, BigDecimal value) {
+        return getHolder(path, periodIndex, value.doubleValue())
+    }
+
+    public static ParameterHolder getHolder(String path, int periodIndex, Boolean value) {
         return new BooleanParameterHolder(path, periodIndex, value)
     }
 
@@ -56,6 +62,10 @@ class ParameterHolderFactory {
 
     public static ParameterHolder getHolder(String path, int periodIndex, AbstractMultiDimensionalParameter value) {
         return new MultiDimensionalParameterHolder(path, periodIndex, value.clone())
+    }
+
+    public static ParameterHolder getHolder(String path, int periodIndex, def value) {
+        throw new IllegalArgumentException("Unknown parameter type ${value?.class?.name}")
     }
 
     public static ParameterHolder getHolder(Parameter parameter) {
@@ -134,7 +144,7 @@ class ParameterHolderFactory {
      * If the new path can be found within the configurations already, the method throws an exception to prevent an invalid state.
      */
     public static List<String> renamePathOfParameter(ParametrizedItem parameterization, String oldPath, String newPath, Component renamedComponent) {
-        parameterization.getAllParameterHolders().each {
+        parameterization.getAllParameterHolders().each { ParameterHolder it ->
             if (it.path.startsWith(newPath)){
                 throw new NonUniqueComponentNameException("A component with the name ${renamedComponent.name} already exists in this dynamic composed component")
             }
@@ -157,7 +167,7 @@ class ParameterHolderFactory {
 
     private static ParameterHolder internalRenamePathOfParameter(ParameterHolder parameterHolder, List<ParameterHolder> removedParameters,
                                                          List<ParameterHolder> clonedParameters, String oldPath, String newPath, boolean isNested) {
-        ParameterHolder cloned = parameterHolder.clone()
+        ParameterHolder cloned = (ParameterHolder) parameterHolder.clone()
         cloned.path = cloned.path.replace(oldPath, newPath)
         if (!isNested) {
             removedParameters << parameterHolder
@@ -168,7 +178,7 @@ class ParameterHolderFactory {
             cloned.getClassifierParameters().clear()
             for (Map.Entry<String, ParameterHolder> nestedParameterHolder : ((ParameterObjectParameterHolder) parameterHolder).getClassifierParameters().entrySet()) {
                 ParameterHolder clonedNested = internalRenamePathOfParameter(nestedParameterHolder.value, removedParameters, clonedParameters, oldPath, newPath, true)
-                cloned.getClassifierParameters().putAt(nestedParameterHolder.key, clonedNested)
+                cloned.getClassifierParameters().put(nestedParameterHolder.key, clonedNested)
             }
         }
         return cloned
@@ -193,10 +203,11 @@ class ParameterHolderFactory {
         for (ParameterHolder parameterHolder : markerParameterHolders) {
             if (!parameterHolder.removed) {
                 for (Class markerClass in markerInterfaces) {
-
-                    List<String> paths = parameterHolder.updateReferenceValues(markerClass, oldComponentName, newComponentName)
-                    if (paths.size() > 0) {
-                        referencingPaths.addAll paths
+                    if (parameterHolder instanceof IMarkerValueAccessor) {
+                        List<String> paths = (parameterHolder as IMarkerValueAccessor).updateReferenceValues(markerClass, oldComponentName, newComponentName)
+                        if (paths.size() > 0) {
+                            referencingPaths.addAll paths
+                        }
                     }
                 }
             }
@@ -220,9 +231,11 @@ class ParameterHolderFactory {
         for (ParameterHolder parameterHolder : markerParameterHolders) {
             if (!parameterHolder.removed) {
                 for (Class markerClass in markerInterfaces) {
-                    List<String> paths = parameterHolder.referencePaths(markerClass, componentName)
-                    if (paths.size() > 0) {
-                        referencingPaths.addAll paths
+                    if (parameterHolder instanceof IMarkerValueAccessor) {
+                        List<String> paths = (parameterHolder as IMarkerValueAccessor).referencePaths(markerClass, componentName)
+                        if (paths.size() > 0) {
+                            referencingPaths.addAll paths
+                        }
                     }
                 }
             }
@@ -261,7 +274,7 @@ class ParameterHolderFactory {
         List clonedParameters = []
         parameterization.getAllParameterHolders().each {ParameterHolder parameterHolder ->
             if (parameterHolder.path.startsWith(oldPath + ":")) {
-                ParameterHolder cloned = parameterHolder.clone()
+                ParameterHolder cloned = (ParameterHolder) parameterHolder.clone()
                 renamePath(cloned, oldPath, newPath)
                 clonedParameters << cloned
             }
@@ -276,7 +289,7 @@ class ParameterHolderFactory {
     }
 
     private static void renamePath(ParameterObjectParameterHolder holder, String oldPath, String newPath) {
-        holder.path = holder.path.replace("${oldPath}", "${newPath}")
+        holder.path = holder.path.replace("${oldPath}".toString(), "${newPath}".toString())
         for (ParameterHolder param in holder.classifierParameters.values()) {
             renamePath(param, oldPath, newPath)
         }

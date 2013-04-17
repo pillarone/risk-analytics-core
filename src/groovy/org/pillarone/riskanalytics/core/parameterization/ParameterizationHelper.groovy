@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.parameterization
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
 import org.pillarone.riskanalytics.core.model.Model
@@ -21,26 +22,28 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjec
 
 public class ParameterizationHelper {
 
-    static Parameterization createDefaultParameterization(Model model, int periodCount = 1) {
+    @CompileStatic
+    public static Parameterization createDefaultParameterization(Model model, int periodCount = 1) {
         Parameterization result = new Parameterization(model.class.simpleName - "Model" + "-Default")
         result.modelClass = model.class
-        periodCount.times { index ->
+        periodCount.times { int index ->
             model.init()
-            List parameterList = extractParameterHoldersFromModel(model, index)
-            parameterList.each {
-                result.addParameter(it)
+            List<ParameterHolder> parameterList = extractParameterHoldersFromModel(model, index)
+            for (ParameterHolder holder in parameterList) {
+                result.addParameter(holder)
             }
         }
         result.periodCount = periodCount
         return result
     }
 
-    static Resource createDefaultResource(String name, IResource resource) {
+    @CompileStatic
+    public static Resource createDefaultResource(String name, IResource resource) {
         Resource result = new Resource(name, resource.class)
 
-        List parameterList = extractParameterHoldersFromResource(resource)
-        parameterList.each {
-            result.addParameter(it)
+        List<ParameterHolder> parameterList = extractParameterHoldersFromResource(resource)
+        for (ParameterHolder holder in parameterList) {
+            result.addParameter(holder)
         }
         return result
     }
@@ -167,11 +170,12 @@ public class ParameterizationHelper {
     }
 
     //PMO-2371 do not copy parameters that are marked as 'removed'
-    static List copyParameters(List parameters) {
-        List result = []
-        parameters.each {
-            if (!it.removed) {
-                result << it.clone()
+    @CompileStatic
+    public static List<ParameterHolder> copyParameters(List<ParameterHolder> parameters) {
+        List<ParameterHolder> result = []
+        for (ParameterHolder parameterHolder in parameters) {
+            if (!parameterHolder.removed) {
+                result << (ParameterHolder) parameterHolder.clone()
             }
         }
         return result

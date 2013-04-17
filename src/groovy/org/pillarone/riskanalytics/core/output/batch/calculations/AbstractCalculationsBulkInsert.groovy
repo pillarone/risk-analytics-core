@@ -9,7 +9,7 @@ abstract class AbstractCalculationsBulkInsert extends AbstractBulkInsert {
     @CompileStatic
     void addResults(int period, String keyFigure, Double keyFigureParameter, long path, long field, long collector, Double value) {
         List values = []
-        values << simulationRun.id
+        values << simulationRunId
         values << period
         values << path
         values << field

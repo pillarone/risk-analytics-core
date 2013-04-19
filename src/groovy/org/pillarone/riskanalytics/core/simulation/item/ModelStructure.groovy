@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.commons.ApplicationHolder
@@ -12,18 +13,22 @@ import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 public class ModelStructure extends ConfigObjectBasedModellingItem {
     protected static final Log LOG = LogFactory.getLog(ModelStructure)
 
+    @CompileStatic
     public ModelStructure(String name) {
         super(name)
     }
 
+    @CompileStatic
     protected Object createDao() {
         return new ModelStructureDAO();
     }
 
+    @CompileStatic
     public Object getDaoClass() {
         ModelStructureDAO
     }
 
+    @CompileStatic
     public IConfigObjectWriter getWriter() {
         return new ModelStructureWriter();
     }

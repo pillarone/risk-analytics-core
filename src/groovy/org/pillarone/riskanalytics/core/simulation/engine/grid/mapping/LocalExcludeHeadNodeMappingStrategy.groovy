@@ -1,9 +1,10 @@
 package org.pillarone.riskanalytics.core.simulation.engine.grid.mapping
 
+import groovy.transform.CompileStatic
 import org.gridgain.grid.GridNode
 import org.gridgain.grid.GridRichNode
 
-
+@CompileStatic
 class LocalExcludeHeadNodeMappingStrategy extends LocalNodesStrategy {
 
     @Override

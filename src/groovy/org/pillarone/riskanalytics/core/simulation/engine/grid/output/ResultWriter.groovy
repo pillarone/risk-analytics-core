@@ -1,11 +1,11 @@
 package org.pillarone.riskanalytics.core.simulation.engine.grid.output
 
-
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.pillarone.riskanalytics.core.FileConstants
 import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper
 
+@CompileStatic
 class ResultWriter {
 
     private String simulationRunPath;
@@ -40,7 +40,9 @@ class ResultWriter {
     }
 
     void close() {
-        streamCache.values()*.close()
+        for(FileOutputStream stream in streamCache.values()) {
+            stream.close()
+        }
     }
 
 }

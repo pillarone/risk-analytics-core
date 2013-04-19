@@ -1,5 +1,6 @@
-package org.pillarone.riskanalytics.core.simulation.engine;
+package org.pillarone.riskanalytics.core.simulation.engine
 
+import grails.util.Holders;
 import org.pillarone.riskanalytics.core.output.CollectorMapping;
 import org.pillarone.riskanalytics.core.output.FieldMapping;
 
@@ -28,7 +29,7 @@ public class MappingCache implements Serializable {
     private boolean initialized = false
 
     public static MappingCache getInstance() {
-        MappingCache cache = ApplicationHolder.application.mainContext.getBean(MappingCache)
+        MappingCache cache = Holders.applicationContext.getBean(MappingCache)
         cache.initCache()
         return cache
     }

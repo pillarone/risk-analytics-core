@@ -1,8 +1,11 @@
 package org.pillarone.riskanalytics.core.parameterization
 
+import groovy.transform.CompileStatic
+
 /**
  * @author fouad.jaada@intuitive-collaboration.com
  */
+@CompileStatic
 class SimpleConstraint implements IMultiDimensionalConstraints {
 
     public static final String IDENTIFIER = "SIMPLE_CONSTRAINT"

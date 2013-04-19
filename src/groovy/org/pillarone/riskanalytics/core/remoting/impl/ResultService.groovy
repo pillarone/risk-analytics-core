@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.remoting.impl
 
+import groovy.transform.CompileStatic
+
 import java.text.SimpleDateFormat
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.dataaccess.ResultAccessor
@@ -83,7 +85,7 @@ class ResultService implements IResultService {
                                     singleValueResult.getDate())
                         }
                     }
-                    if(values.size() != 0) {
+                    if (values.size() != 0) {
                         info.values = values
                         result << info
                     }
@@ -133,6 +135,7 @@ class ResultService implements IResultService {
         return paths
     }
 
+    @CompileStatic
     boolean regExIsUsed(List<String> paths) {
         for (String searchedPath : paths) {
             if (searchedPath.indexOf("(.*)") != -1) {

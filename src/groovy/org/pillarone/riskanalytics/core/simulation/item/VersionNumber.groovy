@@ -1,20 +1,23 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.ResourceDAO
 
 class VersionNumber implements Comparable, Cloneable, Serializable {
 
     private static final long serialVersionUID = -1640758346987125721L;
 
-    List versionNumbers
+    List<Integer> versionNumbers
     boolean workflow = false
 
+    @CompileStatic
     public VersionNumber(String version) {
         parse(version)
     }
 
+    @CompileStatic
     private void parse(String versionString) {
-        List list = new LinkedList<Integer>()
+        List<Integer> list = new LinkedList<Integer>()
         int from = 0
         if (versionString.startsWith("R")) {
             workflow = true
@@ -76,10 +79,12 @@ class VersionNumber implements Comparable, Cloneable, Serializable {
         return allVersions.sort()[-1]
     }
 
+    @CompileStatic
     int getLevel() {
         versionNumbers.size()
     }
 
+    @CompileStatic
     boolean isDirectChildVersionOf(VersionNumber versionNumber) {
         if (versionNumbers.size() <= versionNumber.versionNumbers.size()) {
             return false
@@ -97,7 +102,7 @@ class VersionNumber implements Comparable, Cloneable, Serializable {
         }
     }
 
-
+    @CompileStatic
     String toString() {
         StringBuffer buffer = new StringBuffer(workflow ? "R" : "")
         for (Integer version in versionNumbers) {
@@ -107,10 +112,12 @@ class VersionNumber implements Comparable, Cloneable, Serializable {
         buffer.toString()
     }
 
+    @CompileStatic
     int hashCode() {
         return toString().hashCode()
     }
 
+    @CompileStatic
     boolean equals(Object obj) {
         if (obj instanceof VersionNumber) {
             return toString().equals(obj.toString())
@@ -119,28 +126,30 @@ class VersionNumber implements Comparable, Cloneable, Serializable {
         }
     }
 
+    @CompileStatic
     int compareTo(Object o) {
-        o = o as VersionNumber
+        VersionNumber vn = o as VersionNumber
         if (workflow) {
-            if (!o.workflow) {
+            if (!vn.workflow) {
                 return 1
             }
         } else {
-            if (o.workflow) {
+            if (vn.workflow) {
                 return -1
             }
         }
-        int size = versionNumbers.size() > o.versionNumbers.size() ? versionNumbers.size() : o.versionNumbers.size()
+        int size = versionNumbers.size() > vn.versionNumbers.size() ? versionNumbers.size() : vn.versionNumbers.size()
         for (int i = 0; i < size; i++) {
-            if (versionNumbers[i] != o.versionNumbers[i]) {
-                return versionNumbers[i] > o.versionNumbers[i] ? 1 : -1
+            if (versionNumbers[i] != vn.versionNumbers[i]) {
+                return versionNumbers[i] > vn.versionNumbers[i] ? 1 : -1
             }
         }
-        return versionNumbers.size() == o.versionNumbers.size() ? 0 : versionNumbers.size() > o.versionNumbers.size() ? 1 : -1
+        return versionNumbers.size() == vn.versionNumbers.size() ? 0 : versionNumbers.size() > vn.versionNumbers.size() ? 1 : -1
     }
 
+    @CompileStatic
     Object clone() {
-        VersionNumber newObject = super.clone();
+        VersionNumber newObject = (VersionNumber) super.clone();
         newObject.versionNumbers = new LinkedList()
         versionNumbers.each {Integer it ->
             newObject.versionNumbers << new Integer(it.intValue())
@@ -148,6 +157,7 @@ class VersionNumber implements Comparable, Cloneable, Serializable {
         newObject
     }
 
+    @CompileStatic
     private void addSubversion() {
         versionNumbers.add(1)
     }

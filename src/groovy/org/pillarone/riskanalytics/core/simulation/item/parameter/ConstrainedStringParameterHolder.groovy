@@ -1,18 +1,20 @@
 package org.pillarone.riskanalytics.core.simulation.item.parameter
 
+import groovy.transform.CompileStatic
+import org.pillarone.riskanalytics.core.parameter.ConstrainedStringParameter
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameterization.ConstrainedString
-import org.pillarone.riskanalytics.core.parameter.ConstrainedStringParameter
-import org.pillarone.riskanalytics.core.components.ComponentUtils
 
 class ConstrainedStringParameterHolder extends ParameterHolder implements IMarkerValueAccessor {
 
     private ConstrainedString value;
 
+    @CompileStatic
     public ConstrainedStringParameterHolder(Parameter parameter) {
         super(parameter);
     }
 
+    @CompileStatic
     public ConstrainedStringParameterHolder(String path, int periodIndex, ConstrainedString value) {
         super(path, periodIndex);
         this.value = value;
@@ -23,6 +25,7 @@ class ConstrainedStringParameterHolder extends ParameterHolder implements IMarke
         this.value = new ConstrainedString(getClass().getClassLoader().loadClass(parameter.markerClass), parameter.parameterValue)
     }
 
+    @CompileStatic
     ConstrainedString getBusinessObject() {
         return value;
     }
@@ -32,14 +35,17 @@ class ConstrainedStringParameterHolder extends ParameterHolder implements IMarke
         parameter.parameterValue = value.stringValue
     }
 
+    @CompileStatic
     Parameter createEmptyParameter() {
         return new ConstrainedStringParameter(path: path, periodIndex: periodIndex)
     }
 
+    @CompileStatic
     protected void updateValue(Object newValue) {
         value.stringValue = newValue.toString()
     }
 
+    @CompileStatic
     public ConstrainedStringParameterHolder clone() {
         ConstrainedStringParameterHolder holder = (ConstrainedStringParameterHolder) super.clone();
         //don't call setValue here!
@@ -48,10 +54,12 @@ class ConstrainedStringParameterHolder extends ParameterHolder implements IMarke
     }
 
     @Override
+    @CompileStatic
     void clearCachedValues() {
         value.selectedComponent = null
     }
 
+    @CompileStatic
     List<String> referencePaths(Class markerInterface, String refValue) {
         List<String> paths = new ArrayList()
         if (markerInterface.is(value.markerClass) && value.stringValue == refValue) {
@@ -60,6 +68,7 @@ class ConstrainedStringParameterHolder extends ParameterHolder implements IMarke
         return paths
     }
 
+    @CompileStatic
     List<String> updateReferenceValues(Class markerInterface, String oldValue, String newValue) {
         List<String> paths = referencePaths(markerInterface, oldValue)
         if (paths) {

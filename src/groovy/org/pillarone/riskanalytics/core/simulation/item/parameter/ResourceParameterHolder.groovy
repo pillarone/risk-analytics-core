@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.item.parameter
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.ResourceParameter
 import org.pillarone.riskanalytics.core.simulation.item.Resource
@@ -12,10 +13,12 @@ class ResourceParameterHolder extends ParameterHolder {
     Class resourceClass
 
 
+    @CompileStatic
     ResourceParameterHolder(Parameter parameter) {
         super(parameter)
     }
 
+    @CompileStatic
     ResourceParameterHolder(String path, int periodIndex, Resource resource) {
         super(path, periodIndex)
         name = resource.name
@@ -38,6 +41,7 @@ class ResourceParameterHolder extends ParameterHolder {
     }
 
     @Override
+    @CompileStatic
     Object getBusinessObject() {
         Resource resource = new Resource(name,resourceClass)
         if (version != null) {
@@ -47,6 +51,7 @@ class ResourceParameterHolder extends ParameterHolder {
     }
 
     @Override
+    @CompileStatic
     protected void updateValue(Object newValue) {
         NameVersionPair pair = newValue as NameVersionPair
         name = pair.name
@@ -54,10 +59,12 @@ class ResourceParameterHolder extends ParameterHolder {
     }
 
     @Override
+    @CompileStatic
     Parameter createEmptyParameter() {
         return new ResourceParameter(path: path, periodIndex: periodIndex)
     }
 
+    @CompileStatic
     public static class NameVersionPair {
         String name
         String version

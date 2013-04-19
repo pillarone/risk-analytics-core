@@ -63,7 +63,7 @@ class ModelRegistry {
         }
     }
 
-    Class getModelClass(String className) {
+    Class getModelClass(String className) throws ClassNotFoundException {
         Class modelClass = modelClasses.find { it.name == className }
         if (modelClass == null) {
             modelClass = Thread.currentThread().contextClassLoader.loadClass(className)

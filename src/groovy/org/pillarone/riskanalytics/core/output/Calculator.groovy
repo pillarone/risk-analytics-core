@@ -59,7 +59,8 @@ class Calculator {
 
         long now = System.currentTimeMillis()
         BigDecimal timeForOneKeyFigure = (now - startTime) / completedCalculations
-        return new DateTime(now + (totalCalculations - completedCalculations) * timeForOneKeyFigure)
+        long estimatedEndTime = (now + (totalCalculations - completedCalculations) * timeForOneKeyFigure).toLong()
+        return new DateTime(estimatedEndTime)
     }
 
     @CompileStatic

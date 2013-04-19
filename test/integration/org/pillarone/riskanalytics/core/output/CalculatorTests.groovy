@@ -73,6 +73,17 @@ class CalculatorTests extends GroovyTestCase {
 
     }
 
+    void testEstimatedEnd() {
+        Simulation simulation = new Simulation(run.name)
+        simulation.load()
+
+        Calculator calculator = new Calculator(simulation)
+        calculator.startTime = System.currentTimeMillis() - 1000
+        calculator.completedCalculations = 1
+
+        calculator.getEstimatedEnd()
+    }
+
     private void writeResult(SingleValueResult result) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(bos);

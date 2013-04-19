@@ -1,12 +1,11 @@
 package org.pillarone.riskanalytics.core.util
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
-
+import grails.util.Holders
 
 abstract class Configuration {
 
     public static boolean getBoolean(String key, boolean defaultValue) {
-        ConfigObject config = ConfigurationHolder.config
+        ConfigObject config = Holders.config
         if (config != null) {
             if(config.containsKey(key)) {
                 def value = config[key]

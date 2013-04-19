@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation
 
+import groovy.transform.CompileStatic
 import org.joda.time.DateTime
 
 import org.joda.time.Period
@@ -7,6 +8,7 @@ import org.joda.time.Period
 /**
  * A period counter which is backed by a list of dates. The last date defines the day following the end of the last period.
  */
+@CompileStatic
 class VariableLengthPeriodCounter extends ValuationDatePeriodCounter {
 
     Boolean annualPeriodsOnly

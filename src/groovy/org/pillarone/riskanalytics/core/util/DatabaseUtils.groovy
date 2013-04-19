@@ -1,11 +1,11 @@
 package org.pillarone.riskanalytics.core.util
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 
 abstract class DatabaseUtils {
 
     public static boolean isOracleDatabase() {
-        def url = ConfigurationHolder.config?.dataSource?.url
+        def url = Holders.config?.dataSource?.url
         if (url instanceof String) {
             return url.contains("oracle")
         }
@@ -13,7 +13,7 @@ abstract class DatabaseUtils {
     }
 
     public static boolean isMsSqlDatabase() {
-        def url = ConfigurationHolder.config?.dataSource?.url
+        def url = Holders.config?.dataSource?.url
         if (url instanceof String) {
             return url.contains("jtds")
         }
@@ -21,7 +21,7 @@ abstract class DatabaseUtils {
     }
 
     public static boolean isMySqlDatabase() {
-        def url = ConfigurationHolder.config?.dataSource?.url
+        def url = Holders.config?.dataSource?.url
         if (url instanceof String) {
             return url.contains("mysql")
         }

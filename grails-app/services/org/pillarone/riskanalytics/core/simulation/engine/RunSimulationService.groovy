@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
+import grails.util.Holders
+import groovy.transform.CompileStatic
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.gridgain.grid.Grid
 
@@ -18,8 +20,9 @@ public class RunSimulationService {
     def backgroundService
     Grid grid
 
+    @CompileStatic
     public static RunSimulationService getService() {
-        return ApplicationHolder.getApplication().getMainContext().getBean('runSimulationService')
+        return Holders.applicationContext.getBean(RunSimulationService)
     }
 
     /**
@@ -43,6 +46,7 @@ public class RunSimulationService {
      * @param configuration the simulation details
      * @return the result of the grid gain task
      */
+    @CompileStatic
     public SimulationHandler runSimulationOnGrid(SimulationConfiguration configuration, ResultConfiguration resultConfiguration) {
         configuration.createMappingCache(resultConfiguration)
         configuration.prepareSimulationForGrid()

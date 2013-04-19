@@ -1,6 +1,6 @@
 package org.pillarone.riskanalytics.core.components
 
-import org.pillarone.riskanalytics.core.components.PeriodStore
+import groovy.transform.CompileStatic
 
 /**
  *  This class provides convenience functions for a period store:<br>
@@ -8,6 +8,7 @@ import org.pillarone.riskanalytics.core.components.PeriodStore
  *
  * @author stefan.kunz (at) intuitive-collaboration (dot) com
  */
+@CompileStatic
 public class PeriodStoreUtilities {
 
     static Object getSumOfFutureObjects(PeriodStore store, String key, boolean includeCurrentPeriodObject = true) {

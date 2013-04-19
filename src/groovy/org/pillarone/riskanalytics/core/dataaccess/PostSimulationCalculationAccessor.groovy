@@ -4,7 +4,7 @@ import org.pillarone.riskanalytics.core.output.*
 
 class PostSimulationCalculationAccessor {
 
-    static def getResult(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName, String keyFigure) {
+    static PostSimulationCalculation getResult(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName, String keyFigure) {
         PathMapping path = PathMapping.findByPathName(pathName)
         FieldMapping field = FieldMapping.findByFieldName(fieldName)
         CollectorMapping collector = CollectorMapping.findByCollectorName(collectorName)
@@ -33,7 +33,7 @@ class PostSimulationCalculationAccessor {
         return valuesMap
     }
 
-    static def getResult(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName, String keyFigure, def keyFigureParameter) {
+    static PostSimulationCalculation getResult(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName, String keyFigure, def keyFigureParameter) {
         if (keyFigureParameter == null) {
             return getResult(simulationRun, periodIndex, pathName, collectorName, fieldName, keyFigure)
         } else {

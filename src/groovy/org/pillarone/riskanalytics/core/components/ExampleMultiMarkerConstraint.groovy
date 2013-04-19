@@ -1,10 +1,11 @@
 package org.pillarone.riskanalytics.core.components
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.example.marker.ITest2ComponentMarker
 import org.pillarone.riskanalytics.core.example.marker.ITestComponentMarker
 import org.pillarone.riskanalytics.core.parameterization.IMultiDimensionalConstraints
 
-
+@CompileStatic
 class ExampleMultiMarkerConstraint implements IMultiDimensionalConstraints {
 
     public static final String NAME = "ExampleMultiMarkerConstraint"

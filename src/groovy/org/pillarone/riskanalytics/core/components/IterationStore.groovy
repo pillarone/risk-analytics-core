@@ -1,5 +1,6 @@
-package org.pillarone.riskanalytics.core.components;
+package org.pillarone.riskanalytics.core.components
 
+import groovy.transform.CompileStatic;
 import org.pillarone.riskanalytics.core.simulation.engine.IterationScope;
 import org.pillarone.riskanalytics.core.simulation.engine.PeriodScope;
 
@@ -22,6 +23,7 @@ import org.pillarone.riskanalytics.core.simulation.engine.PeriodScope;
  *
  *  @author stefan.kunz (at) intuitive-collaboration (dot) com
  */
+@CompileStatic
 public class IterationStore extends AbstractStore {
 
     /** is used to keep period information in sync.      */

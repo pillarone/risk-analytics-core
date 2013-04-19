@@ -19,7 +19,7 @@ public class TestDBOutput implements ICollectorOutputStrategy {
         this.batchInsert = AbstractResultsBulkInsert.getBulkInsertInstance()
     }
 
-    public ICollectorOutputStrategy leftShift(List results) {
+    public ICollectorOutputStrategy leftShift(List<SingleValueResultPOJO> results) {
 
         if (batchInsert) {
             if (!batchInsert.isInitialized()) {

@@ -52,7 +52,7 @@ public abstract class AbstractResultsBulkInsert extends AbstractBulkInsert {
         return id;
     }
 
-    public static AbstractBulkInsert getBulkInsertInstance() {
+    public static AbstractResultsBulkInsert getBulkInsertInstance() {
         try {
             ConfigObject configObject = Holders.getGrailsApplication().getConfig();
             Class bulkClass = null;
@@ -62,7 +62,7 @@ public abstract class AbstractResultsBulkInsert extends AbstractBulkInsert {
             if (bulkClass == null) {
                 return new GenericBulkInsert();
             }
-            return (AbstractBulkInsert) AbstractBulkInsert.class.getClassLoader().loadClass(bulkClass.getName()).newInstance();
+            return (AbstractResultsBulkInsert) AbstractResultsBulkInsert.class.getClassLoader().loadClass(bulkClass.getName()).newInstance();
         } catch (Exception e) {
             return new GenericBulkInsert();
         }

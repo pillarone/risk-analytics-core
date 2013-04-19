@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.output
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.RiskAnalyticsInconsistencyException
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.model.Model
@@ -55,6 +56,7 @@ public class PacketCollector extends Component {
         this.mode.packetCollector = this
     }
 
+    @CompileStatic
     protected void doCalculation() {
         if (inPackets.empty) {return}
         outputStrategy << mode.collect(inPackets, runtimeSanityChecks)

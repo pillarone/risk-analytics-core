@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.output
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
 import org.pillarone.riskanalytics.core.model.Model
@@ -16,6 +17,8 @@ import org.pillarone.riskanalytics.core.util.GroovyUtils
  * wildcard element is substituted for all subComponents.
  *
  */
+
+@CompileStatic
 public class CollectorFactory {
 
     private final ICollectorOutputStrategy outputStrategy
@@ -32,7 +35,7 @@ public class CollectorFactory {
      * subComponents initialized.
      */
     public List createCollectors(ResultConfiguration resultConfiguration, Model model) {
-        return enhanceCollectorInformationSet(resultConfiguration.collectors, model).collect {
+        return enhanceCollectorInformationSet(resultConfiguration.collectors, model).collect { PacketCollector it ->
             createCollector(it)
         }
     }
@@ -47,19 +50,19 @@ public class CollectorFactory {
     }
 
 
-    protected List enhanceCollectorInformationSet(List collectorInformations, Model model) {
-        LinkedList enhancedCollectorInormation = new LinkedList()
-        collectorInformations.each {PacketCollector collectorInformation ->
+    protected List<PacketCollector> enhanceCollectorInformationSet(List collectorInformations, Model model) {
+        List<PacketCollector> enhancedCollectorInormation = []
+        collectorInformations.each { PacketCollector collectorInformation ->
             def information = findOrCreateCollectorInformation(collectorInformation, model)
-            enhancedCollectorInormation += information
+            enhancedCollectorInormation.addAll(information)
         }
         return enhancedCollectorInormation
     }
 
-    protected def findOrCreateCollectorInformation(PacketCollector collectorInformation, Model model) {
-        def resultingCollectorInformation = collectorInformation
+    protected List<PacketCollector> findOrCreateCollectorInformation(PacketCollector collectorInformation, Model model) {
+        List<PacketCollector> resultingCollectorInformation = [collectorInformation]
 
-        String[] pathElements = collectorInformation.path.split("\\:")
+        List<String> pathElements = collectorInformation.path.split("\\:").toList()
 
         def component = model
 
@@ -71,7 +74,8 @@ public class CollectorFactory {
                     return resolveWildcardPath(component, collectorInformation, componentName)
                 } else {
                     Map pathToComponent = structureInformation.componentPaths.inverse()
-                    String path = pathElements[0..-2].join(":")
+                    List<String> elements = pathElements[0..-2]
+                    String path = elements.join(":")
                     if (pathToComponent.containsKey(path)) {
                         component = pathToComponent.get(path)
                     } else {
@@ -83,8 +87,8 @@ public class CollectorFactory {
         return resultingCollectorInformation
     }
 
-    private List resolveWildcardPath(DynamicComposedComponent component, PacketCollector collectorInformation, String wildCard) {
-        List result = []
+    private List<PacketCollector> resolveWildcardPath(DynamicComposedComponent component, PacketCollector collectorInformation, String wildCard) {
+        List<PacketCollector> result = []
         component.allSubComponents().each {Component subComponent ->
             String newPath = collectorInformation.path.replace(wildCard, subComponent.name)
             PacketCollector collector = new PacketCollector(CollectingModeFactory.getNewInstance(collectorInformation.mode))

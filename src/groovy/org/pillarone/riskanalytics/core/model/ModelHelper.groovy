@@ -1,13 +1,14 @@
 package org.pillarone.riskanalytics.core.model
 
+import com.google.common.collect.Multimap
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.MarkerInterfaceCollector
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
 import org.pillarone.riskanalytics.core.packets.PacketList
 import org.pillarone.riskanalytics.core.packets.Packet
 import org.pillarone.riskanalytics.core.components.IComponentMarker
-import org.pillarone.riskanalytics.core.components.ComposedComponent
 import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
 
 class ModelHelper {
@@ -81,13 +82,15 @@ class ModelHelper {
         String prefix = model.class.simpleName - "Model"
         Map<Class, List<String>> outputPathsByMarkerInterface = new HashMap<Class, List<String>>()
         Set<String> results = []
+
+        MarkerInterfaceCollector collector = new MarkerInterfaceCollector()
+        model.accept(collector)
         model.properties.each { String key, value ->
             if (value instanceof Component) {
-                results.addAll(internalGetAllPossibleOutputPaths(prefix + ":${key}", value, outputPathsByMarkerInterface, drillDownPaths))
+                results.addAll(internalGetAllPossibleOutputPaths(prefix + ":${key}", value, collector, outputPathsByMarkerInterface, drillDownPaths))
             }
         }
-        Map<Class, List<Component>> componentsByMarkerInterface = new HashMap<Class, List<Component>>()
-        collectComponentsByMarkerInterface(model.allComponents, componentsByMarkerInterface)
+        Multimap<Class, Component> componentsByMarkerInterface = collector.componentsByMarkerInterface()
         results.addAll getPossibleDrillDownOutputPaths(outputPathsByMarkerInterface, componentsByMarkerInterface)
         return injectStructure(results, ModelStructure.getStructureForModel(model.class))
     }
@@ -121,26 +124,28 @@ class ModelHelper {
     }
 
     private static Set<String> internalGetAllPossibleOutputPaths(String prefix, Component component,
-                                                         Map<Class, List<String>> outputPathsByMarkerInterface,
-                                                         List<String> drillDownPaths) {
+                                                                 MarkerInterfaceCollector markerInterfaceCollector,
+                                                                 Map<Class, List<String>> outputPathsByMarkerInterface,
+                                                                 List<String> drillDownPaths) {
         Set<String> results = []
         component.properties.each { String key, value ->
             if (key.startsWith("out")) {
                 String path = prefix + ":${key}"
                 results.add path
                 if ((drillDownPaths != null) && drillDownPaths.contains(path)) {
-                    findDrillDownCandidates component, path, outputPathsByMarkerInterface
+                    Set<Class> markerInterfaces = markerInterfaceCollector.getMarkerInterfaces(component)
+                    findDrillDownCandidates markerInterfaces, path, outputPathsByMarkerInterface
                 }
             } else if (value instanceof Component) {
-                results.addAll(internalGetAllPossibleOutputPaths(prefix + ":${key}", value, outputPathsByMarkerInterface, drillDownPaths))
+                results.addAll(internalGetAllPossibleOutputPaths(prefix + ":${key}", value, markerInterfaceCollector, outputPathsByMarkerInterface, drillDownPaths))
             }
         }
         return results
     }
 
-    private static void findDrillDownCandidates(Component component, String path,
+    private static void findDrillDownCandidates(Set<Class> componentMarkerInterfaces, String path,
                                                 Map<Class, List<String>> outputPathsByMarkerInterface) {
-        for (Class intf : getInterfaces(component)) {
+        for (Class intf : componentMarkerInterfaces) {
             if (IComponentMarker.isAssignableFrom(intf)) {
                 List components = outputPathsByMarkerInterface.get(intf)
                 if (components) {
@@ -153,46 +158,72 @@ class ModelHelper {
         }
     }
 
-    /**
-     * @param component
-     * @return interfaces of the component or of its sub component if it is a DynamicComposedComponent
-     */
-    private static List<Class> getInterfaces(Component component) {
-        if (component instanceof DynamicComposedComponent) {
-            Component subComponent = ((DynamicComposedComponent) component).createDefaultSubComponent()
-            return subComponent.class.interfaces
-        }
-        else {
-            return component.class.interfaces
-        }
-    }
+//    /**
+//     * @param component
+//     * @return interfaces of the component or of its sub component if it is a DynamicComposedComponent
+//     */
+//    private static List<Class> getInterfaces(Component component) {
+//        Set<Class> interfaces = []
+//        if (component instanceof DynamicComposedComponent) {
+//            Component subComponent = ((DynamicComposedComponent) component).createDefaultSubComponent()
+//            getInterfaces(subComponent.class, interfaces)
+//        }
+//        else if (component instanceof ComposedComponent) {
+//            getInterfaces(component.class, interfaces)
+//            for(Component subComponent in component.allSubComponents()) {
+//                getInterfaces(subComponent, interfaces)
+//            }
+//        }
+//        else {
+//            getInterfaces(component.class, interfaces)
+//        }
+//        List<Class> noneMarkerInterfaces = []
+//        for (Class intf : interfaces) {
+//            if (!IComponentMarker.isAssignableFrom(intf)) {
+//                noneMarkerInterfaces.add(intf)
+//            }
+//        }
+//        interfaces.removeAll(noneMarkerInterfaces)
+//        return interfaces.toList()
+//    }
+//
+//    private static void getInterfaces(Component component, Set<Class> interfaces) {
+//        interfaces.addAll getInterfaces(component)
+//    }
+//
+//    private static void getInterfaces(Class clazz, Set<Class> interfaces) {
+//        interfaces.addAll clazz.interfaces
+//        if (clazz.superclass != Component.class) {
+//            getInterfaces(clazz.superclass, interfaces)
+//        }
+//    }
 
     /**
      * @param components
      * @param componentsByMarkerInterface this map is filled by traversing all components including nested and checking
      *                                       for every component if it implements a marker interface
      */
-    public static void collectComponentsByMarkerInterface(List<Component> components,
-                                                              Map<Class, List<Component>> componentsByMarkerInterface) {
-        for (Component component : components) {
-            for (Class intf : getInterfaces(component)) {
-                if (IComponentMarker.isAssignableFrom(intf)) {
-                    List<Component> componentsWithMarkerInterface = componentsByMarkerInterface.get(intf)
-                    if (componentsWithMarkerInterface == null) {
-                        componentsWithMarkerInterface = new ArrayList<Component>()
-                        componentsByMarkerInterface.put(intf, componentsWithMarkerInterface)
-                    }
-                    componentsWithMarkerInterface.add(component)
-                }
-            }
-            if (component instanceof ComposedComponent) {
-                collectComponentsByMarkerInterface component.allSubComponents(), componentsByMarkerInterface
-            }
-        }
-    }
+//    public static void collectComponentsByMarkerInterface(List<Component> components,
+//                                                              Map<Class, List<Component>> componentsByMarkerInterface) {
+//        for (Component component : components) {
+//            for (Class intf : getInterfaces(component)) {
+//                if (IComponentMarker.isAssignableFrom(intf)) {
+//                    List<Component> componentsWithMarkerInterface = componentsByMarkerInterface.get(intf)
+//                    if (componentsWithMarkerInterface == null) {
+//                        componentsWithMarkerInterface = new ArrayList<Component>()
+//                        componentsByMarkerInterface.put(intf, componentsWithMarkerInterface)
+//                    }
+//                    componentsWithMarkerInterface.add(component)
+//                }
+//            }
+//            if (component instanceof ComposedComponent) {
+//                collectComponentsByMarkerInterface component.allSubComponents(), componentsByMarkerInterface
+//            }
+//        }
+//    }
 
     private static Set<String> getPossibleDrillDownOutputPaths(Map<Class, List<String>> outputPathsByMarkerInterface,
-                                                               Map<Class, List<Component>> componentsByMarkerInterface) {
+                                                               Multimap<Class, Component> componentsByMarkerInterface) {
         Set<String> results = []
         Class lobMarker = componentsByMarkerInterface.keySet().find { clazz -> clazz.name.contains(SEGMENT_MARKER) }
         Class perilMarker = componentsByMarkerInterface.keySet().find { clazz -> clazz.name.contains(PERIL_MARKER) }
@@ -248,7 +279,7 @@ class ModelHelper {
      * @param channel
      * @param results extended paths are added to this set
      */
-    private static extendedPaths(Map<Class, List<Component>> componentsByMarkerInterface, Class markerClass,
+    private static extendedPaths(Multimap<Class, Component> componentsByMarkerInterface, Class markerClass,
                                        String markerPath, String pathWithoutChannel, String channel, Set<String> results) {
         for (Component drillDownComponent: componentsByMarkerInterface.get(markerClass)) {
             extendedPath(drillDownComponent, new StringBuilder(pathWithoutChannel), markerPath, channel, results)
@@ -266,7 +297,7 @@ class ModelHelper {
         results.add(builder.toString())
     }
     
-    private static extendedPaths(Map<Class, List<Component>> componentsByMarkerInterface, Class markerClass1,
+    private static extendedPaths(Multimap<Class, Component> componentsByMarkerInterface, Class markerClass1,
                                        String markerPath1, Class markerClass2, String markerPath2, String pathWithoutChannel,
                                        String channel, Set<String> results) {
         for (Component drillDownComponent: componentsByMarkerInterface.get(markerClass1)) {

@@ -163,4 +163,17 @@ class ResultConfigurationTests extends GroovyTestCase {
         assertEquals configuration.name, newConfiguration.name
     }
 
+    //PMO-
+    void testLoadTwice_MustKeepCollectorInstances() {
+        new ResultConfigurationImportService().compareFilesAndWriteToDB(['Core'])
+        String configName = "CoreResultConfiguration"
+        ResultConfiguration configuration = new ResultConfiguration(configName)
+        configuration.modelClass = CoreModel
+        configuration.load()
+        def collectors = configuration.collectors
+        configuration.load()
+        assert collectors == configuration.collectors
+        assert collectors.is(configuration.collectors)
+    }
+
 }

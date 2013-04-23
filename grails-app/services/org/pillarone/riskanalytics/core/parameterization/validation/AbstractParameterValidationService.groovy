@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.parameterization.validation
 
+import groovy.transform.CompileStatic
+
 /**
  https://issuetracking.intuitive-collaboration.com/jira/browse/PMO-40
  */
@@ -54,6 +56,7 @@ abstract class AbstractParameterValidationService {
     /**
      * Convenience method for validate(obj, obj) when obj is its own classifier.
      */
+    @CompileStatic
     List<ParameterValidation> validate(Object candidate) {
         validate(candidate, candidate)
     }

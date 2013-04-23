@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.model.migration
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.model.IModelVisitor
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.components.Component
@@ -11,7 +12,7 @@ import java.util.Map.Entry
 import org.pillarone.riskanalytics.core.model.ModelPath
 import org.pillarone.riskanalytics.core.components.IResource
 
-
+@CompileStatic
 class ConstrainedMultiDimensionalParameterCollector implements IModelVisitor {
 
     List<ConstrainedMultiDimensionalParameter> result = []
@@ -37,15 +38,16 @@ class ConstrainedMultiDimensionalParameterCollector implements IModelVisitor {
     }
 
     void visitParameterObject(IParameterObject parameterObject, ModelPath path) {
-        for (Entry<String, Object> entry in parameterObject.parameters) {
+        for (Entry entry in parameterObject.parameters.entrySet()) {
             checkValue(entry.value)
         }
     }
 
     private checkValue(def value) {
         if (value instanceof ConstrainedMultiDimensionalParameter) {
-            if (value.constraints.class.name == constraints.class.name) {
-                result << value
+            ConstrainedMultiDimensionalParameter mdp = (ConstrainedMultiDimensionalParameter) value
+            if (mdp.constraints.class.name == constraints.class.name) {
+                result << mdp
             }
         }
     }

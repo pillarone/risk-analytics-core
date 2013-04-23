@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.parameterization
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeChecked
 import org.joda.time.DateTime
 
 abstract class AbstractParameterObjectClassifier implements IParameterObjectClassifier {
@@ -9,10 +11,12 @@ abstract class AbstractParameterObjectClassifier implements IParameterObjectClas
     protected String typeName
 
 
+    @CompileStatic
     public AbstractParameterObjectClassifier(String typeName, Map parameters) {
         this(typeName, typeName, parameters)
     }
 
+    @CompileStatic
     public AbstractParameterObjectClassifier(String displayName, String typeName, Map parameters) {
         this.displayName = displayName
         this.typeName = typeName
@@ -27,6 +31,7 @@ abstract class AbstractParameterObjectClassifier implements IParameterObjectClas
         parameters[parameterName]
     }
 
+    @CompileStatic
     public String toString() {
         displayName
     }
@@ -62,6 +67,7 @@ abstract class AbstractParameterObjectClassifier implements IParameterObjectClas
         return clazz + ".getStrategy(${this.class.name}.${typeName.toUpperCase()}, ${parameterString})"
     }
 
+    @CompileStatic
     protected String createConstructionString(DateTime dateTime) {
         StringBuilder builder = new StringBuilder("new org.joda.time.DateTime(")
 
@@ -71,6 +77,7 @@ abstract class AbstractParameterObjectClassifier implements IParameterObjectClas
         return builder.toString()
     }
 
+    @CompileStatic
     String getTypeName() {
         typeName
     }

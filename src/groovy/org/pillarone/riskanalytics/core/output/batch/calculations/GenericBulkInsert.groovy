@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.output.batch.calculations
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.output.PostSimulationCalculation
 import org.pillarone.riskanalytics.core.output.PathMapping
 import org.pillarone.riskanalytics.core.output.FieldMapping
@@ -28,10 +29,12 @@ class GenericBulkInsert extends AbstractCalculationsBulkInsert {
         }
     }
 
+    @CompileStatic
     protected void writeResult(List values) {
         writer.writeLine(values.join(","))
     }
 
+    @CompileStatic
     protected String getNull() {
         return "null"
     }

@@ -1,8 +1,9 @@
 package org.pillarone.riskanalytics.core.output
 
+import grails.util.Holders
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.hibernate.SessionFactory
 import org.pillarone.riskanalytics.core.BatchRunSimulationRun
 
@@ -53,7 +54,8 @@ public class DeleteSimulationService {
     /**
      * Returns the singleton spring bean from the application context.
      */
+    @CompileStatic
     static DeleteSimulationService getInstance() {
-        return (DeleteSimulationService) ApplicationHolder.getApplication().getMainContext().getBean('deleteSimulationService')
+        return Holders.applicationContext.getBean(DeleteSimulationService)
     }
 }

@@ -1,6 +1,8 @@
 package org.pillarone.riskanalytics.core.model.migration
 
+import groovy.transform.CompileStatic
 
+@CompileStatic
 class ModelMigrationClassLoader extends URLClassLoader {
 
     ModelMigrationClassLoader(URL[] urls, ClassLoader parent) {

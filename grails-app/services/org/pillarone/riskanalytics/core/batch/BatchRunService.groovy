@@ -1,5 +1,8 @@
 package org.pillarone.riskanalytics.core.batch
 
+import grails.util.Holders
+import groovy.transform.CompileStatic
+
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import org.apache.commons.logging.Log
@@ -24,29 +27,32 @@ import org.joda.time.DateTime
 class BatchRunService {
 
     boolean transactional = false
-    def batchRunInfoService
+    BatchRunInfoService batchRunInfoService
     BatchRunSimulationRun addedBatchRunSimulationRun
     RunnerRegistry runnerRegistry
     Log LOG = LogFactory.getLog(BatchRunService)
 
+    @CompileStatic
     public static BatchRunService getService() {
-        return ApplicationHolder.getApplication().getMainContext().getBean('batchRunService')
+        return Holders.applicationContext.getBean(BatchRunService)
     }
 
+    @CompileStatic
     public void runBatches() {
-        getActiveBatchRuns()?.each {BatchRun batchRun ->
+        getActiveBatchRuns()?.each { BatchRun batchRun ->
             runBatch(batchRun)
         }
     }
 
     public void runBatch(BatchRun batchRun) {
-        getSimulationRuns(batchRun)?.each {BatchRunSimulationRun batchRunSimulationRun ->
+        getSimulationRuns(batchRun).each {BatchRunSimulationRun batchRunSimulationRun ->
             runSimulation(batchRunSimulationRun)
         }
         getRunnerRegistry().startTimer()
         BatchRun.executeUpdate("update org.pillarone.riskanalytics.core.BatchRun as b set b.executed=? where b.id=? ", [true, batchRun.id])
     }
 
+    @CompileStatic
     public synchronized void runSimulation(BatchRunSimulationRun batchRunSimulationRun) {
         if (batchRunSimulationRun.simulationRun.endTime == null && !batchRunInfoService.runningBatchSimulationRuns.contains(batchRunSimulationRun)) {
             ICollectorOutputStrategy strategy = OutputStrategyFactory.getInstance(batchRunSimulationRun.strategy)
@@ -146,6 +152,7 @@ class BatchRunService {
         return BatchRun.executeQuery("from org.pillarone.riskanalytics.core.BatchRun as b order by b.executionTime asc")
     }
 
+    @CompileStatic
     private Simulation createSimulation(String simulationName) {
         Simulation simulation = new Simulation(simulationName)
         simulation.load()
@@ -154,11 +161,13 @@ class BatchRunService {
         return simulation
     }
 
+    @CompileStatic
     RunnerRegistry getRunnerRegistry() {
         if (!runnerRegistry) runnerRegistry = new RunnerRegistry(batchRunInfoService)
         return runnerRegistry
     }
 
+    @CompileStatic
     protected void notifySimulationStart(Simulation simulation, SimulationState simulationState) {
         LOG.info " notifySimulationStart ${simulation.name} : ${simulationState.toString()}"
         batchRunInfoService?.batchSimulationStart(simulation)
@@ -166,6 +175,7 @@ class BatchRunService {
 
 }
 
+@CompileStatic
 class RunnerRegistry implements ActionListener {
     def batchRunInfoService
     Queue queue = new LinkedList()
@@ -209,7 +219,7 @@ class RunnerRegistry implements ActionListener {
         SimulationHandler simulationHandler = null
         def item = queue.poll()
         if (item) {
-            SimulationConfiguration configuration = item["configuration"]
+            SimulationConfiguration configuration = (SimulationConfiguration) item["configuration"]
             simulationHandler = RunSimulationService.getService().runSimulationOnGrid(configuration, configuration.simulation.template)
             LOG.info "executing a simulation ${configuration.simulation.name} at ${new DateTime()}"
         }

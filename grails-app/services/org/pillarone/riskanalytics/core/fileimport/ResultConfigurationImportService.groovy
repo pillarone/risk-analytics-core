@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.fileimport
 
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.output.PathMapping
@@ -16,10 +17,12 @@ public class ResultConfigurationImportService extends FileImportService {
     private ConfigObject configObject
     private String name
 
+    @CompileStatic
     public String getFileSuffix() {
         return "ResultConfiguration"
     }
 
+    @CompileStatic
     public getDaoClass() {
         return ResultConfigurationDAO
     }

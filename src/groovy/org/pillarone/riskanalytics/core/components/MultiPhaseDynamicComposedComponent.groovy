@@ -1,11 +1,13 @@
 package org.pillarone.riskanalytics.core.components
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.packets.PacketList
 import org.pillarone.riskanalytics.core.wiring.ITransmitter
 
 /**
  * @author stefan.kunz (at) intuitive-collaboration (dot) com
  */
+@CompileStatic
 abstract public class MultiPhaseDynamicComposedComponent extends DynamicComposedComponent implements IChannelAllocation {
 
     private Map<ITransmitter, String> phaseTransmitterInput = new HashMap<ITransmitter, String>();

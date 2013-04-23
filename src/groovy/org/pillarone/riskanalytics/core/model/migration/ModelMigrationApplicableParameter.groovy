@@ -1,9 +1,11 @@
 package org.pillarone.riskanalytics.core.model.migration
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.parameterization.ApplicableParameter
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 
+@CompileStatic
 class ModelMigrationApplicableParameter extends ApplicableParameter {
 
     private static Log LOG = LogFactory.getLog(ModelMigrationApplicableParameter)

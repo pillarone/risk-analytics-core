@@ -1,10 +1,11 @@
 package org.pillarone.riskanalytics.core.dataaccess
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.output.PathMapping
 import org.pillarone.riskanalytics.core.output.FieldMapping
 import org.pillarone.riskanalytics.core.output.CollectorMapping
 
-
+@CompileStatic
 class ResultPathDescriptor {
 
     PathMapping path

@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.model
 
+import groovy.transform.CompileStatic
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.components.ComposedComponent
@@ -22,11 +23,13 @@ abstract class Model {
     protected List<PeriodStore> allPeriodStores = []
     private List<Component> immutableStartComponents = startComponents.asImmutable()
 
+    @CompileStatic
     public String getName() {
         return getName(this.getClass())
     }
 
 
+    @CompileStatic
     void init() {
         allComponents.clear()
         allComposedComponents.clear()
@@ -36,10 +39,12 @@ abstract class Model {
         initAllComponents()
     }
 
+    @CompileStatic
     public static String getName(final Class modelClass) {
         return modelClass.simpleName - "Model"
     }
 
+    @CompileStatic
     public List<Component> getAllComponentsRecursively() {
         List<Component> result = []
         if (allComponents == null) {
@@ -74,6 +79,7 @@ abstract class Model {
         }
     }
 
+    @CompileStatic
     void accept(IModelVisitor visitor) {
         visitor.visitModel(this)
         for (Component component in allComponents) {
@@ -124,6 +130,7 @@ abstract class Model {
         this.class
     }
 
+    @CompileStatic
     void injectComponentNames() {
         injectNames(this)
     }
@@ -147,6 +154,7 @@ abstract class Model {
         }
     }
 
+    @CompileStatic
     public void clearPeriodStore() {
         for (PeriodStore periodStore in allPeriodStores) {
             periodStore.clear()
@@ -170,11 +178,13 @@ abstract class Model {
      */
     abstract boolean requiresStartDate()
 
+    @CompileStatic
     protected void addStartComponent(Component startComponent) {
         startComponents << startComponent
         immutableStartComponents = startComponents.asImmutable()
     }
 
+    @CompileStatic
     public List<Component> getStartComponents() {
         return immutableStartComponents
     }
@@ -201,23 +211,27 @@ abstract class Model {
         }
     }
 
+    @CompileStatic
     public int maxNumberOfFullyDistinctPeriods() {
         Integer.MAX_VALUE
     }
 
+    @CompileStatic
     public String getDefaultResultConfiguration() {
         return null
     }
 
+    @CompileStatic
     public static VersionNumber getModelVersion(Class modelClass) {
         String versionNumber = "1"
         if (MigratableModel.isAssignableFrom(modelClass)) {
-            MigratableModel instance = modelClass.newInstance()
+            MigratableModel instance = (MigratableModel) modelClass.newInstance()
             versionNumber = instance.version.toString()
         }
         return new VersionNumber(versionNumber)
     }
 
+    @CompileStatic
     public List<IParameterObjectClassifier> configureClassifier(String path, List<IParameterObjectClassifier> classifiers) {
         return classifiers
     }
@@ -240,6 +254,7 @@ abstract class Model {
         }
     }
 
+    @CompileStatic
     Closure createResultNavigatorMapping() {
         return null
     }
@@ -249,6 +264,7 @@ abstract class Model {
      * reserves may be before the projection start.
      * @return period labels before the projection start
      */
+    @CompileStatic
     Set<String> periodLabelsBeforeProjectionStart() {
         []
     }

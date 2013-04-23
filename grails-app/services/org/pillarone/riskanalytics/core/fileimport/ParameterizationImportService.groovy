@@ -1,7 +1,7 @@
 package org.pillarone.riskanalytics.core.fileimport
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.ParameterizationDAO
-
 import org.pillarone.riskanalytics.core.parameterization.ParameterizationHelper
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.util.GroovyUtils
@@ -21,9 +21,9 @@ public class ParameterizationImportService extends FileImportService {
         return true
     }
 
-
+    @CompileStatic
     public getDaoClass() {
-        ParameterizationDAO
+        return ParameterizationDAO
     }
 
     public String prepare(URL file, String itemName) {

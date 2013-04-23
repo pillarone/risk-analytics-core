@@ -1,11 +1,13 @@
 package org.pillarone.riskanalytics.core.output.batch.calculations
 
 import groovy.sql.Sql
+import groovy.transform.CompileStatic
 
 /**
  * Allianz Risk Transfer  ATOM
  * User: bzetterstrom
  */
+@CompileStatic
 class SQLServerCalculationBulkInsert extends AbstractCalculationsBulkInsert {
 
     @Override

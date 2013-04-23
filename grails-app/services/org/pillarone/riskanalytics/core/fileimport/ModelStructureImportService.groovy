@@ -1,7 +1,7 @@
 package org.pillarone.riskanalytics.core.fileimport
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.ModelStructureDAO
-
 import org.pillarone.riskanalytics.core.output.ConfigObjectHolder
 import org.pillarone.riskanalytics.core.util.GroovyUtils
 
@@ -28,6 +28,7 @@ class ModelStructureImportService extends FileImportService {
         return true
     }
 
+    @CompileStatic
     public getDaoClass() {
         ModelStructureDAO
     }

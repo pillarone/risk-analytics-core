@@ -1,9 +1,11 @@
 package org.pillarone.riskanalytics.core.parameterization.validation
 
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 
 
+@CompileStatic
 class ValidatorRegistry {
 
     private static Log LOG = LogFactory.getLog(ValidatorRegistry)

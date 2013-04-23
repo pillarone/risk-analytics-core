@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.fileimport
 
+import groovy.transform.CompileStatic
+
 import java.util.jar.JarInputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
@@ -27,6 +29,7 @@ abstract class FileImportService {
      *  and switches off daylight saving capabilities and possible related problems.  */
     DateTimeZone utc = DateTimeZone.setDefault(DateTimeZone.UTC)
 
+    @CompileStatic
     public int compareFilesAndWriteToDB(List modelNames = null) {
 
         int recordCount = 0
@@ -38,16 +41,18 @@ abstract class FileImportService {
         return recordCount
     }
 
+    @CompileStatic
     protected List scanImportFolder(List modelNames = null) {
         URL modelSourceFolder = searchModelImportFolder()
         return modelSourceFolder.toExternalForm().startsWith("jar") ? findURLsInJar(modelSourceFolder, modelNames) : findURLsInDirectory(modelSourceFolder, modelNames)
     }
 
+    @CompileStatic
     protected List<URL> findURLsInDirectory(URL url, List modelNames) {
         LOG.trace "Importing from directory ${url.toExternalForm()}"
 
         List<URL> matchingFiles = []
-        new File(url.toURI()).eachFileRecurse {File file ->
+        new File(url.toURI()).eachFileRecurse { File file ->
             if (file.isFile() && file.name.endsWith("${fileSuffix}.groovy") && shouldImportModel(file.name, modelNames)) {
                 matchingFiles << file.toURI().toURL()
             }
@@ -55,6 +60,7 @@ abstract class FileImportService {
         return matchingFiles
     }
 
+    @CompileStatic
     protected List<URL> findURLsInJar(URL url, List modelNames) {
         LOG.trace "Importing from JAR file ${url.toExternalForm()}"
 
@@ -86,6 +92,7 @@ abstract class FileImportService {
         return matchingFiles
     }
 
+    @CompileStatic
     public boolean importFile(URL url) {
         LOG.debug("importing ${url.toExternalForm()}")
         boolean success = false
@@ -108,6 +115,7 @@ abstract class FileImportService {
         return success
     }
 
+    @CompileStatic
     protected String readFromURL(URL url) {
         Scanner scanner = new Scanner(url.openStream()).useDelimiter("\\Z")
         return scanner.next()
@@ -125,6 +133,7 @@ abstract class FileImportService {
         }
     }
 
+    @CompileStatic
     protected boolean shouldImportModel(String filename, List models) {
         if (!models) {
             return true
@@ -135,6 +144,7 @@ abstract class FileImportService {
         }
     }
 
+    @CompileStatic
     protected URL searchModelImportFolder() {
         URL modelFolder = getClass().getResource("/models")
         if (modelFolder == null) {
@@ -144,11 +154,13 @@ abstract class FileImportService {
         return modelFolder
     }
 
+    @CompileStatic
     public static void spreadRanges(ConfigObject config) {
         ConfigObjectUtils.spreadRanges config
     }
 
 
+    @CompileStatic
     static void importModelsIfNeeded(List modelNames) {
         if (!Boolean.getBoolean("skipImport")) {
             String models = modelNames != null && !modelNames.empty ? modelNames.join(", ") : "all models"
@@ -161,6 +173,7 @@ abstract class FileImportService {
         ModelRegistry.instance.loadFromDatabase()
     }
 
+    @CompileStatic
     String getModelClassName() {
         return null
     }

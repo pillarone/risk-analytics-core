@@ -29,6 +29,7 @@ class GenericBulkInsert extends AbstractResultsBulkInsert {
         }
     }
 
+    @CompileStatic
     protected void writeResult(List values) {
         writer.writeLine(values.join(","))
     }

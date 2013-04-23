@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.model.migration
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.pillarone.riskanalytics.core.parameterization.IParameterObjectClassifier
 import org.pillarone.riskanalytics.core.model.Model
@@ -8,18 +9,19 @@ import org.pillarone.riskanalytics.core.parameterization.ConstrainedMultiDimensi
 import org.pillarone.riskanalytics.core.parameterization.IMultiDimensionalConstraints
 import org.pillarone.riskanalytics.core.model.ModelPathComponent
 
-
 abstract class MigrationSupport extends AbstractMigration {
 
 
     private Model currentSource
     private Model currentTarget
 
+    @CompileStatic
     MigrationSupport(VersionNumber from, VersionNumber to, Class modelClass) {
         super(from, to, modelClass)
     }
 
     @Override
+    @CompileStatic
     final void migrateParameterization(Model source, Model target) {
         currentSource = source
         currentTarget = target
@@ -44,14 +46,16 @@ abstract class MigrationSupport extends AbstractMigration {
 
     }
 
+    @CompileStatic
     protected void removeColumnFromConstraint(Class constraintClass, int index) {
-        for (ConstrainedMultiDimensionalParameter mdp in findMultiDimensionalParametersByConstraints(currentTarget, constraintClass.newInstance())) {
+        for (ConstrainedMultiDimensionalParameter mdp in findMultiDimensionalParametersByConstraints(currentTarget, (IMultiDimensionalConstraints) constraintClass.newInstance())) {
             if (!mdp.isEmpty()) {
                 mdp.removeColumnAt(index)
             }
         }
     }
 
+    @CompileStatic
     protected List<ConstrainedMultiDimensionalParameter> findMultiDimensionalParametersByConstraints(Model model, IMultiDimensionalConstraints constraints) {
         ConstrainedMultiDimensionalParameterCollector collector = new ConstrainedMultiDimensionalParameterCollector(constraints)
         model.accept(collector)
@@ -75,10 +79,12 @@ abstract class MigrationSupport extends AbstractMigration {
         }
     }
 
+    @CompileStatic
     protected ClassLoader getOldModelClassLoader() {
         currentSource.getClass().getClassLoader()
     }
 
+    @CompileStatic
     protected ClassLoader getNewModelClassLoader() {
         currentTarget.getClass().getClassLoader()
     }

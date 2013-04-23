@@ -8,6 +8,7 @@ import org.pillarone.riskanalytics.core.example.component.TestDynamicComposedCom
 class DynamicComposedComponentTests extends GroovyTestCase {
 
     void testAddComponent() {
+        System.out.println("testAddComponent")
         TestDynamicComposedComponent component = new TestDynamicComposedComponent()
         shouldFail {
             component.addSubComponent null
@@ -23,6 +24,7 @@ class DynamicComposedComponentTests extends GroovyTestCase {
     }
 
     void testCacheIsCleared() {
+        System.out.println("testCacheIsCleared")
         TestDynamicComposedComponent composedComponent = new TestDynamicComposedComponent()
         final TestComponent testComponent = new TestComponent(name: "subTest")
         composedComponent.addSubComponent(testComponent)
@@ -39,6 +41,7 @@ class DynamicComposedComponentTests extends GroovyTestCase {
     }
 
     void testGetProperties() {
+        System.out.println("testGetProperties")
         TestDynamicComposedComponent composedComponent = new TestDynamicComposedComponent()
         composedComponent.addSubComponent(new TestComponent(name: 'subSomeComponent'))
         composedComponent.addSubComponent(new TestComponent(name: 'subSomeOtherComponent'))
@@ -52,6 +55,7 @@ class DynamicComposedComponentTests extends GroovyTestCase {
     }
 
     void testSubComponentPropertyAccess() {
+        System.out.println("testSubComponentPropertyAccess")
         TestDynamicComposedComponent composedComponent = new TestDynamicComposedComponent()
         TestComponent component1 = new TestComponent(name: 'subSomeComponent')
         composedComponent.addSubComponent(component1)
@@ -69,6 +73,7 @@ class DynamicComposedComponentTests extends GroovyTestCase {
     }
 
     void testAllSubComponents() {
+        System.out.println("testAllSubComponents")
         ExampleDynamicComponent dynamicComponent = new ExampleDynamicComponent()
         ExampleInputOutputComponent component = dynamicComponent.createDefaultSubComponent()
         component.name = 'c1'

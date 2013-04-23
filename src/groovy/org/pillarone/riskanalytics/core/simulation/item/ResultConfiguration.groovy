@@ -19,6 +19,11 @@ class ResultConfiguration extends ModellingItem {
         collectors = []
     }
 
+    public ResultConfiguration(String name, Class modelClass) {
+        this(name)
+        this.modelClass = modelClass
+    }
+
     public ResultConfiguration(ConfigObject configObject, String name) {
         this(configObject.containsKey("displayName") ? configObject.displayName : name)
         modelClass = configObject.model

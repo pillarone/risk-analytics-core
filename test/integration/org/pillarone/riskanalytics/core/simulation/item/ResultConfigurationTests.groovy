@@ -163,4 +163,21 @@ class ResultConfigurationTests extends GroovyTestCase {
         assertEquals configuration.name, newConfiguration.name
     }
 
+    void testSetCollector() {
+        String configName = "CoreResultConfiguration"
+        ResultConfiguration configuration = new ResultConfiguration(configName)
+        AggregatedCollectingModeStrategy strategy = new AggregatedCollectingModeStrategy()
+        AggregatedCollectingModeStrategy newStrategy = new AggregatedCollectingModeStrategy()
+        configuration.setCollector("path", strategy)
+        assert configuration.getCollector("path").mode == strategy
+        configuration.setCollector("path",null)
+        assert 0 == configuration.collectors.size()
+        assert !configuration.getCollector("path")
+        configuration.setCollector("path",strategy)
+        configuration.setCollector("path",newStrategy)
+        assert 1 == configuration.collectors.size()
+        assert configuration.getCollector("path").mode == newStrategy
+        assert 1 == configuration.collectors.size()
+    }
+
 }

@@ -1,9 +1,11 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
+import grails.util.Holders
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.model.Model
+import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 import org.pillarone.riskanalytics.core.output.DeleteSimulationStrategy
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.output.SimulationRun
@@ -14,8 +16,6 @@ import org.pillarone.riskanalytics.core.parameter.comment.ResultCommentDAO
 import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.FunctionComment
-import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 
 class Simulation extends ParametrizedItem {
 
@@ -44,7 +44,7 @@ class Simulation extends ParametrizedItem {
 
     public Simulation(String name) {
         super(name)
-        keyFiguresToPreCalculate = ApplicationHolder.application?.config?.keyFiguresToCalculate
+        keyFiguresToPreCalculate = Holders.config?.keyFiguresToCalculate
         tags = []
     }
 

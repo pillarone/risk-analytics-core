@@ -29,7 +29,7 @@ class ModelHelper {
     private static final String CEDED_PREMIUM_RISK_BASE = 'cededPremiumRiskBase'
     private static final String CEDED_PREMIUM_AND_RESERVE_RISK_BASE = "cededPremiumAndReserveRiskBase";
     private static final String PERILS = "claimsGenerators"
-    private static final String RESERVES = "claimsGenerators"
+    private static final String RESERVES = "reservesGenerators"
     private static final String CONTRACTS = "reinsuranceContracts"
     private static final String LOB = "linesOfBusiness"
     private static final String SEGMENTS = "segments"
@@ -222,6 +222,7 @@ class ModelHelper {
             String pathWithoutChannel = getPathBase(path)
             String channel = getChannel(path)
             extendedPaths(componentsByMarkerInterface, perilMarker, PERILS, pathWithoutChannel, channel, results)
+            extendedPaths(componentsByMarkerInterface, reserveMarker, RESERVES, pathWithoutChannel, channel, results)
             extendedPaths(componentsByMarkerInterface, contractMarker, CONTRACTS, pathWithoutChannel, channel, results)
             extendedPaths(componentsByMarkerInterface, lobMarker, SEGMENTS, pathWithoutChannel, channel, results)
         }
@@ -229,6 +230,7 @@ class ModelHelper {
             String pathWithoutChannel = getPathBase(path)
             String channel = getChannel(path)
             extendedPaths(componentsByMarkerInterface, perilMarker, PERILS, pathWithoutChannel, channel, results)
+            extendedPaths(componentsByMarkerInterface, reserveMarker, RESERVES, pathWithoutChannel, channel, results)
             extendedPaths(componentsByMarkerInterface, contractMarker, CONTRACTS, pathWithoutChannel, channel, results)
             extendedPaths(componentsByMarkerInterface, lobMarker, SEGMENTS, pathWithoutChannel, channel, results)
         }

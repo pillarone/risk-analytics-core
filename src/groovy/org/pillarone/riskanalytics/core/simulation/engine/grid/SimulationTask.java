@@ -163,7 +163,9 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
             synchronized (this) {
                 while (messageCount.get() < totalMessageCount) {
                     long timeout = System.currentTimeMillis();
-                    LOG.info("Not all messages received yet - waiting");
+                    if (LOG.isDebugEnabled()){
+                        LOG.debug("Not all messages received yet - waiting");
+                    }
                     try {
                         wait(MESSAGE_TIMEOUT);
                     } catch (InterruptedException e) {

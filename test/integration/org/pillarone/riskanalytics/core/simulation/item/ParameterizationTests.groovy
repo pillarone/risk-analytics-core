@@ -5,7 +5,9 @@ import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObject
 import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObjectClassifier
+import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterTypeOne
 import org.pillarone.riskanalytics.core.fileimport.ParameterizationImportService
+import org.pillarone.riskanalytics.core.parameter.DoubleParameter
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.StringParameter
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
@@ -52,7 +54,6 @@ class ParameterizationTests extends GroovyTestCase {
         assertNull parameterization.modelClass
 
         parameterization.load()
-
         assertNotNull parameterization.dao
         assertNotNull parameterization.modelClass
         assertNotNull parameterization.tags
@@ -553,6 +554,16 @@ class ParameterizationTests extends GroovyTestCase {
         parameterization.load()
 
         assertSame(veryNestedHolder, parameterization.parameterHolders[0].classifierParameters["nested"].classifierParameters["a"])
+    }
+
+    void testKeepNewlyAddedParameters() {
+        Parameterization parameterization = new Parameterization("testSafeNestedReload", CoreModel)
+
+        ParameterObjectParameterHolder newHolder = new ParameterObjectParameterHolder("newPath", 0, new ExampleParameterTypeOne())
+        newHolder.added = true
+        List<ParameterObjectParameterHolder> holders = [newHolder]
+        parameterization.loadParameters(holders,[new DoubleParameter(path: 'persistentPath',periodIndex: 0, doubleValue: 1)])
+        assert 2 == holders.size()
     }
 
 

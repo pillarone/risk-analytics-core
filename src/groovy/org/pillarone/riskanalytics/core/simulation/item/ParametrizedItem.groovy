@@ -85,6 +85,12 @@ abstract class ParametrizedItem extends CommentableItem {
         listeners.add(listener)
     }
 
+    @Override
+    void removeAllModellingItemChangeListener() {
+        itemChangedListener.clear()
+        listeners.clear()
+    }
+
     void removeListener(IParametrizedItemListener listener) {
         listeners.remove(listener)
     }
@@ -110,6 +116,7 @@ abstract class ParametrizedItem extends CommentableItem {
     protected void loadParameters(List<ParameterHolder> parameterHolders, Collection<Parameter> parameters) {
         List<ParameterHolder> existingHolders = parameterHolders.clone()
         parameterHolders.clear()
+        parameterHolders.addAll(getNewlyAddedHolders(existingHolders))
 
         for (Parameter p in parameters) {
             final ParameterHolder existingParameterHolder = existingHolders.find { it.path == p.path && it.periodIndex == p.periodIndex}
@@ -120,6 +127,16 @@ abstract class ParametrizedItem extends CommentableItem {
                 parameterHolders << ParameterHolderFactory.getHolder(p)
             }
         }
+    }
+
+    private List<ParameterHolder> getNewlyAddedHolders(List<ParameterHolder> parameterHolders) {
+        List<ParameterHolder> result = []
+        for (ParameterHolder existingParameterHolder in parameterHolders) {
+            if (existingParameterHolder.added) {
+                result << existingParameterHolder
+            }
+        }
+        result
     }
 
     protected void saveParameters(List<ParameterHolder> parameterHolders, Collection<Parameter> parameters, def dao) {

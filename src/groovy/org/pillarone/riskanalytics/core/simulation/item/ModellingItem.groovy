@@ -22,7 +22,7 @@ abstract class ModellingItem implements Serializable {
 //    protected def dao
     boolean changed = false
 
-    private List<IModellingItemChangeListener> itemChangedListener
+    protected List<IModellingItemChangeListener> itemChangedListener
 
     public def id
 

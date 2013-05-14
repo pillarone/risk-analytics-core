@@ -19,12 +19,10 @@ class ApplyGlobalParametersAction implements Action {
 
     private List<GlobalParameterTarget> globalTargets = []
     private List<GlobalParameterSource> globalSources = []
-    private List<InitializingComponent> initializingComponents = []
 
     void perform() {
         traverseModel(simulationScope.model)
         applyGlobalParameters()
-        initializingComponents*.afterParameterInjection(simulationScope)
     }
 
     private void applyGlobalParameters() {
@@ -53,9 +51,6 @@ class ApplyGlobalParametersAction implements Action {
                 globalTargets << new GlobalParameterTarget(targetInstance: component, propertyName: prop.key)
             }
         }
-        if (component instanceof InitializingComponent) {
-            initializingComponents << component
-        }
         for (ITransmitter transmitter in component.allOutputTransmitter) {
             if (transmitter.receiver instanceof PacketCollector) {
                 traverseModel(transmitter.receiver)
@@ -79,9 +74,6 @@ class ApplyGlobalParametersAction implements Action {
             if (prop.key.startsWith("global")) {
                 globalTargets << new GlobalParameterTarget(targetInstance: parameterObject, propertyName: prop.key)
             }
-        }
-        if (parameterObject instanceof InitializingComponent) {
-            initializingComponents << parameterObject
         }
     }
 }

@@ -2,21 +2,23 @@ package org.pillarone.riskanalytics.core.components;
 
 import org.pillarone.riskanalytics.core.parameterization.global.Global;
 import org.pillarone.riskanalytics.core.simulation.engine.IterationScope;
+import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class GlobalParameterComponent extends Component {
+public abstract class GlobalParameterComponent extends Component implements InitializingComponent {
 
     private IterationScope iterationScope;
     private Map<String, Method> cachedMethods = null;
 
     @Override
     final protected void doCalculation() {
-        if (iterationScope.isFirstIteration() && iterationScope.getPeriodScope().isFirstPeriod()) {
-            validateRuntimeGlobalParameters();
-        }
+    }
+
+    public void afterParameterInjection(SimulationScope scope) {
+        validateRuntimeGlobalParameters();
     }
 
     /**

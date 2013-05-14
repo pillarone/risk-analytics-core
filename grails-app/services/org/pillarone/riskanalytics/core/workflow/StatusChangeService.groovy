@@ -16,6 +16,7 @@ import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.remoting.ITransactionService
 import org.pillarone.riskanalytics.core.remoting.impl.RemotingUtils
 import grails.orm.HibernateCriteriaBuilder
+import groovy.transform.CompileStatic
 
 class StatusChangeService {
 
@@ -161,6 +162,7 @@ class StatusChangeService {
     }
 }
 
+@CompileStatic
 class WorkflowException extends RuntimeException {
 
     public WorkflowException(String itemName, Status to, String cause) {

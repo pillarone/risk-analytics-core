@@ -53,8 +53,7 @@ public class SimulationConfiguration implements Serializable, Cloneable {
         preparedSimulation.randomSeed = simulation.randomSeed
         preparedSimulation.modelClass = simulation.modelClass
         preparedSimulation.periodCount = simulation.periodCount
-        preparedSimulation.runtimeParameters = simulation.runtimeParameters.collect { it.clone() }
-        preparedSimulation.keyFiguresToPreCalculate = simulation.keyFiguresToPreCalculate
+        preparedSimulation.runtimeParameters = simulation.runtimeParameters.collect { (ParameterHolder) it.clone() }
 
         preparedSimulation.parameterization = new Parameterization(simulation.parameterization.name, simulation.parameterization.modelClass)
         preparedSimulation.parameterization.periodCount = simulation.parameterization.periodCount

@@ -76,15 +76,43 @@ abstract class ResultAccessor {
 
         List<ResultPathDescriptor> result = []
         File file = new File(GridHelper.getResultLocation(run.id))
+        Map<String,PathMapping> pathMappings = new HashMap<String,PathMapping>()
+        Map<String,FieldMapping> fieldMappings = new HashMap<String,FieldMapping>()
+        Map<Long,CollectorMapping> collectorMappings = new HashMap<Long,CollectorMapping>()
         for (File f in file.listFiles()) {
             String[] ids = f.name.split("_")
-            long collectorId = Long.parseLong(ids[3])
+            Long collectorId = Long.parseLong(ids[3])
             if (collectorId != singleCollector.id) {
-                result.add(new ResultPathDescriptor(PathMapping.get(Long.parseLong(ids[0])), FieldMapping.get(Long.parseLong(ids[2])), CollectorMapping.get(collectorId), Integer.parseInt(ids[1])))
+                result.add(new ResultPathDescriptor(
+                        getPathmapping(pathMappings,ids[0]),
+                        getFieldMapping(fieldMappings,ids[2]),
+                        getCollectorMapping(collectorMappings,collectorId),
+                        Integer.parseInt(ids[1])))
             }
         }
 
         return result
+    }
+
+    private static CollectorMapping getCollectorMapping(Map<Long,CollectorMapping> collectorMappings,Long collectorId) {
+        if (!collectorMappings.containsKey(collectorId)){
+            collectorMappings.put(collectorId,CollectorMapping.get(collectorId))
+        }
+        return collectorMappings.get(collectorId)
+    }
+
+    private static FieldMapping getFieldMapping(Map<String,FieldMapping> fieldMappings,String fieldId) {
+        if (!fieldMappings.containsKey(fieldId)) {
+            fieldMappings.put(fieldId, FieldMapping.get(Long.parseLong(fieldId)))
+        }
+        return fieldMappings.get(fieldId)
+    }
+
+    private static PathMapping getPathmapping(Map<String,PathMapping> pathMappings, String pathId) {
+        if (!pathMappings.containsKey(pathId)){
+            pathMappings.put(pathId,PathMapping.get(Long.parseLong(pathId)))
+        }
+        return pathMappings.get(pathId)
     }
 
     static Double getMean(SimulationRun simulationRun, int periodIndex, String pathName, String collectorName, String fieldName) {

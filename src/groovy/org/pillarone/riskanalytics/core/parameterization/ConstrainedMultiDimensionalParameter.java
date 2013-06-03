@@ -234,7 +234,7 @@ public class ConstrainedMultiDimensionalParameter extends TableMultiDimensionalP
         for (int column = getTitleColumnCount(); column < getColumnCount(); column++) {
             Class columnType = constraints.getColumnType(column);
             if (markerInterface.isAssignableFrom(columnType)) {
-                if (values.get(column).contains(value)) {
+                if (column < values.size() && values.get(column).contains(value)) {
                     return true;
                 }
             }

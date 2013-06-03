@@ -261,6 +261,7 @@ public class SimulationRunner {
                 iterationScope: iterationScope,
                 periodScope: periodScope
         )
+        Action initializingComponentAction = new InitializingComponentsAction(simulationScope: simulationScope)
 
         PeriodAction periodAction = new PeriodAction(periodScope: periodScope, model: simulationScope.model)
         IterationAction iterationAction = new IterationAction(periodAction: periodAction, iterationScope: iterationScope)
@@ -284,6 +285,7 @@ public class SimulationRunner {
         runner.preSimulationActions << applyGlobalParams //distribute global params - resource params must already be injected
         runner.preSimulationActions << periodCounter
         runner.preSimulationActions << injectScopes
+        runner.preSimulationActions << initializingComponentAction //last when everything is ready
 
         runner.simulationAction = simulationAction
 

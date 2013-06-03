@@ -15,8 +15,8 @@ class UserManagement {
 
     public static Person getCurrentUser() {
         SpringSecurityService securityService = getSpringSecurityService()
-        GrailsUser user = securityService.getPrincipal()
-        return user != null ? Person.get(user.id) : tryFindingFixUserNameFromSystemProperty()
+        Person user = (Person) securityService.getCurrentUser()
+        return user ?: tryFindingFixUserNameFromSystemProperty()
     }
 
     private static Person tryFindingFixUserNameFromSystemProperty() {

@@ -1,26 +1,26 @@
 package org.pillarone.riskanalytics.core.workflow
 
+import grails.orm.HibernateCriteriaBuilder
 import grails.util.Holders
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.parameter.comment.workflow.IssueStatus
 import org.pillarone.riskanalytics.core.parameterization.ParameterizationHelper
+import org.pillarone.riskanalytics.core.remoting.ITransactionService
 import org.pillarone.riskanalytics.core.remoting.TransactionInfo
+import org.pillarone.riskanalytics.core.remoting.impl.RemotingUtils
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
 import org.pillarone.riskanalytics.core.user.UserManagement
+
 import static org.pillarone.riskanalytics.core.workflow.Status.*
-import org.joda.time.DateTime
-import org.pillarone.riskanalytics.core.remoting.ITransactionService
-import org.pillarone.riskanalytics.core.remoting.impl.RemotingUtils
-import grails.orm.HibernateCriteriaBuilder
-import groovy.transform.CompileStatic
 
 class StatusChangeService {
 
@@ -28,7 +28,7 @@ class StatusChangeService {
 
     @CompileStatic
     public static StatusChangeService getService() {
-        return (StatusChangeService) Holders.applicationContext.getBean("statusChangeService")
+        return (StatusChangeService) Holders.grailsApplication.mainContext.getBean("statusChangeService")
     }
 
     private Map<Status, Closure> actions = [

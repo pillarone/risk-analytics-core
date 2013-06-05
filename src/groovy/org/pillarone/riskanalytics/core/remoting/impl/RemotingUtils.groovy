@@ -11,7 +11,7 @@ class RemotingUtils {
     private static Log LOG = LogFactory.getLog(RemotingUtils)
 
     public static ITransactionService getTransactionService() {
-        ITransactionService transactionService = (ITransactionService) Holders.applicationContext.getBean("transactionService")
+        ITransactionService transactionService = (ITransactionService) Holders.grailsApplication.mainContext.getBean("transactionService")
         try {
             transactionService.getAllTransactions()
             return transactionService

@@ -1,15 +1,12 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
-import grails.util.Holders;
-import org.pillarone.riskanalytics.core.output.CollectorMapping;
-import org.pillarone.riskanalytics.core.output.FieldMapping;
-
-
-import org.pillarone.riskanalytics.core.output.PathMapping
+import grails.util.Holders
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.hibernate.HibernateException;
+import org.hibernate.HibernateException
+import org.pillarone.riskanalytics.core.output.CollectorMapping
+import org.pillarone.riskanalytics.core.output.FieldMapping
+import org.pillarone.riskanalytics.core.output.PathMapping
 
 /**
  * A cache which enables fast access to PathMapping, FieldMapping & CollectorMapping objects.
@@ -29,7 +26,7 @@ public class MappingCache implements Serializable {
     private boolean initialized = false
 
     public static MappingCache getInstance() {
-        MappingCache cache = Holders.applicationContext.getBean(MappingCache)
+        MappingCache cache = Holders.grailsApplication.mainContext.getBean(MappingCache)
         cache.initCache()
         return cache
     }

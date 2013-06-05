@@ -2,16 +2,13 @@ package org.pillarone.riskanalytics.core.simulation.engine
 
 import grails.util.Holders
 import groovy.transform.CompileStatic
-import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.gridgain.grid.Grid
-
-import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationTask
-
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.gridgain.grid.Grid
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationHandler
-import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
+import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationTask
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SpringBeanDefinitionRegistry
+import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 
 public class RunSimulationService {
 
@@ -22,7 +19,7 @@ public class RunSimulationService {
 
     @CompileStatic
     public static RunSimulationService getService() {
-        return Holders.applicationContext.getBean(RunSimulationService)
+        return Holders.grailsApplication.mainContext.getBean(RunSimulationService)
     }
 
     /**

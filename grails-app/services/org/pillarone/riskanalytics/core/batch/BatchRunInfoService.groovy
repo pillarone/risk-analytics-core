@@ -25,7 +25,7 @@ class BatchRunInfoService {
 
     @CompileStatic
     public static BatchRunInfoService getService() {
-        return Holders.applicationContext.getBean(BatchRunInfoService)
+        return Holders.grailsApplication.mainContext.getBean(BatchRunInfoService)
     }
 
     @CompileStatic

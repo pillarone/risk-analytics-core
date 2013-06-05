@@ -2,12 +2,9 @@ package org.pillarone.riskanalytics.core.batch
 
 import grails.util.Holders
 import groovy.transform.CompileStatic
-
-import java.awt.event.ActionEvent
-import java.awt.event.ActionListener
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.BatchRun
 import org.pillarone.riskanalytics.core.BatchRunSimulationRun
 import org.pillarone.riskanalytics.core.ParameterizationDAO
@@ -22,7 +19,9 @@ import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguratio
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationRunner
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationHandler
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
-import org.joda.time.DateTime
+
+import java.awt.event.ActionEvent
+import java.awt.event.ActionListener
 
 class BatchRunService {
 
@@ -34,7 +33,7 @@ class BatchRunService {
 
     @CompileStatic
     public static BatchRunService getService() {
-        return Holders.applicationContext.getBean(BatchRunService)
+        return Holders.grailsApplication.mainContext.getBean(BatchRunService)
     }
 
     @CompileStatic

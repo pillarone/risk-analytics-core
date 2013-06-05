@@ -13,7 +13,7 @@ public class BatchRunner implements Job {
     static final Logger LOG = Logger.getLogger(BatchRunner)
 
     public static BatchRunService getService() {
-        return Holders.applicationContext.getBean(BatchRunService)
+        Holders.grailsApplication.mainContext.getBean(BatchRunService)
     }
 
     public void execute(JobExecutionContext jobExecutionContext) {

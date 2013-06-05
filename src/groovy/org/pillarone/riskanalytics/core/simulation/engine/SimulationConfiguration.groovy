@@ -1,25 +1,19 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
-import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.pillarone.riskanalytics.core.output.DrillDownMode
-import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
+import org.pillarone.riskanalytics.core.model.Model
+import org.pillarone.riskanalytics.core.model.ModelHelper
+import org.pillarone.riskanalytics.core.output.*
+import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationBlock
 import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
-import org.pillarone.riskanalytics.core.model.Model
-import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
-import org.pillarone.riskanalytics.core.output.CollectorFactory
-import org.pillarone.riskanalytics.core.output.PacketCollector
-import org.pillarone.riskanalytics.core.model.ModelHelper
-import org.pillarone.riskanalytics.core.output.ICollectingModeStrategy
-import org.pillarone.riskanalytics.core.output.CollectingModeFactory
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
-import org.pillarone.riskanalytics.core.wiring.IPacketListener
 import org.pillarone.riskanalytics.core.util.PeriodLabelsUtil
+import org.pillarone.riskanalytics.core.wiring.IPacketListener
 import org.springframework.beans.factory.config.BeanDefinition
 
 /**
@@ -29,7 +23,6 @@ import org.springframework.beans.factory.config.BeanDefinition
  *
  * Use the SimulationConfiguration to configure a SimulationRunner instance.
  */
-@CompileStatic
 public class SimulationConfiguration implements Serializable, Cloneable {
 
     Simulation simulation

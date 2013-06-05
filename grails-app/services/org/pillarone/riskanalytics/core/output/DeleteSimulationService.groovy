@@ -56,6 +56,6 @@ public class DeleteSimulationService {
      */
     @CompileStatic
     static DeleteSimulationService getInstance() {
-        return Holders.applicationContext.getBean(DeleteSimulationService)
+        return Holders.grailsApplication.mainContext.getBean(DeleteSimulationService)
     }
 }

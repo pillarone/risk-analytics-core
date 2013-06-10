@@ -192,6 +192,11 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
             calculator = new Calculator(simulation);
             setSimulationState(SimulationState.POST_SIMULATION_CALCULATIONS);
             calculator.calculate();
+            if (cancelled) {
+                simulation.delete();
+                setSimulationState(SimulationState.CANCELED);
+                return false;
+            }
 
             simulation.setEnd(new DateTime());
             simulation.setNumberOfIterations(completedIterations);
@@ -242,6 +247,9 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
 
     public void cancel() {
         cancelled = true;
+        if(currentState == SimulationState.POST_SIMULATION_CALCULATIONS) {
+            calculator.setStopped(true);
+        }
     }
 
     public int getProgress() {

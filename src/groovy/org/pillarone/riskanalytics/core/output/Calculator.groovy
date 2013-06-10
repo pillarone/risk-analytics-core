@@ -68,6 +68,9 @@ class Calculator {
         startTime = System.currentTimeMillis()
 
         for (ResultPathDescriptor descriptor in pathDescriptors) {
+            if(stopped) {
+                break
+            }
             PathMapping path = descriptor.path
             int periodIndex = descriptor.period
             CollectorMapping collector = descriptor.collector

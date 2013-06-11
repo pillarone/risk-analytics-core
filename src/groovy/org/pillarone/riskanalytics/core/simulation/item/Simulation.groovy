@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.simulation.item
 
 import grails.util.Holders
 import groovy.transform.CompileStatic
+import groovy.transform.TypeChecked
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.ParameterizationDAO
@@ -229,7 +230,7 @@ class Simulation extends ParametrizedItem {
         return results
     }
 
-    @CompileStatic
+    @TypeChecked
     void setModelClass(Class clazz) {
         super.setModelClass(clazz)
         modelVersionNumber = Model.getModelVersion(clazz)

@@ -1,6 +1,8 @@
 package org.pillarone.riskanalytics.core.model
 
+import groovy.transform.CompileStatic
 
+@CompileStatic
 class ModelPathComponent {
 
     Class type

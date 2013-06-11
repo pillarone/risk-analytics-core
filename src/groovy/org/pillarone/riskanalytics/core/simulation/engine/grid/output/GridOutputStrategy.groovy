@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.engine.grid.output
 
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.gridgain.grid.Grid
@@ -9,7 +10,9 @@ import org.pillarone.riskanalytics.core.simulation.engine.SimulationRunner
 import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper
 import org.gridgain.grid.GridRichNode
 import org.gridgain.grid.lang.GridPredicate
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
+@CompileStatic
 class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
 
     private static final int PACKET_LIMIT = 100000
@@ -43,13 +46,13 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
         sendResults()
     }
 
-    ICollectorOutputStrategy leftShift(List results) {
+    ICollectorOutputStrategy leftShift(List<SingleValueResultPOJO> results) {
         LOG.debug("Received ${results.size()} results...")
         HashMap<ResultDescriptor, List<IterationValue>> singleResults = new HashMap<ResultDescriptor, List<IterationValue>>();
         int iteration;
         for (SingleValueResultPOJO result in results) {
             iteration = result.iteration;
-            ResultDescriptor descriptor = new ResultDescriptor(result.field.id, result.path.pathName, result.collector.id, result.period)
+            ResultDescriptor descriptor = new ResultDescriptor(GroovyUtils.getId(result.field), result.path.pathName, GroovyUtils.getId(result.collector), result.period)
 
             List<IterationValue> values = singleResults.get(descriptor);
             if (values == null) {

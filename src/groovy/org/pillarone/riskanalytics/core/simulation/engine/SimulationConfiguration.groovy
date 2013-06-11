@@ -2,22 +2,18 @@ package org.pillarone.riskanalytics.core.simulation.engine
 
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.pillarone.riskanalytics.core.output.DrillDownMode
-import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
+import org.pillarone.riskanalytics.core.model.Model
+import org.pillarone.riskanalytics.core.model.ModelHelper
+import org.pillarone.riskanalytics.core.output.*
+import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationBlock
 import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
-import org.pillarone.riskanalytics.core.model.Model
-import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
-import org.pillarone.riskanalytics.core.output.CollectorFactory
-import org.pillarone.riskanalytics.core.output.PacketCollector
-import org.pillarone.riskanalytics.core.model.ModelHelper
-import org.pillarone.riskanalytics.core.output.ICollectingModeStrategy
-import org.pillarone.riskanalytics.core.output.CollectingModeFactory
-import org.pillarone.riskanalytics.core.wiring.IPacketListener
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.util.PeriodLabelsUtil
+import org.pillarone.riskanalytics.core.wiring.IPacketListener
 import org.springframework.beans.factory.config.BeanDefinition
 
 /**
@@ -50,8 +46,7 @@ public class SimulationConfiguration implements Serializable, Cloneable {
         preparedSimulation.randomSeed = simulation.randomSeed
         preparedSimulation.modelClass = simulation.modelClass
         preparedSimulation.periodCount = simulation.periodCount
-        preparedSimulation.runtimeParameters = simulation.runtimeParameters.collect { it.clone() }
-        preparedSimulation.keyFiguresToPreCalculate = simulation.keyFiguresToPreCalculate
+        preparedSimulation.runtimeParameters = simulation.runtimeParameters.collect { (ParameterHolder) it.clone() }
 
         preparedSimulation.parameterization = new Parameterization(simulation.parameterization.name, simulation.parameterization.modelClass)
         preparedSimulation.parameterization.periodCount = simulation.parameterization.periodCount
@@ -60,7 +55,7 @@ public class SimulationConfiguration implements Serializable, Cloneable {
         preparedSimulation.parameterization.dealId = simulation.parameterization.dealId
 
         //clone parameters to make sure they don't have any model or component references
-        preparedSimulation.parameterization.parameterHolders = simulation.parameterization.parameterHolders.collect { it.clone() }
+        preparedSimulation.parameterization.parameterHolders = simulation.parameterization.parameterHolders.collect { (ParameterHolder) it.clone() }
         simulation.parameterization.parameterHolders*.clearCachedValues()
 
 
@@ -86,17 +81,17 @@ public class SimulationConfiguration implements Serializable, Cloneable {
     }
 
     private void calculateTotalIterations() {
-        simulation.numberOfIterations = simulationBlocks*.blockSize.sum()
+        simulation.numberOfIterations = (int) simulationBlocks*.blockSize.sum()
     }
 
-     /**
+    /**
      * Determines all possible path & field values for this simulation and persists them if they do not exist yet, because we do not have any DB access
      * during a grid job.
      * @param simulationConfiguration the simulation details
      * @return a mapping cache filled with all necessary mappings for this simulation.
      */
     MappingCache createMappingCache(ResultConfiguration resultConfiguration) {
-        Model model = simulation.modelClass.newInstance()
+        Model model = (Model) simulation.modelClass.newInstance()
         model.init()
 
         ParameterApplicator parameterApplicator = new ParameterApplicator(model: model, parameterization: simulation.parameterization)
@@ -133,17 +128,17 @@ public class SimulationConfiguration implements Serializable, Cloneable {
         return ModelHelper.pathsExtendedWithType(splitByTypePaths, typelabels)
     }
 
-    private List<String> getDrillDownPaths(List<PacketCollector> collectors,DrillDownMode mode) {
+    private List<String> getDrillDownPaths(List<PacketCollector> collectors, DrillDownMode mode) {
         List<String> paths = []
-        for (ICollectingModeStrategy strategy: CollectingModeFactory.getDrillDownStrategies(mode)){
-            addMatchingCollector(strategy,collectors,paths)
+        for (ICollectingModeStrategy strategy : CollectingModeFactory.getDrillDownStrategies(mode)) {
+            addMatchingCollector(strategy, collectors, paths)
         }
         return paths
     }
 
-    private addMatchingCollector(ICollectingModeStrategy collectorModeStrategy, List<PacketCollector> collectors, ArrayList<String> paths) {
+    private addMatchingCollector(ICollectingModeStrategy collectorModeStrategy, List<PacketCollector> collectors, List<String> paths) {
         if (collectorModeStrategy != null) {
-            for (PacketCollector collector: collectors) {
+            for (PacketCollector collector : collectors) {
                 if (collector.mode.class.equals(collectorModeStrategy.class)) {
                     paths << collector.path
                 }
@@ -152,14 +147,15 @@ public class SimulationConfiguration implements Serializable, Cloneable {
     }
 
     private Set<String> getSplitByInceptionDateDrillDownPaths(List<PacketCollector> collectors, Model model) {
-        List<String> splitByInceptionDatePaths = getDrillDownPaths(collectors,DrillDownMode.BY_PERIOD)
+        List<String> splitByInceptionDatePaths = getDrillDownPaths(collectors, DrillDownMode.BY_PERIOD)
         Set<String> periodLabels = model.periodLabelsBeforeProjectionStart()
         periodLabels.addAll PeriodLabelsUtil.getPeriodLabels(simulation, model)
         return ModelHelper.pathsExtendedWithPeriod(splitByInceptionDatePaths, periodLabels.toList())
     }
 
     /* fugly */
-    private Set<String> hardcodedTypeSplitEnumRegistry(){
+
+    private Set<String> hardcodedTypeSplitEnumRegistry() {
         return ["ncb", "premium", "loss", "term"]
     }
 }

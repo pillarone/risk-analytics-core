@@ -1,11 +1,12 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
+import groovy.transform.CompileStatic
 import org.apache.log4j.Logger
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.user.UserManagement
-import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.util.GroovyUtils
+import org.springframework.transaction.TransactionStatus
 
 abstract class ModellingItem implements Serializable {
     protected static final Logger LOG = Logger.getLogger(ModellingItem)
@@ -26,6 +27,7 @@ abstract class ModellingItem implements Serializable {
 
     public def id
 
+    @CompileStatic
     public ModellingItem(String name) {
         this.name = name;
         itemChangedListener = []
@@ -43,15 +45,18 @@ abstract class ModellingItem implements Serializable {
 
     protected void deleteDependentData(def dao) {}
 
+    @CompileStatic
     public void setChanged(boolean newChangedValue) {
         this.changed = newChangedValue
         notifyItemChanged()
     }
 
+    @CompileStatic
     public boolean isLoaded() {
         return this.id != null
     }
 
+    @CompileStatic
     public void unload() {
         this.dao = null
         this.id = null
@@ -68,12 +73,14 @@ abstract class ModellingItem implements Serializable {
         }
     }
 
+    @CompileStatic
     public boolean isEditable() {
         return false
     }
 
     abstract protected def loadFromDB()
 
+    @CompileStatic
     public void rename(String newName) {
         if (!isLoaded()) {
             load()
@@ -113,6 +120,7 @@ abstract class ModellingItem implements Serializable {
         return result
     }
 
+    @CompileStatic
     protected void setChangeUserInfo() {
         DateTime date = new DateTime()
         Person currentUser = UserManagement.getCurrentUser()
@@ -169,14 +177,17 @@ abstract class ModellingItem implements Serializable {
     }
 
 
+    @CompileStatic
     public void addModellingItemChangeListener(IModellingItemChangeListener listener) {
         itemChangedListener << listener
     }
 
+    @CompileStatic
     public void removeModellingItemChangeListener(IModellingItemChangeListener listener) {
         itemChangedListener.remove(listener)
     }
 
+    @CompileStatic
     public void removeAllModellingItemChangeListener() {
         itemChangedListener.clear()
     }
@@ -223,10 +234,12 @@ abstract class ModellingItem implements Serializable {
         }
     }
 
+    @CompileStatic
     public boolean isUsedInSimulation() {
         return false
     }
 
+    @CompileStatic
     public List getSimulations() {
         return []
     }

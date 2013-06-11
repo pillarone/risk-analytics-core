@@ -1,17 +1,24 @@
 package org.pillarone.riskanalytics.core.model.migration
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
 import org.pillarone.riskanalytics.core.parameterization.ApplicableParameter
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.parameterization.AbstractMultiDimensionalParameter
+import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 
-
+@CompileStatic
 class ModelMigrationParameterApplicator extends ParameterApplicator {
 
     private static Log LOG = LogFactory.getLog(ModelMigrationParameterApplicator)
+
+    ModelMigrationParameterApplicator(Model model, Parameterization parameterization) {
+        this.model = model
+        this.parameterization = parameterization
+    }
 
     @Override
     protected ApplicableParameter createApplicableParameter(Model model, ParameterHolder parameterHolder) {

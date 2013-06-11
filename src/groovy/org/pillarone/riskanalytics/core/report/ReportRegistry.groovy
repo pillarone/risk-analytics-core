@@ -1,10 +1,12 @@
 package org.pillarone.riskanalytics.core.report
 
 import com.google.common.collect.Multimap
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import com.google.common.collect.ArrayListMultimap
 
+@CompileStatic
 abstract class ReportRegistry {
 
     private static Log LOG = LogFactory.getLog(ReportRegistry)
@@ -30,8 +32,8 @@ abstract class ReportRegistry {
         List<IReportModel> iReportModels = new ArrayList<IReportModel>()
         List<IReportModel> allReports = getAllReportModels()
         for (Class clazz in modelClasses) {
-            List<IReportModel> potentialReports = reportMap.get(clazz)
-            iReportModels << potentialReports.intersect(allReports)
+            Collection<IReportModel> potentialReports = reportMap.get(clazz)
+            iReportModels.addAll(potentialReports.intersect(allReports))
         }
         return iReportModels.flatten()
     }

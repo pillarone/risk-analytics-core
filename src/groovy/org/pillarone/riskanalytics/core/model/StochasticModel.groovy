@@ -1,11 +1,13 @@
 package org.pillarone.riskanalytics.core.model
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
 import org.joda.time.DateTime
 
 /**
  * A model with random elements. The iteration count is specified by the user.
  */
+@CompileStatic
 abstract class StochasticModel extends Model {
 
     /**

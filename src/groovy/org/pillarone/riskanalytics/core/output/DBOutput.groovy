@@ -1,10 +1,12 @@
 package org.pillarone.riskanalytics.core.output
 
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.output.batch.AbstractBulkInsert
 import org.pillarone.riskanalytics.core.output.batch.results.AbstractResultsBulkInsert
 
+@CompileStatic
 public class DBOutput implements ICollectorOutputStrategy {
 
     private static final Log LOG = LogFactory.getLog(ICollectorOutputStrategy)
@@ -15,7 +17,7 @@ public class DBOutput implements ICollectorOutputStrategy {
         this.batchInsert = AbstractResultsBulkInsert.getBulkInsertInstance()
     }
 
-    public ICollectorOutputStrategy leftShift(List results) {
+    public ICollectorOutputStrategy leftShift(List<SingleValueResultPOJO> results) {
 
         if (batchInsert) {
             if (!batchInsert.isInitialized()) {

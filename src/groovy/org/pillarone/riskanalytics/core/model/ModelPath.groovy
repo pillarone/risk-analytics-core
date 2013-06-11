@@ -1,6 +1,9 @@
 package org.pillarone.riskanalytics.core.model
 
+import groovy.transform.CompileStatic
 
+
+@CompileStatic
 final class ModelPath {
 
     List<ModelPathComponent> pathComponents = []

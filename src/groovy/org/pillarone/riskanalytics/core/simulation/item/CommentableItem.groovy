@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeChecked
 import org.pillarone.riskanalytics.core.FileConstants
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
@@ -14,17 +16,20 @@ abstract class CommentableItem extends ModellingItem {
 
     List<Comment> comments
 
+    @CompileStatic
     public CommentableItem(String name) {
         super(name)
         comments = []
     }
 
+    @CompileStatic
     void addComment(Comment comment) {
         comments << comment
         comment.added = true
         notifyItemChanged()
     }
 
+    @CompileStatic
     void removeComment(Comment comment) {
         if (comment.added) {
             comments.remove(comment)
@@ -37,6 +42,7 @@ abstract class CommentableItem extends ModellingItem {
     }
 
 
+    @TypeChecked
     protected void saveComments(def dao) {
         Iterator<Comment> iterator = comments.iterator()
         while (iterator.hasNext()) {
@@ -53,6 +59,7 @@ abstract class CommentableItem extends ModellingItem {
         }
     }
 
+    @CompileStatic
     public boolean commentHasChanged() {
         for (Comment comment: comments) {
             if (comment.added || comment.updated || comment.deleted)
@@ -89,6 +96,7 @@ abstract class CommentableItem extends ModellingItem {
         return false
     }
 
+    @CompileStatic
     private void deleteCommentFiles(CommentDAO commentDAO) {
         if (!commentDAO.files) return
         commentDAO.files.split(",").each {String fileName ->

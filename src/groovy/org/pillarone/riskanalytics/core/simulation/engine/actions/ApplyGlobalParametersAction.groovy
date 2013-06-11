@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.engine.actions
 
+import groovy.transform.TypeChecked
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 import org.pillarone.riskanalytics.core.parameterization.global.GlobalParameterTarget
 import org.pillarone.riskanalytics.core.parameterization.global.GlobalParameterSource
@@ -13,6 +14,7 @@ import java.lang.reflect.Method
 import org.pillarone.riskanalytics.core.wiring.ITransmitter
 import org.pillarone.riskanalytics.core.output.PacketCollector
 
+@TypeChecked
 class ApplyGlobalParametersAction implements Action {
 
     SimulationScope simulationScope
@@ -28,7 +30,7 @@ class ApplyGlobalParametersAction implements Action {
     private void applyGlobalParameters() {
         for (GlobalParameterTarget target in globalTargets) {
             String identifier = target.propertyName.substring(6).toLowerCase()
-            GlobalParameterSource source = globalSources.find { it.identifier == identifier }
+            GlobalParameterSource source = globalSources.find { GlobalParameterSource it -> it.identifier == identifier }
             if (source == null) {
                 throw new IllegalStateException("No global parameter with name $identifier found.")
             }
@@ -43,9 +45,11 @@ class ApplyGlobalParametersAction implements Action {
     }
 
     private void traverseModel(Component component) {
-        for (Map.Entry<String, ?> prop in GroovyUtils.getProperties(component)) {
-            if (prop.value instanceof Component || prop.value instanceof IParameterObject) {
-                traverseModel(prop.value)
+        for (Map.Entry<String, Object> prop in GroovyUtils.getProperties(component).entrySet()) {
+            if (prop.value instanceof Component) {
+                traverseModel(prop.value as Component)
+            } else if (prop.value instanceof IParameterObject) {
+                traverseModel(prop.value as IParameterObject)
             }
             if (prop.key.startsWith("global")) {
                 globalTargets << new GlobalParameterTarget(targetInstance: component, propertyName: prop.key)
@@ -59,7 +63,7 @@ class ApplyGlobalParametersAction implements Action {
     }
 
     private void traverseModel(GlobalParameterComponent component) {
-        for (Map.Entry<String, Method> entry in component.globalMethods) {
+        for (Map.Entry<String, Method> entry in component.globalMethods.entrySet()) {
             globalSources << new GlobalParameterSource(identifier: entry.key, method: entry.value, source: component)
         }
     }
@@ -67,10 +71,10 @@ class ApplyGlobalParametersAction implements Action {
     private void traverseModel(IParameterObject parameterObject) {
         for (param in parameterObject.parameters) {
             if (param instanceof IParameterObject) {
-                traverseModel(param)
+                traverseModel(param as IParameterObject)
             }
         }
-        for (Map.Entry<String, ?> prop in GroovyUtils.getProperties(parameterObject)) {
+        for (Map.Entry<String, Object> prop in GroovyUtils.getProperties(parameterObject).entrySet()) {
             if (prop.key.startsWith("global")) {
                 globalTargets << new GlobalParameterTarget(targetInstance: parameterObject, propertyName: prop.key)
             }

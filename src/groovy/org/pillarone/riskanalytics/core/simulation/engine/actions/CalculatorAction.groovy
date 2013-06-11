@@ -1,10 +1,12 @@
 package org.pillarone.riskanalytics.core.simulation.engine.actions
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.model.DeterministicModel
 import org.pillarone.riskanalytics.core.output.Calculator
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 
+@CompileStatic
 public class CalculatorAction implements Action {
 
     SimulationScope simulationScope

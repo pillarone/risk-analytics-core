@@ -1,8 +1,11 @@
 package org.pillarone.riskanalytics.core.simulation.engine.actions
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 import org.pillarone.riskanalytics.core.util.MathUtils
 
+
+@CompileStatic
 class RandomSeedAction implements Action {
 
     SimulationScope simulationScope

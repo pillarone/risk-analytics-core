@@ -1,8 +1,10 @@
 package org.pillarone.riskanalytics.core.components
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.model.StochasticModel
 import org.pillarone.riskanalytics.core.parameterization.IParameterObjectClassifier
 
+@CompileStatic
 class ResourceModelAdapter extends StochasticModel {
 
     IResource resource

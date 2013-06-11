@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.engine.actions
 
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.components.Component
@@ -12,6 +13,7 @@ import org.pillarone.riskanalytics.core.simulation.engine.PeriodScope
  * For each period its perform method is called.
  */
 
+@CompileStatic
 public class PeriodAction implements Action {
 
     private static Log LOG = LogFactory.getLog(PeriodAction)

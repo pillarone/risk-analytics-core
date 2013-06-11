@@ -18,7 +18,7 @@ class SimulationRunnerTests {
 
         PeriodScope periodScope = new PeriodScope()
         IterationScope iterationScope = new IterationScope(periodScope: periodScope, numberOfPeriods: 2)
-        SimulationScope simulationScope = new SimulationScope(iterationScope: iterationScope, numberOfIterations: 2, model: new EmptyModel())
+        SimulationScope simulationScope = new SimulationScope(iterationScope: iterationScope, numberOfIterations: 2, model: new EmptyModel(), simulation: new Simulation("xy"))
 
         Action periodAction = new PeriodAction(periodScope: periodScope)
         Action iterationAction = new IterationAction(iterationScope: iterationScope, periodAction: periodAction)

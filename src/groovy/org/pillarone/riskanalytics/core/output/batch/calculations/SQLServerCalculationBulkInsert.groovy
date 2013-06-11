@@ -2,11 +2,13 @@ package org.pillarone.riskanalytics.core.output.batch.calculations
 
 import grails.util.Holders
 import groovy.sql.Sql
+import groovy.transform.CompileStatic
 
 /**
  * Allianz Risk Transfer  ATOM
  * User: bzetterstrom
  */
+@CompileStatic
 class SQLServerCalculationBulkInsert extends AbstractCalculationsBulkInsert {
     static final String BULK_INSERT_TEMP_DIR_KEY = "bulkInsertTempDir"
 

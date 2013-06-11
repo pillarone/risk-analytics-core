@@ -1,18 +1,17 @@
 package org.pillarone.riskanalytics.core.dataaccess
 
-import groovy.sql.Sql
+import groovy.transform.CompileStatic
 import org.apache.commons.lang.NotImplementedException
-import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.format.DateTimeFormatter
+import org.pillarone.riskanalytics.core.output.*
+import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper
+import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.util.GroovyUtils
 import org.pillarone.riskanalytics.core.util.MathUtils
-import org.pillarone.riskanalytics.core.output.*
-import groovy.sql.GroovyRowResult
-import org.joda.time.format.DateTimeFormatter
-import org.joda.time.format.DateTimeFormat
-import org.pillarone.riskanalytics.core.simulation.item.Parameterization
-import org.joda.time.DateTime
 
 abstract class ResultAccessor {
 
@@ -24,6 +23,7 @@ abstract class ResultAccessor {
 
     private static HashMap<String, CompareValues> comparators = null;
 
+    @CompileStatic
     static List<SingleValueResultPOJO> getAllResults(SimulationRun simulationRun) {
         List<ResultPathDescriptor> paths = getDistinctPaths(simulationRun)
         List<SingleValueResultPOJO> result = []
@@ -52,7 +52,7 @@ abstract class ResultAccessor {
         DateTimeFormatter formatter = DateTimeFormat.forPattern(Parameterization.PERIOD_DATE_FORMAT)
 
         for (ResultPathDescriptor descriptor in paths) {
-            if(descriptor.collector.collectorName == AggregatedWithSingleAvailableCollectingModeStrategy.IDENTIFIER) { //get distinct path ignores single collectors
+            if (descriptor.collector.collectorName == AggregatedWithSingleAvailableCollectingModeStrategy.IDENTIFIER) { //get distinct path ignores single collectors
                 descriptor.collector = CollectorMapping.findByCollectorName(SingleValueCollectingModeStrategy.IDENTIFIER) //but we only want single values in CSV if they are available
             }
             IterationFileAccessor ifa = new IterationFileAccessor(new File(GridHelper.getResultPathLocation(simulationRun.id, descriptor.path.id, descriptor.field.id, descriptor.collector.id, descriptor.period)));
@@ -125,6 +125,7 @@ abstract class ResultAccessor {
         }
     }
 
+    @CompileStatic
     static Double getMin(SimulationRun simulationRun, int periodIndex, String pathName, String collectorName, String fieldName) {
         double[] sortedValues = getValuesSorted(simulationRun, periodIndex, pathName, collectorName, fieldName)
         if (sortedValues.length == 0) {
@@ -133,6 +134,7 @@ abstract class ResultAccessor {
         return sortedValues[0]
     }
 
+    @CompileStatic
     static Double getMax(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
         double[] sortedValues = getValuesSorted(simulationRun, periodIndex, pathName, collectorName, fieldName)
         if (sortedValues.length == 0) {
@@ -154,17 +156,16 @@ abstract class ResultAccessor {
 
     }
 
+    @CompileStatic
     static Double getStdDev(SimulationRun simulationRun, int periodIndex, String path, String collectorName, String fieldName) {
         PostSimulationCalculation result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, path, collectorName, fieldName, PostSimulationCalculation.STDEV)
         if (result != null) {
             return result.result
-        }
-        else {
+        } else {
             double[] sortedValues = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
             if (sortedValues.size() > 0) {
                 return MathUtils.calculateStandardDeviation(sortedValues)
-            }
-            else {
+            } else {
                 return null
             }
         }
@@ -180,11 +181,12 @@ abstract class ResultAccessor {
      * @param percentage
      * @return interpolated value at percentage or null if there exist no values for the path or the percentage is out of range
      */
+    @CompileStatic
     static Double getNthOrderStatistic(SimulationRun simulationRun, int periodIndex, String path, String collectorName,
                                        String fieldName, double percentage) {
         double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
         if (values.length == 0) return null
-        Double rank = simulationRun.getIterations() * percentage * 0.01
+        Double rank = (Double) simulationRun.getIterations() * percentage * 0.01
 
         Integer index = rank.toInteger()
         if (rank == 0) {
@@ -205,13 +207,13 @@ abstract class ResultAccessor {
     }
 
 
+    @CompileStatic
     static Double getPercentile(SimulationRun simulationRun, int periodIndex, String path, String collectorName, String fieldName, Double severity,
                                 QuantilePerspective perspective) {
-        def result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, path, collectorName, fieldName, perspective.getPercentileAsString(), severity)
+        PostSimulationCalculation result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, path, collectorName, fieldName, perspective.getPercentileAsString(), severity)
         if (result != null) {
             return result.result
-        }
-        else {
+        } else {
             double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]
             if (values.length == 0) {
                 return null
@@ -220,9 +222,10 @@ abstract class ResultAccessor {
         }
     }
 
+    @CompileStatic
     static Double getVar(SimulationRun simulationRun, int periodIndex, String path, String collectorName, String fieldName, Double severity,
                          QuantilePerspective perspective) {
-        def result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, path, collectorName, fieldName, perspective.getVarAsString(), severity)
+        PostSimulationCalculation result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, path, collectorName, fieldName, perspective.getVarAsString(), severity)
         if (result != null) {
             return result.result
         } else {
@@ -234,9 +237,10 @@ abstract class ResultAccessor {
         }
     }
 
+    @CompileStatic
     static Double getTvar(SimulationRun simulationRun, int periodIndex, String path, String collectorName, String fieldName,
                           Double severity, QuantilePerspective perspective) {
-        def result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, path, collectorName, fieldName, perspective.getTvarAsString(), severity)
+        PostSimulationCalculation result = PostSimulationCalculationAccessor.getResult(simulationRun, periodIndex, path, collectorName, fieldName, perspective.getTvarAsString(), severity)
         if (result != null) {
             return result.result
         } else {
@@ -253,6 +257,7 @@ abstract class ResultAccessor {
         return fillWithZeroes(simulationRun, (double[]) IterationFileAccessor.getValuesSorted(simulationRun.id, periodIndex, getPathId(pathName), getCollectorId(collectorName), getFieldId(fieldName)))
     }
 
+    @CompileStatic
     static double[] getValues(SimulationRun simulationRun, int periodIndex, String pathName, String collectorName, String fieldName) {
         File iterationFile = new File(GridHelper.getResultPathLocation(simulationRun.id, getPathId(pathName), getFieldId(fieldName), getCollectorId(collectorName), periodIndex))
         HashMap<Integer, Double> tmpValues = new HashMap<Integer, Double>(simulationRun.iterations);
@@ -265,10 +270,12 @@ abstract class ResultAccessor {
         return fillWithZeroes(simulationRun, values);
     }
 
+    @CompileStatic
     public static Double getUltimatesForOneIteration(SimulationRun simulationRun, int periodIndex, String pathName, String collectorName, String fieldName, int iteration) {
         return getSingleIterationValue(simulationRun, periodIndex, pathName, fieldName, collectorName, iteration)
     }
 
+    @CompileStatic
     private static double[] fillWithZeroes(SimulationRun run, double[] results) {
         // number of iterations may be smaller as results length if a single collector is used
         if (run.iterations <= results.length || results.length == 0) return results
@@ -365,6 +372,7 @@ abstract class ResultAccessor {
         return null;
     }
 
+    @CompileStatic
     public static synchronized void initComparators() {
 
         if (comparators != null) return;
@@ -409,6 +417,7 @@ abstract class ResultAccessor {
         });
     }
 
+    @CompileStatic
     public static List getCriteriaConstrainedIterations(SimulationRun simulationRun, int period, String path, String field,
                                                         String collector, String criteria, Double conditionValue) {
         if (conditionValue == null) return []
@@ -432,6 +441,7 @@ abstract class ResultAccessor {
         return iterations;
     }
 
+    @CompileStatic
     public static Map<Integer, Double> getIterationConstrainedValues(SimulationRun simulationRun, int period, String path, String field, String collector,
                                                                      List<Integer> iterations) {
         return IterationFileAccessor.getIterationConstrainedValues(simulationRun.id, period, getPathId(path), getFieldId(field), getCollectorId(collector), new HashSet<Integer>(iterations))
@@ -462,6 +472,7 @@ abstract class ResultAccessor {
         return collectorName.equals(collectorMapping?.collectorName)
     }
 
+    @CompileStatic
     public static void clearCaches() {
         pathCache.clear()
         fieldCache.clear()

@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation
 
+import groovy.transform.CompileStatic
 import org.joda.time.DateTime
 import org.joda.time.Period
 import org.apache.commons.lang.NotImplementedException
@@ -9,6 +10,7 @@ import org.apache.commons.lang.NotImplementedException
  * has not a defined number of periods, therefore endOfLastPeriod() is not implemented.<br>
  * Be aware of the fact that this period counter allows only for periods beginning at the first day of a month.o
  */
+@CompileStatic
 public class ContinuousPeriodCounter implements IPeriodCounter {
 
     private DateTime startOfFirstPeriod
@@ -72,7 +74,7 @@ public class ContinuousPeriodCounter implements IPeriodCounter {
     }
 
     int belongsToPeriod(DateTime date) {
-        if (date.isBefore(startOfFirstPeriod)) throw new BeforeSimulationStartException()
+        if (date.isBefore(startOfFirstPeriod)) throw new BeforeSimulationStartException("Date is before start of first period.")
         int period = 0;
         DateTime movingEndOfPeriodDate = startOfFirstPeriod.plus(periodLength)
         while (!date.isBefore(movingEndOfPeriodDate)) {

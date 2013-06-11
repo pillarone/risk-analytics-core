@@ -1,5 +1,9 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
+import groovy.transform.CompileStatic
+import org.pillarone.riskanalytics.core.model.Model
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
+
 import java.util.concurrent.atomic.AtomicInteger
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
@@ -36,9 +40,9 @@ public class SimulationRunner {
     private static Log LOG = LogFactory.getLog(SimulationRunner)
     private long start
 
-    List preSimulationActions = []
+    List<Action> preSimulationActions = []
     SimulationAction simulationAction
-    List postSimulationActions = []
+    List<Action> postSimulationActions = []
 
     SimulationScope currentScope
 
@@ -64,6 +68,7 @@ public class SimulationRunner {
      *
      * Any exception occuring during the simulation is caught and the error object will be initialized.
      */
+    @CompileStatic
     public void start() {
         synchronized (lockObj) {
             if (messageCount == null) {
@@ -149,6 +154,7 @@ public class SimulationRunner {
         cleanup()
     }
 
+    @CompileStatic
     private void deleteCancelledSimulation() {
         if (simulationAction.isCancelled()) {
             LOG.info "canceled simulation ${currentScope.simulation.name} will be deleted"
@@ -156,12 +162,14 @@ public class SimulationRunner {
         cleanup()
     }
 
+    @CompileStatic
     public synchronized void cancel() {
         LOG.info("Simulation cancelled by user")
         simulationAction.cancel()
         simulationState = SimulationState.CANCELED
     }
 
+    @CompileStatic
     protected boolean performAction(Action action, SimulationState newState) {
         LOG.info "Trying to perform action ${action.class.simpleName}..."
         synchronized (this) {
@@ -178,23 +186,25 @@ public class SimulationRunner {
     }
 
 
+    @CompileStatic
     DateTime getEstimatedSimulationEnd() {
         int progress = currentScope.getProgress()
         if (progress > 0 && simulationState == SimulationState.RUNNING) {
             long now = System.currentTimeMillis()
-            long onePercentTime = (now - start) / progress
+            long onePercentTime = (long) (now - start) / progress
             long estimatedEnd = now + (onePercentTime * (100 - progress))
             return new DateTime(estimatedEnd)
         } else if (simulationState == SimulationState.POST_SIMULATION_CALCULATIONS) {
-            CalculatorAction action = postSimulationActions.find { it instanceof CalculatorAction }
+            CalculatorAction action = (CalculatorAction) postSimulationActions.find { it instanceof CalculatorAction }
             return action?.calculator?.estimatedEnd
         }
         return null
     }
 
+    @CompileStatic
     int getProgress() {
         if (simulationState == SimulationState.POST_SIMULATION_CALCULATIONS) {
-            CalculatorAction action = postSimulationActions.find { it instanceof CalculatorAction }
+            CalculatorAction action = (CalculatorAction) postSimulationActions.find { it instanceof CalculatorAction }
             return action?.calculator?.progress
         } else {
             return currentScope.progress
@@ -205,10 +215,11 @@ public class SimulationRunner {
      * Configure the runner with the passed configuration.
      * All information about the simulation will be gathered from the configuration and the actions and scopes get the requiered parameter.
      */
+    @CompileStatic
     public void setSimulationConfiguration(SimulationConfiguration configuration) {
         Simulation simulation = (configuration.simulation)
         currentScope.simulation = simulation
-        currentScope.model = simulation.modelClass.newInstance()
+        currentScope.model = (Model) simulation.modelClass.newInstance()
         currentScope.outputStrategy = configuration.outputStrategy
         currentScope.iterationScope.numberOfPeriods = simulation.periodCount
         currentScope.simulationBlocks = configuration.simulationBlocks
@@ -228,6 +239,7 @@ public class SimulationRunner {
      * Create a new instance for running a simulation. All Actions and Scopes get created.
      * The runner instance has to be configured with a SimulationConfiguration before being able to run.
      */
+    @CompileStatic
     public static SimulationRunner createRunner() {
 
         PeriodScope periodScope = new PeriodScope()
@@ -285,25 +297,30 @@ public class SimulationRunner {
         return runner
     }
 
+    @CompileStatic
     public SimulationState getSimulationState() {
         return currentScope.simulationState
     }
 
+    @CompileStatic
     protected void setSimulationState(SimulationState newState) {
         currentScope.simulationState = newState
     }
 
+    @CompileStatic
     protected void notifySimulationStateChanged(Simulation simulation, SimulationState simulationState) {
         if (!batchRunInfoService)
             batchRunInfoService = BatchRunInfoService.getService()
         batchRunInfoService.batchSimulationStateChanged(simulation, simulationState)
     }
 
+    @CompileStatic
     public void setJobCount(int jobCount) {
         threadCount = jobCount;
     }
 
     //cleanup
+    @CompileStatic
     protected void cleanup() {
         WiringUtils.forAllComponents(currentScope.model) {originName, Component component ->
             clearScope "simulationScope", component
@@ -321,7 +338,9 @@ public class SimulationRunner {
             }
 
             clearStore(component)
-            currentScope.parameters.parameterHolders*.clearCachedValues()
+            for(ParameterHolder holder in currentScope.parameters.parameterHolders) {
+                holder.clearCachedValues()
+            }
 
         }
     }

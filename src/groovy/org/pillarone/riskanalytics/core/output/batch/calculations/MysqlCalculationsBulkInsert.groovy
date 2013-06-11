@@ -5,10 +5,9 @@ import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import java.sql.SQLException
 
-
+@CompileStatic
 class MysqlCalculationsBulkInsert extends AbstractCalculationsBulkInsert {
 
-    @CompileStatic
     protected void writeResult(List values) {
         writer.append(values.join(","))
         writer.append(";")

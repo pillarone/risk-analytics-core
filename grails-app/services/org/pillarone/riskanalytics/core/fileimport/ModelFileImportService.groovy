@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.fileimport
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.ModelDAO
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
 import org.springframework.core.type.filter.RegexPatternTypeFilter
@@ -31,10 +32,12 @@ class ModelFileImportService extends FileImportService {
         return dao.save() != null
     }
 
+    @CompileStatic
     public getDaoClass() {
-        ModelDAO
+        return ModelDAO
     }
 
+    @CompileStatic
     public String prepare(URL file, String itemName) {
         fileName = itemName - '.groovy'
 
@@ -51,17 +54,17 @@ class ModelFileImportService extends FileImportService {
     }
 
 
-
+    @CompileStatic
     protected Class findModelClass() {
         ClassPathScanner scanner = new ClassPathScanner()
         scanner.addIncludeFilter(new RegexPatternTypeFilter(Pattern.compile('(.*)\\.' + fileName + '$')))
         Set<BeanDefinition> components = scanner.findCandidateComponents("")
         if (components.size() > 1) {
-            throw new IllegalStateException("More than one model class found with name $fileName: ${components.collect { it.beanClassName }.join(" ")}")
+            throw new IllegalStateException("More than one model class found with name $fileName: ${components.collect { BeanDefinition it -> it.beanClassName }.join(" ")}")
         } else if (components.empty) {
             throw new IllegalStateException("Model class not found for $fileName")
         } else {
-            return getClass().getClassLoader().loadClass(components.toList()[0].beanClassName)
+            return getClass().getClassLoader().loadClass(components.first().beanClassName)
         }
     }
 }

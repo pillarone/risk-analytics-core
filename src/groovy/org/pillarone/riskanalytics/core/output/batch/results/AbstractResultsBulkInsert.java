@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.output.batch.results;
 
 import grails.util.Holders;
+import groovy.transform.CompileStatic;
 import groovy.util.ConfigObject;
 import org.codehaus.groovy.grails.commons.ApplicationHolder;
 import org.pillarone.riskanalytics.core.output.SingleValueResultPOJO;
@@ -19,6 +20,7 @@ public abstract class AbstractResultsBulkInsert extends AbstractBulkInsert {
 
     private Map<Object, Long> idCache = new HashMap<Object, Long>();
 
+    @CompileStatic
     void addResults(List<SingleValueResultPOJO> results) {
         List values = new ArrayList(7);
         for (SingleValueResultPOJO result : results) {
@@ -41,6 +43,7 @@ public abstract class AbstractResultsBulkInsert extends AbstractBulkInsert {
         }
     }
 
+    @CompileStatic
     private long obtainId(Object mapping) {
         if(idCache.containsKey(mapping)) {
             return idCache.get(mapping);
@@ -52,7 +55,7 @@ public abstract class AbstractResultsBulkInsert extends AbstractBulkInsert {
         return id;
     }
 
-    public static AbstractBulkInsert getBulkInsertInstance() {
+    public static AbstractResultsBulkInsert getBulkInsertInstance() {
         try {
             ConfigObject configObject = Holders.getGrailsApplication().getConfig();
             Class bulkClass = null;
@@ -62,7 +65,7 @@ public abstract class AbstractResultsBulkInsert extends AbstractBulkInsert {
             if (bulkClass == null) {
                 return new GenericBulkInsert();
             }
-            return (AbstractBulkInsert) AbstractBulkInsert.class.getClassLoader().loadClass(bulkClass.getName()).newInstance();
+            return (AbstractResultsBulkInsert) AbstractResultsBulkInsert.class.getClassLoader().loadClass(bulkClass.getName()).newInstance();
         } catch (Exception e) {
             return new GenericBulkInsert();
         }

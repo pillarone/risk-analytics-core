@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.components
 
+import groovy.transform.TypeChecked
+
 import java.util.*
 import org.pillarone.riskanalytics.core.simulation.engine.PeriodScope;
 
@@ -16,6 +18,7 @@ import org.pillarone.riskanalytics.core.simulation.engine.PeriodScope;
  *
  *  @author dierk.koenig (at) canoo (dot) com, stefan.kunz (at) intuitive-collaboration (dot) com
  */
+@TypeChecked
 abstract public class AbstractStore {
 
     public static int CURRENT_PERIOD = 0
@@ -117,7 +120,7 @@ abstract public class AbstractStore {
     }
 
     private Object clone(Collection collection) {
-        Collection clonedCollection = collection.clone()
+        Collection clonedCollection = (Collection) collection.clone()
         clonedCollection.clear()
         for (Object obj: collection) {
             //todo(sku): implement a deep clone

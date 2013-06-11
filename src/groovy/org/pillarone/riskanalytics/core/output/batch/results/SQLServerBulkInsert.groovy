@@ -1,7 +1,9 @@
 package org.pillarone.riskanalytics.core.output.batch.results
 
 import groovy.sql.Sql
+import groovy.transform.CompileStatic
 
+@CompileStatic
 class SQLServerBulkInsert extends AbstractResultsBulkInsert {
 
     protected void save() {

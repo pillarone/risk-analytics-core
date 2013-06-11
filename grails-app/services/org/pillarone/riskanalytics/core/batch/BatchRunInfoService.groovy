@@ -1,12 +1,13 @@
 package org.pillarone.riskanalytics.core.batch
 
+import grails.util.Holders
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pillarone.riskanalytics.core.BatchRunSimulationRun
+import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
-import org.pillarone.riskanalytics.core.output.SimulationRun
 
 /**
  * @author fouad.jaada@intuitive-collaboration.com
@@ -14,28 +15,30 @@ import org.pillarone.riskanalytics.core.output.SimulationRun
 class BatchRunInfoService {
 
     List<BatchRunSimulationRun> runningBatchSimulationRuns
-    List<BatchRunSimulationRun> finishedSimulations
+    List<Simulation> finishedSimulations
 
-    Log LOG = LogFactory.getLog(BatchRunInfoService)
-
+    @CompileStatic
     public BatchRunInfoService() {
         runningBatchSimulationRuns = []
         finishedSimulations = []
     }
 
+    @CompileStatic
     public static BatchRunInfoService getService() {
-        return ApplicationHolder.getApplication().getMainContext().getBean('batchRunInfoService')
+        return Holders.grailsApplication.mainContext.getBean(BatchRunInfoService)
     }
 
-
+    @CompileStatic
     public synchronized void batchSimulationStart(Simulation simulation) {
         BatchRunSimulationRun batchRunSimulationRun = update(simulation, SimulationState.NOT_RUNNING)
         addRunning batchRunSimulationRun
     }
 
-
+    @CompileStatic
     public synchronized void batchSimulationStateChanged(Simulation simulation, SimulationState simulationState) {
-        BatchRunSimulationRun brsr = runningBatchSimulationRuns.find { (it.simulationRun.name == simulation.name) && (it.simulationRun.model == simulation.modelClass.name)}
+        BatchRunSimulationRun brsr = runningBatchSimulationRuns.find { BatchRunSimulationRun it ->
+            (it.simulationRun.name == simulation.name) && (it.simulationRun.model == simulation.modelClass.name)
+        }
         if (!brsr) return
         brsr.simulationState = simulationState
         update(simulation, simulationState)
@@ -43,12 +46,13 @@ class BatchRunInfoService {
             finishedSimulations << simulation
     }
 
-
+    @CompileStatic
     public void addRunning(BatchRunSimulationRun batchRunSimulationRun) {
-        runningBatchSimulationRuns.remove(runningBatchSimulationRuns.find {it.simulationRun.name == batchRunSimulationRun.simulationRun.name})
+        runningBatchSimulationRuns.remove(runningBatchSimulationRuns.find { BatchRunSimulationRun it ->
+            it.simulationRun.name == batchRunSimulationRun.simulationRun.name
+        })
         runningBatchSimulationRuns << batchRunSimulationRun
     }
-
 
     private BatchRunSimulationRun update(Simulation simulation, SimulationState simulationState) {
         BatchRunSimulationRun batchRunSimulationRun = BatchRunSimulationRun.findBySimulationRun(SimulationRun.get(simulation.id))
@@ -56,14 +60,16 @@ class BatchRunInfoService {
         batchRunSimulationRun.save()
     }
 
+    @CompileStatic
     public BatchRunSimulationRun getBatchRunSimulationRun(BatchRunSimulationRun batchRunSimulationRun) {
-        return runningBatchSimulationRuns.find { it.id == batchRunSimulationRun.id}
+        return runningBatchSimulationRuns.find { BatchRunSimulationRun it -> it.id == batchRunSimulationRun.id}
     }
 
+    @CompileStatic
     public List<Simulation> getFinished(long endTime) {
         List<Simulation> simulations = []
         for (Simulation simulation: finishedSimulations) {
-            if (simulation?.getEnd()?.getTime() > endTime)
+            if (simulation.end?.millis > endTime)
                 simulations << simulation
         }
         return simulations

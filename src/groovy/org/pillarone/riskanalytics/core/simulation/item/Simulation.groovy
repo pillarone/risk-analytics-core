@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
 import grails.util.Holders
+import groovy.transform.CompileStatic
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.ParameterizationDAO
@@ -48,10 +49,12 @@ class Simulation extends ParametrizedItem {
         tags = []
     }
 
+    @CompileStatic
     protected Object createDao() {
         return new SimulationRun(name: name, model: modelClass?.name)
     }
 
+    @CompileStatic
     public Object getDaoClass() {
         SimulationRun
     }
@@ -133,10 +136,12 @@ class Simulation extends ParametrizedItem {
 
 
     @Override
+    @CompileStatic
     List<ParameterHolder> getAllParameterHolders() {
         return runtimeParameters
     }
 
+    @CompileStatic
     public Object getParameter(String path) {
         for (int i = 0; i < runtimeParameters.size(); i++) {
             ParameterHolder parameterHolder = runtimeParameters.get(i);
@@ -193,6 +198,7 @@ class Simulation extends ParametrizedItem {
     /**
      * safely called within a transaction from the delete() template method
      */
+    @CompileStatic
     protected Object deleteDaoImpl(simulation) {
         assert simulation instanceof SimulationRun
         DeleteSimulationStrategy.instance.deleteSimulation(simulation)
@@ -223,6 +229,7 @@ class Simulation extends ParametrizedItem {
         return results
     }
 
+    @CompileStatic
     void setModelClass(Class clazz) {
         super.setModelClass(clazz)
         modelVersionNumber = Model.getModelVersion(clazz)

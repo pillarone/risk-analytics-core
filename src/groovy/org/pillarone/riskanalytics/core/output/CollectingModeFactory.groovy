@@ -1,8 +1,10 @@
 package org.pillarone.riskanalytics.core.output
 
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 
+@CompileStatic
 class CollectingModeFactory {
 
     private static Map<String, ICollectingModeStrategy> strategies = new HashMap()

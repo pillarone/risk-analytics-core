@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.output.*
@@ -13,6 +14,7 @@ class ResultConfiguration extends ModellingItem {
     VersionNumber modelVersionNumber
     List<PacketCollector> collectors
 
+    @CompileStatic
     public ResultConfiguration(String name) {
         super(name)
         versionNumber = new VersionNumber("1")
@@ -39,6 +41,7 @@ class ResultConfiguration extends ModellingItem {
         return getDaoClass().newInstance()
     }
 
+    @CompileStatic
     public Object getDaoClass() {
         return ResultConfigurationDAO
     }
@@ -52,6 +55,7 @@ class ResultConfiguration extends ModellingItem {
      * components are replaced with the actual sub component names.
      * This is in contrast to getCollectors, which returns the collectors for UI use.
      */
+    @CompileStatic
     public List<PacketCollector> getResolvedCollectors(Model model, CollectorFactory collectorFactory) {
         return collectorFactory.createCollectors(this, model)
     }
@@ -139,6 +143,7 @@ class ResultConfiguration extends ModellingItem {
 
     }
 
+    @CompileStatic
     void setModelClass(Class clazz) {
         super.setModelClass(clazz)
         modelVersionNumber = Model.getModelVersion(clazz)
@@ -148,6 +153,7 @@ class ResultConfiguration extends ModellingItem {
         return SimulationRun.find("from ${SimulationRun.class.name} as run where run.resultConfiguration.name = ? and run.resultConfiguration.modelClassName = ? and run.resultConfiguration.itemVersion =?", [name, modelClass.name, versionNumber.toString()]) != null
     }
 
+    @CompileStatic
     boolean isEditable() {
         return !isUsedInSimulation()
     }
@@ -186,6 +192,7 @@ class ResultConfiguration extends ModellingItem {
         return original
     }
 
+    @CompileStatic
     IConfigObjectWriter getWriter() {
         return new ResultConfigurationWriter()
     }

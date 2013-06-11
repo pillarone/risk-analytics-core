@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.output.batch
 
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.FileConstants
@@ -16,6 +17,7 @@ abstract class AbstractBulkInsert {
     long simulationRunId
     boolean initialized = false
 
+    @CompileStatic
     private void init() {
         if (!initialized) {
             String filename = "${FileConstants.TEMP_FILE_DIRECTORY}${File.separatorChar}${simulationRunId}"
@@ -34,6 +36,7 @@ abstract class AbstractBulkInsert {
         init()
     }
 
+    @CompileStatic
     void setSimulationRunId(long id){
         this.simulationRunId=id;
         init();
@@ -41,6 +44,7 @@ abstract class AbstractBulkInsert {
 
     abstract protected void writeResult(List values)
 
+    @CompileStatic
     final void saveToDB() {
         if (initialized) {
             writer.flush()
@@ -50,6 +54,7 @@ abstract class AbstractBulkInsert {
         }
     }
 
+    @CompileStatic
     void reset() {
         if (initialized) {
             writer.close()

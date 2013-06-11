@@ -1,8 +1,11 @@
 package org.pillarone.riskanalytics.core.util
 
+import groovy.transform.CompileStatic
+
 /**
  * @author fouad.jaada@intuitive-collaboration.com
  */
+@CompileStatic
 class PropertiesUtils {
 
     Properties getProperties(String propertiesName) {

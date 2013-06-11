@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation
 
+import groovy.transform.CompileStatic
 import org.joda.time.DateTime
 import org.joda.time.Period
 
@@ -8,6 +9,7 @@ import org.joda.time.Period
  *
  * @author stefan.kunz (at) intuitive-collaboration (dot) com 
  */
+@CompileStatic
 class LimitedContinuousPeriodCounter extends ContinuousPeriodCounter implements ILimitedPeriodCounter {
 
     private List<DateTime> dates = new ArrayList<DateTime>()

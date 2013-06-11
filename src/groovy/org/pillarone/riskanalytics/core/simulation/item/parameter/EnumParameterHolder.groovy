@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.simulation.item.parameter
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeChecked
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.EnumParameter
 
@@ -7,10 +9,12 @@ class EnumParameterHolder extends ParameterHolder {
 
     private Enum value
 
+    @CompileStatic
     public EnumParameterHolder(Parameter parameter) {
         super(parameter);
     }
 
+    @CompileStatic
     public EnumParameterHolder(String path, int periodIndex, Enum value) {
         super(path, periodIndex);
         this.value = value;
@@ -21,6 +25,7 @@ class EnumParameterHolder extends ParameterHolder {
         this.value = Enum.valueOf(Thread.currentThread().contextClassLoader.loadClass(parameter.parameterType), parameter.parameterValue)
     }
 
+    @CompileStatic
     Enum getBusinessObject() {
         return value;
     }
@@ -30,12 +35,13 @@ class EnumParameterHolder extends ParameterHolder {
         parameter.parameterValue = value.toString()
     }
 
+    @CompileStatic
     Parameter createEmptyParameter() {
         return new EnumParameter(path: path, periodIndex: periodIndex)
     }
 
     protected void updateValue(Object newValue) {
-        value = Enum.valueOf(value.getDeclaringClass(), newValue)
+        value = Enum.valueOf(value.getDeclaringClass(), newValue.toString())
     }
 
 }

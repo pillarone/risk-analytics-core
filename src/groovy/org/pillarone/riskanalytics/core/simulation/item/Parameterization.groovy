@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
+import groovy.transform.CompileStatic
 import org.apache.commons.lang.builder.HashCodeBuilder
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
@@ -46,7 +47,7 @@ class Parameterization extends ParametrizedItem {
     Integer periodCount
     List<ParameterHolder> parameterHolders
     List<Tag> tags = []
-    List periodLabels
+    List<String> periodLabels
 
     boolean orderByPath = false
     boolean valid
@@ -66,6 +67,7 @@ class Parameterization extends ParametrizedItem {
         }
     }
 
+    @CompileStatic
     public Parameterization(String name) {
         super(name)
         setName(name)
@@ -75,15 +77,18 @@ class Parameterization extends ParametrizedItem {
         periodCount = 1
     }
 
+    @CompileStatic
     public Parameterization(String name, Class modelClass) {
         this(name)
         this.modelClass = modelClass
     }
 
+    @CompileStatic
     protected Object createDao() {
         return new ParameterizationDAO()
     }
 
+    @CompileStatic
     public Object getDaoClass() {
         ParameterizationDAO
     }
@@ -92,7 +97,7 @@ class Parameterization extends ParametrizedItem {
         valid = false
         List<ParameterValidation> errors = []
         for (IParameterizationValidator validator in ValidatorRegistry.getValidators()) {
-            errors.addAll(validator.validate(parameterHolders.findAll { !it.removed }))
+            errors.addAll(validator.validate(parameterHolders.findAll { ParameterHolder it -> !it.removed }))
         }
 
         valid = errors.empty || errors.every {ParameterValidation validation -> validation.validationType != ValidationType.ERROR}
@@ -123,9 +128,10 @@ class Parameterization extends ParametrizedItem {
         return result
     }
 
+    @CompileStatic
     private List obtainPeriodLabelsFromParameters() {
         try {
-            Model model = modelClass.newInstance()
+            Model model = (Model) modelClass.newInstance()
             model.init()
             ParameterApplicator applicator = new ParameterApplicator(model: model, parameterization: this)
             applicator.init()
@@ -209,11 +215,13 @@ class Parameterization extends ParametrizedItem {
     }
 
     @Override
+    @CompileStatic
     void addComment(Comment comment) {
         setChanged(true)
         super.addComment(comment)
     }
 
+    @CompileStatic
     void addTaggedComment(String commentText, Tag tag) {
         String modelName = Model.getName(modelClass)
         Comment comment = new Comment(modelName, -1)
@@ -223,6 +231,7 @@ class Parameterization extends ParametrizedItem {
     }
 
     @Override
+    @CompileStatic
     void removeComment(Comment comment) {
         setChanged(true)
         super.removeComment(comment)
@@ -305,6 +314,7 @@ class Parameterization extends ParametrizedItem {
     }
 
     @Override
+    @CompileStatic
     void unload() {
         super.unload()
         loaded = false
@@ -326,6 +336,7 @@ class Parameterization extends ParametrizedItem {
         parameterizationDAO = newDao
     }
 
+    @CompileStatic
     public int hashCode() {
         HashCodeBuilder hashCodeBuilder = new HashCodeBuilder()
         hashCodeBuilder.append(name)
@@ -347,10 +358,12 @@ class Parameterization extends ParametrizedItem {
     }
 
     @Override
+    @CompileStatic
     boolean isLoaded() {
         return loaded
     }
 
+    @CompileStatic
     public boolean isEditable() {
         if (status != Status.NONE && status != Status.DATA_ENTRY) {
             return false
@@ -358,6 +371,7 @@ class Parameterization extends ParametrizedItem {
         return !isUsedInSimulation()
     }
 
+    @CompileStatic
     public List<String> getAllEditablePaths() {
         List result = []
         for (Comment comment in comments) {
@@ -368,6 +382,7 @@ class Parameterization extends ParametrizedItem {
         return result
     }
 
+    @CompileStatic
     public boolean newVersionAllowed() {
         return status == Status.NONE || status == Status.DATA_ENTRY
     }
@@ -387,10 +402,12 @@ class Parameterization extends ParametrizedItem {
 
 
     @Override
+    @CompileStatic
     List<ParameterHolder> getAllParameterHolders() {
         return parameterHolders
     }
 
+    @CompileStatic
     public List<Tag> getTags() {
         return tags
     }
@@ -477,6 +494,7 @@ class Parameterization extends ParametrizedItem {
         return original
     }
 
+    @CompileStatic
     String getPeriodLabel(int index) {
         if (periodLabels != null && !periodLabels.empty) {
             return periodLabels[index]
@@ -484,11 +502,13 @@ class Parameterization extends ParametrizedItem {
         return "P$index".toString()
     }
 
+    @CompileStatic
     void setModelClass(Class clazz) {
         super.setModelClass(clazz)
         modelVersionNumber = Model.getModelVersion(clazz)
     }
 
+    @CompileStatic
     IConfigObjectWriter getWriter() {
         return new ParameterWriter()
     }
@@ -504,6 +524,7 @@ class Parameterization extends ParametrizedItem {
     }
 
     @Override
+    @CompileStatic
     String toString() {
         "$name v$versionNumber"
     }

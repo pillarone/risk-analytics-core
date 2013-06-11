@@ -1,10 +1,11 @@
 package org.pillarone.riskanalytics.core.model.migration
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.pillarone.riskanalytics.core.model.Model
 import org.apache.commons.lang.StringUtils
 
-
+@CompileStatic
 abstract class AbstractMigration {
 
     final VersionNumber from

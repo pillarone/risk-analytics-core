@@ -1,9 +1,10 @@
 package org.pillarone.riskanalytics.core.simulation.engine.actions
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
-import org.pillarone.riskanalytics.core.simulation.engine.actions.Action
 
+@CompileStatic
 public class FinishOutputAction implements Action {
 
     SimulationScope simulationScope

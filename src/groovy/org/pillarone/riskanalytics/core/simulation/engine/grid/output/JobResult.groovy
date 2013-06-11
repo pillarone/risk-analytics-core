@@ -1,6 +1,8 @@
 package org.pillarone.riskanalytics.core.simulation.engine.grid.output
 
+import groovy.transform.CompileStatic
 
+@CompileStatic
 class JobResult implements Serializable {
 
     String nodeName

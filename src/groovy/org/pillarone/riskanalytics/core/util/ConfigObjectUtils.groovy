@@ -26,7 +26,7 @@ public class ConfigObjectUtils {
 
 class PacketUtils {
 
-    public static final Map primitiveToWrapperClass = [
+    public static final Map<Class, Class> primitiveToWrapperClass = [
             (Double.TYPE): Double,
             (Integer.TYPE): Integer,
             (Float.TYPE): Float,

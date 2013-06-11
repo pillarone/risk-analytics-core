@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.ResourceDAO
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.comment.ResourceCommentDAO
@@ -26,6 +27,7 @@ class Resource extends ParametrizedItem {
     List validationErrors
     Status status
 
+    @CompileStatic
     Resource(String name, Class resourceClass) {
         super(name)
         this.modelClass = resourceClass
@@ -34,12 +36,14 @@ class Resource extends ParametrizedItem {
         versionNumber = new VersionNumber("1")
     }
 
+    @CompileStatic
     ResourceHolder getResourceInstance() {
         return new ResourceHolder(modelClass, name, versionNumber)
     }
 
+    @CompileStatic
     IResource createResourceInstance() {
-        IResource instance = modelClass.newInstance()
+        IResource instance = (IResource) modelClass.newInstance()
         if (name != null) {
             if (!isLoaded()) {
                 load()
@@ -66,25 +70,30 @@ class Resource extends ParametrizedItem {
     }
 
     @Override
+    @CompileStatic
     List<ParameterHolder> getAllParameterHolders() {
         return parameterHolders
     }
 
     @Override
+    @CompileStatic
     protected createDao() {
         return new ResourceDAO(name: name, resourceClassName: modelClass.name)
     }
 
     @Override
+    @CompileStatic
     def getDaoClass() {
         return ResourceDAO
     }
 
     @Override
+    @CompileStatic
     Integer getPeriodCount() {
         return 1
     }
 
+    @CompileStatic
     public List<String> getAllEditablePaths() {
         List result = []
         for (Comment comment in comments) {
@@ -204,6 +213,7 @@ class Resource extends ParametrizedItem {
         return false
     }
 
+    @CompileStatic
     List getParameters(String path) {
         return parameterHolders.findAll {ParameterHolder parameter ->
             parameter.path == path && !parameter.removed
@@ -219,6 +229,7 @@ class Resource extends ParametrizedItem {
         } > 0
     }
 
+    @CompileStatic
     public boolean isEditable() {
         if (status != Status.NONE && status != Status.DATA_ENTRY) {
             return false

@@ -1,11 +1,12 @@
 package org.pillarone.riskanalytics.core.simulation.engine.grid
 
+import groovy.transform.CompileStatic
 import org.gridgain.grid.GridTaskFuture
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.joda.time.DateTime
 
-
+@CompileStatic
 class SimulationHandler {
 
     SimulationTask simulationTask

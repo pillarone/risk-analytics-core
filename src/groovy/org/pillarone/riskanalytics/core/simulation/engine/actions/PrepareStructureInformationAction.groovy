@@ -1,13 +1,14 @@
 package org.pillarone.riskanalytics.core.simulation.engine.actions
 
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.pillarone.riskanalytics.core.ModelStructureDAO
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.parameterization.StructureInformation
 import org.pillarone.riskanalytics.core.parameterization.StructureInformationInjector
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 
+@CompileStatic
 public class PrepareStructureInformationAction implements Action {
 
     private static Log LOG = LogFactory.getLog(PrepareStructureInformationAction)

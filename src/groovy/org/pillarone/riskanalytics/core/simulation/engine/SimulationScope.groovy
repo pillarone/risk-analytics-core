@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.joda.time.DateTime
@@ -24,6 +25,7 @@ import org.pillarone.riskanalytics.core.output.FileOutput
  * Components using the SimulationContext are to be changed to use the corresponding scope.
  */
 
+@CompileStatic
 public class SimulationScope {
 
     private static Log LOG = LogFactory.getLog(SimulationScope)
@@ -69,9 +71,9 @@ public class SimulationScope {
 
     int getProgress() {
         if (model instanceof DeterministicModel) {
-            return iterationScope.periodScope.currentPeriod / iterationScope.numberOfPeriods * 100.0
+            return (int) (iterationScope.periodScope.currentPeriod / iterationScope.numberOfPeriods * 100.0)
         } else {
-            return iterationsDone / (simulationBlocks*.blockSize.sum()) * 100.0
+            return (int) (iterationsDone / ((int) simulationBlocks*.blockSize.sum()) * 100.0)
         }
     }
 

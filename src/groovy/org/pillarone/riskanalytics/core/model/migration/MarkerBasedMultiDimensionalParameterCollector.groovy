@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.model.migration
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.components.IResource
 import org.pillarone.riskanalytics.core.model.IModelVisitor
@@ -13,6 +14,7 @@ import org.pillarone.riskanalytics.core.components.IComponentMarker
 import org.pillarone.riskanalytics.core.parameterization.ComboBoxTableMultiDimensionalParameter
 import org.pillarone.riskanalytics.core.parameterization.ComboBoxMatrixMultiDimensionalParameter
 
+@CompileStatic
 class MarkerBasedMultiDimensionalParameterCollector implements IModelVisitor {
 
     List<AbstractMultiDimensionalParameter> result = []
@@ -33,21 +35,22 @@ class MarkerBasedMultiDimensionalParameterCollector implements IModelVisitor {
     }
 
     void visitParameterObject(IParameterObject parameterObject, ModelPath path) {
-        for (Map.Entry<String, Object> entry in parameterObject.parameters) {
+        for (Map.Entry entry in parameterObject.parameters.entrySet()) {
             checkValue(entry.value)
         }
     }
 
     private checkValue(def value) {
         if (value instanceof ConstrainedMultiDimensionalParameter) {
-            for (int i = 0; i < value.columnCount; i++) {
-                if (IComponentMarker.isAssignableFrom(value.constraints.getColumnType(i))) {
-                    result << value
+            ConstrainedMultiDimensionalParameter mdp = (ConstrainedMultiDimensionalParameter) value
+            for (int i = 0; i < mdp.columnCount; i++) {
+                if (IComponentMarker.isAssignableFrom(mdp.constraints.getColumnType(i))) {
+                    result << mdp
                     return
                 }
             }
         } else if (value instanceof ComboBoxTableMultiDimensionalParameter || value instanceof ComboBoxMatrixMultiDimensionalParameter) {
-            result << value
+            result << (AbstractMultiDimensionalParameter) value
         }
     }
 }

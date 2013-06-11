@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.simulation.item.parameter
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeChecked
 import org.pillarone.riskanalytics.core.parameter.EnumParameter
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.ParameterEntry
@@ -18,21 +20,23 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
     IParameterObjectClassifier classifier
     Map<String, ParameterHolder> classifierParameters
 
+    @CompileStatic
     public ParameterObjectParameterHolder(Parameter parameter) {
         super(parameter);
     }
 
+    @TypeChecked
     public ParameterObjectParameterHolder(String path, int periodIndex, IParameterObject value) {
         super(path, periodIndex);
-        if(value == null) {
+        if (value == null) {
             throw new IllegalArgumentException("Parameter object is null at $path P$periodIndex")
         }
 
         classifierParameters = new HashMap<String, ParameterHolder>()
         this.classifier = value.type
 
-        for (Map.Entry entry in value.parameters) {
-            classifierParameters.put(entry.key, ParameterHolderFactory.getHolder(path + ":$entry.key", periodIndex, entry.value))
+        for (Map.Entry entry in value.parameters.entrySet()) {
+            classifierParameters.put(entry.key.toString(), ParameterHolderFactory.getHolder(path + ":$entry.key", periodIndex, entry.value))
         }
         check()
     }
@@ -55,16 +59,18 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
         check()
     }
 
+    @CompileStatic
     IParameterObject getBusinessObject() {
-        if(classifier == null) {
+        if (classifier == null) {
             throw new IllegalStateException("Classifier null in $path P$periodIndex")
         }
         return classifier.getParameterObject(getParameterMap())
     }
 
+    @CompileStatic
     Map getParameterMap() {
         Map result = [:]
-        for (Map.Entry entry in classifierParameters) {
+        for (Map.Entry<String, ParameterHolder> entry in classifierParameters.entrySet()) {
             result.put(entry.key, entry.value.getBusinessObject())
         }
         return result
@@ -93,6 +99,7 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
     }
 
 
+    @CompileStatic
     Parameter createEmptyParameter() {
         ParameterObjectParameter parameter = new ParameterObjectParameter(path: path, periodIndex: periodIndex)
         parameter.type = new EnumParameter(path: path + ":type", periodIndex: periodIndex, parameterType: classifier.getClass().name)
@@ -115,6 +122,7 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
         classifierParameters = newClassifierParameters
     }
 
+    @CompileStatic
     private boolean oldParametersReusable(ParameterHolder oldEntry, String newClassName) {
         if (oldEntry == null) return false
         try {
@@ -127,26 +135,29 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
         }
     }
 
+    @CompileStatic
     boolean hasParameterChanged() {
         if (added || removed) return false
 
         boolean result = modified
         if (!result) {
-            result = classifierParameters.values().any { it.hasParameterChanged() }
+            result = classifierParameters.values().any { ParameterHolder it -> it.hasParameterChanged() }
         }
         return result
     }
 
+    @CompileStatic
     public ParameterObjectParameterHolder clone() {
         ParameterObjectParameterHolder holder = (ParameterObjectParameterHolder) super.clone();
         holder.classifier = classifier
         holder.classifierParameters = new HashMap<String, ParameterHolder>()
-        for (Map.Entry entry in classifierParameters) {
-            holder.classifierParameters.put(entry.key, entry.value.clone())
+        for (Map.Entry<String, ParameterHolder> entry in classifierParameters.entrySet()) {
+            holder.classifierParameters.put(entry.key, (ParameterHolder) entry.value.clone())
         }
         return holder
     }
 
+    @CompileStatic
     public void clearCachedValues() {
         for (ParameterHolder p in classifierParameters.values()) {
             p.clearCachedValues()
@@ -172,14 +183,15 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
         classifierParameters = inStream.readObject()
     }
 
+    @CompileStatic
     List<String> referencePaths(Class markerInterface, String refValue) {
         if (classifierParameters.size() > 0) {
             List<String> references = new ArrayList<String>()
             for (ParameterHolder parameterHolder : classifierParameters.values()) {
                 if (parameterHolder instanceof MultiDimensionalParameterHolder) {
-                    references.addAll parameterHolder.referencePaths(markerInterface, refValue)
+                    references.addAll((parameterHolder as IMarkerValueAccessor).referencePaths(markerInterface, refValue))
                 } else if (parameterHolder instanceof ParameterObjectParameterHolder) {
-                    references.addAll(parameterHolder.referencePaths(markerInterface, refValue))
+                    references.addAll((parameterHolder as IMarkerValueAccessor).referencePaths(markerInterface, refValue))
                 }
             }
             return references
@@ -187,15 +199,16 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
         return Collections.emptyList()
     }
 
+    @CompileStatic
     List<String> updateReferenceValues(Class markerInterface, String oldValue, String newValue) {
         if (classifierParameters.size() > 0) {
             List<String> referencePaths = new ArrayList<String>()
             for (ParameterHolder parameterHolder : classifierParameters.values()) {
                 if (parameterHolder instanceof MultiDimensionalParameterHolder) {
-                    referencePaths.addAll parameterHolder.updateReferenceValues(markerInterface, oldValue, newValue)
+                    referencePaths.addAll( (parameterHolder as IMarkerValueAccessor).updateReferenceValues(markerInterface, oldValue, newValue))
                 }
                 if (parameterHolder instanceof ParameterObjectParameterHolder) {
-                    referencePaths.addAll parameterHolder.updateReferenceValues(markerInterface, oldValue, newValue)
+                    referencePaths.addAll ((parameterHolder as IMarkerValueAccessor).updateReferenceValues(markerInterface, oldValue, newValue))
                 }
             }
             return referencePaths
@@ -203,6 +216,7 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
         return Collections.emptyList()
     }
 
+    @CompileStatic
     private void check() {
         if (classifier == null) { //TODO: would like to throw an exception here, but then migration fails
             LOG.error("Classifier null in path $path period $periodIndex")

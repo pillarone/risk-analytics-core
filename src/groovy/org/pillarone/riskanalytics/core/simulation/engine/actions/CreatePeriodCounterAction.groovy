@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.engine.actions
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
 import org.pillarone.riskanalytics.core.simulation.ILimitedPeriodCounter
@@ -9,6 +10,7 @@ import org.pillarone.riskanalytics.core.simulation.ILimitedPeriodCounter
  * This action should be executed AFTER  {@code PrepareParameterizationAction} because the model may need its
  * parameters injected to create the period counter.
  */
+@CompileStatic
 class CreatePeriodCounterAction implements Action {
 
     SimulationScope simulationScope

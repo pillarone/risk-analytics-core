@@ -1,8 +1,10 @@
-package org.pillarone.riskanalytics.core.initialization;
+package org.pillarone.riskanalytics.core.initialization
 
+import groovy.transform.CompileStatic;
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.plugins.log4j.Log4jConfig
 
+@CompileStatic
 class StandaloneConfigLoader {
 
     static void loadLog4JConfig(String environment) {

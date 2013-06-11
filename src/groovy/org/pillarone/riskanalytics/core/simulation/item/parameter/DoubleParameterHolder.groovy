@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.item.parameter
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.DoubleParameter
 
@@ -7,10 +8,12 @@ class DoubleParameterHolder extends ParameterHolder {
 
     private double value;
 
+    @CompileStatic
     public DoubleParameterHolder(Parameter parameter) {
         super(parameter);
     }
 
+    @CompileStatic
     public DoubleParameterHolder(String path, int periodIndex, double value) {
         super(path, periodIndex);
         this.value = value;
@@ -21,6 +24,7 @@ class DoubleParameterHolder extends ParameterHolder {
         this.value = parameter.doubleValue
     }
 
+    @CompileStatic
     Double getBusinessObject() {
         return value;
     }
@@ -29,12 +33,14 @@ class DoubleParameterHolder extends ParameterHolder {
         parameter.doubleValue = value
     }
 
+    @CompileStatic
     Parameter createEmptyParameter() {
         return new DoubleParameter(path: path, periodIndex: periodIndex)
     }
 
+    @CompileStatic
     protected void updateValue(Object newValue) {
-        value = newValue
+        value = (double) newValue
     }
 
 }

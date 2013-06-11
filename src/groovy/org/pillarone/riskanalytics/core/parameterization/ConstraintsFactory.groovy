@@ -1,10 +1,12 @@
 package org.pillarone.riskanalytics.core.parameterization
 
 import com.google.common.collect.MapMaker
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.model.migration.ModelMigrator
 
+@CompileStatic
 class ConstraintsFactory {
 
     private static Log LOG = LogFactory.getLog(ConstraintsFactory)
@@ -37,7 +39,7 @@ class ConstraintsFactory {
                 final String name1 = constraint.class.name
                 Class clazz = Thread.currentThread().contextClassLoader.loadClass(name1)
                 if (clazz != constraint.class) {
-                    return clazz.newInstance()
+                    return (IMultiDimensionalConstraints) clazz.newInstance()
                 }
             }
         }

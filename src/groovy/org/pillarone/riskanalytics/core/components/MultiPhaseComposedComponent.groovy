@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.components
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.packets.PacketList
 import org.pillarone.riskanalytics.core.wiring.ITransmitter
 import org.pillarone.riskanalytics.core.simulation.SimulationException
@@ -10,6 +11,7 @@ import org.pillarone.riskanalytics.core.simulation.SimulationException
  * @author stefan.kunz (at) intuitive-collaboration (dot) com
  */
 // todo(msp): this code is identical with DMPCC due to restriction regarding multiple inheritance, refactor
+@CompileStatic
 abstract class MultiPhaseComposedComponent extends ComposedComponent implements IChannelAllocation {
 
     private Map<ITransmitter, String> phasePerTransmitterInput = new HashMap<ITransmitter, String>()

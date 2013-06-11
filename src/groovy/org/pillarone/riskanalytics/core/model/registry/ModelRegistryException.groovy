@@ -1,6 +1,8 @@
 package org.pillarone.riskanalytics.core.model.registry
 
+import groovy.transform.CompileStatic
 
+@CompileStatic
 class ModelRegistryException extends RuntimeException {
 
     ModelRegistryException() {

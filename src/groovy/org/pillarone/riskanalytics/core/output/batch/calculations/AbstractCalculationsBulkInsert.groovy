@@ -1,7 +1,7 @@
 package org.pillarone.riskanalytics.core.output.batch.calculations
 
+import grails.util.Holders
 import groovy.transform.CompileStatic
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pillarone.riskanalytics.core.output.batch.AbstractBulkInsert
 
 abstract class AbstractCalculationsBulkInsert extends AbstractBulkInsert {
@@ -9,7 +9,7 @@ abstract class AbstractCalculationsBulkInsert extends AbstractBulkInsert {
     @CompileStatic
     void addResults(int period, String keyFigure, Double keyFigureParameter, long path, long field, long collector, Double value) {
         List values = []
-        values << simulationRun.id
+        values << simulationRunId
         values << period
         values << path
         values << field
@@ -25,7 +25,7 @@ abstract class AbstractCalculationsBulkInsert extends AbstractBulkInsert {
     protected abstract String getNull()
 
     public static AbstractCalculationsBulkInsert getBulkInsertInstance() {
-        Class bulkClass = ApplicationHolder.application?.config?.calculationBulkInsert
+        Class bulkClass = Holders?.config?.calculationBulkInsert
         if (!bulkClass) {
             return new GenericBulkInsert()
         }

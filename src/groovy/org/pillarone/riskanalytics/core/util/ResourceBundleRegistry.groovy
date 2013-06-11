@@ -1,10 +1,12 @@
 package org.pillarone.riskanalytics.core.util
 
+import groovy.transform.CompileStatic
+
 /**
  * @author fouad.jaada@intuitive-collaboration.com
  */
 
-
+@CompileStatic
 class ResourceBundleRegistry {
 
     private static Map<String, Set<String>> bundles = [:]

@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.model.migration
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.model.IModelVisitor
 import org.pillarone.riskanalytics.core.model.Model
@@ -8,6 +9,7 @@ import org.pillarone.riskanalytics.core.parameterization.AbstractParameterObject
 import org.pillarone.riskanalytics.core.parameterization.IParameterObject
 import org.pillarone.riskanalytics.core.components.IResource
 
+@CompileStatic
 class ClassifierCollector implements IModelVisitor {
 
     private Class classifierClass
@@ -29,7 +31,7 @@ class ClassifierCollector implements IModelVisitor {
 
     void visitParameterObject(IParameterObject parameterObject, ModelPath path) {
         if (parameterObject.type.class.name == classifierClass.name) {
-            AbstractParameterObjectClassifier parameterObjectClassifier = parameterObject.type
+            AbstractParameterObjectClassifier parameterObjectClassifier = (AbstractParameterObjectClassifier) parameterObject.type
             if (parameterObjectClassifier.typeName == name) {
                 result << new ResultPair(path: path, classifierParameters: parameterObject.parameters)
             }

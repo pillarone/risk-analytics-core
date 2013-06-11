@@ -10,7 +10,7 @@ public class FileOutput implements ICollectorOutputStrategy {
     SimulationScope simulationScope
     String filename = null;
 
-    public ICollectorOutputStrategy leftShift(List results) {
+    public ICollectorOutputStrategy leftShift(List<SingleValueResultPOJO> results) {
 
         File resultFile = new File(getFileName(results[0]))
         if (!resultFile.exists()) {

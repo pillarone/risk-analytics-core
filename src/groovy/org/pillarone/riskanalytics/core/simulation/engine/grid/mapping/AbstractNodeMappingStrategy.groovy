@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.simulation.engine.grid.mapping
 
+import grails.util.Holders
+import groovy.transform.CompileStatic
 import org.gridgain.grid.GridNode
 import org.gridgain.grid.Grid
 import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper
@@ -7,7 +9,7 @@ import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
-
+@CompileStatic
 abstract class AbstractNodeMappingStrategy implements INodeMappingStrategy {
 
     public static final String STRATEGY_CLASS_SYSTEM_PROPERTY = "nodeMappingStrategy"
@@ -38,12 +40,12 @@ abstract class AbstractNodeMappingStrategy implements INodeMappingStrategy {
 
     public static INodeMappingStrategy getStrategy() {
         try {
-            Class strategy = ConfigurationHolder.config.get(STRATEGY_CLASS_KEY)
+            Class strategy = (Class) Holders.config.get(STRATEGY_CLASS_KEY)
             if(System.getProperty(STRATEGY_CLASS_SYSTEM_PROPERTY) != null) {
                 String mappingClass = System.getProperty(STRATEGY_CLASS_SYSTEM_PROPERTY)
                 strategy = Thread.currentThread().contextClassLoader.loadClass(mappingClass)
             }
-            return strategy.newInstance()
+            return (INodeMappingStrategy) strategy.newInstance()
         } catch (Exception e) {
             return new LocalNodesStrategy()
         }

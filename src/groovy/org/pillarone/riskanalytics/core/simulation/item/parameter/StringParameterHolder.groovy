@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.item.parameter
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.StringParameter
 
@@ -7,10 +8,12 @@ class StringParameterHolder extends ParameterHolder {
 
     private String value;
 
+    @CompileStatic
     public StringParameterHolder(Parameter parameter) {
         super(parameter);
     }
 
+    @CompileStatic
     public StringParameterHolder(String path, int periodIndex, String value) {
         super(path, periodIndex);
         this.value = value;
@@ -21,6 +24,7 @@ class StringParameterHolder extends ParameterHolder {
         this.value = parameter.parameterValue
     }
 
+    @CompileStatic
     String getBusinessObject() {
         return value;
     }
@@ -29,10 +33,12 @@ class StringParameterHolder extends ParameterHolder {
         parameter.parameterValue = value
     }
 
+    @CompileStatic
     Parameter createEmptyParameter() {
         return new StringParameter(path: path, periodIndex: periodIndex)
     }
 
+    @CompileStatic
     protected void updateValue(Object newValue) {
         value = newValue.toString()
     }

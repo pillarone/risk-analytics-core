@@ -1,29 +1,34 @@
 package org.pillarone.riskanalytics.core.workflow
 
+import grails.orm.HibernateCriteriaBuilder
+import grails.util.Holders
+import groovy.transform.CompileStatic
+import groovy.transform.TypeChecked
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.parameter.comment.workflow.IssueStatus
 import org.pillarone.riskanalytics.core.parameterization.ParameterizationHelper
+import org.pillarone.riskanalytics.core.remoting.ITransactionService
+import org.pillarone.riskanalytics.core.remoting.TransactionInfo
+import org.pillarone.riskanalytics.core.remoting.impl.RemotingUtils
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
 import org.pillarone.riskanalytics.core.user.UserManagement
+
 import static org.pillarone.riskanalytics.core.workflow.Status.*
-import org.joda.time.DateTime
-import org.pillarone.riskanalytics.core.remoting.ITransactionService
-import org.pillarone.riskanalytics.core.remoting.impl.RemotingUtils
-import grails.orm.HibernateCriteriaBuilder
-import groovy.transform.CompileStatic
 
 class StatusChangeService {
 
     private static Log LOG = LogFactory.getLog(StatusChangeService)
 
+    @CompileStatic
     public static StatusChangeService getService() {
-        return (StatusChangeService) ApplicationHolder.application.mainContext.getBean("statusChangeService")
+        return (StatusChangeService) Holders.grailsApplication.mainContext.getBean("statusChangeService")
     }
 
     private Map<Status, Closure> actions = [
@@ -74,23 +79,25 @@ class StatusChangeService {
             }
     ]
 
+    @CompileStatic
     Parameterization changeStatus(Parameterization parameterization, Status to) {
         Parameterization newParameterization = null
         reviewComments(parameterization, to)
         AuditLog.withTransaction { status ->
-            newParameterization = actions.get(to).call(parameterization)
+            newParameterization = (Parameterization) actions.get(to).call(parameterization)
         }
         return newParameterization
     }
 
     //TODO: re-use MIF
 
+    @CompileStatic
     private Parameterization incrementVersion(Parameterization item, boolean newR) {
         String parameterizationName = newR ? getTransactionName(item.dealId) : item.name
         Parameterization newItem = new Parameterization(parameterizationName)
 
-        List newParameters = ParameterizationHelper.copyParameters(item.parameters)
-        newParameters.each {
+        List<ParameterHolder> newParameters = ParameterizationHelper.copyParameters(item.parameters)
+        newParameters.each { ParameterHolder it ->
             newItem.addParameter(it)
         }
         newItem.periodCount = item.periodCount
@@ -102,7 +109,7 @@ class StatusChangeService {
 
         for (Comment comment in item.comments) {
             if (comment instanceof WorkflowComment) {
-                if (comment.status != IssueStatus.CLOSED) {
+                if ((comment as WorkflowComment).status != IssueStatus.CLOSED) {
                     newItem.addComment(comment.clone())
                 }
             } else {
@@ -115,8 +122,9 @@ class StatusChangeService {
         return newItem
     }
 
+    @TypeChecked
     private void audit(Status from, Status to, Parameterization fromParameterization, Parameterization toParameterization) {
-        AuditLog auditLog = new AuditLog(fromStatus: from, toStatus: to, fromParameterization: fromParameterization?.dao, toParameterization: toParameterization.dao)
+        AuditLog auditLog = new AuditLog(fromStatus: from, toStatus: to, fromParameterization: (ParameterizationDAO) fromParameterization?.dao, toParameterization: (ParameterizationDAO) toParameterization.dao)
         auditLog.date = new DateTime()
         auditLog.person = UserManagement.getCurrentUser()
         if (!auditLog.save(flush: true)) {
@@ -156,9 +164,10 @@ class StatusChangeService {
         }
     }
 
+    @CompileStatic
     private String getTransactionName(long dealId) {
         ITransactionService service = RemotingUtils.getTransactionService()
-        service.allTransactions.find { it.dealId == dealId }.name
+        service.allTransactions.find { TransactionInfo it -> it.dealId == dealId }.name
     }
 }
 

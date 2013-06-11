@@ -1,5 +1,6 @@
-package org.pillarone.riskanalytics.core.components;
+package org.pillarone.riskanalytics.core.components
 
+import groovy.transform.TypeChecked;
 import org.pillarone.riskanalytics.core.simulation.engine.PeriodScope;
 
 /**
@@ -15,6 +16,7 @@ import org.pillarone.riskanalytics.core.simulation.engine.PeriodScope;
  *
  * @author dierk.koenig (at) canoo (dot) com, stefan.kunz (at) intuitive-collaboration (dot) com
  */
+@TypeChecked
 public class PeriodStore extends AbstractStore {
 
     public PeriodStore(PeriodScope periodScope) {

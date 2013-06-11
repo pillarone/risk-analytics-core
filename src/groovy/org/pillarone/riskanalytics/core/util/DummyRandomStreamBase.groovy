@@ -1,7 +1,9 @@
 package org.pillarone.riskanalytics.core.util
 
+import groovy.transform.CompileStatic
 import umontreal.iro.lecuyer.rng.RandomStreamBase
 
+@CompileStatic
 public class DummyRandomStreamBase extends RandomStreamBase {
     double nextValue = 2
     boolean valid = true

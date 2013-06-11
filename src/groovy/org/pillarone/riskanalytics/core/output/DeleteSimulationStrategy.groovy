@@ -1,8 +1,10 @@
 package org.pillarone.riskanalytics.core.output
 
 import grails.util.Environment
+import groovy.transform.CompileStatic
 
 
+@CompileStatic
 public abstract class DeleteSimulationStrategy {
 
     abstract void deleteSimulation(SimulationRun simulationRun)

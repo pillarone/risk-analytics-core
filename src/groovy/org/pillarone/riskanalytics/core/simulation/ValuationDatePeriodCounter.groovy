@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation
 
+import groovy.transform.CompileStatic
 import org.joda.time.DateTime
 
 /**
@@ -8,6 +9,7 @@ import org.joda.time.DateTime
  * at certain valuation dates and evaluating for these dates cashflows, calculating interest, ...
  * Implementation of methods may therefore be different for than in period base implementations!
  */
+@CompileStatic
 class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
 
     protected List<DateTime> dates
@@ -88,8 +90,8 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
      * @return date is after ith valuation date
      */
     int belongsToPeriod(DateTime date) {
-        if (date.isBefore(startOfFirstPeriod())) throw new BeforeSimulationStartException()
-        if (date.isAfter(endOfLastPeriod())) throw new AfterSimulationEndException()
+        if (date.isBefore(startOfFirstPeriod())) throw new BeforeSimulationStartException("Date is before start of first period")
+        if (date.isAfter(endOfLastPeriod())) throw new AfterSimulationEndException("Date is after last period.")
         int period = -1
         for (DateTime periodStart : dates) {
             if (periodStart.isAfter(date)) {
@@ -136,7 +138,7 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
      * @throws AfterSimulationEndException if period is greater than number of valuation dates
      */
     DateTime startOfPeriod(int period) throws AfterSimulationEndException {
-        if (period >= dates.size()) throw new AfterSimulationEndException()
+        if (period >= dates.size()) throw new AfterSimulationEndException("Period index >= number of periods")
         return dates[period]
     }
 
@@ -147,7 +149,7 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
      */
     DateTime endOfPeriod(DateTime date) throws AfterSimulationEndException {
         int period = belongsToPeriod(date) + 1
-        if (period >= dates.size()) throw new AfterSimulationEndException()
+        if (period >= dates.size()) throw new AfterSimulationEndException("Period index >= number of periods")
         return dates[period]
     }
 
@@ -157,7 +159,7 @@ class ValuationDatePeriodCounter implements ILimitedPeriodCounter {
      * @throws AfterSimulationEndException if period is equal or greater than number of valuation dates
      */
     DateTime endOfPeriod(int period) throws AfterSimulationEndException {
-        if (period >= dates.size() - 1) throw new AfterSimulationEndException()
+        if (period >= dates.size() - 1) throw new AfterSimulationEndException("Period index >= number of periods")
         return dates[period + 1]
     }
 

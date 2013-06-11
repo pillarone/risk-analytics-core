@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
 import org.pillarone.riskanalytics.core.output.ConfigObjectHolder
 import org.pillarone.riskanalytics.core.simulation.item.ModellingItem
@@ -13,6 +14,7 @@ abstract class ConfigObjectBasedModellingItem extends ModellingItem {
     VersionNumber versionNumber
     String comment
 
+    @CompileStatic
     public ConfigObjectBasedModellingItem(String name) {
         super(name);
         versionNumber = new VersionNumber('1')
@@ -36,6 +38,7 @@ abstract class ConfigObjectBasedModellingItem extends ModellingItem {
         data.model = newModelClass
     }
 
+    @CompileStatic
     private String checkAndTransformToStringData() {
         StringWriter stringWriter = new StringWriter()
         getWriter().write(data, new BufferedWriter(stringWriter))
@@ -46,6 +49,7 @@ abstract class ConfigObjectBasedModellingItem extends ModellingItem {
         return stringData
     }
 
+    @CompileStatic
     public void unload() {
         super.unload();
         data = null

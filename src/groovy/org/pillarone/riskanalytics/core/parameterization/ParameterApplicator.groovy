@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.parameterization
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeChecked
 import org.pillarone.riskanalytics.core.components.Component
 import org.pillarone.riskanalytics.core.components.DynamicComposedComponent
 import org.pillarone.riskanalytics.core.model.Model
@@ -20,17 +22,18 @@ public class ParameterApplicator {
 
     Model model
     Parameterization parameterization
-    List parameterPerPeriod
+    List<List<ApplicableParameter>> parameterPerPeriod
     int lastInjectedPeriod = -1
 
     /**
      * Creates the internal representation of all parameters defined by the ParameterizationDAO.
      */
+    @TypeChecked
     void init() {
         assert model
         assert parameterization
         parameterPerPeriod = buildApplicableParameter(parameterization)
-        for (List parameterForPeriod in parameterPerPeriod) {
+        for (List<ApplicableParameter> parameterForPeriod in parameterPerPeriod) {
             for (ApplicableParameter parameter in parameterForPeriod) {
                 prepareParameter(model, parameter)
             }
@@ -41,17 +44,21 @@ public class ParameterApplicator {
      * Writing the parameter defined for the period to the models components.
      * ApplicableParameter.apply() is called for all parameter defined for the period.
      */
+    @CompileStatic
     public void applyParameterForPeriod(int periodIndex) {
-        List parameterForPeriod = parameterPerPeriod[periodIndex]
-        for (ApplicableParameter parameter in parameterForPeriod) {
-            parameter.apply()
+        List<ApplicableParameter> parameterForPeriod = parameterPerPeriod[periodIndex]
+        if (parameterForPeriod != null) {
+            for (ApplicableParameter parameter in parameterForPeriod) {
+                parameter.apply()
+            }
         }
         lastInjectedPeriod = periodIndex
     }
 
 
-    protected List buildApplicableParameter(Parameterization parameterization) {
-        List parameterPerPeriod = []
+    @CompileStatic
+    protected List<List<ApplicableParameter>> buildApplicableParameter(Parameterization parameterization) {
+        List<List<ApplicableParameter>> parameterPerPeriod = []
         parameterization.periodCount.times {
             parameterPerPeriod << []
         }
@@ -75,25 +82,29 @@ public class ParameterApplicator {
         return new ApplicableParameter(component: component, parameterPropertyName: pathElements[-1], parameterValue: parameterValue)
     }
 
+    @TypeChecked
     protected void prepareParameter(Model model, ApplicableParameter parameter) {
         prepareParameter(model, parameter.parameterValue, parameter.parameterPropertyName)
     }
 
     protected void prepareParameter(Model model, def parameterValue, String context) {}
 
+    @CompileStatic
     protected void prepareParameter(Model model, AbstractMultiDimensionalParameter parameterValue, String context) {
         parameterValue.simulationModel = model
     }
 
+    @TypeChecked
     protected void prepareParameter(Model model, IParameterObject parameterValue, String context) {
         if (parameterValue == null) {
             throw new IllegalStateException("Parameter object null in ${context}")
         }
-        for (Map.Entry entry in parameterValue.getParameters()) {
+        for (Map.Entry entry in parameterValue.getParameters().entrySet()) {
             prepareParameter(model, entry.value, context + ":" + entry.key.toString())
         }
     }
 
+    @CompileStatic
     protected void prepareParameter(Model model, ConstrainedString parameterValue, String context) {
         List<Component> allMarkedComponents = model.getMarkedComponents(parameterValue.markerClass)
         parameterValue.selectedComponent = allMarkedComponents.find {Component c -> c.name == parameterValue.stringValue }

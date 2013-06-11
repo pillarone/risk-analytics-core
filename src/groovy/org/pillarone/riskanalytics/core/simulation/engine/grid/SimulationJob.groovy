@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.engine.grid
 
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.gridgain.grid.GridJobAdapterEx
@@ -19,6 +20,7 @@ import org.codehaus.groovy.grails.commons.DefaultGrailsApplication
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.joda.time.DateTimeZone
 
+@CompileStatic
 class SimulationJob extends GridJobAdapterEx {
 
     private SimulationConfiguration simulationConfiguration
@@ -52,7 +54,7 @@ class SimulationJob extends GridJobAdapterEx {
             getClass().getClassLoader().loadClass("org.pillarone.riskanalytics.core.components.ComponentUtils")
             //***** http://www.gridgainsystems.com/jiveforums/thread.jspa?threadID=1324&tstart=0
 
-            for(Map.Entry<Class, IPacketAggregator> entry in aggregatorMap) {
+            for(Map.Entry<Class, IPacketAggregator> entry in aggregatorMap.entrySet()) {
                 PacketAggregatorRegistry.registerAggregator(entry.key, entry.value)
             }
             ResourceRegistry.clear()
@@ -64,7 +66,7 @@ class SimulationJob extends GridJobAdapterEx {
             runner.setSimulationConfiguration(simulationConfiguration)
             runner.start()
 
-            GridOutputStrategy outputStrategy = this.simulationConfiguration.outputStrategy
+            GridOutputStrategy outputStrategy = (GridOutputStrategy) this.simulationConfiguration.outputStrategy
             final JobResult result = new JobResult(
                     totalMessagesSent: outputStrategy.totalMessages, start: start, end: new Date(),
                     nodeName: jobIdentifier.toString(), simulationException: runner.error?.error,

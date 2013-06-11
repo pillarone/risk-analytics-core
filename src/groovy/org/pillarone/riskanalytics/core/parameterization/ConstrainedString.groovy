@@ -1,7 +1,9 @@
 package org.pillarone.riskanalytics.core.parameterization
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.components.Component
 
+@CompileStatic
 public class ConstrainedString implements Serializable {
 
     String stringValue

@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.model
 
+import groovy.transform.CompileStatic
 import org.joda.time.Period
 import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
 import org.joda.time.DateTime
@@ -9,6 +10,7 @@ import org.pillarone.riskanalytics.core.simulation.ContinuousPeriodCounter
  * A DeterministicModel is a Model without random elements. Therefore only one iteration is necessary.
  * But the period count can be set by the user.
  */
+@CompileStatic
 abstract class DeterministicModel extends Model {
 
     /**

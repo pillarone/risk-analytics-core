@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.model.migration
 
+import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.pillarone.riskanalytics.core.ParameterizationDAO
@@ -26,11 +27,13 @@ public class ModelMigrator {
         }
     }
 
+    @CompileStatic
     public ModelMigrator(Class<? extends MigratableModel> modelClass) {
         this.modelClass = modelClass
         toVersion = Model.getModelVersion(modelClass);
     }
 
+    @CompileStatic
     public static boolean migrationClassLoaderBeingUsedInThisThread() {
         return classLoaderBeingUsed.get()
     }
@@ -92,6 +95,7 @@ public class ModelMigrator {
 
     }
 
+    @CompileStatic
     protected Model createModel(Parameterization parameterization, int periodIndex, ClassLoader loader) {
         Model model = null
         doWithContextClassLoader loader, {
@@ -100,7 +104,7 @@ public class ModelMigrator {
             model.injectComponentNames()
             parameterization.load()
 
-            ParameterApplicator applicator = new ModelMigrationParameterApplicator(model: model, parameterization: parameterization)
+            ParameterApplicator applicator = new ModelMigrationParameterApplicator(model, parameterization)
             applicator.init()
             applicator.applyParameterForPeriod(periodIndex)
 
@@ -110,6 +114,7 @@ public class ModelMigrator {
         return model
     }
 
+    @CompileStatic
     public static void doWithContextClassLoader(ClassLoader cl, Closure closure) {
         Thread currentThread = Thread.currentThread()
         ClassLoader current = currentThread.contextClassLoader

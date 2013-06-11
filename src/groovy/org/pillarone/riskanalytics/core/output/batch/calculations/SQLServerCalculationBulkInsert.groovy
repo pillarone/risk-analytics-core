@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.output.batch.calculations
 import grails.util.Holders
 import groovy.sql.Sql
 import groovy.transform.CompileStatic
+import org.apache.maven.artifact.ant.shaded.FileUtils
 
 /**
  * Allianz Risk Transfer  ATOM
@@ -62,12 +63,12 @@ class SQLServerCalculationBulkInsert extends AbstractCalculationsBulkInsert {
             //Ensure tmp dir is valid etc etc
             File tmpDir = new File(sharedPath)
             assert tmpDir.isDirectory(): sharedPath + " is not a valid directory"
-            File formatFile = tmpDir.listFiles().find { it.name == "post_simulation_calculation_formatfile.xml" }
+            File formatFile = tmpDir.listFiles().find { File it -> it.name == "post_simulation_calculation_formatfile.xml" }
             if (!formatFile) {
                 //The format file needs to be accessible by the database, so copy it to the temp dir.
-                assert tmpDir.canWrite(): "Can not write to the remote directory " + remoteDir + "!"
+                assert tmpDir.canWrite(): "Can not write to the remote directory " + tmpDir + "!"
                 formatFile = new File(tmpDir.absolutePath + "/post_simulation_calculation_formatfile.xml")
-                new AntBuilder().copy(file: localFile.canonicalPath, tofile: formatFile.canonicalPath)
+                FileUtils.copyFile(localFile, formatFile)
             }
             return formatFile.getAbsolutePath()
         } else {

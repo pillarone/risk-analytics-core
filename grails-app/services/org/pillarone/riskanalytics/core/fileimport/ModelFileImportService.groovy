@@ -55,7 +55,7 @@ class ModelFileImportService extends FileImportService {
     protected Class findModelClass() {
         ClassPathScanner scanner = new ClassPathScanner()
         scanner.addIncludeFilter(new RegexPatternTypeFilter(Pattern.compile('(.*)\\.' + fileName + '$')))
-        Set<BeanDefinition> components = scanner.findCandidateComponents("")
+        Set<BeanDefinition> components = scanner.findCandidateComponents("models") //classes in jars are not found when the base package is empty PMO-2524
         if (components.size() > 1) {
             throw new IllegalStateException("More than one model class found with name $fileName: ${components.collect { it.beanClassName }.join(" ")}")
         } else if (components.empty) {

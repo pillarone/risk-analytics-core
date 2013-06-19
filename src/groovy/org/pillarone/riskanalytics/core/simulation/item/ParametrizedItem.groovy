@@ -298,7 +298,7 @@ abstract class ParametrizedItem extends CommentableItem {
 
     protected void updateParameterValue(ParameterObjectParameterHolder holder, def newValue) {
         holder.setValue(newValue)
-        for (Comment comment in comments.findAll { Comment it -> it.path.startsWith(holder.path) }) {
+        for (Comment comment in comments.findAll { Comment it -> it.path.contains(holder.path) }) {
             removeComment(comment)
         }
         fireClassifierChanged(holder.path)

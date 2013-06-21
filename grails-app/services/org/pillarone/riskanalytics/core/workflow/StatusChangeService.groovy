@@ -28,7 +28,7 @@ class StatusChangeService {
 
     @CompileStatic
     public static StatusChangeService getService() {
-        return (StatusChangeService) Holders.grailsApplication.mainContext.getBean("statusChangeService")
+        return (StatusChangeService) Holders.grailsApplication.mainContext.getBean(StatusChangeService.class)
     }
 
     private Map<Status, Closure> actions = [

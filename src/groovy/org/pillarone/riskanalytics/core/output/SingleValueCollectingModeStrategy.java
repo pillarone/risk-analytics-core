@@ -38,7 +38,7 @@ public class SingleValueCollectingModeStrategy extends AbstractCollectingModeStr
 
     public String getDisplayName(Locale locale) {
         if (displayName == null) {
-            displayName = ResourceBundle.getBundle(RESOURCE_BUNDLE, locale).getString("ICollectingModeStrategy." + IDENTIFIER);
+            displayName = ResourceBundle.getBundle(RESOURCE_BUNDLE, locale, Thread.currentThread().getContextClassLoader()).getString("ICollectingModeStrategy." + IDENTIFIER);
         }
         return displayName;
     }

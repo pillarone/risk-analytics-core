@@ -242,7 +242,7 @@ public class GroovyUtils {
         def resourceBundle = []
         def resources = ResourceBundleRegistry.getBundles(ResourceBundleRegistry.VALIDATION)
         for (String bundleName in resources) {
-            resourceBundle << ResourceBundle.getBundle(bundleName, locale)
+            resourceBundle << ResourceBundle.getBundle(bundleName, locale, Thread.currentThread().contextClassLoader)
         }
         return resourceBundle
     }

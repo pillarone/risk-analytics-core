@@ -26,7 +26,7 @@ public class AggregatedCollectingModeStrategy extends AbstractCollectingModeStra
 
     public String getDisplayName(Locale locale) {
         if (displayName == null) {
-            displayName = ResourceBundle.getBundle(RESOURCE_BUNDLE, locale).getString("ICollectingModeStrategy." + getIdentifier());
+            displayName = ResourceBundle.getBundle(RESOURCE_BUNDLE, locale, Thread.currentThread().getContextClassLoader()).getString("ICollectingModeStrategy." + getIdentifier());
         }
         return displayName;
     }

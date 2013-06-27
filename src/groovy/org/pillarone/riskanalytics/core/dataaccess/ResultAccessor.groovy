@@ -30,10 +30,11 @@ abstract class ResultAccessor {
 
         for (ResultPathDescriptor descriptor in paths) {
             double[] values = getValues(simulationRun, descriptor.period, descriptor.path.pathName, descriptor.collector.collectorName, descriptor.field.fieldName)
-            for (double value in values) {
+            for (int i=0; i < values.size(); i ++){
+                double value = values[i]
                 result << new SingleValueResultPOJO(
                         path: descriptor.path, field: descriptor.field, collector: descriptor.collector,
-                        period: descriptor.period, simulationRun: simulationRun, value: value
+                        period: descriptor.period, simulationRun: simulationRun, value: value, iteration:i
                 )
             }
 

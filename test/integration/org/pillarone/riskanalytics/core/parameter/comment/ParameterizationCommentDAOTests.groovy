@@ -42,7 +42,6 @@ class ParameterizationCommentDAOTests extends GroovyTestCase {
         comment.comment = "text"
 
         comment.addToTags(new CommentTag(tag: tag))
-        comment.files = ["file1", "file2"] as Set
 
         assertNotNull comment.save()
 

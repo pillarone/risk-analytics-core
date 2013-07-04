@@ -13,7 +13,7 @@ class CommentDAO {
     Person user
     String files
 
-    static hasMany = [tags: CommentTag]
+    static hasMany = [tags: CommentTag, commentFile : CommentFileDAO]
 
     static constraints = {
         user(nullable: true)

@@ -1,7 +1,9 @@
 package org.pillarone.riskanalytics.core.simulation.item.parameter.comment
 
 import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.FileConstants
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
+import org.pillarone.riskanalytics.core.parameter.comment.CommentFileDAO
 import org.pillarone.riskanalytics.core.parameter.comment.CommentTag
 import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.user.Person
@@ -17,14 +19,14 @@ class Comment implements Cloneable {
     Person user
     protected String comment
     private Set<Tag> tags = new HashSet()
-    Set<String> files = new HashSet<String>()
+    Map<String, File> files = new HashMap<String, File>()
 
     boolean added = false
     boolean updated = false
     boolean deleted = false
     final static String POST_LOCKING = "post locking"
 
-    protected Comment() { }
+    protected Comment() {}
 
     public Comment(CommentDAO commentDAO) {
         path = commentDAO.path
@@ -35,8 +37,10 @@ class Comment implements Cloneable {
         if (commentDAO.tags?.size() > 0) {
             tags.addAll(commentDAO.tags?.tag)
         }
-        if (commentDAO.files) {
-            files.addAll(commentDAO.files.split(","))
+        commentDAO.commentFile?.each {
+            File file = File.createTempFile(it.name, '.commentFile', new File(FileConstants.TEMP_FILE_DIRECTORY))
+            file.setBytes(it.content)
+            files.put(it.name,file)
         }
     }
 
@@ -51,17 +55,16 @@ class Comment implements Cloneable {
         this(commentMap['path'], commentMap['period'])
 
         comment = commentMap['comment']
-        commentMap['tags']?.each {String tagName ->
+        commentMap['tags']?.each { String tagName ->
             Tag tag = Tag.findByName(tagName)
             if (!tag) {
-                Tag.withTransaction {TransactionStatus status ->
+                Tag.withTransaction { TransactionStatus status ->
                     tag = new Tag(name: tagName)
                     tag.save()
                 }
             }
             addTag(tag)
         }
-        files = commentMap['files']
         lastChange = commentMap['lastChange']
     }
 
@@ -69,12 +72,12 @@ class Comment implements Cloneable {
         return tags.toList()
     }
 
-    public void addFile(String file) {
-        files.add(file)
+    public void addFile(String filename, File file) {
+        files.put(filename,file)
     }
 
-    public void removeFile(String file) {
-        files.remove(file)
+    public void removeFile(String filename) {
+        files.remove(filename)
     }
 
     public void clearFiles() {
@@ -82,12 +85,12 @@ class Comment implements Cloneable {
     }
 
     public void setTags(Set selectedTags) {
-        selectedTags.each {Tag tag ->
+        selectedTags.each { Tag tag ->
             if (!tags.contains(tag))
                 addTag(tag)
         }
         List tagsToRemove = []
-        tags.each {Tag tag ->
+        tags.each { Tag tag ->
             if (!selectedTags.contains(tag))
                 tagsToRemove << tag
         }
@@ -139,14 +142,27 @@ class Comment implements Cloneable {
             dao.removeFromTags(tag)
 
         }
-        tagsToRemove.each {it.delete()}
+        tagsToRemove.each { it.delete() }
 
         for (Tag tag in tags) {
             if (!dao.tags*.tag?.contains(tag)) {
                 dao.addToTags(new CommentTag(tag: tag))
             }
         }
-        dao.files = files ? files.join(",") : ""
+        files?.each {k,v ->
+            if (!dao.commentFile?.name?.contains(k)) {
+                dao.addToCommentFile(new CommentFileDAO(name: k, content: v.bytes))
+            }
+        }
+        List filesToRemove = []
+        dao.commentFile.each {
+            if (!(it.name in files.keySet())) {
+                filesToRemove << it
+            }
+        }
+        filesToRemove.each {
+            dao.removeFromCommentFile(it)
+        }
     }
 
     public String toConfigObject() {
@@ -156,7 +172,6 @@ class Comment implements Cloneable {
         String newComment = replaceCharacters(comment)
         sb.append("path:'${path}', period:${period}, lastChange:new org.joda.time.DateTime(${lastChange.millis}),user:null, comment: ${c}\"${c}\"${c}\"${newComment}${c}\"${c}\"${c}\"")
         if (tags && !tags.isEmpty()) sb.append(", " + GroovyUtils.toString("tags", tags*.name - [POST_LOCKING]))
-        if (files && !files.isEmpty()) sb.append(", " + GroovyUtils.toString("files", files as List))
         sb.append("]\"\"")
         return sb.toString()
     }
@@ -175,7 +190,7 @@ class Comment implements Cloneable {
         clone.user = user
         clone.comment = comment
         clone.lastChange = (DateTime) new DateTime(lastChange.millis)
-        clone.tags = tags.findAll {it.name != POST_LOCKING}.clone() as Set
+        clone.tags = tags.findAll { it.name != POST_LOCKING }.clone() as Set
         clone.files = (Set) files?.clone()
 
         clone.added = false

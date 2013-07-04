@@ -90,29 +90,10 @@ abstract class CommentableItem extends ModellingItem {
         if (commentDAO) {
             dao.removeFromComments(commentDAO)
             commentDAO.delete()
-            deleteCommentFiles(commentDAO)
             return true
         }
         return false
     }
-
-    @CompileStatic
-    private void deleteCommentFiles(CommentDAO commentDAO) {
-        if (!commentDAO.files) return
-        commentDAO.files.split(",").each {String fileName ->
-            try {
-                File file = new File(FileConstants.COMMENT_FILE_DIRECTORY + File.separator + fileName)
-                if (file.exists()) {
-                    file.delete()
-                    LOG.info "comment file  $file deleted"
-                }
-            } catch (Exception ex) {
-                LOG.error "error occured during delete a file ${fileName} : ${ex}"
-            }
-        }
-
-    }
-
 
     CommentDAO getItemCommentDAO(def dao) {
         return null

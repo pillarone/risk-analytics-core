@@ -46,4 +46,64 @@ class CommentDAOTests extends GroovyTestCase {
         assertEquals commentTagCount, CommentTag.count()
 
     }
+
+    void testFileHandling() {
+        String fileContent = 'test content'
+        ParameterizationDAO parameterization = new ParameterizationDAO()
+        parameterization.name = "test"
+        parameterization.modelClassName = EmptyModel.name
+        parameterization.itemVersion = "1"
+        parameterization.periodCount = 1
+        parameterization.status = Status.NONE
+        assertNotNull parameterization.save()
+        File file = new File('test.txt')
+        file.text = fileContent
+
+        ParameterizationCommentDAO comment = new ParameterizationCommentDAO()
+        comment.parameterization = parameterization
+        comment.path = "path"
+        comment.periodIndex = 0
+        comment.timeStamp = new DateTime()
+        comment.comment = "text"
+        comment.addToCommentFile(new CommentFileDAO(file))
+
+        assertNotNull comment.save(flush: true)
+        int commentId = comment.id
+        CommentDAO.withNewSession {
+            CommentDAO persistedComment = CommentDAO.get(commentId)
+            assertEquals(1, persistedComment.commentFile.size())
+            CommentFileDAO commentFile = (persistedComment.commentFile as List)[0]
+            assertEquals('test.txt', commentFile.name)
+            assertEquals(fileContent, new String(commentFile.content))
+        }
+    }
+
+    void testDeleteComment() {
+        String fileContent = 'test content'
+        ParameterizationDAO parameterization = new ParameterizationDAO()
+        parameterization.name = "test"
+        parameterization.modelClassName = EmptyModel.name
+        parameterization.itemVersion = "1"
+        parameterization.periodCount = 1
+        parameterization.status = Status.NONE
+        assertNotNull parameterization.save()
+        File file = new File('test.txt')
+        file.text = fileContent
+
+        ParameterizationCommentDAO comment = new ParameterizationCommentDAO()
+        comment.parameterization = parameterization
+        comment.path = "path"
+        comment.periodIndex = 0
+        comment.timeStamp = new DateTime()
+        comment.comment = "text"
+        comment.addToCommentFile(new CommentFileDAO(file))
+
+        assertNotNull comment.save(flush: true)
+        assert 1 == CommentFileDAO.list().size()
+
+        comment.delete(flush: true)
+        CommentDAO.withNewSession {
+            assert 0 == CommentFileDAO.list().size()
+        }
+    }
 }

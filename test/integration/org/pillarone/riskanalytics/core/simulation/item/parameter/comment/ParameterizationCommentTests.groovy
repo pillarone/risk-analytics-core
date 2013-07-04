@@ -62,6 +62,9 @@ class ParameterizationCommentTests extends GroovyTestCase {
         Comment comment = new Comment("path", 0)
         comment.text = "text"
         comment.addTag(new Tag(name: "x"))
+        File file = new File('test.txt')
+        file.text = "file content"
+        comment.addFile(file)
 
         ParameterizationCommentDAO dao = new ParameterizationCommentDAO()
         comment.applyToDomainObject(dao)
@@ -86,6 +89,7 @@ class ParameterizationCommentTests extends GroovyTestCase {
 
         comment.applyToDomainObject(dao)
         assertEquals 0, dao.tags.size()
+        assertEquals 1, dao.commentFile.size()
 
     }
 }

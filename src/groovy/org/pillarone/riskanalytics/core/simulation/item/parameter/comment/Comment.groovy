@@ -19,7 +19,7 @@ class Comment implements Cloneable {
     Person user
     protected String comment
     private Set<Tag> tags = new HashSet()
-    Map<String, File> files = new HashMap<String, File>()
+    Set<CommentFile> files = new HashSet<CommentFile>()
 
     boolean added = false
     boolean updated = false
@@ -38,10 +38,12 @@ class Comment implements Cloneable {
             tags.addAll(commentDAO.tags?.tag)
         }
         commentDAO.commentFile?.each {
-            File file = File.createTempFile(it.name, '.commentFile', new File(FileConstants.TEMP_FILE_DIRECTORY))
-            file.setBytes(it.content)
-            files.put(it.name,file)
+            files.add(new CommentFile(it.name, it.id))
         }
+    }
+
+    public byte[] getFileContent(CommentFile file) {
+        file.getContent()
     }
 
     public Comment(String path, int period) {
@@ -72,12 +74,12 @@ class Comment implements Cloneable {
         return tags.toList()
     }
 
-    public void addFile(String filename, File file) {
-        files.put(filename,file)
+    public void addFile(CommentFile file) {
+        files.add(file)
     }
 
     public void removeFile(String filename) {
-        files.remove(filename)
+        files.removeAll { it.filename == filename }
     }
 
     public void clearFiles() {
@@ -149,15 +151,16 @@ class Comment implements Cloneable {
                 dao.addToTags(new CommentTag(tag: tag))
             }
         }
-        files?.each {k,v ->
-            if (!dao.commentFile?.name?.contains(k)) {
-                dao.addToCommentFile(new CommentFileDAO(name: k, content: v.bytes))
+
+        files.each { CommentFile file ->
+            if (!(file.filename in dao?.commentFile?.name)) {
+                dao.addToCommentFile(new CommentFileDAO(name: file.filename, content: file.content))
             }
         }
         List filesToRemove = []
-        dao.commentFile.each {
-            if (!(it.name in files.keySet())) {
-                filesToRemove << it
+        dao.commentFile?.each { commentFile ->
+            if (!files.find { it.filename == commentFile.name }) {
+                filesToRemove << commentFile
             }
         }
         filesToRemove.each {

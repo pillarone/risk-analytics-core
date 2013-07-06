@@ -65,7 +65,7 @@ class CommentDAOTests extends GroovyTestCase {
         comment.periodIndex = 0
         comment.timeStamp = new DateTime()
         comment.comment = "text"
-        comment.addToCommentFile(new CommentFileDAO(file))
+        comment.addToCommentFile(new CommentFileDAO(name:file.name, content: file.bytes))
 
         assertNotNull comment.save(flush: true)
         int commentId = comment.id
@@ -96,7 +96,7 @@ class CommentDAOTests extends GroovyTestCase {
         comment.periodIndex = 0
         comment.timeStamp = new DateTime()
         comment.comment = "text"
-        comment.addToCommentFile(new CommentFileDAO(file))
+        comment.addToCommentFile(new CommentFileDAO(name:file.name, content: file.bytes))
 
         assertNotNull comment.save(flush: true)
         assert 1 == CommentFileDAO.list().size()

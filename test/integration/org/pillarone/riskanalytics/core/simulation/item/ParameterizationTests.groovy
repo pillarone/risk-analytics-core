@@ -21,6 +21,7 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolde
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjectParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.StringParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
+import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.CommentFile
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.EnumTagType
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
 import org.pillarone.riskanalytics.core.workflow.Status
@@ -160,8 +161,10 @@ class ParameterizationTests extends GroovyTestCase {
 
         Comment newComment = new Comment("path", 0)
         newComment.text = "text"
-        newComment.addFile("filename1", new File("file1"))
-        newComment.addFile("filename1",new File("file1"))
+        File file = new File("file1")
+        file.text = "test"
+        newComment.addFile(new CommentFile("filename1", file))
+        newComment.addFile(new CommentFile("filename1", file))
         assertTrue newComment.getFiles().size() == 1
 
         parameterization.addComment(newComment)

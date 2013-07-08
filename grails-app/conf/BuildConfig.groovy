@@ -27,6 +27,7 @@ grails.project.dependency.resolution = {
         runtime ":tomcat:2.2.1"
 
         test ":code-coverage:1.2.4"
+        runtime ":database-migration:1.3.5"
     }
 
     dependencies {

@@ -19,7 +19,7 @@ class TraceLogManager {
     }
 
     private List<String> getList() {
-        long id = getId()
+        Long id = getId()
         return messages.get(id)
     }
 
@@ -33,7 +33,7 @@ class TraceLogManager {
 
     private Long getId() {
         Person user = UserManagement.currentUser
-        return user?.id ?: 0
+        return user?.id ?: 0L
     }
 
     void clear() {

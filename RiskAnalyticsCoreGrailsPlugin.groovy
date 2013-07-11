@@ -8,6 +8,7 @@ import org.pillarone.riskanalytics.core.FileConstants
 import org.pillarone.riskanalytics.core.example.migration.TestConstrainedTable
 import org.pillarone.riskanalytics.core.example.parameter.ExampleResourceConstraints
 import org.pillarone.riskanalytics.core.listener.ModellingItemHibernateListener
+import org.pillarone.riskanalytics.core.log.TraceLogManager
 import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
 import org.pillarone.riskanalytics.core.output.AggregatedWithSingleAvailableCollectingModeStrategy
 import org.pillarone.riskanalytics.core.output.CollectingModeFactory
@@ -32,7 +33,7 @@ import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.7-b4"
+    def version = "1.8-a2"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.2.1 > *"
     // the other plugins this plugin depends on
@@ -65,6 +66,8 @@ Persistence & Simulation engine.
 
     def doWithSpring = {
         ConfigObject config = ConfigurationHolder.config
+
+        traceLogManager(TraceLogManager)
 
         String url = "rmi://localhost:1099/TransactionService"
         if (config.containsKey("transactionServiceUrl")) {

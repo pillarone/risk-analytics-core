@@ -213,4 +213,8 @@ class ResultConfiguration extends ModellingItem {
         return mapping
     }
 
+    @Override
+    String getNameAndVersion() {
+        "$name v${versionNumber.toString()}"
+    }
 }

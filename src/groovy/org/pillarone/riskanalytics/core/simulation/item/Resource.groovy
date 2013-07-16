@@ -162,7 +162,7 @@ class Resource extends ParametrizedItem {
             dao.removeFromTags(tag)
 
         }
-        tagsToRemove.each {it.delete()}
+        tagsToRemove.each { it.delete() }
 
         for (Tag tag in tags) {
             if (!dao.tags*.tag?.contains(tag)) {
@@ -215,7 +215,7 @@ class Resource extends ParametrizedItem {
 
     @CompileStatic
     List getParameters(String path) {
-        return parameterHolders.findAll {ParameterHolder parameter ->
+        return parameterHolders.findAll { ParameterHolder parameter ->
             parameter.path == path && !parameter.removed
         }
     }
@@ -235,5 +235,10 @@ class Resource extends ParametrizedItem {
             return false
         }
         return !isUsedInSimulation()
+    }
+
+    @Override
+    String getNameAndVersion() {
+        "$name v${versionNumber.toString()}"
     }
 }

@@ -244,6 +244,10 @@ abstract class ModellingItem implements Serializable {
         return []
     }
 
+    String getNameAndVersion() {
+        name
+    }
+
 }
 
 interface IModellingItemChangeListener {

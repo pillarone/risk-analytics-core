@@ -526,8 +526,12 @@ class Parameterization extends ParametrizedItem {
     @Override
     @CompileStatic
     String toString() {
-        "$name v$versionNumber"
+        nameAndVersion
     }
 
-
+    @Override
+    @CompileStatic
+    String getNameAndVersion() {
+        "$name v${versionNumber.toString()}"
+    }
 }

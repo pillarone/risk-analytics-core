@@ -42,8 +42,21 @@ class ModellingItemHibernateListener implements PostInsertEventListener, PostUpd
         ModellingItem item = getModellingItem(postUpdateEvent.entity)
         if (item != null) {
             for (ModellingItemListener listener : _listeners) {
-                listener.modellingItemChanged(item)
+                fireEvent(item, postUpdateEvent.entity, listener)
             }
+        }
+    }
+
+    void fireEvent(ModellingItem item, entity, ModellingItemListener listener) {
+        listener.modellingItemChanged(item)
+    }
+
+    void fireEvent(Simulation item, SimulationRun dao, ModellingItemListener listener){
+        if (dao.toBeDeleted){
+            listener.modellingItemDeleted(item)
+        }else {
+            listener.modellingItemChanged(item)
+
         }
     }
 
@@ -63,25 +76,45 @@ class ModellingItemHibernateListener implements PostInsertEventListener, PostUpd
     Resource getModellingItem(ResourceDAO dao) {
         Resource resource = new Resource(dao.name, Thread.currentThread().contextClassLoader.loadClass(dao.resourceClassName))
         resource.versionNumber = new VersionNumber(dao.itemVersion)
+
         return resource
     }
 
     Parameterization getModellingItem(ParameterizationDAO dao) {
         Parameterization parameterization = new Parameterization(dao.name, Thread.currentThread().contextClassLoader.loadClass(dao.modelClassName))
+        parameterization.id = dao.id
         parameterization.versionNumber = new VersionNumber(dao.itemVersion)
+        parameterization.creationDate = dao.creationDate
+        parameterization.modificationDate = dao.modificationDate
+        parameterization.creator = dao.creator
+        parameterization.lastUpdater = dao.lastUpdater
+        parameterization.tags = dao.tags*.tag
+        parameterization.valid = dao.valid
+        parameterization.status = dao.status
         return parameterization
     }
 
     ResultConfiguration getModellingItem(ResultConfigurationDAO dao) {
         ResultConfiguration resultConfiguration = new ResultConfiguration(dao.name)
+        resultConfiguration.id = dao.id
         resultConfiguration.modelClass = Thread.currentThread().contextClassLoader.loadClass(dao.modelClassName)
         resultConfiguration.versionNumber = new VersionNumber(dao.itemVersion)
+        resultConfiguration.creationDate = dao.creationDate
+        resultConfiguration.modificationDate = dao.modificationDate
+        resultConfiguration.creator = dao.creator
+        resultConfiguration.lastUpdater = dao.lastUpdater
         return resultConfiguration
     }
 
     Simulation getModellingItem(SimulationRun dao) {
         Simulation simulation = new Simulation(dao.name)
+        simulation.id = dao.id
         simulation.modelClass = Thread.currentThread().contextClassLoader.loadClass(dao.model)
+        simulation.end = dao.endTime
+        simulation.start = dao.startTime
+        simulation.creationDate = dao.creationDate
+        simulation.modificationDate = dao.modificationDate
+        simulation.creator = dao.creator
         return simulation
     }
 }

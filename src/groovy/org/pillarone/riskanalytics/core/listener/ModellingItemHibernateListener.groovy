@@ -6,22 +6,17 @@ import org.hibernate.event.PostInsertEventListener
 import org.hibernate.event.PostUpdateEvent
 import org.hibernate.event.PostInsertEvent
 import org.hibernate.event.PostDeleteEvent
+import org.pillarone.riskanalytics.core.ResourceDAO
 import org.pillarone.riskanalytics.core.simulation.item.ModellingItem
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
+import org.pillarone.riskanalytics.core.simulation.item.Resource
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 
-/**
- * Created by IntelliJ IDEA.
- * User: bzetterstrom
- * Date: 11/3/11
- * Time: 6:23 PM
- * To change this template use File | Settings | File Templates.
- */
 class ModellingItemHibernateListener implements PostInsertEventListener, PostUpdateEventListener, PostDeleteEventListener {
     final List<ModellingItemListener> _listeners = new ArrayList<ModellingItemListener>();
 
@@ -61,38 +56,32 @@ class ModellingItemHibernateListener implements PostInsertEventListener, PostUpd
         }
     }
 
-    ModellingItem getModellingItem(Object entity) {
-        if (entity instanceof ParameterizationDAO) {
-            return toParameterization(entity)
-        } else if (entity instanceof ResultConfigurationDAO) {
-            return toResultConfiguration(entity)
-        } else if (entity instanceof SimulationRun) {
-            return toSimulation(entity)
-        }
-
-        return null
+    ModellingItem getModellingItem(Object dao) {
+        null
     }
 
-    private Parameterization toParameterization(ParameterizationDAO dao) {
+    Resource getModellingItem(ResourceDAO dao) {
+        Resource resource = new Resource(dao.name, Thread.currentThread().contextClassLoader.loadClass(dao.resourceClassName))
+        resource.versionNumber = new VersionNumber(dao.itemVersion)
+        return resource
+    }
+
+    Parameterization getModellingItem(ParameterizationDAO dao) {
         Parameterization parameterization = new Parameterization(dao.name, Thread.currentThread().contextClassLoader.loadClass(dao.modelClassName))
         parameterization.versionNumber = new VersionNumber(dao.itemVersion)
-
         return parameterization
     }
 
-    private ResultConfiguration toResultConfiguration(ResultConfigurationDAO dao) {
+    ResultConfiguration getModellingItem(ResultConfigurationDAO dao) {
         ResultConfiguration resultConfiguration = new ResultConfiguration(dao.name)
         resultConfiguration.modelClass = Thread.currentThread().contextClassLoader.loadClass(dao.modelClassName)
         resultConfiguration.versionNumber = new VersionNumber(dao.itemVersion)
-
         return resultConfiguration
     }
 
-    private Simulation toSimulation(SimulationRun dao) {
+    Simulation getModellingItem(SimulationRun dao) {
         Simulation simulation = new Simulation(dao.name)
         simulation.modelClass = Thread.currentThread().contextClassLoader.loadClass(dao.model)
-
         return simulation
     }
-
 }

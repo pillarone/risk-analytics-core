@@ -58,8 +58,6 @@ class Parameterization extends ParametrizedItem {
     Long dealId
     DateTime valuationDate
 
-    private boolean loaded = false
-
     public Parameterization(Map params) {
         this(params.remove("name").toString())
         params.each {k, v ->
@@ -292,9 +290,13 @@ class Parameterization extends ParametrizedItem {
             loadComments(dao)
             tags = dao.tags*.tag
             if (!tags) tags = []
-            loaded = true
         }
         LOG.info("Parameterization $name loaded in ${System.currentTimeMillis() - time}ms")
+    }
+
+    @Override
+    void loaded(boolean completeLoad) {
+        loaded = completeLoad
     }
 
     private void loadComments(ParameterizationDAO dao) {

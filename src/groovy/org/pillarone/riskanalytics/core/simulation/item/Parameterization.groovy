@@ -319,7 +319,6 @@ class Parameterization extends ParametrizedItem {
     @CompileStatic
     void unload() {
         super.unload()
-        loaded = false
         parameterHolders?.clear()
         comments?.clear()
         tags?.clear()

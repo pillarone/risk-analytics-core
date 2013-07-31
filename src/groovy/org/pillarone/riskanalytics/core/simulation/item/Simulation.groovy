@@ -87,7 +87,6 @@ class Simulation extends ParametrizedItem {
         saveComments(run)
         saveTags(run)
         saveParameters(runtimeParameters, run.runtimeParameters, run)
-        println()
     }
 
     protected void mapFromDao(def source, boolean completeLoad) {

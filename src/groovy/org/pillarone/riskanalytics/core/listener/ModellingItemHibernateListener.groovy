@@ -73,11 +73,21 @@ class ModellingItemHibernateListener implements PostInsertEventListener, PostUpd
         null
     }
 
-    Resource getModellingItem(ResourceDAO dao) {
-        Resource resource = new Resource(dao.name, Thread.currentThread().contextClassLoader.loadClass(dao.resourceClassName))
-        resource.versionNumber = new VersionNumber(dao.itemVersion)
-
-        return resource
+    Resource getModellingItem(ResourceDAO detachedDao) {
+        ResourceDAO.withNewSession {
+            ResourceDAO dao = ResourceDAO.get(detachedDao.id) ?: detachedDao
+            Resource resource = new Resource(dao.name, Thread.currentThread().contextClassLoader.loadClass(dao.resourceClassName))
+            resource.id = dao.id
+            resource.versionNumber = new VersionNumber(dao.itemVersion)
+            resource.creationDate = dao.creationDate
+            resource.modificationDate = dao.modificationDate
+            resource.creator = dao.creator
+            resource.lastUpdater = dao.lastUpdater
+            resource.tags = dao.tags*.tag
+            resource.valid = dao.valid
+            resource.status = dao.status
+            return resource
+        }
     }
 
     Parameterization getModellingItem(ParameterizationDAO detachedDao) {

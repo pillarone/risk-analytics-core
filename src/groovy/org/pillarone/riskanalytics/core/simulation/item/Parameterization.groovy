@@ -294,11 +294,6 @@ class Parameterization extends ParametrizedItem {
         LOG.info("Parameterization $name loaded in ${System.currentTimeMillis() - time}ms")
     }
 
-    @Override
-    void loaded(boolean completeLoad) {
-        loaded = completeLoad
-    }
-
     private void loadComments(ParameterizationDAO dao) {
         comments = []
 
@@ -358,11 +353,6 @@ class Parameterization extends ParametrizedItem {
         return SimulationRun.find("from ${SimulationRun.class.name} as run where run.parameterization.name = ? and run.parameterization.modelClassName = ? and run.parameterization.itemVersion =?", [name, modelClass.name, versionNumber.toString()]) != null
     }
 
-    @Override
-    @CompileStatic
-    boolean isLoaded() {
-        return loaded
-    }
 
     @CompileStatic
     public boolean isEditable() {

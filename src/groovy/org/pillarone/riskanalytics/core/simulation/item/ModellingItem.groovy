@@ -26,7 +26,7 @@ abstract class ModellingItem implements Serializable {
     protected List<IModellingItemChangeListener> itemChangedListener
 
     public def id
-    boolean loaded
+    protected boolean loaded
 
     @CompileStatic
     public ModellingItem(String name) {
@@ -67,13 +67,13 @@ abstract class ModellingItem implements Serializable {
                 mapFromDao(loadedDao, completeLoad)
             }
             dao = loadedDao
-            loaded(completeLoad)
+            this.@loaded = completeLoad
         }
     }
 
     @CompileStatic
-    public void loaded(boolean completeLoad){
-        loaded = true
+    boolean isLoaded() {
+        return loaded
     }
 
     @CompileStatic

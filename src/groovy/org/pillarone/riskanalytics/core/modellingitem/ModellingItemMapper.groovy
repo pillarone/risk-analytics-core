@@ -82,6 +82,65 @@ class ModellingItemMapper {
         return null
     }
 
+    static Parameterization newItemInstance(Parameterization item) {
+        Parameterization parameterization = new Parameterization(item.name, item.modelClass)
+        parameterization.id = item.id
+        parameterization.versionNumber = item.versionNumber
+        parameterization.creationDate = item.creationDate
+        parameterization.modificationDate = item.modificationDate
+        parameterization.creator = item.creator
+        parameterization.lastUpdater = item.lastUpdater
+        parameterization.tags = item.tags
+        parameterization.valid = item.valid
+        parameterization.status = item.status
+        return parameterization
+    }
+
+    static ModellingItem newItemInstance(ModellingItem item) {
+        throw new IllegalArgumentException("Not implemented. Item ${item.class} cannot be instantiated.")
+    }
+
+    static Simulation newItemInstance(Simulation item) {
+        Simulation simulation = new Simulation(item.name)
+        simulation.id = item.id
+        simulation.parameterization = newItemInstance(item.parameterization)
+        simulation.template = newItemInstance(item.template)
+        simulation.modelClass = item.modelClass
+        simulation.tags = item.tags
+        simulation.end = item.end
+        simulation.start = item.start
+        simulation.creationDate = item.creationDate
+        simulation.modificationDate = item.modificationDate
+        simulation.creator = item.creator
+        return simulation
+    }
+
+    static Resource newItemInstance(Resource item) {
+        Resource resource = new Resource(item.name, item.modelClass)
+        resource.id = item.id
+        resource.versionNumber = item.versionNumber
+        resource.creationDate = item.creationDate
+        resource.modificationDate = item.modificationDate
+        resource.creator = item.creator
+        resource.lastUpdater = item.lastUpdater
+        resource.tags = item.tags
+        resource.valid = item.valid
+        resource.status = item.status
+        return resource
+    }
+
+    static ResultConfiguration newItemInstance(ResultConfiguration item) {
+        ResultConfiguration resultConfiguration = new ResultConfiguration(item.name)
+        resultConfiguration.id = item.id
+        resultConfiguration.modelClass = item.modelClass
+        resultConfiguration.versionNumber = item.versionNumber
+        resultConfiguration.creationDate = item.creationDate
+        resultConfiguration.modificationDate = item.modificationDate
+        resultConfiguration.creator = item.creator
+        resultConfiguration.lastUpdater = item.lastUpdater
+
+        return resultConfiguration
+    }
 
 
 }

@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
 import groovy.transform.CompileStatic
+import org.apache.commons.lang.builder.HashCodeBuilder
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.output.*
@@ -213,4 +214,25 @@ class ResultConfiguration extends ModellingItem {
         return mapping
     }
 
+    @Override
+    String getNameAndVersion() {
+        "$name v${versionNumber.toString()}"
+    }
+
+    public boolean equals(Object obj) {
+        if (obj instanceof ResultConfiguration) {
+            return obj.name.equals(name) && obj.modelClass.equals(modelClass) && obj.versionNumber.equals(versionNumber)
+        } else {
+            return false
+        }
+    }
+
+    @CompileStatic
+    public int hashCode() {
+        HashCodeBuilder hashCodeBuilder = new HashCodeBuilder()
+        hashCodeBuilder.append(name)
+        hashCodeBuilder.append(modelClass)
+        hashCodeBuilder.append(versionNumber.toString())
+        return hashCodeBuilder.toHashCode()
+    }
 }

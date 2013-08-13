@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
 import groovy.transform.CompileStatic
+import org.apache.commons.lang.builder.HashCodeBuilder
 import org.pillarone.riskanalytics.core.ResourceDAO
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.comment.ResourceCommentDAO
@@ -162,7 +163,7 @@ class Resource extends ParametrizedItem {
             dao.removeFromTags(tag)
 
         }
-        tagsToRemove.each {it.delete()}
+        tagsToRemove.each { it.delete() }
 
         for (Tag tag in tags) {
             if (!dao.tags*.tag?.contains(tag)) {
@@ -215,7 +216,7 @@ class Resource extends ParametrizedItem {
 
     @CompileStatic
     List getParameters(String path) {
-        return parameterHolders.findAll {ParameterHolder parameter ->
+        return parameterHolders.findAll { ParameterHolder parameter ->
             parameter.path == path && !parameter.removed
         }
     }
@@ -236,4 +237,28 @@ class Resource extends ParametrizedItem {
         }
         return !isUsedInSimulation()
     }
+
+    @Override
+    String getNameAndVersion() {
+        "$name v${versionNumber.toString()}"
+    }
+
+    @CompileStatic
+    public int hashCode() {
+        HashCodeBuilder hashCodeBuilder = new HashCodeBuilder()
+        hashCodeBuilder.append(name)
+        hashCodeBuilder.append(modelClass)
+        hashCodeBuilder.append(versionNumber.toString())
+        return hashCodeBuilder.toHashCode()
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Resource) {
+            return obj.name.equals(name) && obj.modelClass.equals(modelClass) && obj.versionNumber.equals(versionNumber)
+        } else {
+            return false
+        }
+    }
+
 }

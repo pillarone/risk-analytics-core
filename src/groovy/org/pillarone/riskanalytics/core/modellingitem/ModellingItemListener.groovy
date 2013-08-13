@@ -1,4 +1,4 @@
-package org.pillarone.riskanalytics.core.listener
+package org.pillarone.riskanalytics.core.modellingitem
 
 import org.pillarone.riskanalytics.core.simulation.item.ModellingItem
 

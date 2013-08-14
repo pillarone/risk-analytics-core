@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.simulation.item
 import grails.util.Holders
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
+import org.apache.commons.lang.builder.HashCodeBuilder
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.ParameterizationDAO
@@ -243,5 +244,23 @@ class Simulation extends ParametrizedItem {
         return ResultCommentDAO.executeQuery("select count(*) from ${ResultCommentDAO.class.name} as r where r.simulationRun.name = ? and  r.simulationRun.model = ?", [name, modelClass.name])[0]
 
     }
+
+    @CompileStatic
+    public int hashCode() {
+        HashCodeBuilder hashCodeBuilder = new HashCodeBuilder()
+        hashCodeBuilder.append(name)
+        hashCodeBuilder.append(modelClass)
+        hashCodeBuilder.append(modelVersionNumber.toString())
+        return hashCodeBuilder.toHashCode()
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Simulation) {
+            return obj.name.equals(name) && obj.modelClass.equals(modelClass) && obj.modelVersionNumber.equals(modelVersionNumber)
+        } else {
+            return false
+        }
+    }
+
 
 }

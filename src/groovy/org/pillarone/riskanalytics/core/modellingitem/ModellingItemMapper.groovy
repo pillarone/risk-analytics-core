@@ -26,6 +26,7 @@ class ModellingItemMapper {
             parameterization.tags = dao.tags*.tag
             parameterization.valid = dao.valid
             parameterization.status = dao.status
+            parameterization.dealId = dao.dealId
             return parameterization
         }
     }
@@ -93,6 +94,7 @@ class ModellingItemMapper {
         parameterization.tags = item.tags
         parameterization.valid = item.valid
         parameterization.status = item.status
+        parameterization.dealId = item.dealId
         return parameterization
     }
 

@@ -72,4 +72,21 @@ class ResourceTests extends GroovyTestCase {
         assertEquals(99, exampleResource.parmInteger)
         assertEquals("String", exampleResource.parmString)
     }
+
+    void testEquals(){
+        Resource resource1 = new Resource('test', Resource)
+        Resource resource2 = new Resource('test', Resource)
+        resource1.versionNumber = new VersionNumber('1.1')
+        resource2.versionNumber = new VersionNumber('1.1')
+        assert resource1.equals(resource2)
+        resource1.id = 1
+        resource2.id = 2
+        assert !resource1.equals(resource2)
+        resource2.id = null
+        resource2.name = 'test2'
+        assert !resource1.equals(resource2)
+        resource2.name = 'test'
+        resource2.versionNumber = new VersionNumber('1.2')
+        assert !resource1.equals(resource2)
+    }
 }

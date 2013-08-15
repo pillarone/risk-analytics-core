@@ -281,7 +281,6 @@ class SimulationTests extends GroovyTestCase {
 
     }
 
-
     private Simulation createSimulation(String simulationName) {
         createParameterization()
         createResultConfiguration()
@@ -292,6 +291,27 @@ class SimulationTests extends GroovyTestCase {
         simulation.numberOfIterations = 10
         simulation.modelClass = EmptyModel
         return simulation
+    }
+
+    void testEquals() {
+        Simulation simulation1 = new Simulation('test1')
+        Simulation simulation2 = new Simulation('test1')
+        assert simulation1.equals(simulation2)
+        simulation1.name = 'test2'
+        assert !simulation1.equals(simulation2)
+        simulation1.id = 4
+        simulation2.id = 4
+        assert simulation1.equals(simulation2)
+        simulation2.id = null
+        simulation1.name = 'test1'
+        simulation2.modelClass = Object
+        simulation1.modelClass = Object
+        assert simulation1.equals(simulation2)
+        simulation2.modelVersionNumber = new VersionNumber('1.1')
+        simulation1.modelVersionNumber = new VersionNumber('1.1')
+        assert simulation1.equals(simulation2)
+        simulation2.modelClass = String
+        assert !simulation1.equals(simulation2)
     }
 
 

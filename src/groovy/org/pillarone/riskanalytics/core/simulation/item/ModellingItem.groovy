@@ -61,7 +61,7 @@ abstract class ModellingItem implements Serializable {
     }
 
     public void load(boolean completeLoad = true) {
-        daoClass.withTransaction {TransactionStatus status ->
+        daoClass.withTransaction { TransactionStatus status ->
             def loadedDao = loadFromDB()
             if (loadedDao) {
                 mapFromDao(loadedDao, completeLoad)
@@ -97,7 +97,7 @@ abstract class ModellingItem implements Serializable {
 
     public def save() {
         def result = null
-        daoClass.withTransaction {status ->
+        daoClass.withTransaction { status ->
             def daoToBeSaved = dao
 
             if (daoToBeSaved == null) {
@@ -156,7 +156,7 @@ abstract class ModellingItem implements Serializable {
             LOG.warn "attempt to delete an unloaded dao: $dao"
             load()     // todo: can't we simply return?
         }
-        daoClass.withTransaction {TransactionStatus status ->
+        daoClass.withTransaction { TransactionStatus status ->
             try {
                 def dao = getDao()
                 if (dao != null && deleteDaoImpl(dao)) {
@@ -251,6 +251,17 @@ abstract class ModellingItem implements Serializable {
         name
     }
 
+    @Override
+    boolean equals(Object obj) {
+        if (obj instanceof ModellingItem) {
+            if (id != null && obj.id != null) {
+                return obj.id.equals(id)
+            } else {
+                return obj.name.equals(name) && obj.modelClass.equals(modelClass)
+            }
+        }
+        return false
+    }
 }
 
 interface IModellingItemChangeListener {

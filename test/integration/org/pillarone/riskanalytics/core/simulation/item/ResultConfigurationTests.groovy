@@ -180,4 +180,21 @@ class ResultConfigurationTests extends GroovyTestCase {
         assert 1 == configuration.collectors.size()
     }
 
+    void testEquals(){
+        ResultConfiguration resultConfiguration1 = new ResultConfiguration('test', Resource)
+        ResultConfiguration resultConfiguration2 = new ResultConfiguration('test', Resource)
+        resultConfiguration1.versionNumber = new VersionNumber('1.1')
+        resultConfiguration2.versionNumber = new VersionNumber('1.1')
+        assert resultConfiguration1.equals(resultConfiguration2)
+        resultConfiguration1.id = 1
+        resultConfiguration2.id = 2
+        assert !resultConfiguration1.equals(resultConfiguration2)
+        resultConfiguration2.id = null
+        resultConfiguration2.name = 'test2'
+        assert !resultConfiguration1.equals(resultConfiguration2)
+        resultConfiguration2 = new ResultConfiguration('test', Resource)
+        resultConfiguration2.versionNumber = new VersionNumber('1.2')
+        assert !resultConfiguration1.equals(resultConfiguration2)
+    }
+
 }

@@ -255,7 +255,7 @@ class Resource extends ParametrizedItem {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Resource) {
-            return obj.name.equals(name) && obj.modelClass.equals(modelClass) && obj.versionNumber.equals(versionNumber)
+            return super.equals(obj) && obj.versionNumber.equals(versionNumber)
         } else {
             return false
         }

@@ -221,7 +221,7 @@ class ResultConfiguration extends ModellingItem {
 
     public boolean equals(Object obj) {
         if (obj instanceof ResultConfiguration) {
-            return obj.name.equals(name) && obj.modelClass.equals(modelClass) && obj.versionNumber.equals(versionNumber)
+            return super.equals(obj) && obj.versionNumber.equals(versionNumber)
         } else {
             return false
         }

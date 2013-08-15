@@ -343,7 +343,7 @@ class Parameterization extends ParametrizedItem {
 
     public boolean equals(Object obj) {
         if (obj instanceof Parameterization) {
-            return obj.name.equals(name) && obj.modelClass.equals(modelClass) && obj.versionNumber.equals(versionNumber)
+            return super.equals(obj) && obj.versionNumber.equals(versionNumber)
         } else {
             return false
         }

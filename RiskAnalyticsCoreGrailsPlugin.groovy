@@ -33,7 +33,7 @@ import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.8-a5"
+    def version = "1.8-a6"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.2.1 > *"
     // the other plugins this plugin depends on
@@ -113,6 +113,7 @@ Persistence & Simulation engine.
             gridGainHome = gridgainHomeDefault
             collisionSpi = ref("collisionSpi")
             marshaller = ref("marshaller")
+            networkTimeout = 30000
 
         }
         marshaller(org.gridgain.grid.marshaller.optimized.GridOptimizedMarshaller) { }

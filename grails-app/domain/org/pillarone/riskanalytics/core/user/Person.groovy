@@ -23,6 +23,8 @@ class Person {
     }
 
     Set<Authority> getAuthorities() {
-        PersonAuthority.findAllByPerson(this).collect { it.authority } as Set
+        withTransaction {
+            return PersonAuthority.findAllByPerson(this).collect { it.authority } as Set
+        }
     }
 }

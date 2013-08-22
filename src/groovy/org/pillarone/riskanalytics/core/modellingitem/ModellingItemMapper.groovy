@@ -1,16 +1,10 @@
 package org.pillarone.riskanalytics.core.modellingitem
 
-import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.ResourceDAO
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.output.SimulationRun
-import org.pillarone.riskanalytics.core.simulation.item.ModellingItem
-import org.pillarone.riskanalytics.core.simulation.item.Parameterization
-import org.pillarone.riskanalytics.core.simulation.item.Resource
-import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
-import org.pillarone.riskanalytics.core.simulation.item.Simulation
-import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
+import org.pillarone.riskanalytics.core.simulation.item.*
 
 class ModellingItemMapper {
     static Parameterization getModellingItem(ParameterizationDAO detachedDao) {
@@ -49,8 +43,11 @@ class ModellingItemMapper {
             SimulationRun dao = SimulationRun.get(detachedDao.id) ?: detachedDao
             Simulation simulation = new Simulation(dao.name)
             simulation.id = dao.id
-            simulation.parameterization = getModellingItem(dao.parameterization)
-            simulation.template = getModellingItem(dao.resultConfiguration)
+            if (!dao.toBeDeleted){
+                // simulation runs that are to be deleted do not have p14n and resultConfigs anymore.
+                simulation.parameterization = getModellingItem(dao.parameterization)
+                simulation.template = getModellingItem(dao.resultConfiguration)
+            }
             simulation.modelClass = ModellingItemMapper.classLoader.loadClass(dao.model)
             simulation.tags = dao.tags*.tag
             simulation.end = dao.endTime
@@ -99,14 +96,18 @@ class ModellingItemMapper {
     }
 
     static ModellingItem newItemInstance(ModellingItem item) {
-        throw new IllegalArgumentException("Not implemented. Item ${item.class} cannot be instantiated.")
+        throw new IllegalArgumentException("Not implemented. Item ${item?.class} cannot be instantiated.")
     }
 
     static Simulation newItemInstance(Simulation item) {
         Simulation simulation = new Simulation(item.name)
         simulation.id = item.id
-        simulation.parameterization = newItemInstance(item.parameterization)
-        simulation.template = newItemInstance(item.template)
+        if (item.parameterization){
+            simulation.parameterization = newItemInstance(item.parameterization)
+        }
+        if (item.template){
+            simulation.template = newItemInstance(item.template)
+        }
         simulation.modelClass = item.modelClass
         simulation.tags = item.tags
         simulation.end = item.end

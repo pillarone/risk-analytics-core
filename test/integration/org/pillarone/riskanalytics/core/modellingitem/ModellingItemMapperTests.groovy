@@ -22,9 +22,6 @@ class ModellingItemMapperTests extends GroovyTestCase{
         Simulation item = ModellingItemMapper.getModellingItem(run)
         assert item.parameterization == null
         assert item.template == null
-        Simulation newInstance = ModellingItemMapper.newItemInstance(item)
-        assert newInstance.parameterization == null
-        assert newInstance.template == null
     }
 
 }

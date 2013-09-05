@@ -32,7 +32,7 @@ databaseChangeLog = {
                                 }
                             }
                             commentDao.files = null
-                            commentDao.save()
+                            commentDao.save(flush: true)
                         }
                     }
                 }

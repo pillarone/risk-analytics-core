@@ -1,4 +1,4 @@
-package models.core
+package models.resource
 
 import org.pillarone.riskanalytics.core.example.component.ExampleComponentContainingResource
 import org.pillarone.riskanalytics.core.example.component.TestComponent2

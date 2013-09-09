@@ -1,4 +1,4 @@
-package models.core
+package models.resource
 
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObjectClassifier
@@ -8,7 +8,7 @@ import org.pillarone.riskanalytics.core.example.component.ExampleResource
 import org.pillarone.riskanalytics.core.parameterization.ConstraintsFactory
 import org.pillarone.riskanalytics.core.example.parameter.ExampleResourceConstraints
 
-model = models.core.ResourceModel
+model = ResourceModel
 periodCount = 1
 components {
     parameterComponent {

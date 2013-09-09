@@ -1,8 +1,7 @@
-package models.core
+package models.resource
 
 model = ResourceModel
 periodCount = 1
 
-components {
-
+company {
 }

@@ -41,6 +41,10 @@ abstract class ModelTest extends GroovyTestCase {
         (getModelClass().simpleName - "Model") + "Parameters"
     }
 
+    String getModelName() {
+        (getModelClass().simpleName - "Model")
+    }
+
     String getResultConfigurationFileName() {
         (getModelClass().simpleName - "Model") + "ResultConfiguration"
     }
@@ -91,9 +95,9 @@ abstract class ModelTest extends GroovyTestCase {
         MappingCache.instance.clear()
         MathUtils.initRandomStreamBase(1234)
 
-        new ParameterizationImportService().compareFilesAndWriteToDB([getParameterFileName()])
-        new ResultConfigurationImportService().compareFilesAndWriteToDB([getResultConfigurationFileName()])
-        new ModelStructureImportService().compareFilesAndWriteToDB([getStructureFileName()])
+        new ParameterizationImportService().compareFilesAndWriteToDB([getModelName()])
+        new ResultConfigurationImportService().compareFilesAndWriteToDB([getModelName()])
+        new ModelStructureImportService().compareFilesAndWriteToDB([getModelName()])
 
         def parameter = ParameterizationDAO.findByName(getParameterDisplayName())
         assertNotNull parameter

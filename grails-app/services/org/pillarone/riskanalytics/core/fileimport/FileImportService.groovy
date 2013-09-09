@@ -33,7 +33,7 @@ abstract class FileImportService {
     public int compareFilesAndWriteToDB(List modelNames = null) {
 
         int recordCount = 0
-        scanImportFolder(modelNames).each {URL url ->
+        scanImportFolder(modelNames).each { URL url ->
             if (importFile(url)) {
                 recordCount++
             }
@@ -53,7 +53,7 @@ abstract class FileImportService {
 
         List<URL> matchingFiles = []
         new File(url.toURI()).eachFileRecurse { File file ->
-            if (file.isFile() && file.name.endsWith("${fileSuffix}.groovy") && shouldImportModel(file.name, modelNames)) {
+            if (file.isFile() && file.name.endsWith("${fileSuffix}.groovy") && shouldImportModel(file.parentFile.name, file.name, modelNames)) {
                 matchingFiles << file.toURI().toURL()
             }
         }
@@ -76,7 +76,10 @@ abstract class FileImportService {
             ZipEntry entry = null
             while ((entry = inputStream.getNextEntry()) != null) {
                 String entryName = entry.getName()
-                if (entryName.contains("models") && entryName.endsWith("${fileSuffix}.groovy") && shouldImportModel(entryName.substring(entryName.lastIndexOf("/") + 1), modelNames)) {
+                String filename = entryName.substring(entryName.lastIndexOf("/") + 1)
+                String folderName = entryName - "/$filename"
+                folderName = folderName.substring(folderName.lastIndexOf("/") + 1)
+                if (entryName.contains("models") && entryName.endsWith("${fileSuffix}.groovy") && shouldImportModel(folderName, filename, modelNames)) {
                     URL resource = getClass().getResource("/" + entryName)
                     if (resource != null) {
                         matchingFiles << resource
@@ -134,13 +137,13 @@ abstract class FileImportService {
     }
 
     @CompileStatic
-    protected boolean shouldImportModel(String filename, List models) {
+    protected boolean shouldImportModel(String folderName, String filename, List models) {
         if (!models) {
             return true
         }
         LOG.trace "filtering $filename with $models"
-        models.any {String it ->
-            filename.startsWith(it)
+        models.any { String it ->
+            filename.startsWith(it) && folderName.toLowerCase().equals(it.toLowerCase())
         }
     }
 

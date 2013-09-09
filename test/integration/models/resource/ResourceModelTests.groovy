@@ -1,4 +1,4 @@
-package models.core
+package models.resource
 
 import org.pillarone.riskanalytics.core.components.ResourceRegistry
 import org.pillarone.riskanalytics.core.simulation.engine.ModelTest

@@ -17,7 +17,7 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjec
 class ArgumentParserIntegrationTests extends GroovyTestCase {
 
     void testOptionalArguments() {
-        new ParameterizationImportService().compareFilesAndWriteToDB(['CoreParameters'])
+        new ParameterizationImportService().compareFilesAndWriteToDB(['Core'])
 
         ArgumentParser argumentParser = new ArgumentParser()
         String[] args = [
@@ -42,7 +42,7 @@ class ArgumentParserIntegrationTests extends GroovyTestCase {
     }
 
     void testForceParameterizationWithExisting() {
-        new ParameterizationImportService().compareFilesAndWriteToDB(['CoreParameters'])
+        new ParameterizationImportService().compareFilesAndWriteToDB(['Core'])
 
         int initialParameterizationCount = ParameterizationDAO.count()
 
@@ -68,7 +68,7 @@ class ArgumentParserIntegrationTests extends GroovyTestCase {
     }
 
     void testForceResultConfigurationWithExisting() {
-        new ResultConfigurationImportService().compareFilesAndWriteToDB(['CoreResultConfiguration'])
+        new ResultConfigurationImportService().compareFilesAndWriteToDB(['Core'])
 
         int initialResultConfigurationCount = ResultConfigurationDAO.count()
 
@@ -177,7 +177,7 @@ class ArgumentParserIntegrationTests extends GroovyTestCase {
     }
 
     void testParameterizationWithSameExisting() {
-        new ParameterizationImportService().compareFilesAndWriteToDB(['CoreParameters'])
+        new ParameterizationImportService().compareFilesAndWriteToDB(['Core'])
 
         int initialParameterizationCount = ParameterizationDAO.count()
 
@@ -199,7 +199,7 @@ class ArgumentParserIntegrationTests extends GroovyTestCase {
     }
 
     void testResultConfigurationWithSameExisting() {
-        new ResultConfigurationImportService().compareFilesAndWriteToDB(['CoreResultConfiguration'])
+        new ResultConfigurationImportService().compareFilesAndWriteToDB(['Core'])
 
         int initialResultConfigurationCount = ResultConfigurationDAO.count()
 
@@ -221,7 +221,7 @@ class ArgumentParserIntegrationTests extends GroovyTestCase {
     }
 
     void testParameterizationWithDifferentExisting() {
-        new ParameterizationImportService().compareFilesAndWriteToDB(['CoreParameters'])
+        new ParameterizationImportService().compareFilesAndWriteToDB(['Core'])
 
         Parameterization parameterizationToChange = new Parameterization("CoreParameters")
         parameterizationToChange.modelClass = CoreModel
@@ -251,7 +251,7 @@ class ArgumentParserIntegrationTests extends GroovyTestCase {
     }
 
     void testResultConfigurationWithDifferentExisting() {
-        new ResultConfigurationImportService().compareFilesAndWriteToDB(['CoreResultConfiguration'])
+        new ResultConfigurationImportService().compareFilesAndWriteToDB(['Core'])
 
         ResultConfiguration resultConfigurationToChange = new ResultConfiguration("CoreResultConfiguration")
         resultConfigurationToChange.modelClass = CoreModel

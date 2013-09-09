@@ -8,7 +8,7 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.IntegerParamet
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjectParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.StringParameterHolder
-import models.core.ResourceModel
+import models.resource.ResourceModel
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ResourceParameterHolder
 import org.pillarone.riskanalytics.core.example.component.ExampleResource
 import org.pillarone.riskanalytics.core.simulation.item.Resource

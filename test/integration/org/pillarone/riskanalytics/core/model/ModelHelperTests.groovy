@@ -10,8 +10,8 @@ import org.pillarone.riskanalytics.core.fileimport.ModelStructureImportService
 class ModelHelperTests extends GroovyTestCase {
 
     void testOutPaths() {
-        new ParameterizationImportService().compareFilesAndWriteToDB(['CoreParameters'])
-        new ModelStructureImportService().compareFilesAndWriteToDB(['CoreStructure'])
+        new ParameterizationImportService().compareFilesAndWriteToDB(['Core'])
+        new ModelStructureImportService().compareFilesAndWriteToDB(['Core'])
 
         Parameterization parameterization = new Parameterization("CoreParameters")
         parameterization.load(true)

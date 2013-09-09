@@ -19,9 +19,9 @@ class CalculatorTests extends GroovyTestCase {
     void setUp() {
         ResultAccessor.clearCaches()
 
-        new ParameterizationImportService().compareFilesAndWriteToDB(['CoreParameters'])
-        new ResultConfigurationImportService().compareFilesAndWriteToDB(['CoreResultConfiguration'])
-        new ModelStructureImportService().compareFilesAndWriteToDB(['CoreStructure'])
+        new ParameterizationImportService().compareFilesAndWriteToDB(['Core'])
+        new ResultConfigurationImportService().compareFilesAndWriteToDB(['Core'])
+        new ModelStructureImportService().compareFilesAndWriteToDB(['Core'])
         run = new SimulationRun()
         run.name = 'testRun'
         run.parameterization = ParameterizationDAO.findByName('CoreParameters')

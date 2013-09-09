@@ -405,7 +405,7 @@ class ParameterizationTests extends GroovyTestCase {
     }
 
     void testToConfigObject() {
-        new ParameterizationImportService().compareFilesAndWriteToDB(['CoreParameters'])
+        new ParameterizationImportService().compareFilesAndWriteToDB(['Core'])
 
         Parameterization parameterization = new Parameterization('CoreParameters')
 

@@ -49,6 +49,13 @@ public class ModelFileImportServiceTests extends GroovyTestCase {
         assertEquals "wrong fileSuffix", "Model", service.fileSuffix
     }
 
+    void testShouldImportModel() {
+        assertFalse service.shouldImportModel('core', "CoreModel.groovy",null)
+        assertFalse service.shouldImportModel('core', "CoreModel.groovy", [])
+        assertTrue service.shouldImportModel('core', "CoreModel.groovy",['Core'])
+    }
+
+
     void testLookupItem() {
         File modelFile = new File(getModelFolder(), "migratableCore/MigratableCoreModel.groovy")
         assertTrue "import not successful", service.importFile(modelFile.toURI().toURL())

@@ -26,8 +26,8 @@ class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
 
     void setUp() {
 
-        new ParameterizationImportService().compareFilesAndWriteToDB(['CoreParameters'])
-        new ResultConfigurationImportService().compareFilesAndWriteToDB(['CoreResultConfiguration'])
+        new ParameterizationImportService().compareFilesAndWriteToDB(['Core'])
+        new ResultConfigurationImportService().compareFilesAndWriteToDB(['Core'])
 
         MappingCache cacheInstance = MappingCache.instance
         fieldMapping = cacheInstance.lookupField("ultimate")

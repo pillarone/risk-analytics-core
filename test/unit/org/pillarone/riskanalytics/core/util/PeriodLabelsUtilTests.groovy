@@ -1,6 +1,6 @@
 package org.pillarone.riskanalytics.core.util
 
-import models.core.ResourceModel
+import models.resource.ResourceModel
 import org.joda.time.DateTime
 import org.joda.time.Period
 import org.pillarone.riskanalytics.core.model.Model

@@ -10,7 +10,7 @@ class PrepareStructureInformationActionTests extends GroovyTestCase {
 
     void testPerform() {
 
-        new ModelStructureImportService().compareFilesAndWriteToDB(['CoreStructure'])
+        new ModelStructureImportService().compareFilesAndWriteToDB(['Core'])
 
         CoreModel model = new CoreModel()
         model.init()

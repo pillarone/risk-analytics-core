@@ -8,14 +8,10 @@ import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import models.core.CoreModel
 import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
 import org.pillarone.riskanalytics.core.components.IResource
-import models.core.ResourceModel
+import models.resource.ResourceModel
 import org.pillarone.riskanalytics.core.simulation.item.Resource
 import org.pillarone.riskanalytics.core.example.component.ExampleResource
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
-import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
-import org.pillarone.riskanalytics.core.parameter.comment.Tag
-import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
-
 
 class ModelVisitorTests extends GroovyTestCase {
 

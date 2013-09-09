@@ -32,8 +32,8 @@ class ResultAccessorTests extends GroovyTestCase {
     void setUp() {
         ResultAccessor.clearCaches()
 
-        new ParameterizationImportService().compareFilesAndWriteToDB(['CoreParameters'])
-        new ResultConfigurationImportService().compareFilesAndWriteToDB(['CoreResultConfiguration'])
+        new ParameterizationImportService().compareFilesAndWriteToDB(['Core'])
+        new ResultConfigurationImportService().compareFilesAndWriteToDB(['Core'])
         simulationRun = new SimulationRun()
         simulationRun.name = "testRun"
         simulationRun.parameterization = ParameterizationDAO.findByName('CoreParameters')

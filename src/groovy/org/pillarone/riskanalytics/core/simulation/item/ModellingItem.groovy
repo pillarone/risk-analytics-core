@@ -262,6 +262,11 @@ abstract class ModellingItem implements Serializable {
         }
         return false
     }
+
+    @Override
+    String toString() {
+        nameAndVersion
+    }
 }
 
 interface IModellingItemChangeListener {

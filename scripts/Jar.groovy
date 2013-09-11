@@ -15,6 +15,7 @@ Options:
 -buildJar (optional): Creates a jar file of the project
 -buildClasses (optional): Creates a directory which contains all output and a .cmd file to start the project
 -mainClass (required for buildJar and buildClasses): main class to start
+-excludeJars (optional): A comma separated list of jar file names that are excluded from the class path.
 ''') {
     depends(parseArguments, packageApp)
 
@@ -80,6 +81,12 @@ private void buildJar() {
 
     copyLibraries(jarTarget)
     List classPath = getRelativeClassPaths("$jarTarget/lib")
+    String excludedJarFiles = argsMap.excludeJars
+    if (excludedJarFiles) {
+        excludedJarFiles.split(',').each { String jarFileToExclude ->
+            classPath.removeAll { String classPathEntry -> classPathEntry.matches(".*$jarFileToExclude") }
+        }
+    }
 
     String manifestTarget = "${jarTarget}/MANIFEST.MF"
     ant.manifest(file: manifestTarget) {

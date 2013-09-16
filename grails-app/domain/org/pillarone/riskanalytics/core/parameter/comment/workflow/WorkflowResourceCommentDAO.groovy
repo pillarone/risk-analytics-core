@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.parameter.comment.workflow
 
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.ResourceDAO
+import org.pillarone.riskanalytics.core.parameter.comment.CommentFileDAO
 import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.util.DatabaseUtils
@@ -16,6 +17,7 @@ class WorkflowResourceCommentDAO {
     IssueStatus status
 
     static belongsTo = ResourceDAO
+    static hasMany = [commentFile : CommentFileDAO]
 
     static constraints = {
         user(nullable: true)

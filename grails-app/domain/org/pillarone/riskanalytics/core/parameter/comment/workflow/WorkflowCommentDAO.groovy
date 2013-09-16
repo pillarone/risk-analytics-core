@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.parameter.comment.workflow
 
 import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.pillarone.riskanalytics.core.parameter.comment.CommentFileDAO
 import org.pillarone.riskanalytics.core.user.Person
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
@@ -17,6 +18,8 @@ class WorkflowCommentDAO {
     IssueStatus status
 
     static belongsTo = ParameterizationDAO
+    static hasMany = [commentFile : CommentFileDAO]
+
 
     static constraints = {
         user(nullable: true)

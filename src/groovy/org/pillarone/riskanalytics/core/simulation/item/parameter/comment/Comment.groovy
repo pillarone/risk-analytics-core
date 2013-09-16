@@ -1,7 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.item.parameter.comment
 
 import org.joda.time.DateTime
-import org.pillarone.riskanalytics.core.FileConstants
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 import org.pillarone.riskanalytics.core.parameter.comment.CommentFileDAO
 import org.pillarone.riskanalytics.core.parameter.comment.CommentTag
@@ -37,7 +36,11 @@ class Comment implements Cloneable {
         if (commentDAO.tags?.size() > 0) {
             tags.addAll(commentDAO.tags?.tag)
         }
-        commentDAO.commentFile?.each {
+        attachFiles(commentDAO)
+    }
+
+    protected void attachFiles(dao) {
+        dao.commentFile?.each {
             files.add(new CommentFile(it.name, it.id))
         }
     }
@@ -152,6 +155,10 @@ class Comment implements Cloneable {
             }
         }
 
+        mapToCommentFiles(dao)
+    }
+
+    protected mapToCommentFiles(dao) {
         files.each { CommentFile file ->
             if (!(file.filename in dao?.commentFile?.name)) {
                 dao.addToCommentFile(new CommentFileDAO(name: file.filename, content: file.content))

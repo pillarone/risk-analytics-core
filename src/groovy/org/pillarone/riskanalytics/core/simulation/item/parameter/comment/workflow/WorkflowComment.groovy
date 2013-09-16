@@ -4,7 +4,6 @@ import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.parameter.comment.workflow.IssueStatus
 import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowCommentDAO
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
-import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowResourceCommentDAO
 
 class WorkflowComment extends Comment {
@@ -18,6 +17,7 @@ class WorkflowComment extends Comment {
         user = dao.user
         comment = dao.comment
         status = dao.status
+        attachFiles(dao)
     }
 
     public WorkflowComment(WorkflowResourceCommentDAO dao) {
@@ -27,6 +27,7 @@ class WorkflowComment extends Comment {
         user = dao.user
         comment = dao.comment
         status = dao.status
+        attachFiles(dao)
     }
 
     public WorkflowComment(String path, int period) {
@@ -39,19 +40,20 @@ class WorkflowComment extends Comment {
     }
 
     void applyToDomainObject(WorkflowCommentDAO dao) {
+        mapToDao(dao)
+    }
+
+    private mapToDao(def dao) {
         dao.path = path
         dao.comment = comment
         dao.timeStamp = lastChange
         dao.user = user
         dao.status = status
+        mapToCommentFiles(dao)
     }
 
     void applyToDomainObject(WorkflowResourceCommentDAO dao) {
-        dao.path = path
-        dao.comment = comment
-        dao.timeStamp = lastChange
-        dao.user = user
-        dao.status = status
+        mapToDao(dao)
     }
 
     void resolve() {

@@ -3,6 +3,7 @@ import org.codehaus.groovy.grails.orm.hibernate.HibernateEventListeners
 import org.gridgain.grid.GridConfigurationAdapter
 import org.gridgain.grid.GridSpringBean
 import org.gridgain.grid.spi.collision.fifoqueue.GridFifoQueueCollisionSpi
+import org.gridgain.grid.spi.failover.never.GridNeverFailoverSpi
 import org.joda.time.DateTimeZone
 import org.pillarone.riskanalytics.core.FileConstants
 import org.pillarone.riskanalytics.core.example.migration.TestConstrainedTable
@@ -112,11 +113,13 @@ Persistence & Simulation engine.
             }
             gridGainHome = gridgainHomeDefault
             collisionSpi = ref("collisionSpi")
+            failoverSpi = ref("failoverSpi")
             marshaller = ref("marshaller")
             networkTimeout = 30000
 
         }
         marshaller(org.gridgain.grid.marshaller.optimized.GridOptimizedMarshaller) { }
+        failoverSpi(GridNeverFailoverSpi)
         collisionSpi(GridFifoQueueCollisionSpi) {
             parallelJobsNumber = ConfigurationHolder.config.containsKey("numberOfParallelJobsPerNode") ?
                 ConfigurationHolder.config."numberOfParallelJobsPerNode" : 100

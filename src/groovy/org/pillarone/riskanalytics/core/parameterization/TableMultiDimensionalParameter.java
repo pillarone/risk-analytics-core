@@ -35,6 +35,10 @@ public class TableMultiDimensionalParameter extends AbstractMultiDimensionalPara
         return 1;
     }
 
+    public List getTitles() {
+        return titles;
+    }
+
     public boolean isCellEditable(int row, int column) {
         return row != 0;
     }

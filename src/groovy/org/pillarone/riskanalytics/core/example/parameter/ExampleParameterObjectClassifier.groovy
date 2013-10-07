@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.example.parameter
 
+import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.parameterization.AbstractParameterObjectClassifier
 import org.pillarone.riskanalytics.core.parameterization.IParameterObjectClassifier
 import org.pillarone.riskanalytics.core.parameterization.IParameterObject
@@ -30,6 +31,10 @@ class ExampleParameterObjectClassifier extends AbstractParameterObjectClassifier
             "TYPE3", ["p1": 0d, "p2": 1d, "p3": 2d]
     )
 
+    public static final ExampleParameterObjectClassifier TYPE4 = new ExampleParameterObjectClassifier(
+            "TYPE4", ["date": new DateTime()]
+    )
+
     public static final ExampleParameterObjectClassifier NESTED_PARAMETER_OBJECT = new ExampleParameterObjectClassifier(
             "NESTED_PARAMETER_OBJECT", ["nested": TYPE0.getParameterObject(TYPE0.parameters)]
     )
@@ -56,7 +61,7 @@ class ExampleParameterObjectClassifier extends AbstractParameterObjectClassifier
     }
 
     List<IParameterObjectClassifier> getClassifiers() {
-        return [TYPE0, TYPE1, TYPE2, NESTED_PARAMETER_OBJECT, NESTED_MDP, NESTED_MDP2, RESOURCE];
+        return [TYPE0, TYPE1, TYPE2, TYPE3, TYPE4, NESTED_PARAMETER_OBJECT, NESTED_MDP, NESTED_MDP2, RESOURCE];
     }
 
     IParameterObject getParameterObject(Map parameters) {

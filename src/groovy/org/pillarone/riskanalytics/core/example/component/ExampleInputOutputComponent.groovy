@@ -28,6 +28,7 @@ class ExampleInputOutputComponent extends Component implements InitializingCompo
     boolean afterParameterInjectionCalled = false
 
     protected void doCalculation() {
+        println("called by ${System.identityHashCode(this)}: size: ${inValue.size()} in-transm: ${allInputTransmitter.size()}")
         IIdGenerator generator = getIdGenerator()
         assertNotNull(generator)
         String firstId = generator.nextValue()

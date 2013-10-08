@@ -40,7 +40,7 @@ public class Transmitter implements ITransmitter {
         filterSource();
         
         setTransmitted(true);
-        if (LOG.isDebugEnabled() && source.size() > 1) {
+        if (/*LOG.isInfoEnabled() && */source.size() > 1) {
             StringBuffer buffer = new StringBuffer();
             buffer.append(senderChannelName);
             buffer.append(" [");
@@ -54,7 +54,7 @@ public class Transmitter implements ITransmitter {
             buffer.append(" -> ");
             buffer.append(receiver.getClass());
             buffer.append(")");
-            LOG.info(buffer.toString());
+            System.out.println((buffer.toString()));
         }
         notifyReceiver();
     }

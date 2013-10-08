@@ -50,6 +50,8 @@ public class SimulationRunner {
 
     BatchRunInfoService batchRunInfoService
 
+    List<ISimulationProgressListener> progressListeners = []
+
     private int threadCount;
     private static AtomicInteger messageCount;
     private static Object lockObj = new Object();
@@ -105,6 +107,7 @@ public class SimulationRunner {
             }
 
             LOG.info("Finished Initialization of Thread " + Thread.currentThread().getId());
+            progressListeners*.initializationCompleted(this)
 
             long initializationTime = System.currentTimeMillis() - start
             LOG.info "Initialization completed in ${initializationTime}ms"

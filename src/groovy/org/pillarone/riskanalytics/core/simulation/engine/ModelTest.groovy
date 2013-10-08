@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
+import models.core.CoreModel
+import org.apache.commons.lang.builder.HashCodeBuilder
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.joda.time.DateTime
@@ -11,17 +13,11 @@ import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.output.FileOutput
 import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
-import org.pillarone.riskanalytics.core.simulation.item.Parameterization
-import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
-import org.pillarone.riskanalytics.core.simulation.item.Simulation
-import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
-import org.apache.commons.lang.builder.HashCodeBuilder
-import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationBlock
-import org.pillarone.riskanalytics.core.util.MathUtils
+import org.pillarone.riskanalytics.core.simulation.item.*
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
-import org.pillarone.riskanalytics.core.output.CollectorMapping
-import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
+import org.pillarone.riskanalytics.core.util.MathUtils
+import org.pillarone.riskanalytics.core.wiring.WireCategory
 
 /**
  * An abstract class which provides functionality to run model tests.
@@ -36,6 +32,7 @@ abstract class ModelTest extends GroovyTestCase {
     private static final EPSILON = 1E-6
 
     protected SimulationRunner runner
+    protected SimulationRunner runner2
 
     String getParameterFileName() {
         (getModelClass().simpleName - "Model") + "Parameters"
@@ -89,6 +86,7 @@ abstract class ModelTest extends GroovyTestCase {
     }
 
     Simulation run
+    Simulation run2
 
     protected void setUp() {
         super.setUp()
@@ -102,21 +100,33 @@ abstract class ModelTest extends GroovyTestCase {
         def parameter = ParameterizationDAO.findByName(getParameterDisplayName())
         assertNotNull parameter
 
-        Parameterization parameterization = new Parameterization(parameter.name)
-        parameterization.modelClass = getModelClass()
-        parameterization.load()
-
         def resultConfig = ResultConfigurationDAO.findByName(getResultConfigurationDisplayName())
         assertNotNull resultConfig
 
-        ResultConfiguration resultConfiguration = new ResultConfiguration(resultConfig.name)
+        Class modelClass = getModelClass()
+
+        run = prepareSimulation(parameter.name, resultConfig.name, modelClass)
+        run2 = prepareSimulation(parameter.name, resultConfig.name, modelClass)
+
+        assertNotNull run.save()
+        assertNotNull run2.save()
+        refFileName = getPath() + getResultFileName() + "_ref.tsl"
+        newFileName = getPath() + getResultFileName() + ".tsl"
+        clean()
+    }
+
+    protected Simulation prepareSimulation(String parameterizationName, String resultConfigurationName, Class modelClass) {
+        def modelInstance = modelClass.newInstance() as Model
+
+        Parameterization parameterization = new Parameterization(parameterizationName)
+        parameterization.modelClass = getModelClass()
+        parameterization.load()
+
+        ResultConfiguration resultConfiguration = new ResultConfiguration(resultConfigurationName)
         resultConfiguration.modelClass = getModelClass()
         resultConfiguration.load()
 
-        Class modelClass = getModelClass()
-        def modelInstance = modelClass.newInstance() as Model
-
-        run = new Simulation(getResultFileName())
+        Simulation run = new Simulation(getResultFileName() + new DateTime().toString())
         run.parameterization = parameterization
         run.template = resultConfiguration
         run.modelClass = modelClass
@@ -129,18 +139,38 @@ abstract class ModelTest extends GroovyTestCase {
             run.beginOfFirstPeriod = new DateTime(2009, 1, 1, 0, 0, 0, 0)
         }
 
-        for(ParameterHolder parameterHolder in getRuntimeParameters()) {
+        for (ParameterHolder parameterHolder in getRuntimeParameters()) {
             run.addParameter(parameterHolder)
         }
-
-        assertNotNull run.save()
-        refFileName = getPath() + getResultFileName() + "_ref.tsl"
-        newFileName = getPath() + getResultFileName() + ".tsl"
-        clean()
+        return run
     }
 
     final void testModelRun() {
-        runner = SimulationRunner.createRunner()
+        runner = prepareRunner(run)
+        runner2 = prepareRunner(run2)
+
+        //TODO: move
+        new SimulationRunnerSynchronizer([runner, runner2], {
+            CoreModel model1 = runner.currentScope.model
+            CoreModel model2 = runner2.currentScope.model
+            WireCategory.doSetProperty(model2.exampleInputOutputComponent, "inValue",WireCategory.doGetProperty(model1.exampleOutputComponent, "outValue1"))
+            println("Extended wiring finished.")
+        })
+
+        def t1 = Thread.start { runner.start(); assertNull "${runner.error?.error?.message}", runner.error }
+        def t2 = Thread.start { runner2.start(); assertNull "${runner2.error?.error?.message}", runner2.error }
+
+        t1.join()
+        t2.join()
+
+        if (shouldCompareResults()) {
+            compareResults()
+        }
+        postSimulationEvaluation()
+    }
+
+    protected SimulationRunner prepareRunner(Simulation run) {
+        SimulationRunner runner = SimulationRunner.createRunner()
         ICollectorOutputStrategy output = getOutputStrategy()
         SimulationConfiguration configuration = new SimulationConfiguration(
                 simulation: run, outputStrategy: output,
@@ -148,15 +178,7 @@ abstract class ModelTest extends GroovyTestCase {
         )
         configuration.createMappingCache(run.template)
         runner.simulationConfiguration = configuration
-
-
-        runner.start()
-
-        assertNull "${runner.error?.error?.message}", runner.error
-        if (shouldCompareResults()) {
-            compareResults()
-        }
-        postSimulationEvaluation()
+        return runner
     }
 
     protected ICollectorOutputStrategy getOutputStrategy() {
@@ -241,8 +263,7 @@ abstract class ModelTest extends GroovyTestCase {
             assertNotNull "No result found for I$iteration P$period $path $field", expectedResult
             if (stopAtFirstDifference()) {
                 assertEquals("Different value at I$iteration P$period $path $field", expectedResult, value, EPSILON)
-            }
-            else if (Math.abs(expectedResult - value) > EPSILON) {
+            } else if (Math.abs(expectedResult - value) > EPSILON) {
                 LOG.error("Different value at I$iteration P$period $path $field, expected $expectedResult, $value")
                 countDifferences++
             }

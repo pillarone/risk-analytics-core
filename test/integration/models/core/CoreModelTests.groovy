@@ -1,5 +1,7 @@
 package models.core
 
+import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
+import org.pillarone.riskanalytics.core.output.NoOutput
 import org.pillarone.riskanalytics.core.simulation.engine.ModelTest
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
@@ -34,5 +36,13 @@ class CoreModelTests extends ModelTest {
         assertTrue(model.exampleInputOutputComponent.afterParameterInjectionCalled)
     }
 
+    @Override
+    protected ICollectorOutputStrategy getOutputStrategy() {
+        return new NoOutput()
+    }
 
+    @Override
+    int getIterationCount() {
+        return 1
+    }
 }

@@ -11,7 +11,7 @@ class ExampleOutputComponent extends Component implements ITestComponentMarker {
     PacketList<Packet> outValue2 = new PacketList<Packet>()
 
     protected void doCalculation() {
-
+        outValue1 << new Packet()
     }
 
 

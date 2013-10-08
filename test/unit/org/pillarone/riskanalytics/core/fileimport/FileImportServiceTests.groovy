@@ -100,9 +100,10 @@ class FileImportServiceTests extends GroovyTestCase {
                 prepare: {file, name -> }
         ] as FileImportService
 
-        assertTrue "no model specified", fileImportService.shouldImportModel('core', "CoreParameters.groovy", null)
-        assertTrue "no model specified", fileImportService.shouldImportModel('core', "CoreParameters.groovy", [])
-        assertTrue "matching model specified", fileImportService.shouldImportModel('core', "CoreParameters.groovy", ["Core"])
-        assertFalse "non-matching model specified", fileImportService.shouldImportModel('core', "CoreParameters.groovy", ["CapitalEagle"])
+        assertTrue "no model specified", fileImportService.shouldImportModel("CoreParameters.groovy", null)
+        assertTrue "no model specified", fileImportService.shouldImportModel("CoreParameters.groovy", [])
+        assertTrue "matching model specified", fileImportService.shouldImportModel("CoreParameters.groovy", ["Core"])
+        assertFalse "non-matching model specified", fileImportService.shouldImportModel("CoreParameters.groovy", ["CapitalEagle"])
+
     }
 }

@@ -1,6 +1,5 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
-import models.core.CoreModel
 import org.apache.commons.lang.builder.HashCodeBuilder
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
@@ -17,7 +16,6 @@ import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationBlock
 import org.pillarone.riskanalytics.core.simulation.item.*
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.util.MathUtils
-import org.pillarone.riskanalytics.core.wiring.WireCategory
 
 /**
  * An abstract class which provides functionality to run model tests.
@@ -25,14 +23,13 @@ import org.pillarone.riskanalytics.core.wiring.WireCategory
  */
 abstract class ModelTest extends GroovyTestCase {
 
-    private static final Log LOG = LogFactory.getLog(ModelTest)
+    protected static final Log LOG = LogFactory.getLog(getClass())
 
     String refFileName
     String newFileName
     private static final EPSILON = 1E-6
 
     protected SimulationRunner runner
-    protected SimulationRunner runner2
 
     String getParameterFileName() {
         (getModelClass().simpleName - "Model") + "Parameters"
@@ -86,7 +83,6 @@ abstract class ModelTest extends GroovyTestCase {
     }
 
     Simulation run
-    Simulation run2
 
     protected void setUp() {
         super.setUp()
@@ -106,10 +102,8 @@ abstract class ModelTest extends GroovyTestCase {
         Class modelClass = getModelClass()
 
         run = prepareSimulation(parameter.name, resultConfig.name, modelClass)
-        run2 = prepareSimulation(parameter.name, resultConfig.name, modelClass)
 
         assertNotNull run.save()
-        assertNotNull run2.save()
         refFileName = getPath() + getResultFileName() + "_ref.tsl"
         newFileName = getPath() + getResultFileName() + ".tsl"
         clean()
@@ -145,24 +139,11 @@ abstract class ModelTest extends GroovyTestCase {
         return run
     }
 
-    final void testModelRun() {
+    void testModelRun() {
         runner = prepareRunner(run)
-        runner2 = prepareRunner(run2)
+        runner.start()
 
-        //TODO: move
-        new SimulationRunnerSynchronizer([runner, runner2], {
-            CoreModel model1 = runner.currentScope.model
-            CoreModel model2 = runner2.currentScope.model
-            WireCategory.doSetProperty(model2.exampleInputOutputComponent, "inValue",WireCategory.doGetProperty(model1.exampleOutputComponent, "outValue1"))
-            println("Extended wiring finished.")
-        })
-
-        def t1 = Thread.start { runner.start(); assertNull "${runner.error?.error?.message}", runner.error }
-        def t2 = Thread.start { runner2.start(); assertNull "${runner2.error?.error?.message}", runner2.error }
-
-        t1.join()
-        t2.join()
-
+        assertNull "${runner.error?.error?.message}", runner.error
         if (shouldCompareResults()) {
             compareResults()
         }
@@ -199,7 +180,7 @@ abstract class ModelTest extends GroovyTestCase {
         true
     }
 
-    private void clean() {
+    protected void clean() {
         File resultFile = new File(newFileName)
         if (resultFile.exists()) {
             if (!resultFile.delete())
@@ -207,7 +188,7 @@ abstract class ModelTest extends GroovyTestCase {
         }
     }
 
-    private void compareResults() {
+    protected void compareResults() {
         File refFile = new File(refFileName)
         if (!refFile.exists())
             fail("No referenceResultFileName defined for ${modelClass.name}: ($refFileName)")

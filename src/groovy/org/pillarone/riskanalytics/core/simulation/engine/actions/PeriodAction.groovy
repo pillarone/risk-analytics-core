@@ -8,6 +8,8 @@ import org.pillarone.riskanalytics.core.model.DeterministicModel
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.simulation.engine.PeriodScope
 
+import java.util.concurrent.CyclicBarrier
+
 /**
  * The PeriodAction is responsible for executing a "simulation step" by triggering the startComponents of the model.
  * For each period its perform method is called.
@@ -21,6 +23,7 @@ public class PeriodAction implements Action {
     Model model
     PeriodScope periodScope
     boolean parameterValidationNeeded = true    // true for all periods of the first iteration
+    CyclicBarrier barrier
 
     /**
      * Performing the periodAction means:
@@ -49,6 +52,7 @@ public class PeriodAction implements Action {
         } else {
             if (LOG.isWarnEnabled()) LOG.warn "No model instance available."
         }
+        barrier?.await()
         //ContinuousPeriodCounter & Scope start at 0, so the period has to be increased after its execution
         periodScope.prepareNextPeriod()
     }

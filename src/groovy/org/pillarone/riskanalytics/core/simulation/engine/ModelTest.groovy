@@ -145,8 +145,10 @@ abstract class ModelTest extends GroovyTestCase {
         configuration.createMappingCache(run.template)
         runner.simulationConfiguration = configuration
 
-
+        println ("starting Simulation ${System.currentTimeMillis()}")
+        long start = System.currentTimeMillis()
         runner.start()
+        println ("end Simulation. Took  ${(System.currentTimeMillis() - start)/1000} seconds")
 
         assertNull "${runner.error?.error?.message}", runner.error
         if (shouldCompareResults()) {

@@ -1,6 +1,6 @@
 package org.pillarone.riskanalytics.core.parameterization
 
-interface IMultiDimensionalConstraints {
+interface IMultiDimensionalConstraints extends Serializable{
 
     boolean matches(int row, int column, Object value)
 

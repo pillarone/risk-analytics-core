@@ -1,6 +1,8 @@
 package org.pillarone.riskanalytics.core.components;
 
-public interface IComponentMarker {
+import java.io.Serializable;
+
+public interface IComponentMarker extends Serializable {
     public String getNormalizedName();
     public String getName();
 }

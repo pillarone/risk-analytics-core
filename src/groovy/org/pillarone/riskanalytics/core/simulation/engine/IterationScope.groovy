@@ -10,7 +10,7 @@ import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationTask
  * The IterationScope provides information that is valid throughout a single iteration.
  */
 @CompileStatic
-public class IterationScope {
+public class IterationScope implements Serializable{
 
     private static Log LOG = LogFactory.getLog(IterationScope)
 

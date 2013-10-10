@@ -4,9 +4,10 @@ import org.joda.time.DateTime;
 import org.pillarone.riskanalytics.core.components.Component;
 import org.pillarone.riskanalytics.core.components.IComponentMarker;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class Packet implements Cloneable, Comparable {
+public class Packet implements Cloneable, Comparable, Serializable {
     public Component origin;
 
     // to associate the packet with its sender (as the origin gets modified by components only in some cases)

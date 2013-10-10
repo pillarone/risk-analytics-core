@@ -3,7 +3,9 @@ package org.pillarone.riskanalytics.core.wiring;
 import org.pillarone.riskanalytics.core.components.Component;
 import org.pillarone.riskanalytics.core.packets.PacketList;
 
-public interface ITransmitter {
+import java.io.Serializable;
+
+public interface ITransmitter extends Serializable{
 
     public void transmit();
 

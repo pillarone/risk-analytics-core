@@ -12,7 +12,7 @@ import org.pillarone.riskanalytics.core.simulation.IPeriodCounter
  */
 
 @CompileStatic
-public class PeriodScope {
+public class PeriodScope implements Serializable{
 
     private static Log LOG = LogFactory.getLog(PeriodScope)
 

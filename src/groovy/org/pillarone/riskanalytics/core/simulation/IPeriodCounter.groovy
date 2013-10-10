@@ -7,7 +7,7 @@ import org.joda.time.DateTime
  * interval. Therefore end period methods will return the start date of the next period, which is actually not part
  * ot the period. Period counting starts with 0.
  */
-public interface IPeriodCounter {
+public interface IPeriodCounter extends Serializable{
 
     /**
      * Resets the period counter to its initial state.

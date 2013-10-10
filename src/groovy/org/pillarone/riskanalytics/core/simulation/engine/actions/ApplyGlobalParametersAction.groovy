@@ -19,8 +19,8 @@ class ApplyGlobalParametersAction implements Action {
 
     SimulationScope simulationScope
 
-    private List<GlobalParameterTarget> globalTargets = []
-    private List<GlobalParameterSource> globalSources = []
+    private transient List<GlobalParameterTarget> globalTargets = []
+    private transient List<GlobalParameterSource> globalSources = []
 
     void perform() {
         traverseModel(simulationScope.model)

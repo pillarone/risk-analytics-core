@@ -13,7 +13,7 @@ import java.util.Map;
 
 abstract public class AbstractCollectingModeStrategy implements ICollectingModeStrategy {
 
-    protected PacketCollector packetCollector;
+    protected transient PacketCollector packetCollector;
 
     private Log LOG = LogFactory.getLog(AbstractCollectingModeStrategy.class);
 

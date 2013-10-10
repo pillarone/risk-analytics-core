@@ -26,7 +26,7 @@ import org.pillarone.riskanalytics.core.output.FileOutput
  */
 
 @CompileStatic
-public class SimulationScope {
+public class SimulationScope implements Serializable{
 
     private static Log LOG = LogFactory.getLog(SimulationScope)
 

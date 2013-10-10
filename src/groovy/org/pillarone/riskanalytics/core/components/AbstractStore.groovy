@@ -19,7 +19,7 @@ import org.pillarone.riskanalytics.core.simulation.engine.PeriodScope;
  *  @author dierk.koenig (at) canoo (dot) com, stefan.kunz (at) intuitive-collaboration (dot) com
  */
 @TypeChecked
-abstract public class AbstractStore {
+abstract public class AbstractStore implements Serializable{
 
     public static int CURRENT_PERIOD = 0
     public static int LAST_PERIOD = -1

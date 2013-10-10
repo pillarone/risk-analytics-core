@@ -15,7 +15,7 @@ public abstract class AbstractMultiDimensionalParameter implements Cloneable, Se
      * Outer list contains the columns. In order to access the cell in column 5 and row 2, use values.get(5).get(2)
      */
     protected List<List> values;
-    protected Model simulationModel;
+    protected transient Model simulationModel;
     public int max_tokens = 500;
 
     /**

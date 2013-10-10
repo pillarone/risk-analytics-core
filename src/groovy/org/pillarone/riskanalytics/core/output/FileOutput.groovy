@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.output
 
+import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.DateTimeFormat
@@ -22,7 +23,7 @@ public class FileOutput implements ICollectorOutputStrategy {
         resultFile.withWriterAppend {writer ->
             DateTimeFormatter formatDate = DateTimeFormat.forPattern("dd-MMMM-yyyy kk:mm:ss SSS");
             for (SingleValueResultPOJO result in results) {
-                String formattedDate = formatDate.print(result.date)
+                String formattedDate = formatDate.print(result.date as DateTime)
                 writer.writeLine("${result.iteration}\t${result.period}\t${result.valueIndex}\t${result.path.pathName}\t${result.field.fieldName}\t${result.value}\t${formattedDate}")
             }
         }

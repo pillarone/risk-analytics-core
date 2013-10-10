@@ -20,11 +20,11 @@ import java.util.Map;
  */
 abstract public class MultiPhaseComponent extends Component implements IChannelAllocation {
 
-    private Map<ITransmitter, String> phasePerTransmitterInput = new HashMap<ITransmitter, String>();
-    private Map<ITransmitter, String> phasePerTransmitterOutput = new HashMap<ITransmitter, String>();
-    private Map<String, Integer> numberOfTransmitterPerPhaseInput = new HashMap<String, Integer>();
-    private Map<String, Integer> numberOfTransmitterPerPhaseOutput = new HashMap<String, Integer>();
-    private Map<String, Integer> numberOfNotifiedTransmittersPerPhase = new HashMap<String, Integer>();
+    private transient Map<ITransmitter, String> phasePerTransmitterInput = new HashMap<ITransmitter, String>();
+    private transient Map<ITransmitter, String> phasePerTransmitterOutput = new HashMap<ITransmitter, String>();
+    private transient Map<String, Integer> numberOfTransmitterPerPhaseInput = new HashMap<String, Integer>();
+    private transient Map<String, Integer> numberOfTransmitterPerPhaseOutput = new HashMap<String, Integer>();
+    private transient Map<String, Integer> numberOfNotifiedTransmittersPerPhase = new HashMap<String, Integer>();
     private Integer numberOfPhases;
     private int finishedPhases;
 

@@ -11,7 +11,7 @@ class GlobalParameterSource {
 
     String identifier
     Component source
-    Method method
+    transient Method method
 
     void applyToTarget(GlobalParameterTarget target) {
         checkTypes(target)

@@ -18,11 +18,11 @@ import org.pillarone.riskanalytics.core.util.GroovyUtils
  * the selectedComponent is set on ConstrainedString parameter, missing subComponents of a DynamicComposedComponent get
  * created.
  */
-public class ParameterApplicator {
+public class ParameterApplicator implements Serializable{
 
-    Model model
-    Parameterization parameterization
-    List<List<ApplicableParameter>> parameterPerPeriod
+    transient Model model
+    transient Parameterization parameterization
+    transient List<List<ApplicableParameter>> parameterPerPeriod
     int lastInjectedPeriod = -1
 
     /**

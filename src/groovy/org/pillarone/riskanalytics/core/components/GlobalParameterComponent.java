@@ -11,7 +11,7 @@ import java.util.Map;
 public abstract class GlobalParameterComponent extends Component implements InitializingComponent {
 
     private IterationScope iterationScope;
-    private Map<String, Method> cachedMethods = null;
+    private transient Map<String, Method> cachedMethods = null;
 
     @Override
     final protected void doCalculation() {

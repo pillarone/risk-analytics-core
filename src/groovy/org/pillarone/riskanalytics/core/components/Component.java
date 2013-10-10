@@ -7,21 +7,24 @@ import org.pillarone.riskanalytics.core.model.ModelPathComponent;
 import org.pillarone.riskanalytics.core.packets.PacketList;
 import org.pillarone.riskanalytics.core.parameterization.IParameterObject;
 import org.pillarone.riskanalytics.core.simulation.SimulationException;
+import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope;
 import org.pillarone.riskanalytics.core.simulation.engine.id.IIdGenerator;
 import org.pillarone.riskanalytics.core.util.GroovyUtils;
 import org.pillarone.riskanalytics.core.wiring.ITransmitter;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.*;
 
 /**
  * todo: description of general concept
  */
-abstract public class Component implements Cloneable {
+abstract public class Component implements Cloneable, Serializable {
 
+    public transient SimulationScope simulationScope;
     private String name;
-    private List<ITransmitter> allInputTransmitter = new ArrayList<ITransmitter>();
-    private List<ITransmitter> allOutputTransmitter = new ArrayList<ITransmitter>();
+    private transient List<ITransmitter> allInputTransmitter = new ArrayList<ITransmitter>();
+    private transient List<ITransmitter> allOutputTransmitter = new ArrayList<ITransmitter>();
     private List<PacketList> inChannels = new ArrayList<PacketList>();
     private List<PacketList> outChannels = new ArrayList<PacketList>();
     private int transmitCount = 0;
@@ -227,7 +230,7 @@ abstract public class Component implements Cloneable {
         return fields;
     }
 
-    protected Map propertyCache = null;
+    protected transient Map propertyCache = null;
 
     /**
      * Handle with care! Properties are only retrieved once and never change their value!

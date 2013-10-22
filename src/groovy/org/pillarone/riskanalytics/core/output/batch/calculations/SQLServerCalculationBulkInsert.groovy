@@ -48,7 +48,7 @@ class SQLServerCalculationBulkInsert extends AbstractCalculationsBulkInsert {
         if (confgd) {
             String result = "\\\\" + InetAddress.getLocalHost().getHostName() + "\\" + confgd + "\\" + tempFile.name
             File resFile = new File(result)
-            assert resFile.exists()
+            assert resFile.exists() //, "Hint: Is the temp directory shared so the DB can read it?"
             return result
         } else {
             return tempFile.getAbsolutePath()

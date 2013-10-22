@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.example.parameter
 
+import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.parameterization.AbstractParameterObjectClassifier
 import org.pillarone.riskanalytics.core.parameterization.IParameterObjectClassifier
 import org.pillarone.riskanalytics.core.parameterization.IParameterObject
@@ -18,6 +19,10 @@ class ExampleParameterObjectClassifier extends AbstractParameterObjectClassifier
             "TYPE0", ["a": 10d, "b": 100d]
     )
 
+    public static final ExampleParameterObjectClassifier TYPE_WITH_ERROR = new ExampleParameterObjectClassifier(
+            "TYPE_WITH_ERROR", ["a": 10d, "b": 100d]
+    )
+
     public static final ExampleParameterObjectClassifier TYPE1 = new ExampleParameterObjectClassifier(
             "TYPE1", ["p1": 0d, "p2": 1d]
     )
@@ -28,6 +33,10 @@ class ExampleParameterObjectClassifier extends AbstractParameterObjectClassifier
 
     public static final ExampleParameterObjectClassifier TYPE3 = new ExampleParameterObjectClassifier(
             "TYPE3", ["p1": 0d, "p2": 1d, "p3": 2d]
+    )
+
+    public static final ExampleParameterObjectClassifier TYPE4 = new ExampleParameterObjectClassifier(
+            "TYPE4", ["date": new DateTime()]
     )
 
     public static final ExampleParameterObjectClassifier NESTED_PARAMETER_OBJECT = new ExampleParameterObjectClassifier(
@@ -56,10 +65,13 @@ class ExampleParameterObjectClassifier extends AbstractParameterObjectClassifier
     }
 
     List<IParameterObjectClassifier> getClassifiers() {
-        return [TYPE0, TYPE1, TYPE2, NESTED_PARAMETER_OBJECT, NESTED_MDP, NESTED_MDP2, RESOURCE];
+        return [TYPE0, TYPE1, TYPE2, TYPE3, TYPE4, TYPE_WITH_ERROR,NESTED_PARAMETER_OBJECT, NESTED_MDP, NESTED_MDP2, RESOURCE];
     }
 
     IParameterObject getParameterObject(Map parameters) {
+        if (this == TYPE_WITH_ERROR){
+            throw new IllegalArgumentException('invalid parameter.')
+        }
         return new ExampleParameterObject(classifier: this, parameters: parameters)
     }
 

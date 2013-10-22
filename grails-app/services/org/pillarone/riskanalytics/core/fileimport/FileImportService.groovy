@@ -102,10 +102,9 @@ abstract class FileImportService {
         String urlString = url.toExternalForm()
         String itemName = prepare(url, urlString.substring(urlString.lastIndexOf("/") + 1))
 
-        def fileContent = readFromURL(url)
         boolean alreadyImported = lookUpItem(getDaoClass(), itemName)
-
         if (!alreadyImported) {
+            String fileContent = readFromURL(url)
             if (saveItemObject(fileContent)) {
                 LOG.debug(">imported $itemName")
                 success = true

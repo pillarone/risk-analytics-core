@@ -27,7 +27,6 @@ class BatchRunService {
 
     boolean transactional = false
     BatchRunInfoService batchRunInfoService
-    BatchRunSimulationRun addedBatchRunSimulationRun
     RunnerRegistry runnerRegistry
     Log LOG = LogFactory.getLog(BatchRunService)
 
@@ -68,17 +67,19 @@ class BatchRunService {
     }
 
 
-    void addSimulationRun(BatchRun batchRun, Simulation simulation, OutputStrategy strategy) {
+    BatchRunSimulationRun addSimulationRun(BatchRun batchRun, Simulation simulation, OutputStrategy strategy) {
         BatchRun.withTransaction {
             simulation.save()
             batchRun = BatchRun.findByName(batchRun.name)
             int priority = BatchRunSimulationRun.countByBatchRun(batchRun)
-            addedBatchRunSimulationRun = new BatchRunSimulationRun(batchRun: batchRun, simulationRun: simulation.simulationRun, priority: priority, strategy: strategy, simulationState: SimulationState.NOT_RUNNING)
+            BatchRunSimulationRun addedBatchRunSimulationRun = new BatchRunSimulationRun(batchRun: batchRun, simulationRun: simulation.simulationRun, priority: priority, strategy: strategy, simulationState: SimulationState.NOT_RUNNING)
             addedBatchRunSimulationRun.save()
             if (batchRun.executed) {
                 batchRun.executed = false
                 batchRun.save()
             }
+
+            return addedBatchRunSimulationRun
         }
     }
 

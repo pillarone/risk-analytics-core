@@ -25,7 +25,7 @@ class ModelHelperTests extends GroovyTestCase {
 
         Set paths = ModelHelper.getAllPossibleOutputPaths(coreModel, null)
         assertEquals 6, paths.size()
-        assertTrue paths.any {it.contains("hierarchyLevel")}
+        assertTrue paths.any { it.contains("hierarchyLevel") }
 
         assertEquals 0, ModelHelper.getAllPossibleFields(coreModel, false).size()
     }

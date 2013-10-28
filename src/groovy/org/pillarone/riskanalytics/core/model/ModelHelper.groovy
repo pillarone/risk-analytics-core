@@ -43,7 +43,6 @@ class ModelHelper {
 
     private static Log LOG = LogFactory.getLog(ModelHelper.class);
 
-
     /**
      * A static helper method which obtains all possible output paths of this model
      * @param model A model with all parameters injected
@@ -100,7 +99,7 @@ class ModelHelper {
         ConfigObject lines = structure.data.company
         if (lines.size() > 0) {
             Map repls = [:]
-            lines.each {String line, data ->
+            lines.each { String line, data ->
                 ConfigObject comps = data.components
                 comps.each { String comp, val ->
                     repls.put(comp, "${line}:${comp}")
@@ -150,8 +149,7 @@ class ModelHelper {
                 List components = outputPathsByMarkerInterface.get(intf)
                 if (components) {
                     components.add(path)
-                }
-                else {
+                } else {
                     outputPathsByMarkerInterface.put(intf, [path])
                 }
             }
@@ -227,7 +225,7 @@ class ModelHelper {
         Set<String> results = []
         Class lobMarker = componentsByMarkerInterface.keySet().find { clazz -> clazz.name.contains(SEGMENT_MARKER) }
         Class perilMarker = componentsByMarkerInterface.keySet().find { clazz -> clazz.name.contains(PERIL_MARKER) }
-        Class reserveMarker = componentsByMarkerInterface.keySet().find { clazz -> clazz.name.contains(RESERVE_MARKER)}
+        Class reserveMarker = componentsByMarkerInterface.keySet().find { clazz -> clazz.name.contains(RESERVE_MARKER) }
         Class contractMarker = componentsByMarkerInterface.keySet().find { clazz -> clazz.name.contains(CONTRACT_MARKER) }
         Class legalEntityMarker = componentsByMarkerInterface.keySet().find { clazz -> clazz.name.contains(LEGAL_ENTITY_MARKER) }
         Class structureMarker = componentsByMarkerInterface.keySet().find { clazz -> clazz.name.contains(STRUCTURE_MARKER) }
@@ -272,7 +270,7 @@ class ModelHelper {
     }
 
     /**
-     * @param componentsByMarkerInterface, key marker interface, values list of implementing components
+     * @param componentsByMarkerInterface , key marker interface, values list of implementing components
      * @param markerClass
      * @param markerPath is inserted between pathWithoutChannel and channel
      * @param pathWithoutChannel
@@ -280,13 +278,14 @@ class ModelHelper {
      * @param results extended paths are added to this set
      */
     private static extendedPaths(Multimap<Class, Component> componentsByMarkerInterface, Class markerClass,
-                                       String markerPath, String pathWithoutChannel, String channel, Set<String> results) {
-        for (Component drillDownComponent: componentsByMarkerInterface.get(markerClass)) {
+                                 String markerPath, String pathWithoutChannel, String channel, Set<String> results) {
+        for (Component drillDownComponent : componentsByMarkerInterface.get(markerClass)) {
             extendedPath(drillDownComponent, new StringBuilder(pathWithoutChannel), markerPath, channel, results)
         }
     }
 
-    private static void extendedPath(Component drillDownComponent, StringBuilder builder, String markerPath, String channel, Set<String> results) {
+    private
+    static void extendedPath(Component drillDownComponent, StringBuilder builder, String markerPath, String channel, Set<String> results) {
         if (drillDownComponent instanceof DynamicComposedComponent) return
         builder.append(PATH_SEPARATOR)
         builder.append(markerPath)
@@ -296,11 +295,11 @@ class ModelHelper {
         builder.append(channel)
         results.add(builder.toString())
     }
-    
+
     private static extendedPaths(Multimap<Class, Component> componentsByMarkerInterface, Class markerClass1,
-                                       String markerPath1, Class markerClass2, String markerPath2, String pathWithoutChannel,
-                                       String channel, Set<String> results) {
-        for (Component drillDownComponent: componentsByMarkerInterface.get(markerClass1)) {
+                                 String markerPath1, Class markerClass2, String markerPath2, String pathWithoutChannel,
+                                 String channel, Set<String> results) {
+        for (Component drillDownComponent : componentsByMarkerInterface.get(markerClass1)) {
             if (drillDownComponent instanceof DynamicComposedComponent) continue
             StringBuilder builder = new StringBuilder(pathWithoutChannel)
             builder.append(PATH_SEPARATOR)

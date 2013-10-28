@@ -41,7 +41,9 @@ class SimulationConfigurationTests {
 
         assertEquals(simulation.parameterization.allParameterHolders.size(), configuration.simulation.parameterization.allParameterHolders.size())
         for (ParameterHolder holder in simulation.parameterization.allParameterHolders) {
-            ParameterHolder copiedHolder = configuration.simulation.parameterization.allParameterHolders.find { it.path == holder.path && it.periodIndex == holder.periodIndex }
+            ParameterHolder copiedHolder = configuration.simulation.parameterization.allParameterHolders.find {
+                it.path == holder.path && it.periodIndex == holder.periodIndex
+            }
             assertNotNull(copiedHolder)
             assertNotSame(copiedHolder, holder)
         }

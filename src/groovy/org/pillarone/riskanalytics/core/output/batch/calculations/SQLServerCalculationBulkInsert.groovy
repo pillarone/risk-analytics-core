@@ -19,7 +19,8 @@ class SQLServerCalculationBulkInsert extends AbstractCalculationsBulkInsert {
         Sql sql = new Sql(simulationRun.dataSource)
         String resultFilePath = getResultFilePath()
         String formatFilePath = getFormatFilePath()
-        String query = "BULK INSERT post_simulation_calculation FROM '" + resultFilePath + "' WITH (FORMATFILE = '" + formatFilePath + "', KEEPNULLS)"//.replaceAll('\\\\', '/')
+        String query = "BULK INSERT post_simulation_calculation FROM '" + resultFilePath + "' WITH (FORMATFILE = '" + formatFilePath + "', KEEPNULLS)"
+//.replaceAll('\\\\', '/')
         int numberOfResults = sql.executeUpdate(query)
         time = System.currentTimeMillis() - time
         LOG.info("${numberOfResults} post_simulation_calculation rows saved in ${time} ms");

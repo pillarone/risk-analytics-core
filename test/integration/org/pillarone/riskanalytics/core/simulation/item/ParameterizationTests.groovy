@@ -420,7 +420,7 @@ class ParameterizationTests extends GroovyTestCase {
         assertEquals 'CoreParameters', configObject.displayName
 
         ConfigObject components = configObject.components
-        assertEquals 2, components.size()
+        assertEquals 3, components.size()
 
         def distribution = components.exampleInputOutputComponent.parmParameterObject[0]
         assertTrue distribution instanceof ExampleParameterObject

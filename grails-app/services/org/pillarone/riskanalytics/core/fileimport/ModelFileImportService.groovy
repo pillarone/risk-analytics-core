@@ -49,11 +49,6 @@ class ModelFileImportService extends FileImportService {
     }
 
     @Override
-    protected boolean shouldImportModel(String folderName, String filename, List models) {
-        (filename - "${fileSuffix}.groovy") in models
-    }
-
-    @Override
     protected boolean lookUpItem(String itemName) {
         ModelDAO.findByModelClassNameAndItemVersion(modelClass.name, versionNumber) != null
     }

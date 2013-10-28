@@ -96,7 +96,7 @@ comments=[]
         migrator.migrateParameterizations()
 
         old.load()
-        assertEquals 5, old.parameterHolders.size() //composite:parmTimeMode should have been removed
+        assertEquals 7, old.parameterHolders.size() //composite:parmTimeMode should have been removed
         assertNull old.parameterHolders.find { it.path == "composite:parmTimeMode" }
         parmStrategy = old.parameterHolders.find { it.path == "composite:parmStrategy" }
         assertEquals "TWO_COLUMNS", parmStrategy.classifier.typeName

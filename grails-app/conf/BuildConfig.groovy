@@ -29,7 +29,7 @@ grails.project.dependency.resolution = {
         runtime ":spring-security-core:2.0-RC2"
         runtime ":tomcat:7.0.42"
 
-        test ":code-coverage:1.2.4"
+        test ":code-coverage:1.2.6"
         runtime ":database-migration:1.3.6"
     }
 

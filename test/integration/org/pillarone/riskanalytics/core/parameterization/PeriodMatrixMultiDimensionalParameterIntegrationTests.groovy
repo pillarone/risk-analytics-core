@@ -1,10 +1,13 @@
 package org.pillarone.riskanalytics.core.parameterization
 
+import org.junit.Test
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import models.core.CoreModel
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 import org.pillarone.riskanalytics.core.example.marker.ITestComponentMarker
 import org.pillarone.riskanalytics.core.simulation.item.parameter.MultiDimensionalParameterHolder
+
+import static org.junit.Assert.assertEquals
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,8 +16,9 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.MultiDimension
  * Time: 2:22 PM
  * To change this template use File | Settings | File Templates.
  */
-class PeriodMatrixMultiDimensionalParameterIntegrationTests extends GroovyTestCase {
+class PeriodMatrixMultiDimensionalParameterIntegrationTests {
 
+    @Test
     void testSaveLoad() {
         Parameterization parameterization = new Parameterization("Name", CoreModel)
         parameterization.addParameter(ParameterHolderFactory.getHolder(

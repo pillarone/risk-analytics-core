@@ -1,5 +1,6 @@
 package models.resource
 
+import org.junit.Before
 import org.pillarone.riskanalytics.core.components.ResourceRegistry
 import org.pillarone.riskanalytics.core.simulation.engine.ModelTest
 import org.pillarone.riskanalytics.core.simulation.item.Resource
@@ -7,11 +8,13 @@ import org.pillarone.riskanalytics.core.example.component.ExampleResource
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 import org.pillarone.riskanalytics.core.components.ResourceHolder
 
+import static org.junit.Assert.*
+
 
 class ResourceModelTests extends ModelTest {
 
-    @Override
-    protected void setUp() {
+    @Before
+    void setUp() {
         ResourceRegistry.clear()
         Resource resource = new Resource("myResource", ExampleResource)
         resource.addParameter(ParameterHolderFactory.getHolder("parmInteger", 0, 99))

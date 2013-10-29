@@ -1,19 +1,17 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
+import org.junit.Test
 import org.pillarone.riskanalytics.core.BatchRun
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.batch.BatchRunService
 import org.pillarone.riskanalytics.core.output.OutputStrategy
 
+import static org.junit.Assert.assertNotNull
+
 
 abstract class BatchRunTest extends ModelTest {
 
-    @Override
-    protected void setUp() {
-        super.setUp()
-
-    }
-
+    @Test
     final void testBatchRun() {
         BatchRun batchRun = new BatchRun(name: "testBatchRun", executionTime: new DateTime(2100, 1, 1, 0, 0, 0, 0)).save()
         assertNotNull batchRun

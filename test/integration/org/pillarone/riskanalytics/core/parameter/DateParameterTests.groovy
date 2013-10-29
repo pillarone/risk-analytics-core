@@ -1,9 +1,13 @@
 package org.pillarone.riskanalytics.core.parameter
 
 import org.joda.time.DateTime
+import org.junit.Test
 
-class DateParameterTests extends GroovyTestCase {
+import static org.junit.Assert.*
 
+class DateParameterTests {
+
+    @Test
     void testInsert() {
         DateParameter parameter = new DateParameter(path: "path", dateValue: new DateTime(1972, 6, 14, 0, 0, 0, 0))
 
@@ -13,11 +17,13 @@ class DateParameterTests extends GroovyTestCase {
 
     }
 
+    @Test
     void testGetInstance() {
         DateParameter parameter = new DateParameter(path: "path", dateValue: new DateTime(1972, 6, 14, 0, 0, 0, 0))
         assertEquals new DateTime(1972, 6, 14, 0, 0, 0, 0), parameter.dateValue
     }
 
+    @Test
     void testSetInstance() {
         DateParameter parameter = new DateParameter(path: "path", dateValue: new DateTime(1972, 6, 14, 0, 0, 0, 0))
         assertEquals new DateTime(1972, 6, 14, 0, 0, 0, 0), parameter.dateValue

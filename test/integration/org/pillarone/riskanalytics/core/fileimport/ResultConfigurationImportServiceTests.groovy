@@ -1,11 +1,15 @@
 package org.pillarone.riskanalytics.core.fileimport
 
+import org.junit.Test
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 
-class ResultConfigurationImportServiceTests extends GroovyTestCase {
+import static org.junit.Assert.*
+
+class ResultConfigurationImportServiceTests {
 
     ResultConfigurationImportService resultConfigurationImportService
 
+    @Test
     void testImportResultConfiguration() {
 
         File paramFile = new File("src/java/models/core/CoreResultConfiguration.groovy")

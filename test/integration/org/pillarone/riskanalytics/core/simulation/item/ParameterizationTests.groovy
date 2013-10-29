@@ -1,6 +1,8 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
 import models.core.CoreModel
+import org.junit.Before
+import org.junit.Test
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObject
@@ -26,14 +28,18 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.EnumTa
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
 import org.pillarone.riskanalytics.core.workflow.Status
 
-class ParameterizationTests extends GroovyTestCase {
+import static org.junit.Assert.*
 
+class ParameterizationTests {
+
+    @Before
     void setUp() {
         if (!ValidatorRegistry.contains(TestValidationService.class)) {
             ValidatorRegistry.addValidator(new TestValidationService())
         }
     }
 
+    @Test
     void testLoad() {
 
         Parameterization unknownParameterization = new Parameterization("unknown name")
@@ -61,6 +67,7 @@ class ParameterizationTests extends GroovyTestCase {
         assertSame "wrong model class", EmptyModel, parameterization.modelClass
     }
 
+    @Test
     public void testLoadDoesOverwriteChanges() {
         String daoName = "myOtherDao"
 
@@ -81,6 +88,7 @@ class ParameterizationTests extends GroovyTestCase {
     }
 
 
+    @Test
     public void testModelClass() {
         Parameterization parameterization = new Parameterization("p")
         assertNull parameterization.getModelClass()
@@ -93,6 +101,7 @@ class ParameterizationTests extends GroovyTestCase {
     }
 
 
+    @Test
     public void testSave() {
         Parameterization parameterization = new Parameterization("newParams")
         parameterization.modelClass = EmptyModel
@@ -120,6 +129,7 @@ class ParameterizationTests extends GroovyTestCase {
     }
 
 
+    @Test
     void testAddRemoveParameter() {
         Parameterization parameterization = new Parameterization("newParams")
         parameterization.periodCount = 1
@@ -152,6 +162,7 @@ class ParameterizationTests extends GroovyTestCase {
     }
 
 
+    @Test
     void testAddRemoveComment() {
         Parameterization parameterization = new Parameterization("newParams")
         parameterization.periodCount = 1
@@ -192,6 +203,7 @@ class ParameterizationTests extends GroovyTestCase {
     }
 
 
+    @Test
     void testAddRemoveIssue() {
         Parameterization parameterization = new Parameterization("newParams")
         parameterization.periodCount = 1
@@ -225,6 +237,7 @@ class ParameterizationTests extends GroovyTestCase {
         assertEquals initialCount, WorkflowCommentDAO.count()
     }
 
+    @Test
     void testSimpleParameterUpdate() {
         Parameterization parameterization = new Parameterization("testSimpleParameterUpdate")
         parameterization.periodCount = 1
@@ -253,6 +266,7 @@ class ParameterizationTests extends GroovyTestCase {
         assertEquals "newValue", parameterization.parameters[0].businessObject
     }
 
+    @Test
     void testSimpleCommentUpdate() {
         Parameterization parameterization = new Parameterization("testSimpleParameterUpdate")
         parameterization.periodCount = 1
@@ -282,6 +296,7 @@ class ParameterizationTests extends GroovyTestCase {
         assertEquals "newValue", parameterization.comments[0].text
     }
 
+    @Test
     void testSimpleIssueUpdate() {
         Parameterization parameterization = new Parameterization("testSimpleParameterUpdate")
         parameterization.periodCount = 1
@@ -311,6 +326,7 @@ class ParameterizationTests extends GroovyTestCase {
         assertEquals "newValue", parameterization.comments[0].text
     }
 
+    @Test
     void testPMO_1007() {
         Parameterization parameterization = new Parameterization("testSimpleParameterUpdate")
         parameterization.periodCount = 1
@@ -325,6 +341,7 @@ class ParameterizationTests extends GroovyTestCase {
         assertFalse parameterization.getParameters("path").size() > 0
     }
 
+    @Test
     void testSaveOfParameter() {
         Parameterization parameterization = new Parameterization("newParams")
         parameterization.modelClass = EmptyModel
@@ -338,6 +355,7 @@ class ParameterizationTests extends GroovyTestCase {
     }
 
 
+    @Test
     void testGetParameters() {
         Parameterization parameterization = new Parameterization("newParams")
         parameterization.modelClass = EmptyModel
@@ -357,6 +375,7 @@ class ParameterizationTests extends GroovyTestCase {
         assertTrue parameters.contains(parameterB)
     }
 
+    @Test
     void testGetParametersByPath() {
         Parameterization parameterization = new Parameterization("newParams")
         parameterization.modelClass = EmptyModel
@@ -387,6 +406,7 @@ class ParameterizationTests extends GroovyTestCase {
         assertTrue "paramaters must be sorted by period", parameters[2].periodIndex < parameters[3].periodIndex
     }
 
+    @Test
     void testEquals() {
 
         Parameterization p1 = new Parameterization('Name')
@@ -404,6 +424,7 @@ class ParameterizationTests extends GroovyTestCase {
         assertFalse p1.equals(simulation)
     }
 
+    @Test
     void testToConfigObject() {
         new ParameterizationImportService().compareFilesAndWriteToDB(['Core'])
 
@@ -440,6 +461,7 @@ class ParameterizationTests extends GroovyTestCase {
 
     }
 
+    @Test
     void testValidation() {
         Parameterization parameterization = new Parameterization("testValidationList")
         assertNull parameterization.validationErrors
@@ -470,6 +492,7 @@ class ParameterizationTests extends GroovyTestCase {
         assertFalse parameterization.valid
     }
 
+    @Test
     void testIsLoaded() {
         Parameterization parameterization = new Parameterization("testIsLoaded")
         parameterization.modelClass = EmptyModel
@@ -484,6 +507,7 @@ class ParameterizationTests extends GroovyTestCase {
 
     }
 
+    @Test
     void testIsEditable() {
         Parameterization parameterization = new Parameterization("newParams")
         parameterization.modelClass = EmptyModel
@@ -507,6 +531,7 @@ class ParameterizationTests extends GroovyTestCase {
         assertFalse parameterization.isEditable()
     }
 
+    @Test
     void testSafeReload() {
         Parameterization parameterization = new Parameterization("test", CoreModel)
         final ParameterHolder holder = ParameterHolderFactory.getHolder("testSafeReload", 0, 1)
@@ -526,6 +551,7 @@ class ParameterizationTests extends GroovyTestCase {
 
     }
 
+    @Test
     void testGetParameterHolder() {
         Parameterization parameterization = new Parameterization("testSafeNestedReload", CoreModel)
         ParameterObjectParameterHolder holder = ParameterHolderFactory.getHolder("component:parmParameter", 0, ExampleParameterObjectClassifier.getStrategy(ExampleParameterObjectClassifier.NESTED_PARAMETER_OBJECT, ExampleParameterObjectClassifier.NESTED_PARAMETER_OBJECT.parameters))
@@ -545,6 +571,7 @@ class ParameterizationTests extends GroovyTestCase {
         assertEquals(2, parameterHolders.size())
     }
 
+    @Test
     void testSafeNestedReload() {
         Parameterization parameterization = new Parameterization("testSafeNestedReload", CoreModel)
         ParameterObjectParameterHolder holder = ParameterHolderFactory.getHolder("testSafeNestedReload", 0, ExampleParameterObjectClassifier.getStrategy(ExampleParameterObjectClassifier.NESTED_PARAMETER_OBJECT, ExampleParameterObjectClassifier.NESTED_PARAMETER_OBJECT.parameters))
@@ -559,6 +586,7 @@ class ParameterizationTests extends GroovyTestCase {
         assertSame(veryNestedHolder, parameterization.parameterHolders[0].classifierParameters["nested"].classifierParameters["a"])
     }
 
+    @Test
     void testKeepNewlyAddedParameters() {
         Parameterization parameterization = new Parameterization("testSafeNestedReload", CoreModel)
 

@@ -1,10 +1,14 @@
 package org.pillarone.riskanalytics.core.parameter
 
+import org.junit.Test
 import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObjectClassifier
 import org.pillarone.riskanalytics.core.parameterization.IParameterObject
 
-class ParameterObjectParameterTests extends GroovyTestCase {
+import static org.junit.Assert.*
 
+class ParameterObjectParameterTests {
+
+    @Test
     void testInsert() {
         EnumParameter type = new EnumParameter(path: "type")
         type.parameterType = ExampleParameterObjectClassifier.name

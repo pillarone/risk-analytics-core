@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.model.migration
 
+import org.junit.Before
+import org.junit.Test
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import models.migratableCore.MigratableCoreModel
@@ -13,13 +15,14 @@ import org.pillarone.riskanalytics.core.example.migration.TestConstrainedTable
 import org.pillarone.riskanalytics.core.parameterization.AbstractMultiDimensionalParameter
 
 
-class MigrationSupportTests extends GroovyTestCase {
+class MigrationSupportTests {
 
-    @Override
-    protected void setUp() {
+    @Before
+    void setUp() {
         FileImportService.importModelsIfNeeded(['MigratableCoreModel'])
     }
 
+    @Test
     void testClassifiers() {
         MigrationSupportImpl support = new MigrationSupportImpl(new VersionNumber("1"), new VersionNumber("2"), MigratableCoreModel)
         Model newModel = new MigratableCoreModel()

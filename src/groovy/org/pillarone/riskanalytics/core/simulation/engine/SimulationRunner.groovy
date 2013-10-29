@@ -68,7 +68,6 @@ public class SimulationRunner {
      *
      * Any exception occuring during the simulation is caught and the error object will be initialized.
      */
-    @CompileStatic
     public void start() {
         synchronized (lockObj) {
             if (messageCount == null) {
@@ -116,7 +115,7 @@ public class SimulationRunner {
             }
             messageCount.set(0);
             if (shouldReturn) return
-            LOG.info "${currentScope?.simulationBlocks?.blockSize.sum()} iterations completed in ${System.currentTimeMillis() - (start + initializationTime)}ms"
+            LOG.info "${currentScope.simulationBlocks.blockSize.sum()} iterations completed in ${System.currentTimeMillis() - (start + initializationTime)}ms"
 
             for (Action action in postSimulationActions) {
                 if (!performAction(action, null)) {

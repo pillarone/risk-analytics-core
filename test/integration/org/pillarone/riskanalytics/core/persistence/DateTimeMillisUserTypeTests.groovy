@@ -1,11 +1,15 @@
 package org.pillarone.riskanalytics.core.persistence
 
+import org.junit.Test
 import org.pillarone.riskanalytics.core.test.DateTimeMillisUserTypeTest
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.parameter.DateParameter
 
-class DateTimeMillisUserTypeTests extends GroovyTestCase {
+import static org.junit.Assert.*
 
+class DateTimeMillisUserTypeTests {
+
+    @Test
     void testSave() {
         DateTime date = new DateTime(2010, 1, 1, 0, 0, 0, 0)
         DateTimeMillisUserTypeTest time = new DateTimeMillisUserTypeTest(theDate: date)
@@ -19,6 +23,7 @@ class DateTimeMillisUserTypeTests extends GroovyTestCase {
         assertEquals date, time2.theDate
     }
 
+    @Test
     void testNull() {
         DateTimeMillisUserTypeTest time = new DateTimeMillisUserTypeTest(theDate: null)
         time.save(flush: true)
@@ -31,6 +36,7 @@ class DateTimeMillisUserTypeTests extends GroovyTestCase {
         assertNull time2.theDate
     }
 
+    @Test
     void testUpdate() {
         DateTime date = new DateTime(2010, 1, 1, 0, 0, 0, 0)
         DateTimeMillisUserTypeTest time = new DateTimeMillisUserTypeTest(theDate: date)

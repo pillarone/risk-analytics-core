@@ -1,8 +1,12 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
+import org.apache.commons.lang.builder.HashCodeBuilder
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.joda.time.DateTime
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.fileimport.ModelStructureImportService
 import org.pillarone.riskanalytics.core.fileimport.ParameterizationImportService
@@ -11,23 +15,17 @@ import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.output.FileOutput
 import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
-import org.pillarone.riskanalytics.core.simulation.item.Parameterization
-import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
-import org.pillarone.riskanalytics.core.simulation.item.Simulation
-import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
-import org.apache.commons.lang.builder.HashCodeBuilder
-import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationBlock
-import org.pillarone.riskanalytics.core.util.MathUtils
+import org.pillarone.riskanalytics.core.simulation.item.*
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
-import org.pillarone.riskanalytics.core.output.CollectorMapping
-import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
+import org.pillarone.riskanalytics.core.util.MathUtils
 
+import static org.junit.Assert.*
 /**
  * An abstract class which provides functionality to run model tests.
  * This class does not belong to the test sources so that it can be used in plugins too.
  */
-abstract class ModelTest extends GroovyTestCase {
+abstract class ModelTest {
 
     private static final Log LOG = LogFactory.getLog(ModelTest)
 
@@ -86,8 +84,8 @@ abstract class ModelTest extends GroovyTestCase {
 
     Simulation run
 
-    protected void setUp() {
-        super.setUp()
+    @Before
+    void setUp() {
         MappingCache.instance.clear()
         MathUtils.initRandomStreamBase(1234)
 
@@ -135,6 +133,7 @@ abstract class ModelTest extends GroovyTestCase {
         clean()
     }
 
+    @Test
     final void testModelRun() {
         runner = SimulationRunner.createRunner()
         ICollectorOutputStrategy output = getOutputStrategy()
@@ -153,6 +152,16 @@ abstract class ModelTest extends GroovyTestCase {
             compareResults()
         }
         postSimulationEvaluation()
+    }
+
+    @After
+    void cleanUp() { //TODO: db changes made in @Before classes do not get rolled back by grails..
+        Parameterization parameterization = run.parameterization
+        ResultConfiguration template = run.template
+
+        run.delete()
+        parameterization.delete()
+        template.delete()
     }
 
     protected ICollectorOutputStrategy getOutputStrategy() {

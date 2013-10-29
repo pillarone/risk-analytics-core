@@ -1,7 +1,12 @@
 package org.pillarone.riskanalytics.core.parameter
 
-class IntegerParameterTests extends GroovyTestCase {
+import org.junit.Test
 
+import static org.junit.Assert.*
+
+class IntegerParameterTests {
+
+    @Test
     void testObjectCreation() {
         IntegerParameter parameter = new IntegerParameter(path: "path", integerValue: 1)
         assertEquals 1, parameter.integerValue
@@ -12,6 +17,7 @@ class IntegerParameterTests extends GroovyTestCase {
         assertEquals 3, parameter.integerValue
     }
 
+    @Test
     void testInsert() {
         IntegerParameter parameter = new IntegerParameter(path: "path", integerValue: 2)
 

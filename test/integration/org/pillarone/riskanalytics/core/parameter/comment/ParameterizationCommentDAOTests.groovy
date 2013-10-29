@@ -1,20 +1,24 @@
 package org.pillarone.riskanalytics.core.parameter.comment
 
 import org.joda.time.DateTime
+import org.junit.Before
+import org.junit.Test
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.workflow.Status
 
+import static org.junit.Assert.*
+
 /**
  * @author fouad.jaada@intuitive-collaboration.com
  */
-class ParameterizationCommentDAOTests extends GroovyTestCase {
+class ParameterizationCommentDAOTests {
 
     ParameterizationDAO parameterization
 
 
-    @Override
-    protected void setUp() {
+    @Before
+    void setUp() {
         parameterization = new ParameterizationDAO()
         parameterization.name = "test"
         parameterization.modelClassName = EmptyModel.name
@@ -26,6 +30,7 @@ class ParameterizationCommentDAOTests extends GroovyTestCase {
 
 
 
+    @Test
     void testSaveDeleteP14NCommentDAO() {
         int tagCount = Tag.count()
         int commentCount = CommentDAO.count()

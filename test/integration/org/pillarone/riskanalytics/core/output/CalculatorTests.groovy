@@ -1,6 +1,9 @@
 package org.pillarone.riskanalytics.core.output
 
 import models.core.CoreModel
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.fileimport.ParameterizationImportService
 import org.pillarone.riskanalytics.core.fileimport.ResultConfigurationImportService
@@ -11,11 +14,14 @@ import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultTran
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultWriter
 import org.pillarone.riskanalytics.core.dataaccess.ResultAccessor
 
-class CalculatorTests extends GroovyTestCase {
+import static org.junit.Assert.*
+
+class CalculatorTests {
 
     SimulationRun run
     ResultWriter resultWriter
 
+    @Before
     void setUp() {
         ResultAccessor.clearCaches()
 
@@ -53,10 +59,12 @@ class CalculatorTests extends GroovyTestCase {
 
     }
 
-    protected void tearDown() {
+    @After
+    void tearDown() {
         resultWriter.close()
     }
 
+    @Test
     void testResults() {
 
         int initialRecordCount = PostSimulationCalculation.count()
@@ -73,6 +81,7 @@ class CalculatorTests extends GroovyTestCase {
 
     }
 
+    @Test
     void testEstimatedEnd() {
         Simulation simulation = new Simulation(run.name)
         simulation.load()

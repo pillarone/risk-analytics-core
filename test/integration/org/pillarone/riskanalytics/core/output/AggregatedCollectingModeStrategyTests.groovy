@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.output
 
+import org.junit.Before
+import org.junit.Test
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.output.batch.AbstractBulkInsert
 import org.pillarone.riskanalytics.core.packets.ITestPacketApple
@@ -16,7 +18,9 @@ import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import models.core.CoreModel
 
-class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
+import static org.junit.Assert.*
+
+class AggregatedCollectingModeStrategyTests {
 
     AggregatedCollectingModeStrategy strategy
     Simulation run
@@ -24,6 +28,7 @@ class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
     PathMapping pathMapping
     CollectorMapping collectorMapping
 
+    @Before
     void setUp() {
 
         new ParameterizationImportService().compareFilesAndWriteToDB(['Core'])
@@ -61,6 +66,7 @@ class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
         collector.path = "Empty:path"
     }
 
+    @Test
     void testCollectAndCreateResults() {
         PacketList<ITestPacketApple> claims = []
         def result = 0
@@ -72,7 +78,7 @@ class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
         assertNotNull "no aggregatedValues", aggregatedValues
         assertFalse "empty values", aggregatedValues.isEmpty()
         assertEquals 1, aggregatedValues.size()
-        assertEquals result, aggregatedValues.get(0).value
+        assertEquals result, aggregatedValues.get(0).value, 0
 
         SingleValueResultPOJO singleValueResult = aggregatedValues.get(0)
 
@@ -95,8 +101,8 @@ class AggregatedCollectingModeStrategyTests extends GroovyTestCase {
         aggregatedValues = strategy.collect(underwritingInfos, true)
         assertNotNull "no aggregatedValues", aggregatedValues
         assertFalse "empty values", aggregatedValues.isEmpty()
-        assertEquals aResult, aggregatedValues.find {it.field.fieldName == "a"}.value
-        assertEquals bResult, aggregatedValues.find {it.field.fieldName == "b"}.value
+        assertEquals aResult, aggregatedValues.find {it.field.fieldName == "a"}.value, 0
+        assertEquals bResult, aggregatedValues.find {it.field.fieldName == "b"}.value, 0
     }
 
 }

@@ -154,7 +154,6 @@ class Calculator {
         return mean
     }
 
-    @CompileStatic
     private boolean calculateIsStochastic(int periodIndex, long pathId, long collectorId, long fieldId, double[] results) {
         long time = System.currentTimeMillis()
 

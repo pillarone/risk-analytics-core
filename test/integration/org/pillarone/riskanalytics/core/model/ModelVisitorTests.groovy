@@ -1,5 +1,8 @@
 package org.pillarone.riskanalytics.core.model
 
+import groovy.transform.CompileStatic
+import org.junit.Before
+import org.junit.Test
 import org.pillarone.riskanalytics.core.components.ResourceRegistry
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
 import org.pillarone.riskanalytics.core.components.Component
@@ -13,10 +16,13 @@ import org.pillarone.riskanalytics.core.simulation.item.Resource
 import org.pillarone.riskanalytics.core.example.component.ExampleResource
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 
-class ModelVisitorTests extends GroovyTestCase {
+import static org.junit.Assert.assertEquals
+
+class ModelVisitorTests {
 
     Model model
 
+    @Before
     void setUp() {
         ResourceRegistry.clear()
         FileImportService.importModelsIfNeeded(['Core'])
@@ -32,6 +38,7 @@ class ModelVisitorTests extends GroovyTestCase {
         applicator.applyParameterForPeriod(0)
     }
 
+    @Test
     void testAccept() {
         TestModelVisitor visitor = new TestModelVisitor()
         model.accept(visitor)
@@ -43,6 +50,7 @@ class ModelVisitorTests extends GroovyTestCase {
 
     }
 
+    @Test
     void testAcceptResource() {
 
         Resource resource = new Resource("myResource", ExampleResource)
@@ -68,29 +76,29 @@ class ModelVisitorTests extends GroovyTestCase {
         assertEquals(1, visitor.calledForResource.size())
     }
 
-    private static class TestModelVisitor implements IModelVisitor {
+}
 
-        List<Component> calledForComponent = []
-        List<Model> calledForModel = []
-        List<IParameterObject> calledForParameterObject = []
-        List<IResource> calledForResource = []
+@CompileStatic
+class TestModelVisitor implements IModelVisitor {
 
-        void visitComponent(Component component, ModelPath path) {
-            calledForComponent << component
-        }
+    List<Component> calledForComponent = []
+    List<Model> calledForModel = []
+    List<IParameterObject> calledForParameterObject = []
+    List<IResource> calledForResource = []
 
-        void visitModel(Model model) {
-            calledForModel << model
-        }
+    void visitComponent(Component component, ModelPath path) {
+        calledForComponent << component
+    }
 
-        void visitParameterObject(IParameterObject parameterObject, ModelPath path) {
-            calledForParameterObject << parameterObject
-        }
+    void visitModel(Model model) {
+        calledForModel << model
+    }
 
-        void visitResource(IResource resource, ModelPath path) {
-            calledForResource << resource
-        }
+    void visitParameterObject(IParameterObject parameterObject, ModelPath path) {
+        calledForParameterObject << parameterObject
+    }
 
-
+    void visitResource(IResource resource, ModelPath path) {
+        calledForResource << resource
     }
 }

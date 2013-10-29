@@ -4,6 +4,8 @@ import org.pillarone.riskanalytics.core.simulation.engine.ModelTest
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 
+import static org.junit.Assert.*
+
 /**
  * This does not really test the CoreModel but:
  *

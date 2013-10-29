@@ -2,6 +2,9 @@ package org.pillarone.riskanalytics.core.simulation.engine.grid
 
 
 import org.gridgain.grid.Grid
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.gridgain.grid.GridNode
@@ -10,11 +13,14 @@ import org.gridgain.grid.kernal.GridRichNodeImpl
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 
+import static org.junit.Assert.*
 
-class SimulationTaskTests extends GroovyTestCase {
+
+class SimulationTaskTests {
 
     private Class oldValue
 
+    @Before
     void setUp() {
         Object clazz = ConfigurationHolder.config.get(AbstractNodeMappingStrategy.STRATEGY_CLASS_KEY)
         if (clazz instanceof Class) {
@@ -23,12 +29,13 @@ class SimulationTaskTests extends GroovyTestCase {
         ConfigurationHolder.config.put(AbstractNodeMappingStrategy.STRATEGY_CLASS_KEY, TestNodeStrategy)
     }
 
-    @Override protected void tearDown() {
-        super.tearDown()
+    @After
+    void tearDown() {
         ConfigurationHolder.config.put(AbstractNodeMappingStrategy.STRATEGY_CLASS_KEY, oldValue)
 
     }
 
+    @Test
     void testSplitOneJobOneBlock() {
         SimulationTask simulationTask = new TestSimulationTask(1)
 

@@ -13,13 +13,11 @@ import static org.junit.Assert.*
 
 class SimulationConfigurationTests {
 
-    @Before
-    void importData() {
-        FileImportService.importModelsIfNeeded(["Core"])
-    }
 
     @Test
     void prepareForGrid() {
+        FileImportService.importModelsIfNeeded(["Core"])
+
         Simulation simulation = new Simulation("prepareForGrid")
         simulation.modelClass = CoreModel
         simulation.parameterization = new Parameterization("CoreParameters", CoreModel)

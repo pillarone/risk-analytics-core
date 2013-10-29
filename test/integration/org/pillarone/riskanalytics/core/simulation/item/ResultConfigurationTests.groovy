@@ -1,11 +1,15 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
 import models.core.CoreModel
+import org.junit.Test
 import org.pillarone.riskanalytics.core.fileimport.ResultConfigurationImportService
 import org.pillarone.riskanalytics.core.output.*
 
-class ResultConfigurationTests extends GroovyTestCase {
+import static org.junit.Assert.*
 
+class ResultConfigurationTests {
+
+    @Test
     void testLoad() {
         new ResultConfigurationImportService().compareFilesAndWriteToDB(['Core'])
 
@@ -27,6 +31,7 @@ class ResultConfigurationTests extends GroovyTestCase {
         assertEquals SingleValueCollectingModeStrategy.IDENTIFIER, sortedCollectors.get(3).mode.identifier
     }
 
+    @Test
     void testSave() {
 
         int initialConfigurationCount = ResultConfigurationDAO.count()
@@ -119,6 +124,7 @@ class ResultConfigurationTests extends GroovyTestCase {
         assertEquals SingleValueCollectingModeStrategy.IDENTIFIER, sortedCollectors.get(2).mode.identifier
     }
 
+    @Test
     void testFileConfiguration() {
 
         ConfigObject config = new ConfigSlurper().parse(new File("src/java/models/core/CoreResultConfiguration.groovy").toURI().toURL())
@@ -131,6 +137,7 @@ class ResultConfigurationTests extends GroovyTestCase {
 
     }
 
+    @Test
     void testConfigObject() {
         new ResultConfigurationImportService().compareFilesAndWriteToDB(['Core'])
 
@@ -163,6 +170,7 @@ class ResultConfigurationTests extends GroovyTestCase {
         assertEquals configuration.name, newConfiguration.name
     }
 
+    @Test
     void testSetCollector() {
         String configName = "CoreResultConfiguration"
         ResultConfiguration configuration = new ResultConfiguration(configName)
@@ -180,6 +188,7 @@ class ResultConfigurationTests extends GroovyTestCase {
         assert 1 == configuration.collectors.size()
     }
 
+    @Test
     void testEquals(){
         ResultConfiguration resultConfiguration1 = new ResultConfiguration('test', Resource)
         ResultConfiguration resultConfiguration2 = new ResultConfiguration('test', Resource)

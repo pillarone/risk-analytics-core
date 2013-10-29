@@ -1,5 +1,8 @@
 package org.pillarone.riskanalytics.core.remoting.impl
 
+import org.junit.Before
+import org.junit.Test
+
 import java.text.SimpleDateFormat
 import models.core.CoreModel
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
@@ -22,7 +25,9 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolde
 import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.EnumTagType
 
-class ResultServiceTests extends GroovyTestCase {
+import static org.junit.Assert.*
+
+class ResultServiceTests {
 
     IResultService resultService
 
@@ -39,6 +44,7 @@ class ResultServiceTests extends GroovyTestCase {
     // no path matching to this regex
     String path3RegExName = "Artisan:grossClaims20:(.*):outClaimsShort2"
 
+    @Before
     void setUp() {
         path1 = PathMapping.findByPathName(path1Name)
         if (path1 == null) {
@@ -68,6 +74,7 @@ class ResultServiceTests extends GroovyTestCase {
     }
 
 
+    @Test
     void testGetParamInfos() {
         Parameterization parameterization1 = new Parameterization("test1")
         parameterization1.modelClass = CoreModel
@@ -113,6 +120,7 @@ class ResultServiceTests extends GroovyTestCase {
         assertEquals parameterization2.status, info.status
     }
 
+    @Test
     void testGetSimulationInfos() {
         FileImportService.importModelsIfNeeded([CoreModel.getSimpleName() - "Model"])
 
@@ -151,6 +159,7 @@ class ResultServiceTests extends GroovyTestCase {
     }
 
     //TODO: implement missing method in ResultAccessor
+    @Test
     void testGetResults() {
         Parameterization parameterization1 = new Parameterization("test1")
         parameterization1.modelClass = EmptyModel
@@ -210,11 +219,11 @@ class ResultServiceTests extends GroovyTestCase {
 
         assertEquals 2, resultInfo.values.size()
         assertEquals 0, resultInfo.values[0].iteration
-        assertEquals 10, resultInfo.values[0].value
+        assertEquals 10, resultInfo.values[0].value, 0
         assertEquals first, resultInfo.values[0].periodDate
 
         assertEquals 1, resultInfo.values[1].iteration
-        assertEquals 20, resultInfo.values[1].value
+        assertEquals 20, resultInfo.values[1].value, 0
         assertEquals first, resultInfo.values[1].periodDate
 
         resultInfo = results[1]
@@ -224,11 +233,11 @@ class ResultServiceTests extends GroovyTestCase {
 
         assertEquals 2, resultInfo.values.size()
         assertEquals 0, resultInfo.values[0].iteration
-        assertEquals 100, resultInfo.values[0].value
+        assertEquals 100, resultInfo.values[0].value, 0
         assertEquals second, resultInfo.values[0].periodDate
 
         assertEquals 1, resultInfo.values[1].iteration
-        assertEquals 200, resultInfo.values[1].value
+        assertEquals 200, resultInfo.values[1].value, 0
         assertEquals second, resultInfo.values[1].periodDate
 
         String regExcombinedPath = path1RegExName + ":" + field.fieldName

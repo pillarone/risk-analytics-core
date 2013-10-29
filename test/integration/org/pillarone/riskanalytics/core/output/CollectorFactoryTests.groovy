@@ -1,14 +1,18 @@
 package org.pillarone.riskanalytics.core.output
 
 import models.core.CoreModel
+import org.junit.Test
 import org.pillarone.riskanalytics.core.example.component.ExampleInputOutputComponent
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.parameterization.StructureInformation
 import org.pillarone.riskanalytics.core.parameterization.StructureInformationInjector
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 
-class CollectorFactoryTests extends GroovyTestCase {
+import static org.junit.Assert.*
 
+class CollectorFactoryTests {
+
+    @Test
     void testCreateCollector() {
 
         ICollectorOutputStrategy outputStrategy = new FileOutput()
@@ -27,6 +31,7 @@ class CollectorFactoryTests extends GroovyTestCase {
         assertSame "collecting mode", SingleValueCollectingModeStrategy.IDENTIFIER, collector.mode.identifier
     }
 
+    @Test
     void testCreateCollectors() {
 
         Model testModel = new CoreModel()
@@ -53,6 +58,7 @@ class CollectorFactoryTests extends GroovyTestCase {
 
     }
 
+    @Test
     void testCreateCollectorsWithStructureFile() {
         Model testModel = new CoreModel()
         testModel.init()
@@ -81,6 +87,7 @@ class CollectorFactoryTests extends GroovyTestCase {
         assertFalse collectors.empty
     }
 
+    @Test
     void testCreateCollectors_Empty() {
 
         Model testModel = new CoreModel()
@@ -97,6 +104,7 @@ class CollectorFactoryTests extends GroovyTestCase {
         assertTrue collectors.empty
     }
 
+    @Test
     void testEnhanceCollectorInformation() {
 
         CoreModel model = new CoreModel()
@@ -121,6 +129,7 @@ class CollectorFactoryTests extends GroovyTestCase {
 
     }
 
+    @Test
     void testNestedComponentInDynamicComponent() {
         CoreModel model = new CoreModel()
         model.init()

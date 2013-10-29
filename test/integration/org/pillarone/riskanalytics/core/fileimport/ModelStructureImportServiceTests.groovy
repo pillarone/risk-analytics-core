@@ -1,14 +1,18 @@
 package org.pillarone.riskanalytics.core.fileimport
 
+import org.junit.Test
 import org.pillarone.riskanalytics.core.ModelStructureDAO
 
-class ModelStructureImportServiceTests extends GroovyTestCase {
+import static org.junit.Assert.*
+
+class ModelStructureImportServiceTests {
 
 
     private FileImportService getService() {
         return new ModelStructureImportService()
     }
 
+    @Test
     void testImportFile() {
 
         File modelFile = new File(getModelFolder(), "core/CoreStructure.groovy")
@@ -19,6 +23,7 @@ class ModelStructureImportServiceTests extends GroovyTestCase {
 
     }
 
+    @Test
     void testPrepare() {
 
         File modelFile = new File(getModelFolder(), "core/CoreStructure.groovy")
@@ -31,10 +36,12 @@ class ModelStructureImportServiceTests extends GroovyTestCase {
     }
 
 
+    @Test
     void testDaoClass() {
         assertEquals "wrong dao class", ModelStructureDAO, service.daoClass
     }
 
+    @Test
     void testFileSuffix() {
         assertEquals "wrong fileSuffix", "Structure", service.fileSuffix
     }

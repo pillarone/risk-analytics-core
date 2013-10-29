@@ -99,7 +99,7 @@ class ParameterizationDAOTests extends GroovyTestCase {
         parameterization.addToParameters(parameter)
 
         ParameterObjectParameter parameter2 = new ParameterObjectParameter(path: 'path2')
-        parameter2.type = new EnumParameter(parameterType: " ", parameterValue: " ", path: "path")
+        parameter2.type = new EnumParameter(parameterType: "x", parameterValue: "y", path: "path")
         parameterization.addToParameters(parameter2)
 
 

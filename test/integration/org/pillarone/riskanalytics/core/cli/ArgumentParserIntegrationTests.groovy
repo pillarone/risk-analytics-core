@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.cli
 
 import models.core.CoreModel
 import org.apache.commons.cli.CommandLine
+import org.junit.Test
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.fileimport.ParameterizationImportService
 import org.pillarone.riskanalytics.core.fileimport.ResultConfigurationImportService
@@ -14,8 +15,11 @@ import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjectParameterHolder
 
-class ArgumentParserIntegrationTests extends GroovyTestCase {
+import static org.junit.Assert.*
 
+class ArgumentParserIntegrationTests {
+
+    @Test
     void testOptionalArguments() {
         new ParameterizationImportService().compareFilesAndWriteToDB(['Core'])
 
@@ -41,6 +45,7 @@ class ArgumentParserIntegrationTests extends GroovyTestCase {
 
     }
 
+    @Test
     void testForceParameterizationWithExisting() {
         new ParameterizationImportService().compareFilesAndWriteToDB(['Core'])
 
@@ -67,6 +72,7 @@ class ArgumentParserIntegrationTests extends GroovyTestCase {
         assertEquals "2", simulation.parameterization.versionNumber.toString()
     }
 
+    @Test
     void testForceResultConfigurationWithExisting() {
         new ResultConfigurationImportService().compareFilesAndWriteToDB(['Core'])
 
@@ -90,6 +96,7 @@ class ArgumentParserIntegrationTests extends GroovyTestCase {
         assertEquals "2", simulation.template.versionNumber.toString()
     }
 
+    @Test
     void testForceParameterizationWithoutExisting() {
 
         int initialParameterizationCount = ParameterizationDAO.count()
@@ -112,6 +119,7 @@ class ArgumentParserIntegrationTests extends GroovyTestCase {
         assertEquals "1", simulation.parameterization.versionNumber.toString()
     }
 
+    @Test
     void testForceResultConfigurationWithoutExisting() {
 
         int initialResultConfigurationCount = ResultConfigurationDAO.count()
@@ -134,6 +142,7 @@ class ArgumentParserIntegrationTests extends GroovyTestCase {
         assertEquals "1", simulation.template.versionNumber.toString()
     }
 
+    @Test
     void testParameterizationWithoutExisting() {
 
         int initialParameterizationCount = ParameterizationDAO.count()
@@ -155,6 +164,7 @@ class ArgumentParserIntegrationTests extends GroovyTestCase {
         assertEquals "1", simulation.parameterization.versionNumber.toString()
     }
 
+    @Test
     void testResultConfigurationWithoutExisting() {
 
         int initialResultConfigurationCount = ResultConfigurationDAO.count()
@@ -176,6 +186,7 @@ class ArgumentParserIntegrationTests extends GroovyTestCase {
         assertEquals "1", simulation.template.versionNumber.toString()
     }
 
+    @Test
     void testParameterizationWithSameExisting() {
         new ParameterizationImportService().compareFilesAndWriteToDB(['Core'])
 
@@ -198,6 +209,7 @@ class ArgumentParserIntegrationTests extends GroovyTestCase {
         assertEquals "1", simulation.parameterization.versionNumber.toString()
     }
 
+    @Test
     void testResultConfigurationWithSameExisting() {
         new ResultConfigurationImportService().compareFilesAndWriteToDB(['Core'])
 
@@ -220,6 +232,7 @@ class ArgumentParserIntegrationTests extends GroovyTestCase {
         assertEquals "1", simulation.template.versionNumber.toString()
     }
 
+    @Test
     void testParameterizationWithDifferentExisting() {
         new ParameterizationImportService().compareFilesAndWriteToDB(['Core'])
 
@@ -227,7 +240,7 @@ class ArgumentParserIntegrationTests extends GroovyTestCase {
         parameterizationToChange.modelClass = CoreModel
         parameterizationToChange.load()
 
-        ParameterObjectParameterHolder holder = parameterizationToChange.parameterHolders[0]
+        ParameterObjectParameterHolder holder = parameterizationToChange.parameterHolders.find { it.path == "exampleInputOutputComponent:parmParameterObject"}
         holder.setValue("TYPE1")
         parameterizationToChange.save()
 
@@ -250,6 +263,7 @@ class ArgumentParserIntegrationTests extends GroovyTestCase {
         assertEquals "2", simulation.parameterization.versionNumber.toString()
     }
 
+    @Test
     void testResultConfigurationWithDifferentExisting() {
         new ResultConfigurationImportService().compareFilesAndWriteToDB(['Core'])
 

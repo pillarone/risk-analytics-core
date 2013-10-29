@@ -266,7 +266,7 @@ abstract class Model {
      */
     @CompileStatic
     Set<String> periodLabelsBeforeProjectionStart() {
-        []
+        new HashSet<String>()
     }
 
 }

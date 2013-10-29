@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
+import org.junit.Test
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.example.parameter.ExampleEnum
@@ -12,8 +13,11 @@ import org.pillarone.riskanalytics.core.parameterization.SimpleMultiDimensionalP
 import org.pillarone.riskanalytics.core.parameterization.TableMultiDimensionalParameter
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 
-class ItemComparatorTests extends GroovyTestCase {
+import static org.junit.Assert.*
 
+class ItemComparatorTests {
+
+    @Test
     void testCompareTemplates() {
         ResultConfiguration a = new ResultConfiguration("a")
         ResultConfiguration b = new ResultConfiguration("b")
@@ -37,6 +41,7 @@ class ItemComparatorTests extends GroovyTestCase {
         assertFalse ItemComparator.contentEquals(a, b)
     }
 
+    @Test
     void testSimplePositiveCompareParameterizations() {
         ParameterizationDAO dao = new ParameterizationDAO()
         dao.name = 'testSimplePositiveCompareParameterizations'
@@ -66,6 +71,7 @@ class ItemComparatorTests extends GroovyTestCase {
         assertTrue ItemComparator.contentEquals(item, item2)
     }
 
+    @Test
     void testSimplePositiveWithMultiplePeriodsCompareParameterizations() {
         ParameterizationDAO dao = new ParameterizationDAO()
         dao.name = 'testSimplePositiveWithMultiplePeriodsCompareParameterizations'
@@ -95,6 +101,7 @@ class ItemComparatorTests extends GroovyTestCase {
         assertTrue ItemComparator.contentEquals(item, item2)
     }
 
+    @Test
     void testNegativeWithDifferentCountCompareParameterizations() {
         ParameterizationDAO dao = new ParameterizationDAO()
         dao.name = 'testSimpleNegativeCompareParameterizations'
@@ -119,6 +126,7 @@ class ItemComparatorTests extends GroovyTestCase {
         assertFalse ItemComparator.contentEquals(item, item2)
     }
 
+    @Test
     void testNegativeWithSameCountButDifferentTypeCompareParameterizations() {
         ParameterizationDAO dao = new ParameterizationDAO()
         dao.name = 'testNegativeWithSameCountButDifferentTypeCompareParameterizations'
@@ -142,6 +150,7 @@ class ItemComparatorTests extends GroovyTestCase {
         assertFalse ItemComparator.contentEquals(item, item2)
     }
 
+    @Test
     void testNegativeWithSameCountButDifferentPathCompareParameterizations() {
         ParameterizationDAO dao = new ParameterizationDAO()
         dao.name = 'testNegativeWithSameCountButDifferentPathCompareParameterizations'
@@ -165,6 +174,7 @@ class ItemComparatorTests extends GroovyTestCase {
         assertFalse ItemComparator.contentEquals(item, item2)
     }
 
+    @Test
     void testPositiveWithParameterObjectCompareParameterizations() {
         ParameterizationDAO dao = new ParameterizationDAO()
         dao.name = 'testPositiveWithParameterObjectCompareParameterizations'
@@ -188,6 +198,7 @@ class ItemComparatorTests extends GroovyTestCase {
         assertTrue ItemComparator.contentEquals(item, item2)
     }
 
+    @Test
     void testNegativeWithDifferentParameterObjectTypeCompareParameterizations() {
         ParameterizationDAO dao = new ParameterizationDAO()
         dao.name = 'testNegativeWithDifferentParameterObjectTypeCompareParameterizations'
@@ -211,6 +222,7 @@ class ItemComparatorTests extends GroovyTestCase {
         assertFalse ItemComparator.contentEquals(item, item2)
     }
 
+    @Test
     void testNegativeWithDifferentParameterObjectParametersCompareParameterizations() {
         ParameterizationDAO dao = new ParameterizationDAO()
         dao.name = 'testNegativeWithDifferentParameterObjectParametersCompareParameterizations'
@@ -234,6 +246,7 @@ class ItemComparatorTests extends GroovyTestCase {
         assertFalse ItemComparator.contentEquals(item, item2)
     }
 
+    @Test
     void testPositiveWithMultiDimensionalParametersCompareParameterizations() {
         ParameterizationDAO dao = new ParameterizationDAO()
         dao.name = 'testPositiveWithMultiDimensionalParametersCompareParameterizations'
@@ -257,6 +270,7 @@ class ItemComparatorTests extends GroovyTestCase {
         assertTrue ItemComparator.contentEquals(item, item2)
     }
 
+    @Test
     void testNegativeWithMultiDimensionalWithDifferentTypesCompareParameterizations() {
         ParameterizationDAO dao = new ParameterizationDAO()
         dao.name = 'testNegativeWithMultiDimensionalWithDifferentTypesCompareParameterizations'
@@ -280,6 +294,7 @@ class ItemComparatorTests extends GroovyTestCase {
         assertFalse ItemComparator.contentEquals(item, item2)
     }
 
+    @Test
     void testNegativeWithMultiDimensionalWithDifferentStructureCompareParameterizations() {
         ParameterizationDAO dao = new ParameterizationDAO()
         dao.name = 'testNegativeWithMultiDimensionalWithDifferentStructureCompareParameterizations'
@@ -303,6 +318,7 @@ class ItemComparatorTests extends GroovyTestCase {
         assertFalse ItemComparator.contentEquals(item, item2)
     }
 
+    @Test
     void testNegativeWithMultiDimensionalWithDifferentValuesCompareParameterizations() {
         ParameterizationDAO dao = new ParameterizationDAO()
         dao.name = 'testNegativeWithMultiDimensionalWithDifferentValuesCompareParameterizations'
@@ -326,6 +342,7 @@ class ItemComparatorTests extends GroovyTestCase {
         assertFalse ItemComparator.contentEquals(item, item2)
     }
 
+    @Test
     void testNegativeWithMultiDimensionalWithDifferentTitlesCompareParameterizations() {
         ParameterizationDAO dao = new ParameterizationDAO()
         dao.name = 'testNegativeWithMultiDimensionalWithDifferentTitlesCompareParameterizations'
@@ -349,6 +366,7 @@ class ItemComparatorTests extends GroovyTestCase {
         assertFalse ItemComparator.contentEquals(item, item2)
     }
 
+    @Test
     void testPositivePMO768() {
         ParameterizationDAO dao = new ParameterizationDAO()
         dao.name = 'testPositivePMO768'

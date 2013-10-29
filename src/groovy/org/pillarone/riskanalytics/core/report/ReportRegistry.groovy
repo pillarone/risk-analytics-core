@@ -35,7 +35,7 @@ abstract class ReportRegistry {
             Collection<IReportModel> potentialReports = reportMap.get(clazz)
             iReportModels.addAll(potentialReports.intersect(allReports))
         }
-        return iReportModels.flatten()
+        return iReportModels.flatten().toList()
     }
 
     public static List<IReportModel> getAllReportModels() {

@@ -1,9 +1,13 @@
 package org.pillarone.riskanalytics.core.parameter
 
+import org.junit.Test
 import org.pillarone.riskanalytics.core.parameterization.*
 
-class MultiDimensionalParameterTests extends GroovyTestCase {
+import static org.junit.Assert.*
 
+class MultiDimensionalParameterTests {
+
+    @Test
     void testSave() {
         MultiDimensionalParameter parameter = new MultiDimensionalParameter(className: SimpleMultiDimensionalParameter.name, path: 'testSave')
         MultiDimensionalParameterValue paramValue = new MultiDimensionalParameterValue(row: 0, col: 0, value: serializeToByteArray(0))
@@ -20,6 +24,7 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertEquals 1, reloaded.multiDimensionalParameterValues.size()
     }
 
+    @Test
     void testGetSimpleInstance() {
         MultiDimensionalParameter parameter = new MultiDimensionalParameter(className: SimpleMultiDimensionalParameter.name, path: 'testGetSimpleInstance')
         MultiDimensionalParameterValue paramValue = new MultiDimensionalParameterValue(row: 0, col: 0, value: serializeToByteArray(0))
@@ -38,6 +43,7 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertEquals 1, reloaded.multiDimensionalParameterValues.size()
     }
 
+    @Test
     void testGetSimpleInstanceWithMultipleColumns() {
         MultiDimensionalParameter parameter = new MultiDimensionalParameter(className: SimpleMultiDimensionalParameter.name, path: 'testGetSimpleInstanceWithMultipleColumns')
         MultiDimensionalParameterValue paramValue = new MultiDimensionalParameterValue(row: 0, col: 0, value: serializeToByteArray(0))
@@ -60,6 +66,7 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
     }
 
 
+    @Test
     void testGetTableInstance() {
         MultiDimensionalParameter parameter = new MultiDimensionalParameter(className: TableMultiDimensionalParameter.name, path: 'testGetTableInstance')
         MultiDimensionalParameterValue paramValue = new MultiDimensionalParameterValue(row: 0, col: 0, value: serializeToByteArray(0))
@@ -87,6 +94,7 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertEquals 2, reloaded.multiDimensionalParameterTitles.size()
     }
 
+    @Test
     void testGetMatrixInstance() {
         MultiDimensionalParameter parameter = new MultiDimensionalParameter(className: MatrixMultiDimensionalParameter.name, path: 'testGetMatrixInstance')
         MultiDimensionalParameterValue paramValue = new MultiDimensionalParameterValue(row: 0, col: 0, value: serializeToByteArray(0))
@@ -114,6 +122,7 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertEquals 2, reloaded.multiDimensionalParameterTitles.size()
     }
 
+    @Test
     void testGetLobInstance() {
         MultiDimensionalParameter parameter = new MultiDimensionalParameter(className: ComboBoxMatrixMultiDimensionalParameter.name, path: 'testGetLobInstance')
         MultiDimensionalParameterValue paramValue = new MultiDimensionalParameterValue(row: 0, col: 0, value: serializeToByteArray(0))
@@ -140,6 +149,7 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertEquals 1, reloaded.multiDimensionalParameterTitles.size()
     }
 
+    @Test
     void testGetLobTableInstance() {
         MultiDimensionalParameter parameter = new MultiDimensionalParameter(className: ComboBoxTableMultiDimensionalParameter.name, path: 'testGetLobTableInstance')
         MultiDimensionalParameterValue paramValue = new MultiDimensionalParameterValue(row: 0, col: 0, value: serializeToByteArray(0))
@@ -167,6 +177,7 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertEquals 2, reloaded.multiDimensionalParameterTitles.size()
     }
 
+    @Test
     void testGetConstrainedInstance() {
         MultiDimensionalParameter parameter = new MultiDimensionalParameter(className: ConstrainedMultiDimensionalParameter.name, path: 'testGetConstrainedInstance')
         parameter.constraintName = SimpleConstraint.IDENTIFIER
@@ -196,6 +207,7 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertEquals 2, reloaded.multiDimensionalParameterTitles.size()
     }
 
+    @Test
     void testSetInstance() {
         def mdp = new SimpleMultiDimensionalParameter([1, 2, 3])
         MultiDimensionalParameter parameter = new MultiDimensionalParameter(path: 'path')
@@ -272,6 +284,7 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertNotNull parameter.multiDimensionalParameterTitles.find {it.row == 2 && it.col == 0 && it.title == 'row 2'}
     }
 
+    @Test
     void testUpdateValues() {
         SimpleMultiDimensionalParameter mdp = new SimpleMultiDimensionalParameter([[1, 2], [3, 4]])
 
@@ -291,6 +304,7 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertEquals newMdp.values, parameter.parameterInstance.values
     }
 
+    @Test
     void testUpdateAndAddValues() {
         SimpleMultiDimensionalParameter mdp = new SimpleMultiDimensionalParameter([[1, 2], [3, 4]])
 
@@ -310,6 +324,7 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertEquals newMdp.values, parameter.parameterInstance.values
     }
 
+    @Test
     void testUpdateAndRemoveValues() {
         SimpleMultiDimensionalParameter mdp = new SimpleMultiDimensionalParameter([[1, 2, 3], [4, 5, 6]])
 
@@ -329,6 +344,7 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertEquals newMdp.values, parameter.parameterInstance.values
     }
 
+    @Test
     void testUpdateTitles() {
         MatrixMultiDimensionalParameter mdp = new MatrixMultiDimensionalParameter([[1, 2], [3, 4]], ['row1', 'row2'], ['col1', 'col2'])
 
@@ -349,6 +365,7 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertEquals newMdp.columnNames, parameter.parameterInstance.columnNames
     }
 
+    @Test
     void testUpdateAndAddTitles() {
         MatrixMultiDimensionalParameter mdp = new MatrixMultiDimensionalParameter([[1, 2], [3, 4]], ['row1', 'row2'], ['col1', 'col2'])
 
@@ -369,6 +386,7 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertEquals newMdp.columnNames, parameter.parameterInstance.columnNames
     }
 
+    @Test
     void testUpdateAndRemoveTitles() {
         MatrixMultiDimensionalParameter mdp = new MatrixMultiDimensionalParameter([[1, 2, 3], [4, 5, 6], [7, 8, 9]], ['new1', 'new2', 'new3'], ['new4', 'new5', 'new6'])
 

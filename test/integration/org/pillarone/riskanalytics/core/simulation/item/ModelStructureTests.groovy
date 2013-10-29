@@ -1,11 +1,15 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
+import org.junit.Test
 import org.pillarone.riskanalytics.core.ModelStructureDAO
 import org.pillarone.riskanalytics.core.output.ConfigObjectHolder
 
-class ModelStructureTests extends GroovyTestCase {
+import static org.junit.Assert.*
+
+class ModelStructureTests {
 
 
+    @Test
     void testFindAllModelClasses() {
         ModelStructureDAO exampleCompanyStructure = new ModelStructureDAO()
         exampleCompanyStructure.name = "ExampleCompany"

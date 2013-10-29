@@ -1,15 +1,20 @@
 package org.pillarone.riskanalytics.core.parameter.comment
 
 import org.joda.time.DateTime
+import org.junit.Test
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import models.core.CoreModel
+
+import static junit.framework.Assert.assertNotNull
+import static org.junit.Assert.assertEquals
 
 /**
  * @author fouad.jaada@intuitive-collaboration.com
  */
-class ResultCommentDAOTests extends GroovyTestCase {
+class ResultCommentDAOTests {
 
 
+    @Test
     void testSaveDeleteResultCommentDAO() {
         int tagCount = Tag.count()
         int commentCount = CommentDAO.count()

@@ -1,7 +1,12 @@
 package org.pillarone.riskanalytics.core.parameter
 
-class StringParameterTests extends GroovyTestCase {
+import org.junit.Test
 
+import static org.junit.Assert.assertNotNull
+
+class StringParameterTests {
+
+    @Test
     void testInsert() {
         StringParameter parameter = new StringParameter(path: "path", parameterValue: 'string')
 

@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.parameterization
 
 import models.core.CoreModel
+import org.junit.Test
 import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObjectClassifier
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
@@ -18,20 +19,25 @@ import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObject
 import org.pillarone.riskanalytics.core.example.parameter.ExampleResourceConstraints
 
-class ParameterizationHelperTests extends GroovyTestCase {
+import static org.junit.Assert.*
 
+class ParameterizationHelperTests {
+
+    @Test
     void testDefaultName() {
         CoreModel model = new CoreModel()
         Parameterization parameterization = ParameterizationHelper.createDefaultParameterization(model)
         assertEquals "Core-Default", parameterization.name
     }
 
+    @Test
     void testModelClassName() {
         CoreModel model = new CoreModel()
         Parameterization parameterization = ParameterizationHelper.createDefaultParameterization(model)
         assertSame CoreModel, parameterization.modelClass
     }
 
+    @Test
     void testGetAllParameter() {
         CoreModel model = new CoreModel()
         model.init()
@@ -42,6 +48,7 @@ class ParameterizationHelperTests extends GroovyTestCase {
         assertSame model.exampleInputOutputComponent.parmParameterObject, parameter["exampleInputOutputComponent:parmParameterObject"]
     }
 
+    @Test
     void testCreateDefaultParameterization() {
         int initialParameterCount = Parameter.count()
         CoreModel model = new CoreModel()
@@ -52,6 +59,7 @@ class ParameterizationHelperTests extends GroovyTestCase {
         assertEquals initialParameterCount + 10, Parameter.count()
     }
 
+    @Test
     void testCreateDefaultResourceParameterization() {
         int initialParameterCount = Parameter.count()
         ResourceModel model = new ResourceModel()
@@ -69,6 +77,7 @@ class ParameterizationHelperTests extends GroovyTestCase {
         assertTrue(stringWriter.toString().contains("parmResource[0]=new org.pillarone.riskanalytics.core.components.ResourceHolder(org.pillarone.riskanalytics.core.example.component.ExampleResource)"))
     }
 
+    @Test
     void testCreateDefaultResource() {
         Resource resource = ParameterizationHelper.createDefaultResource("test", new ExampleResource())
         assertEquals(3, resource.parameterHolders.size())
@@ -76,6 +85,7 @@ class ParameterizationHelperTests extends GroovyTestCase {
         assertEquals(ExampleResource, resource.modelClass)
     }
 
+    @Test
     void testCreateDefaultParameterizationForMultiplePeriods() {
         int initialParameterCount = Parameter.count()
         CoreModel model = new CoreModel()
@@ -86,6 +96,7 @@ class ParameterizationHelperTests extends GroovyTestCase {
         assertEquals initialParameterCount + 30, Parameter.count()
     }
 
+    @Test
     void testCreateParameterizationFromConfigObject() {
         ConfigObject configObject = new ConfigObject()
         configObject.model = CoreModel
@@ -118,6 +129,7 @@ class ParameterizationHelperTests extends GroovyTestCase {
         assertEquals 'TYPE1', pop.classifier.toString()
     }
 
+    @Test
     void testCopyParameters() {
         List params = []
         IntegerParameterHolder p1 = ParameterHolderFactory.getHolder('intPath', 2, 5)
@@ -139,6 +151,7 @@ class ParameterizationHelperTests extends GroovyTestCase {
         assertEquals p2.businessObject, newP2.businessObject
     }
 
+    @Test
     void testCollectResources() {
         List<ParameterHolder> parameters = [ParameterHolderFactory.getHolder("res", 0, new ResourceHolder<ExampleResource>(ExampleResource, "example", new VersionNumber("1"))), ParameterHolderFactory.getHolder("double", 0, 1d)]
         List<Resource> resources = ParameterizationHelper.collectUsedResources(parameters)
@@ -150,6 +163,7 @@ class ParameterizationHelperTests extends GroovyTestCase {
         assertEquals(ExampleResource, resource.modelClass)
     }
 
+    @Test
     void testCollectResourcesPO() {
         ExampleParameterObject parameterObject = ExampleParameterObjectClassifier.getStrategy(ExampleParameterObjectClassifier.RESOURCE, [resource:
                 new ConstrainedMultiDimensionalParameter([[new ResourceHolder<ExampleResource>(ExampleResource, "example", new VersionNumber("1"))]], ["title"], new ExampleResourceConstraints())])
@@ -164,6 +178,7 @@ class ParameterizationHelperTests extends GroovyTestCase {
         assertEquals(ExampleResource, resource.modelClass)
     }
 
+    @Test
     void testCollectResourcesMDP() {
 
 

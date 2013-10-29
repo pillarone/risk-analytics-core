@@ -1,13 +1,17 @@
 package org.pillarone.riskanalytics.core.simulation.engine.actions
 
 import models.core.CoreModel
+import org.junit.Test
 import org.pillarone.riskanalytics.core.fileimport.ModelStructureImportService
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
-class PrepareStructureInformationActionTests extends GroovyTestCase {
+import static org.junit.Assert.*
 
+class PrepareStructureInformationActionTests {
+
+    @Test
     void testPerform() {
 
         new ModelStructureImportService().compareFilesAndWriteToDB(['Core'])

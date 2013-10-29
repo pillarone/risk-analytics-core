@@ -1,15 +1,19 @@
 package org.pillarone.riskanalytics.core.fileimport
 
+import org.junit.Test
 import org.pillarone.riskanalytics.core.ModelDAO
 import models.core.CoreModel
 import models.migratableCore.MigratableCoreModel
 
-public class ModelFileImportServiceTests extends GroovyTestCase {
+import static org.junit.Assert.*
+
+public class ModelFileImportServiceTests {
 
     private ModelFileImportService getService() {
         return new ModelFileImportService()
     }
 
+    @Test
     void testImportFile() {
         File modelFile = new File(getModelFolder(), "core/CoreModel.groovy")
         def count = ModelDAO.count()
@@ -32,6 +36,7 @@ public class ModelFileImportServiceTests extends GroovyTestCase {
 
     }
 
+    @Test
     void testPrepare() {
 
         File modelFile = new File(getModelFolder(), "core/CoreModel.groovy")
@@ -41,14 +46,17 @@ public class ModelFileImportServiceTests extends GroovyTestCase {
     }
 
 
+    @Test
     void testDaoClass() {
         assertEquals "wrong dao class", ModelDAO, service.daoClass
     }
 
+    @Test
     void testFileSuffix() {
         assertEquals "wrong fileSuffix", "Model", service.fileSuffix
     }
 
+    @Test
     void testLookupItem() {
         File modelFile = new File(getModelFolder(), "migratableCore/MigratableCoreModel.groovy")
         assertTrue "import not successful", service.importFile(modelFile.toURI().toURL())

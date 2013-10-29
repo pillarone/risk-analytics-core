@@ -1,11 +1,13 @@
 package org.pillarone.riskanalytics.core.parameter
 
-import org.pillarone.riskanalytics.core.example.parameter.ExampleEnum
-import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObjectClassifier
+import org.junit.Test
 
-class EnumParameterTests extends GroovyTestCase {
+import static org.junit.Assert.assertNotNull
+
+class EnumParameterTests {
 
 
+    @Test
     void testInsert() {
         EnumParameter parameter = new EnumParameter(path: "path", parameterValue: "FIRST_VALUE", parameterType: "org.pillarone.riskanalytics.core.example.parameter.ExampleEnum")
         EnumParameter savedParam = parameter.save()

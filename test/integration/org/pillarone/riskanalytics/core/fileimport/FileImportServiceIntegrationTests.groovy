@@ -1,5 +1,8 @@
 package org.pillarone.riskanalytics.core.fileimport
 
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
@@ -9,18 +12,21 @@ import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 import models.migratableCore.MigratableCoreModel
 import models.core.CoreModel
 
-class FileImportServiceIntegrationTests extends GroovyTestCase {
+import static org.junit.Assert.*
 
+class FileImportServiceIntegrationTests  {
+
+    @Before
     void setUp() {
         ModelRegistry.instance.clear()
     }
 
-    @Override
-    protected void tearDown() {
+    @After
+    void tearDown() {
         System.setProperty("skipImport", "false")
-        super.tearDown()
     }
 
+    @Test
     void testImportModelsIfNeeded() {
         FileImportService.importModelsIfNeeded(["Core"])
         ParameterizationDAO dao = ParameterizationDAO.findByName("CoreParameters")
@@ -42,6 +48,7 @@ class FileImportServiceIntegrationTests extends GroovyTestCase {
         assertEquals "1", resultConfiguration.modelVersionNumber.toString()
     }
 
+    @Test
     void testImportModelsIfNeededMigrated() {
         FileImportService.importModelsIfNeeded(["MigratableCore"])
         ParameterizationDAO dao = ParameterizationDAO.findByName("MigratableCoreParameters")
@@ -63,6 +70,7 @@ class FileImportServiceIntegrationTests extends GroovyTestCase {
         assertEquals "2", resultConfiguration.modelVersionNumber.toString()
     }
 
+    @Test
     void testSkipImportTrue() {
         System.setProperty("skipImport", "true")
         FileImportService.importModelsIfNeeded(["Core"])
@@ -72,6 +80,7 @@ class FileImportServiceIntegrationTests extends GroovyTestCase {
         assertEquals ModelStructureDAO.count() as int, ModelRegistry.instance.allModelClasses.size()
     }
 
+    @Test
     void testSkipImportTrueWithExisting() {
 
         new ModelStructureImportService().compareFilesAndWriteToDB(['Core'])
@@ -92,6 +101,7 @@ class FileImportServiceIntegrationTests extends GroovyTestCase {
         assertEquals ModelStructureDAO.count() as int, ModelRegistry.instance.allModelClasses.size()
     }
 
+    @Test
     void testSkipImportFalse() {
         System.setProperty("skipImport", "false")
         FileImportService.importModelsIfNeeded(["Core"])

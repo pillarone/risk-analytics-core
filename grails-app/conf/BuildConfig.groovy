@@ -1,6 +1,8 @@
 //Use a custom plugins dir, because different branches use different plugin versions
 grails.project.plugins.dir = "../local-plugins/RiskAnalyticsCore-master"
 
+grails.project.dependency.resolver = "maven"
+
 grails.project.dependency.resolution = {
     inherits "global" // inherit Grails' default dependencies
     log "warn"
@@ -12,27 +14,28 @@ grails.project.dependency.resolution = {
 
         //even though this plugin does not need anything from this repo, it has to be added for the deploy script to check existing plugins
         mavenRepo "https://repository.intuitive-collaboration.com/nexus/content/repositories/pillarone-public/"
+        mavenRepo "http://repo.spring.io/milestone/" //needed for spring-security-core 2.0-rc2 plugin
 //        mavenRepo "http://www.gridgainsystems.com/maven2/" //TODO: repository offline..
     }
 
     plugins {
         runtime ":background-thread:1.3"
-        runtime ":hibernate:2.2.1"
+        runtime ":hibernate:3.6.10.2"
         runtime ":joda-time:0.5"
-        runtime ":maven-publisher:0.7.5", {
+        runtime ":release:3.0.1", {
             exclude "groovy"
         }
         runtime ":quartz:0.4.2"
-        runtime ":spring-security-core:1.2.7.3"
-        runtime ":tomcat:2.2.1"
+        runtime ":spring-security-core:2.0-RC2"
+        runtime ":tomcat:7.0.42"
 
         test ":code-coverage:1.2.4"
-        runtime ":database-migration:1.3.5"
+        runtime ":database-migration:1.3.6"
     }
 
     dependencies {
         runtime 'net.sf.jasperreports:jasperreports:4.0.1', {
-            exclude "xml-apis"
+            excludes "xml-apis", "commons-collections"
         }
         compile('org.apache.poi:poi:3.8')
         compile('org.apache.poi:poi-ooxml:3.8') {

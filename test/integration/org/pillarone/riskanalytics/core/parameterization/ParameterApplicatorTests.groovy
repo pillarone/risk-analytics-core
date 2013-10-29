@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.parameterization
 import models.core.CoreModel
 import models.core.parameterApplicator.ParameterApplicatorModel
 import org.apache.commons.logging.LogFactory
+import org.junit.Test
 import org.pillarone.riskanalytics.core.example.component.ExampleDynamicComponent
 import org.pillarone.riskanalytics.core.example.component.ExampleInputOutputComponent
 import org.pillarone.riskanalytics.core.example.parameter.ExampleParameterObjectClassifier
@@ -11,7 +12,10 @@ import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjectParameterHolder
 
-class ParameterApplicatorTests extends GroovyTestCase {
+import static groovy.test.GroovyAssert.shouldFail
+import static org.junit.Assert.*
+
+class ParameterApplicatorTests {
 
 
     private Parameterization getParameterization(File paramFile) {
@@ -21,6 +25,7 @@ class ParameterApplicatorTests extends GroovyTestCase {
         return parameterization
     }
 
+    @Test
     void testCreateApplicableParameter() {
 
         Model m = new CoreModel()
@@ -39,6 +44,7 @@ class ParameterApplicatorTests extends GroovyTestCase {
 
     }
 
+    @Test
     void testBuildApplicableParameter() {
         Parameterization parameter = getParameterization(new File("src/java/models/core/CoreParameters.groovy"))
 
@@ -57,6 +63,7 @@ class ParameterApplicatorTests extends GroovyTestCase {
         }
     }
 
+    @Test
     void testInit() {
         Parameterization parameter = getParameterization(new File("src/java/models/core/CoreParameters.groovy"))
 
@@ -72,6 +79,7 @@ class ParameterApplicatorTests extends GroovyTestCase {
         assertNotNull applicator.parameterPerPeriod
     }
 
+    @Test
     void testInitWithNestedMdp() {
         Parameterization parameter = getParameterization(new File("src/java/models/core/CoreParameters.groovy"))
         ParameterObjectParameterHolder param = parameter.parameterHolders.find { it.path = "exampleInputOutputComponent:parmParameterObject" }
@@ -96,6 +104,7 @@ class ParameterApplicatorTests extends GroovyTestCase {
 
     //TODO msp: create better test model
 
+    @Test
     void testApplyParameter() {
 
         Parameterization parameter = getParameterization(new File("src/java/models/core/CoreParameters.groovy"))
@@ -114,6 +123,7 @@ class ParameterApplicatorTests extends GroovyTestCase {
 
     }
 
+    @Test
     void testDynamicComposedComponentExpansion() {
 
         Parameterization parameter = getParameterization(new File("src/java/models/core/CoreParameters.groovy"))
@@ -131,6 +141,7 @@ class ParameterApplicatorTests extends GroovyTestCase {
 
 
 
+    @Test
     void testGetPropertyOrSubComponent() {
         ParameterApplicator applicator = new ParameterApplicator()
         ExampleInputOutputComponent component = new ExampleInputOutputComponent()
@@ -155,6 +166,7 @@ class ParameterApplicatorTests extends GroovyTestCase {
 
     }
 
+    @Test
     void testAbstractMultiDimensionalParameterHandling() {
         Parameterization parameter = getParameterization(new File("src/java/models/core/parameterApplicator/ParameterApplicatorParameters.groovy"))
 
@@ -174,6 +186,7 @@ class ParameterApplicatorTests extends GroovyTestCase {
 
     }
 
+    @Test
     void testConstraindedStringHandling() {
         Parameterization parameter = getParameterization(new File("src/java/models/core/parameterApplicator/ParameterApplicatorParameters.groovy"))
 
@@ -193,6 +206,7 @@ class ParameterApplicatorTests extends GroovyTestCase {
         }
     }
 
+    @Test
     void testParameterizationPerformance() {
         Parameterization parameter = getParameterization(new File("src/java/models/core/CoreParameters.groovy"))
 

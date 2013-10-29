@@ -1,14 +1,18 @@
 package org.pillarone.riskanalytics.core.model
 
+import org.junit.Test
 import org.pillarone.riskanalytics.core.fileimport.ParameterizationImportService
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import models.core.CoreModel
 import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
 import org.pillarone.riskanalytics.core.fileimport.ModelStructureImportService
 
+import static org.junit.Assert.*
 
-class ModelHelperTests extends GroovyTestCase {
 
+class ModelHelperTests {
+
+    @Test
     void testOutPaths() {
         new ParameterizationImportService().compareFilesAndWriteToDB(['Core'])
         new ModelStructureImportService().compareFilesAndWriteToDB(['Core'])

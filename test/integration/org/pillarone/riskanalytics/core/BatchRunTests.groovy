@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core
 
+import org.junit.Test
 import org.pillarone.riskanalytics.core.output.batch.BatchRunner
 import org.pillarone.riskanalytics.core.output.OutputStrategy
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
@@ -9,12 +10,15 @@ import org.pillarone.riskanalytics.core.simulation.item.SimulationTests
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.joda.time.DateTime
 
+import static org.junit.Assert.*
+
 /**
  * @author fouad jaada
  */
 
-public class BatchRunTests extends SimulationTests {
+class BatchRunTests extends SimulationTests {
 
+    @Test
     public void testAddSimulationRun() {
         BatchRun batchRun = new BatchRun()
         batchRun.name = "Test"
@@ -61,6 +65,7 @@ public class BatchRunTests extends SimulationTests {
         assertTrue batchRun.batchRunService.getSimulationRunAt(bRun, 1).name == simulation.name
     }
 
+    @Test
     public void testDeleteBatchRun() {
 
         BatchRun batchRun = new BatchRun()
@@ -84,6 +89,7 @@ public class BatchRunTests extends SimulationTests {
         assertNull bRun
     }
 
+    @Test
     public void testGetActiveBatchRuns() {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, -2)

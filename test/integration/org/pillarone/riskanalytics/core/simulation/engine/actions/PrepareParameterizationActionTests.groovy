@@ -2,6 +2,8 @@ package org.pillarone.riskanalytics.core.simulation.engine.actions
 
 import models.core.CoreModelTests
 
+import static org.junit.Assert.*
+
 
 class PrepareParameterizationActionTests extends CoreModelTests {
 

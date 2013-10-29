@@ -2,10 +2,12 @@ package org.pillarone.riskanalytics.core.simulation.item
 
 import models.core.CoreModel
 import org.joda.time.DateTime
-import org.pillarone.riskanalytics.core.BatchRun
+import org.junit.Before
+import org.junit.Test
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
+import org.pillarone.riskanalytics.core.output.*
 import org.pillarone.riskanalytics.core.parameter.IntegerParameter
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.SimulationTag
@@ -17,14 +19,14 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Commen
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.EnumTagType
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.FunctionComment
 import org.pillarone.riskanalytics.core.workflow.Status
-import org.pillarone.riskanalytics.core.output.*
 
-class SimulationTests extends GroovyTestCase {
+import static org.junit.Assert.*
 
-    DeleteSimulationService deleteSimulationService
+class SimulationTests {
 
-    protected void setUp() {
-        super.setUp()
+
+    @Before
+    void setUp() {
         FileImportService.importModelsIfNeeded(["Core"])
     }
 
@@ -46,6 +48,7 @@ class SimulationTests extends GroovyTestCase {
         template
     }
 
+    @Test
     void testLoad() {
         DateTime start = new DateTime()
         SimulationRun run = new SimulationRun()
@@ -87,6 +90,7 @@ class SimulationTests extends GroovyTestCase {
         assertEquals simulation.modelClass, simulation.parameterization.modelClass
     }
 
+    @Test
     void testSave() {
         createParameterization()
         createResultConfiguration()
@@ -110,9 +114,8 @@ class SimulationTests extends GroovyTestCase {
         assertEquals parameterCount + 2, Parameter.count()
     }
 
+    @Test
     void testDelete() {
-        new DBCleanUpService().cleanUp()
-
         SimulationRun run1 = new SimulationRun()
         run1.name = "simulation1"
         run1.parameterization = createParameterization()
@@ -150,49 +153,16 @@ class SimulationTests extends GroovyTestCase {
         Simulation simulation = new Simulation("simulation1")
         assertTrue "Simulation deleted", simulation.delete()
 
-        assertEquals 3, SingleValueResult.list().findAll {svr -> svr.simulationRun.toBeDeleted}.size()
-
-        assertNotNull "simulation toBeDeleted == true ", SimulationRun.findByToBeDeleted(true)
+        assertEquals 2, SingleValueResult.count()
+        assertEquals 1, SimulationRun.count()
 
         // these deletions should be possible without foreign key constraint violations
         oldParametrization.delete(flush: true)
         oldSimTemplate.delete(flush: true)
 
-        // test physical deletion
-
-        deleteSimulationService.deleteAllMarkedSimulations()
-        assertNull SimulationRun.findByToBeDeleted(true)
     }
 
-    void deleteSimulationAndBacthRunSimulationRun() {
-        new DBCleanUpService().cleanUp()
-
-        BatchRun batchRun = new BatchRun()
-        batchRun.name = "Test"
-        batchRun.executionTime = new DateTime()
-        batchRun.save()
-
-        BatchRun batch = BatchRun.findByName("Test")
-        assertNotNull batch
-
-        def bRuns = batch.batchRunService.getSimulationRuns(batch)
-        assertTrue bRuns.size() == 0
-
-        Simulation simulation = createSimulation("simulation")
-        batch.batchRunService.addSimulationRun(batch, simulation, OutputStrategy.BATCH_DB_OUTPUT)
-
-        BatchRun bRun = BatchRun.findByName(batch.name)
-
-        assertTrue batch.batchRunService.getSimulationRuns(bRun).size() == 1
-        assertTrue batchRun.batchRunService.getSimulationRunAt(bRun, 0).name == simulation.name
-
-        assertTrue "Simulation deleted", simulation.delete()
-        assertNotNull "simulation toBeDeleted == true ", SimulationRun.findByToBeDeleted(true)
-
-        deleteSimulationService.deleteAllMarkedSimulations()
-        assertNull SimulationRun.findByToBeDeleted(true)
-    }
-
+    @Test
     void testAddRemoveComment() {
         Simulation simulation = createSimulation("Tests")
         simulation.periodCount = 1
@@ -228,6 +198,7 @@ class SimulationTests extends GroovyTestCase {
         assertEquals initialCount, ResultCommentDAO.count()
     }
 
+    @Test
     void testAddRemoveFunctionComment() {
         Simulation simulation = createSimulation("Tests")
         simulation.periodCount = 1
@@ -263,6 +234,7 @@ class SimulationTests extends GroovyTestCase {
         assertEquals initialCount, ResultCommentDAO.count()
     }
 
+    @Test
     public void testAddSimulationTag() {
         Simulation simulation = createSimulation("Tests")
         int simulationTagCount = SimulationTag.count()
@@ -293,6 +265,7 @@ class SimulationTests extends GroovyTestCase {
         return simulation
     }
 
+    @Test
     void testEquals() {
         Simulation simulation1 = new Simulation('test1')
         Simulation simulation2 = new Simulation('test1')

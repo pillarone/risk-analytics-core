@@ -135,7 +135,6 @@ abstract class ResultAccessor {
         return sortedValues[0]
     }
 
-    @CompileStatic
     static Double getMax(SimulationRun simulationRun, int periodIndex = 0, String pathName, String collectorName, String fieldName) {
         double[] sortedValues = getValuesSorted(simulationRun, periodIndex, pathName, collectorName, fieldName)
         if (sortedValues.length == 0) {
@@ -182,7 +181,6 @@ abstract class ResultAccessor {
      * @param percentage
      * @return interpolated value at percentage or null if there exist no values for the path or the percentage is out of range
      */
-    @CompileStatic
     static Double getNthOrderStatistic(SimulationRun simulationRun, int periodIndex, String path, String collectorName,
                                        String fieldName, double percentage) {
         double[] values = getValuesSorted(simulationRun, periodIndex, path, collectorName, fieldName) as double[]

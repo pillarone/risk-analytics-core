@@ -1,11 +1,15 @@
 package org.pillarone.riskanalytics.core.simulation.item.parameter.comment
 
+import org.junit.Test
 import org.pillarone.riskanalytics.core.parameter.comment.CommentTag
 import org.pillarone.riskanalytics.core.parameter.comment.ParameterizationCommentDAO
 import org.pillarone.riskanalytics.core.parameter.comment.Tag
 
-class ParameterizationCommentTests extends GroovyTestCase {
+import static org.junit.Assert.*
 
+class ParameterizationCommentTests {
+
+    @Test
     void testConstructor() {
         ParameterizationCommentDAO dao = new ParameterizationCommentDAO(path: "path", periodIndex: 0, comment: "text")
 
@@ -30,6 +34,7 @@ class ParameterizationCommentTests extends GroovyTestCase {
         assertEquals 0, comment.period
     }
 
+    @Test
     void testUpdateComment() {
         Comment comment = new Comment("path", 0)
         assertFalse comment.updated
@@ -39,6 +44,7 @@ class ParameterizationCommentTests extends GroovyTestCase {
         assertEquals "text", comment.text
     }
 
+    @Test
     void testAddRemoveTag() {
         Comment comment = new Comment("path", 0)
 
@@ -58,6 +64,7 @@ class ParameterizationCommentTests extends GroovyTestCase {
         assertEquals 1, comment.tags.size()
     }
 
+    @Test
     void testApplyToDomainObject() {
         Comment comment = new Comment("path", 0)
         comment.text = "text"

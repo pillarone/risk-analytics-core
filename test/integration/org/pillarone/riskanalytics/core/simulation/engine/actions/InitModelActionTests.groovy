@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.engine.actions
 
+import org.junit.Test
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.simulation.engine.MappingCache
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
@@ -7,8 +8,12 @@ import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 
-class InitModelActionTests extends GroovyTestCase {
+import static groovy.test.GroovyAssert.shouldFail
+import static org.junit.Assert.*
 
+class InitModelActionTests {
+
+    @Test
     void testPerform() {
 
         Simulation simulation = new Simulation("simulation")
@@ -27,6 +32,7 @@ class InitModelActionTests extends GroovyTestCase {
 
     }
 
+    @Test
     void testCheckVersion() {
 
         Simulation simulation = new Simulation("simulation")

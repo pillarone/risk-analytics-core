@@ -8,7 +8,7 @@ class AllNodesStrategy extends AbstractNodeMappingStrategy {
 
     @Override
     Set<GridNode> filterNodes(List<GridNode> allNodes) {
-        return allNodes
+        return allNodes.toSet()
     }
 
 

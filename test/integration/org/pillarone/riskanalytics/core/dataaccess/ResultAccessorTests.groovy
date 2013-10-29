@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.dataaccess
 
+import org.junit.Before
+import org.junit.Test
 import org.pillarone.riskanalytics.core.output.CollectorMapping
 import org.pillarone.riskanalytics.core.output.FieldMapping
 import org.pillarone.riskanalytics.core.output.PathMapping
@@ -15,9 +17,9 @@ import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultTran
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultDescriptor
 import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
 
-import java.util.logging.Level
+import static org.junit.Assert.*
 
-class ResultAccessorTests extends GroovyTestCase {
+class ResultAccessorTests {
 
     SimulationRun simulationRun
     PathMapping path1
@@ -29,6 +31,7 @@ class ResultAccessorTests extends GroovyTestCase {
 
     private ResultWriter resultWriter
 
+    @Before
     void setUp() {
         ResultAccessor.clearCaches()
 
@@ -77,6 +80,7 @@ class ResultAccessorTests extends GroovyTestCase {
         }
     }
 
+    @Test
     void testGetAllResults() {
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 0)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 10)
@@ -87,6 +91,7 @@ class ResultAccessorTests extends GroovyTestCase {
         assertEquals(5, ResultAccessor.getAllResults(simulationRun).size())
     }
 
+    @Test
     void testGetMean() {
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 1)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 2)
@@ -94,7 +99,7 @@ class ResultAccessorTests extends GroovyTestCase {
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 3, value: 4)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 4, value: 5)
 
-        assertEquals(3d, ResultAccessor.getMean(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName))
+        assertEquals(3d, ResultAccessor.getMean(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName), 0)
 
 
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 0, iteration: 1, value: 5)
@@ -102,10 +107,11 @@ class ResultAccessorTests extends GroovyTestCase {
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 0, iteration: 3, value: 15)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 0, iteration: 4, value: 20)
 
-        assertEquals(10d, ResultAccessor.getMean(simulationRun, 0, path2.pathName, collector.collectorName, field.fieldName))
+        assertEquals(10d, ResultAccessor.getMean(simulationRun, 0, path2.pathName, collector.collectorName, field.fieldName), 0)
 
     }
 
+    @Test
     void testGetMin() {
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 1)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 2)
@@ -113,7 +119,7 @@ class ResultAccessorTests extends GroovyTestCase {
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 3, value: 4)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 4, value: 5)
 
-        assertEquals(1, ResultAccessor.getMin(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName))
+        assertEquals(1, ResultAccessor.getMin(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName), 0)
 
 
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 0, iteration: 1, value: 5)
@@ -121,17 +127,18 @@ class ResultAccessorTests extends GroovyTestCase {
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 0, iteration: 3, value: 15)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 0, iteration: 4, value: 20)
 
-        assertEquals(0, ResultAccessor.getMin(simulationRun, 0, path2.pathName, collector.collectorName, field.fieldName))
+        assertEquals(0, ResultAccessor.getMin(simulationRun, 0, path2.pathName, collector.collectorName, field.fieldName), 0)
 
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 1, iteration: 1, value: -5)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 1, iteration: 2, value: 10)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 1, iteration: 3, value: 15)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 1, iteration: 4, value: 20)
 
-        assertEquals(-5, ResultAccessor.getMin(simulationRun, 1, path2.pathName, collector.collectorName, field.fieldName))
+        assertEquals(-5, ResultAccessor.getMin(simulationRun, 1, path2.pathName, collector.collectorName, field.fieldName), 0)
 
     }
 
+    @Test
     void testGetMax() {
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 1)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 2)
@@ -139,7 +146,7 @@ class ResultAccessorTests extends GroovyTestCase {
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 3, value: 4)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 4, value: 5)
 
-        assertEquals(5, ResultAccessor.getMax(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName))
+        assertEquals(5, ResultAccessor.getMax(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName), 0)
 
 
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 0, iteration: 1, value: -5)
@@ -147,17 +154,18 @@ class ResultAccessorTests extends GroovyTestCase {
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 0, iteration: 3, value: -15)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 0, iteration: 4, value: -20)
 
-        assertEquals(0, ResultAccessor.getMax(simulationRun, 0, path2.pathName, collector.collectorName, field.fieldName))
+        assertEquals(0, ResultAccessor.getMax(simulationRun, 0, path2.pathName, collector.collectorName, field.fieldName), 0)
 
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 1, iteration: 1, value: 5)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 1, iteration: 2, value: -10)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 1, iteration: 3, value: -15)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path2, field: field, collector: collector, period: 1, iteration: 4, value: -20)
 
-        assertEquals(5, ResultAccessor.getMax(simulationRun, 1, path2.pathName, collector.collectorName, field.fieldName))
+        assertEquals(5, ResultAccessor.getMax(simulationRun, 1, path2.pathName, collector.collectorName, field.fieldName), 0)
 
     }
 
+    @Test
     void testGetDistinctPaths() {
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 0)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 10)
@@ -176,6 +184,7 @@ class ResultAccessorTests extends GroovyTestCase {
         assertEquals 3, paths.size()
     }
 
+    @Test
     void testHasDifferentValues() {
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 10)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 10)
@@ -197,6 +206,7 @@ class ResultAccessorTests extends GroovyTestCase {
 
     }
 
+    @Test
     void testGetValues() {
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 1)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 5)
@@ -227,6 +237,7 @@ class ResultAccessorTests extends GroovyTestCase {
 
     }
 
+    @Test
     void testGetValuesSorted() {
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 20)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 10)
@@ -235,11 +246,11 @@ class ResultAccessorTests extends GroovyTestCase {
 
         List values = ResultAccessor.getValuesSorted(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName)
         assertEquals 5, values.size()
-        assertEquals 0, values[0]
-        assertEquals 1, values[1]
-        assertEquals 5, values[2]
-        assertEquals 10, values[3]
-        assertEquals 20, values[4]
+        assertEquals 0, values[0], 0
+        assertEquals 1, values[1], 0
+        assertEquals 5, values[2], 0
+        assertEquals 10, values[3], 0
+        assertEquals 20, values[4], 0
 
     }
 
@@ -256,6 +267,7 @@ class ResultAccessorTests extends GroovyTestCase {
         resultWriter.writeResult(new ResultTransferObject(new ResultDescriptor(result.field.id, result.path.id, result.collector.id, result.period), null, bos.toByteArray(), 0));
     }
 
+    @Test
     void testGetConstrainedIteration() {
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 20)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 2, value: 10)
@@ -280,6 +292,7 @@ class ResultAccessorTests extends GroovyTestCase {
         assertEquals 2, values[0]
     }
 
+    @Test
     void testIterationConstrainedValues() {
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 20)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 2, value: 10)
@@ -290,11 +303,12 @@ class ResultAccessorTests extends GroovyTestCase {
         iterations.add(2)
         Map<Integer, Double> values = ResultAccessor.getIterationConstrainedValues(simulationRun, 0, path1.pathName, field.fieldName, collector.collectorName, iterations);
         values = values.sort { it.key }
-        assertEquals 20, values.values().toList()[0]
-        assertEquals 10, values.values().toList()[1]
-        assertEquals 5, values.values().toList()[2]
+        assertEquals 20, values.values().toList()[0], 0
+        assertEquals 10, values.values().toList()[1], 0
+        assertEquals 5, values.values().toList()[2], 0
     }
 
+    @Test
     void testGetNthOrderStatisticSpare() {
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 0, value: 20)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 1, value: 10)
@@ -302,19 +316,20 @@ class ResultAccessorTests extends GroovyTestCase {
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 2, value: 5)
         writeResult new SingleValueResult(simulationRun: simulationRun, valueIndex: 0, path: path1, field: field, collector: collector, period: 0, iteration: 3, value: 0)
 
-        assertEquals "0%", 0d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 0.0)
-        assertEquals "20%", 0d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 20.0)
-        assertEquals "25%", 2.5d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 25.0)
-        assertEquals "39%", 2.5d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 39.0)
-        assertEquals "40%", 5d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 40.0)
-        assertEquals "50%", 6.5d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 50.0)
-        assertEquals "60%", 8d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 60.0)
-        assertEquals "61%", 9d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 61.0)
-        assertEquals "71%", 9d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 71.0)
-        assertEquals "80%", 10d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 80.0)
-        assertEquals "100%", 20d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 100.0)
+        assertEquals "0%", 0d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 0.0), 0
+        assertEquals "20%", 0d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 20.0), 0
+        assertEquals "25%", 2.5d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 25.0), 0
+        assertEquals "39%", 2.5d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 39.0), 0
+        assertEquals "40%", 5d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 40.0), 0
+        assertEquals "50%", 6.5d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 50.0), 0
+        assertEquals "60%", 8d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 60.0), 0
+        assertEquals "61%", 9d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 61.0), 0
+        assertEquals "71%", 9d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 71.0), 0
+        assertEquals "80%", 10d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 80.0), 0
+        assertEquals "100%", 20d, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, 100.0), 0
     }
 
+    @Test
     void testGetNthOrderStatistic() {
         simulationRun.iterations = 100
         (1..100).each {
@@ -322,7 +337,7 @@ class ResultAccessorTests extends GroovyTestCase {
         }
 
         (1..100).each {
-            assertEquals "equals $it%", it, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, it)
+            assertEquals "equals $it%", it, ResultAccessor.getNthOrderStatistic(simulationRun, 0, path1.pathName, collector.collectorName, field.fieldName, it), 0
         }
     }
 }

@@ -13,6 +13,6 @@ class LocalExcludedMappingStrategy extends AbstractNodeMappingStrategy {
 
     @Override
     Set<GridNode> filterNodes(List<GridNode> allNodes) {
-        return allNodes.findAll { !it.is(grid.localNode()) }
+        return allNodes.findAll { !it.is(grid.localNode()) }.toSet()
     }
 }

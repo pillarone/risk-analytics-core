@@ -218,7 +218,7 @@ class Resource extends ParametrizedItem {
     List getParameters(String path) {
         return parameterHolders.findAll { ParameterHolder parameter ->
             parameter.path == path && !parameter.removed
-        }
+        }.toList()
     }
 
     public boolean isUsedInSimulation() {

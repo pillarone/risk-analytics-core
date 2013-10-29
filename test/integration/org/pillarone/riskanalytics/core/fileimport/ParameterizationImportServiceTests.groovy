@@ -1,9 +1,12 @@
 package org.pillarone.riskanalytics.core.fileimport
 
+import org.junit.Test
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.joda.time.DateTime
 
-class ParameterizationImportServiceTests extends GroovyTestCase {
+import static org.junit.Assert.*
+
+class ParameterizationImportServiceTests {
 
 
     private ParameterizationImportService getService() {
@@ -11,6 +14,7 @@ class ParameterizationImportServiceTests extends GroovyTestCase {
     }
 
 
+    @Test
     void testImportParameterization() {
 
         File paramFile = new File(getModelFolder(), "core/CoreParameters.groovy")
@@ -22,6 +26,7 @@ class ParameterizationImportServiceTests extends GroovyTestCase {
 
     }
 
+    @Test
     void testImportParameterizationWithComments() {
 
         File paramFile = new File(getModelFolder(), "core/CoreParametersWithComments.groovy")
@@ -47,6 +52,7 @@ class ParameterizationImportServiceTests extends GroovyTestCase {
 
     }
 
+    @Test
     void testImportParameterizationWithoutComments() {
 
         File paramFile = new File(getModelFolder(), "core/CoreParametersWithoutComments.groovy")
@@ -65,6 +71,7 @@ class ParameterizationImportServiceTests extends GroovyTestCase {
 
 
 
+    @Test
     void testPrepare() {
 
         File paramFile = new File(getModelFolder(), "core/CoreParameters.groovy")
@@ -76,10 +83,12 @@ class ParameterizationImportServiceTests extends GroovyTestCase {
 
     }
 
+    @Test
     void testDaoClass() {
         assertEquals "wrong dao class", ParameterizationDAO, service.daoClass
     }
 
+    @Test
     void testFileSuffix() {
         assertEquals "wrong fileSuffix", "Parameters", service.fileSuffix
     }

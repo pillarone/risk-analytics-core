@@ -2,7 +2,7 @@ import org.pillarone.riskanalytics.core.output.batch.results.SQLServerBulkInsert
 import org.pillarone.riskanalytics.core.output.batch.calculations.SQLServerCalculationBulkInsert
 import org.pillarone.riskanalytics.core.output.batch.results.MysqlBulkInsert
 import org.pillarone.riskanalytics.core.output.batch.calculations.MysqlCalculationsBulkInsert
-import grails.plugins.springsecurity.SecurityConfigType
+import grails.plugin.springsecurity.SecurityConfigType
 import org.pillarone.riskanalytics.core.simulation.engine.grid.mapping.OneNodeStrategy
 
 environments {
@@ -145,7 +145,7 @@ grails {
         }
     }
 
-    plugins {
+    plugin {
         springsecurity {
             userLookup {
                 userDomainClassName = 'org.pillarone.riskanalytics.core.user.Person'
@@ -172,3 +172,27 @@ grails {
 }
 grails.views.default.codec="none" // none, html, base64
 grails.views.gsp.encoding="UTF-8"
+
+// Uncomment and edit the following lines to start using Grails encoding & escaping improvements
+
+/* remove this line 
+// GSP settings
+grails {
+    views {
+        gsp {
+            encoding = 'UTF-8'
+            htmlcodec = 'xml' // use xml escaping instead of HTML4 escaping
+            codecs {
+                expression = 'html' // escapes values inside null
+                scriptlet = 'none' // escapes output from scriptlets in GSPs
+                taglib = 'none' // escapes output from taglibs
+                staticparts = 'none' // escapes output from static template parts
+            }
+        }
+        // escapes all not-encoded output at final stage of outputting
+        filteringCodecForContentType {
+            //'text/html' = 'html'
+        }
+    }
+}
+remove this line */

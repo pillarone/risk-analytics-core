@@ -1,4 +1,4 @@
-import grails.plugins.springsecurity.SpringSecurityService
+import grails.plugin.springsecurity.SpringSecurityService
 import grails.util.Environment
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pillarone.riskanalytics.core.BatchRunSimulationRun

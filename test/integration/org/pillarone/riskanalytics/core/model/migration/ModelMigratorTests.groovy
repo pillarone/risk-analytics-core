@@ -2,6 +2,8 @@ package org.pillarone.riskanalytics.core.model.migration
 
 import models.migratableCore.MigratableCoreModel
 import models.migratableCore.MigratableCoreModel.Migration_v1_v2
+import org.junit.Before
+import org.junit.Test
 import org.pillarone.riskanalytics.core.fileimport.ModelFileImportService
 import org.pillarone.riskanalytics.core.fileimport.ModelStructureImportService
 import org.pillarone.riskanalytics.core.fileimport.ResultConfigurationImportService
@@ -12,7 +14,9 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjec
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.pillarone.riskanalytics.core.ModelDAO
 
-class ModelMigratorTests extends GroovyTestCase {
+import static org.junit.Assert.*
+
+class ModelMigratorTests {
 
     String oldParameterization = """
 package models.migratableCore
@@ -43,6 +47,7 @@ comments=[]
 
     ClassLoader modelMigrationClassLoader
 
+    @Before
     void setUp() {
         new ModelFileImportService().compareFilesAndWriteToDB(["MigratableCore"])
 
@@ -76,6 +81,7 @@ comments=[]
         }
     }
 
+    @Test
     void testOldModel() {
         Parameterization old = new Parameterization("MigratableCoreParams")
         old.modelClass = MigratableCoreModel

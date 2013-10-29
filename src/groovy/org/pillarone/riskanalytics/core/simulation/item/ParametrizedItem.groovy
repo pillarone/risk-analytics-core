@@ -13,7 +13,6 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Commen
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.components.ComponentUtils
 
-@TypeChecked
 abstract class ParametrizedItem extends CommentableItem {
 
     protected static Log LOG = LogFactory.getLog(ParametrizedItem)

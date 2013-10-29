@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.modellingitem
 
 import models.core.CoreModel
+import org.junit.Test
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
@@ -11,8 +12,9 @@ import org.pillarone.riskanalytics.core.simulation.item.Simulation
  * Time: 10:29
  * To change this template use File | Settings | File Templates.
  */
-class ModellingItemMapperTests extends GroovyTestCase{
+class ModellingItemMapperTests {
 
+    @Test
     void testMapSimulations_ToBeDeleted() {
         SimulationRun run = new SimulationRun()
         run.name = 'name'

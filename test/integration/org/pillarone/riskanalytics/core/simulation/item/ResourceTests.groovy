@@ -1,5 +1,7 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
+import org.junit.Before
+import org.junit.Test
 import org.pillarone.riskanalytics.core.ResourceDAO
 import org.pillarone.riskanalytics.core.components.ResourceRegistry
 import org.pillarone.riskanalytics.core.example.component.ExampleResource
@@ -13,14 +15,16 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolde
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
 
-class ResourceTests extends GroovyTestCase {
+import static org.junit.Assert.*
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp()
+class ResourceTests {
+
+    @Before
+    void setUp() throws Exception {
         ResourceRegistry.clear()
     }
 
+    @Test
     void testSaveLoad() {
         Resource resource = new Resource("resource", ExampleResource)
         resource.addParameter(ParameterHolderFactory.getHolder("path", 0, "param"))
@@ -60,6 +64,7 @@ class ResourceTests extends GroovyTestCase {
         assertEquals(0, ResourceTag.count())
     }
 
+    @Test
     void testGetInstance() {
         Resource resource = new Resource("myResource", ExampleResource)
         resource.addParameter(ParameterHolderFactory.getHolder("parmInteger", 0, 99))
@@ -73,6 +78,7 @@ class ResourceTests extends GroovyTestCase {
         assertEquals("String", exampleResource.parmString)
     }
 
+    @Test
     void testEquals(){
         Resource resource1 = new Resource('test', Resource)
         Resource resource2 = new Resource('test', Resource)

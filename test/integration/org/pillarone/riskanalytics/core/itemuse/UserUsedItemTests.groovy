@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.itemuse
 
+import org.junit.Test
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.user.itemuse.item.UserUsedParameterization
@@ -8,6 +9,8 @@ import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 
+import static org.junit.Assert.assertNotNull
+
 /**
  * Created by IntelliJ IDEA.
  * User: bzetterstrom
@@ -15,7 +18,8 @@ import org.pillarone.riskanalytics.core.example.model.EmptyModel
  * Time: 17:38
  * To change this template use File | Settings | File Templates.
  */
-class UserUsedItemTests extends GroovyTestCase {
+class UserUsedItemTests {
+    @Test
     void testUserUsedParameterization() {
         UserUsedParameterization userUsedParameterization = new UserUsedParameterization()
         userUsedParameterization.time = new DateTime();

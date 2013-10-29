@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.item.parameter
 
+import org.junit.Test
 import org.pillarone.riskanalytics.core.parameter.DoubleParameter
 import org.pillarone.riskanalytics.core.parameter.EnumParameter
 import org.pillarone.riskanalytics.core.parameter.Parameter
@@ -14,8 +15,11 @@ import org.pillarone.riskanalytics.core.parameterization.ConstrainedString
 import org.pillarone.riskanalytics.core.example.parameter.ExampleMultiDimensionalConstraints
 import org.pillarone.riskanalytics.core.parameterization.ComboBoxTableMultiDimensionalParameter
 
-class ParameterObjectParameterHolderTests extends GroovyTestCase {
+import static org.junit.Assert.*
 
+class ParameterObjectParameterHolderTests {
+
+    @Test
     void testSimpleApply() {
         ParameterObjectParameter parameter = new ParameterObjectParameter(path: 'path', periodIndex: 0)
         parameter.type = new EnumParameter(parameterType: ExampleParameterObjectClassifier.getName(), parameterValue: "TYPE1", path: 'path', periodIndex: 0)
@@ -36,12 +40,12 @@ class ParameterObjectParameterHolderTests extends GroovyTestCase {
         ParameterHolder p1 = holder.classifierParameters.find {entry -> entry.key == "p1"}.value
         assertNotNull p1
 
-        assertEquals 1, p1.businessObject
+        assertEquals 1d, p1.businessObject, 0d
 
         ParameterHolder p2 = holder.classifierParameters.find {entry -> entry.key == "p2"}.value
         assertNotNull p2
 
-        assertEquals 0.1, p2.businessObject
+        assertEquals 0.1, p2.businessObject, 0d
 
         assertFalse holder.hasParameterChanged()
         p1.value = 2
@@ -63,15 +67,16 @@ class ParameterObjectParameterHolderTests extends GroovyTestCase {
         p1 = holder.classifierParameters.find {entry -> entry.key == "p1"}.value
         assertNotNull p1
 
-        assertEquals 2, p1.businessObject
+        assertEquals 2, p1.businessObject, 0
 
         p2 = holder.classifierParameters.find {entry -> entry.key == "p2"}.value
         assertNotNull p2
 
-        assertEquals 0.2, p2.businessObject
+        assertEquals 0.2, p2.businessObject, 0
 
     }
 
+    @Test
     void testApplyWithLessEntries() {
         ParameterObjectParameter parameter = new ParameterObjectParameter(path: 'path', periodIndex: 0)
         parameter.type = new EnumParameter(parameterType: ExampleParameterObjectClassifier.getName(), parameterValue: "TYPE2", path: 'path', periodIndex: 0)
@@ -109,6 +114,7 @@ class ParameterObjectParameterHolderTests extends GroovyTestCase {
         assertNull holder.classifierParameters.find {entry -> entry.key == "p3"}
     }
 
+    @Test
     void testApplyWithAdditionalEntries() {
         ParameterObjectParameter parameter = new ParameterObjectParameter(path: 'path', periodIndex: 0)
         parameter.type = new EnumParameter(parameterType: ExampleParameterObjectClassifier.getName(), parameterValue: "TYPE1", path: 'path', periodIndex: 0)
@@ -146,6 +152,7 @@ class ParameterObjectParameterHolderTests extends GroovyTestCase {
 
     }
 
+    @Test
     void testUpdateValue() {
         ParameterObjectParameter parameter = new ParameterObjectParameter(path: 'path', periodIndex: 0)
         parameter.type = new EnumParameter(parameterType: ExampleParameterObjectClassifier.getName(), parameterValue: "TYPE1", path: 'path', periodIndex: 0)
@@ -159,12 +166,13 @@ class ParameterObjectParameterHolderTests extends GroovyTestCase {
         assertEquals ExampleParameterObjectClassifier.TYPE0, holder.classifier
         assertEquals 2, holder.classifierParameters.size()
         assertTrue holder.classifierParameters.containsKey("a")
-        assertEquals 10, holder.classifierParameters.get("a").businessObject
+        assertEquals 10d, holder.classifierParameters.get("a").businessObject, 0d
 
         assertTrue holder.classifierParameters.containsKey("b")
-        assertEquals 100, holder.classifierParameters.get("b").businessObject
+        assertEquals 100, holder.classifierParameters.get("b").businessObject, 0d
     }
 
+    @Test
     void testUpdateValueKeepExistingValues() {
         ParameterObjectParameter parameter = new ParameterObjectParameter(path: 'path', periodIndex: 0)
         parameter.type = new EnumParameter(parameterType: ExampleParameterObjectClassifier.getName(), parameterValue: "TYPE1", path: 'path', periodIndex: 0)
@@ -179,13 +187,14 @@ class ParameterObjectParameterHolderTests extends GroovyTestCase {
         assertEquals 3, holder.classifierParameters.size()
 
         assertTrue holder.classifierParameters.containsKey("p1")
-        assertEquals 22, holder.classifierParameters.get("p1").businessObject
+        assertEquals 22d, holder.classifierParameters.get("p1").businessObject, 0d
 
         assertTrue holder.classifierParameters.containsKey("p2")
-        assertEquals 33, holder.classifierParameters.get("p2").businessObject
+        assertEquals 33, holder.classifierParameters.get("p2").businessObject, 0d
 
     }
 
+    @Test
     void testUpdateValueReplaceExistingValuesWithDifferentTypes() {
         ParameterObjectParameter parameter = new ParameterObjectParameter(path: 'path', periodIndex: 0)
         parameter.type = new EnumParameter(parameterType: ExampleParameterObjectClassifier.getName(), parameterValue: "TYPE2", path: 'path', periodIndex: 0)
@@ -201,17 +210,18 @@ class ParameterObjectParameterHolderTests extends GroovyTestCase {
         assertEquals 3, holder.classifierParameters.size()
 
         assertTrue holder.classifierParameters.containsKey("p1")
-        assertEquals 22, holder.classifierParameters.get("p1").businessObject
+        assertEquals 22d, holder.classifierParameters.get("p1").businessObject, 0d
 
         assertTrue holder.classifierParameters.containsKey("p2")
-        assertEquals 33, holder.classifierParameters.get("p2").businessObject
+        assertEquals 33, holder.classifierParameters.get("p2").businessObject, 0d
 
         assertTrue holder.classifierParameters.containsKey("p3")
         //should be the default value, because we don't want to keep the value if it has the same name, but is a different type
-        assertEquals 2d, holder.classifierParameters.get("p3").businessObject
+        assertEquals 2d, holder.classifierParameters.get("p3").businessObject, 0d
 
     }
 
+    @Test
     void testHasParameterChanged() {
         ParameterObjectParameterHolder holder = ParameterHolderFactory.getHolder("path", 0, ExampleParameterObjectClassifier.getStrategy(ExampleParameterObjectClassifier.TYPE0, ["a": 0, "b": 1]))
 

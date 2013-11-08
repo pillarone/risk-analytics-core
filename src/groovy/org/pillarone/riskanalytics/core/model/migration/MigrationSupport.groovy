@@ -15,7 +15,6 @@ abstract class MigrationSupport extends AbstractMigration {
     private Model currentSource
     private Model currentTarget
 
-    @CompileStatic
     MigrationSupport(VersionNumber from, VersionNumber to, Class modelClass) {
         super(from, to, modelClass)
     }

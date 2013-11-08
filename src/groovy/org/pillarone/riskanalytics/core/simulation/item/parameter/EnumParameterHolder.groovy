@@ -9,12 +9,10 @@ class EnumParameterHolder extends ParameterHolder {
 
     private Enum value
 
-    @CompileStatic
     public EnumParameterHolder(Parameter parameter) {
         super(parameter);
     }
 
-    @CompileStatic
     public EnumParameterHolder(String path, int periodIndex, Enum value) {
         super(path, periodIndex);
         this.value = value;

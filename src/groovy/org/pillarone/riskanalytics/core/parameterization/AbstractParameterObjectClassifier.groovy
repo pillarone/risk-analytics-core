@@ -11,12 +11,10 @@ abstract class AbstractParameterObjectClassifier implements IParameterObjectClas
     protected String typeName
 
 
-    @CompileStatic
     public AbstractParameterObjectClassifier(String typeName, Map parameters) {
         this(typeName, typeName, parameters)
     }
 
-    @CompileStatic
     public AbstractParameterObjectClassifier(String displayName, String typeName, Map parameters) {
         this.displayName = displayName
         this.typeName = typeName

@@ -8,12 +8,10 @@ class BooleanParameterHolder extends ParameterHolder {
 
     private boolean value;
 
-    @CompileStatic
     public BooleanParameterHolder(Parameter parameter) {
         super(parameter);
     }
 
-    @CompileStatic
     public BooleanParameterHolder(String path, int periodIndex, boolean value) {
         super(path, periodIndex);
         this.value = value;

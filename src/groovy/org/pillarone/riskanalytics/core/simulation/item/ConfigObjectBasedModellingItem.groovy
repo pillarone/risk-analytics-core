@@ -14,7 +14,6 @@ abstract class ConfigObjectBasedModellingItem extends ModellingItem {
     VersionNumber versionNumber
     String comment
 
-    @CompileStatic
     public ConfigObjectBasedModellingItem(String name) {
         super(name);
         versionNumber = new VersionNumber('1')

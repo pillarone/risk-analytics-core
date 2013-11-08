@@ -17,7 +17,6 @@ class BatchRunInfoService {
     List<BatchRunSimulationRun> runningBatchSimulationRuns
     List<Simulation> finishedSimulations
 
-    @CompileStatic
     public BatchRunInfoService() {
         runningBatchSimulationRuns = []
         finishedSimulations = []

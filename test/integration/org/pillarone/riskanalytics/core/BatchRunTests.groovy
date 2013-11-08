@@ -1,6 +1,8 @@
 package org.pillarone.riskanalytics.core
 
+import org.junit.Before
 import org.junit.Test
+import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.output.batch.BatchRunner
 import org.pillarone.riskanalytics.core.output.OutputStrategy
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
@@ -17,6 +19,12 @@ import static org.junit.Assert.*
  */
 
 class BatchRunTests extends SimulationTests {
+
+    @Before
+    public void xyz() {
+        int x = ResultConfigurationDAO.count()
+        println()
+    }
 
     @Test
     public void testAddSimulationRun() {

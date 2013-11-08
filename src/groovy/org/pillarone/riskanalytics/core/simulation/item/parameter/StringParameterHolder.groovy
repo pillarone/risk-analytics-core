@@ -8,12 +8,10 @@ class StringParameterHolder extends ParameterHolder {
 
     private String value;
 
-    @CompileStatic
     public StringParameterHolder(Parameter parameter) {
         super(parameter);
     }
 
-    @CompileStatic
     public StringParameterHolder(String path, int periodIndex, String value) {
         super(path, periodIndex);
         this.value = value;

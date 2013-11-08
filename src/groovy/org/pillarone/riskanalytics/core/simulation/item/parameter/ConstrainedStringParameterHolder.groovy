@@ -9,12 +9,10 @@ class ConstrainedStringParameterHolder extends ParameterHolder implements IMarke
 
     private ConstrainedString value;
 
-    @CompileStatic
     public ConstrainedStringParameterHolder(Parameter parameter) {
         super(parameter);
     }
 
-    @CompileStatic
     public ConstrainedStringParameterHolder(String path, int periodIndex, ConstrainedString value) {
         super(path, periodIndex);
         this.value = value;

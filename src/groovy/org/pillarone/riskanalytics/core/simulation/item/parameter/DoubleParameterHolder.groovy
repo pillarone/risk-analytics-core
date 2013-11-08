@@ -8,12 +8,10 @@ class DoubleParameterHolder extends ParameterHolder {
 
     private double value;
 
-    @CompileStatic
     public DoubleParameterHolder(Parameter parameter) {
         super(parameter);
     }
 
-    @CompileStatic
     public DoubleParameterHolder(String path, int periodIndex, double value) {
         super(path, periodIndex);
         this.value = value;

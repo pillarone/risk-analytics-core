@@ -20,7 +20,6 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
     IParameterObjectClassifier classifier
     Map<String, ParameterHolder> classifierParameters
 
-    @CompileStatic
     public ParameterObjectParameterHolder(Parameter parameter) {
         super(parameter);
     }

@@ -28,7 +28,6 @@ abstract class ModellingItem implements Serializable {
     public def id
     protected boolean loaded
 
-    @CompileStatic
     public ModellingItem(String name) {
         this.name = name;
         itemChangedListener = []

@@ -8,7 +8,6 @@ class ModelItem extends ModellingItem {
     VersionNumber versionNumber
     String srcCode
 
-    @CompileStatic
     public ModelItem(String name) {
         super(name)
         versionNumber = new VersionNumber('1')

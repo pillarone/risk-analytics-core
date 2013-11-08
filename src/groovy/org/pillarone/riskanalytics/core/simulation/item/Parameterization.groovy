@@ -65,7 +65,6 @@ class Parameterization extends ParametrizedItem {
         }
     }
 
-    @CompileStatic
     public Parameterization(String name) {
         super(name)
         setName(name)
@@ -75,7 +74,6 @@ class Parameterization extends ParametrizedItem {
         periodCount = 1
     }
 
-    @CompileStatic
     public Parameterization(String name, Class modelClass) {
         this(name)
         this.modelClass = modelClass

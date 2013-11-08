@@ -16,7 +16,6 @@ abstract class CommentableItem extends ModellingItem {
 
     List<Comment> comments
 
-    @CompileStatic
     public CommentableItem(String name) {
         super(name)
         comments = []

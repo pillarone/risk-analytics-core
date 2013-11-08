@@ -2,8 +2,11 @@ package org.pillarone.riskanalytics.core.simulation.item
 
 import models.core.CoreModel
 import org.joda.time.DateTime
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.pillarone.riskanalytics.core.ModelDAO
+import org.pillarone.riskanalytics.core.ModelStructureDAO
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
@@ -28,6 +31,15 @@ class SimulationTests {
     @Before
     void setUp() {
         FileImportService.importModelsIfNeeded(["Core"])
+    }
+
+    @After
+    void cleanUp() {
+        SimulationRun.list()*.delete()
+        ParameterizationDAO.list()*.delete()
+        ResultConfigurationDAO.list()*.delete()
+        ModelStructureDAO.list()*.delete()
+        ModelDAO.list()*.delete()
     }
 
     protected ParameterizationDAO createParameterization() {

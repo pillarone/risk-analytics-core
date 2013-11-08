@@ -13,12 +13,10 @@ class ResourceParameterHolder extends ParameterHolder {
     Class resourceClass
 
 
-    @CompileStatic
     ResourceParameterHolder(Parameter parameter) {
         super(parameter)
     }
 
-    @CompileStatic
     ResourceParameterHolder(String path, int periodIndex, Resource resource) {
         super(path, periodIndex)
         name = resource.name

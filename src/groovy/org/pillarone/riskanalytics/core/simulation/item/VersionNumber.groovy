@@ -10,7 +10,6 @@ class VersionNumber implements Comparable, Cloneable, Serializable {
     List<Integer> versionNumbers
     boolean workflow = false
 
-    @CompileStatic
     public VersionNumber(String version) {
         parse(version)
     }

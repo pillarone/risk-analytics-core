@@ -28,7 +28,6 @@ class Resource extends ParametrizedItem {
     List validationErrors
     Status status
 
-    @CompileStatic
     Resource(String name, Class resourceClass) {
         super(name)
         this.modelClass = resourceClass

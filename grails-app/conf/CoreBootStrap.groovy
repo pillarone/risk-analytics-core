@@ -31,15 +31,15 @@ class CoreBootStrap {
         //All mappings must be persistent before a simulation is started
         CollectorMapping.withTransaction { status ->
             CollectorMapping mapping = new CollectorMapping(collectorName: SingleValueCollectingModeStrategy.IDENTIFIER)
-            if (CollectorMapping.find(mapping) == null) {
+            if (CollectorMapping.findByCollectorName(mapping.collectorName) == null) {
                 mapping.save()
             }
             mapping = new CollectorMapping(collectorName: AggregatedCollectingModeStrategy.IDENTIFIER)
-            if (CollectorMapping.find(mapping) == null) {
+            if (CollectorMapping.findByCollectorName(mapping.collectorName) == null) {
                 mapping.save()
             }
             mapping = new CollectorMapping(collectorName: AggregatedWithSingleAvailableCollectingModeStrategy.IDENTIFIER)
-            if (CollectorMapping.find(mapping) == null) {
+            if (CollectorMapping.findByCollectorName(mapping.collectorName) == null) {
                 mapping.save()
             }
         }

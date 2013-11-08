@@ -27,7 +27,6 @@ public class ModelMigrator {
         }
     }
 
-    @CompileStatic
     public ModelMigrator(Class<? extends MigratableModel> modelClass) {
         this.modelClass = modelClass
         toVersion = Model.getModelVersion(modelClass);

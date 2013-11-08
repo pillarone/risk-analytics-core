@@ -15,7 +15,6 @@ class ResultConfiguration extends ModellingItem {
     VersionNumber modelVersionNumber
     List<PacketCollector> collectors
 
-    @CompileStatic
     public ResultConfiguration(String name) {
         super(name)
         versionNumber = new VersionNumber("1")

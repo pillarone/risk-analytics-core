@@ -13,7 +13,6 @@ import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 public class ModelStructure extends ConfigObjectBasedModellingItem {
     protected static final Log LOG = LogFactory.getLog(ModelStructure)
 
-    @CompileStatic
     public ModelStructure(String name) {
         super(name)
     }

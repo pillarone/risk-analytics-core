@@ -12,12 +12,10 @@ class MultiDimensionalParameterHolder extends ParameterHolder implements IMarker
 
     private AbstractMultiDimensionalParameter value;
 
-    @CompileStatic
     public MultiDimensionalParameterHolder(Parameter parameter) {
         super(parameter);
     }
 
-    @CompileStatic
     public MultiDimensionalParameterHolder(String path, int periodIndex, AbstractMultiDimensionalParameter value) {
         super(path, periodIndex);
         this.value = value;

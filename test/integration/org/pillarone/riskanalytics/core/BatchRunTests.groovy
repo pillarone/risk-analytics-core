@@ -1,30 +1,24 @@
 package org.pillarone.riskanalytics.core
 
-import org.junit.Before
+import models.core.CoreModel
+import org.joda.time.DateTime
 import org.junit.Test
+import org.pillarone.riskanalytics.core.example.model.EmptyModel
+import org.pillarone.riskanalytics.core.output.OutputStrategy
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.output.batch.BatchRunner
-import org.pillarone.riskanalytics.core.output.OutputStrategy
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
-import org.pillarone.riskanalytics.core.simulation.item.SimulationTests
-import org.pillarone.riskanalytics.core.example.model.EmptyModel
-import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.workflow.Status
 
 import static org.junit.Assert.*
-
 /**
  * @author fouad jaada
  */
 
-class BatchRunTests extends SimulationTests {
+class BatchRunTests {
 
-    @Before
-    public void xyz() {
-        int x = ResultConfigurationDAO.count()
-        println()
-    }
 
     @Test
     public void testAddSimulationRun() {
@@ -166,6 +160,24 @@ class BatchRunTests extends SimulationTests {
         simulation.numberOfIterations = 10
         simulation.modelClass = EmptyModel
         return simulation
+    }
+
+    protected ParameterizationDAO createParameterization() {
+        ParameterizationDAO params = new ParameterizationDAO(name: 'params')
+        params.modelClassName = CoreModel.name
+        params.itemVersion = '1'
+        params.periodCount = 1
+        params.status = Status.NONE
+        assertNotNull "params not saved", params.save()
+        params
+    }
+
+    protected ResultConfigurationDAO createResultConfiguration() {
+        ResultConfigurationDAO template = new ResultConfigurationDAO(name: 'template')
+        template.modelClassName = CoreModel.name
+        template.itemVersion = '1'
+        assertNotNull "template not saved", template.save()
+        template
     }
 
 

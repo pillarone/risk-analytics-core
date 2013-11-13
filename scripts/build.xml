@@ -103,8 +103,9 @@
         <antcall target="_beforeReleasePlugin"/>
         <exec executable="${grails}" failonerror="true" resolveexecutable="true">
             <arg value="--non-interactive"/>
-            <arg value="deploy-plugin"/>
+            <arg value="publish-plugin"/>
             <arg value="--repository=${release.repository}"/>
+            <arg value="--no-overwrite"/>
             <env key="GRAILS_HOME" value="${GRAILS_HOME}"/>
         </exec>
     </target>

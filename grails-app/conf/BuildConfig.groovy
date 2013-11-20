@@ -4,7 +4,9 @@ grails.project.plugins.dir = "../local-plugins/RiskAnalyticsCore-master"
 grails.project.dependency.resolver = "maven"
 
 grails.project.dependency.resolution = {
-    inherits "global" // inherit Grails' default dependencies
+    inherits ("global") { // inherit Grails' default dependencies
+        excludes "grails-plugin-testing"
+    }
     log "warn"
 
     repositories {
@@ -54,6 +56,13 @@ grails.project.dependency.resolution = {
         runtime("jboss:jboss-serialization:4.2.2.GA")
         runtime("trove:trove:1.0.2")
         runtime("org.fusesource.jansi:jansi:1.2.1")
+        compile 'commons-cli:commons-cli:1.2'
+        compile 'it.sauronsoftware.cron4j:cron4j:2.2.5'
+        compile 'com.google.collections:google-collections:1.0'
+        compile 'ca.umontreal.iro:ssj:2.4'
+        compile 'org.gridgain:gridgain:3.6.0c'
+        test("org.grails:grails-plugin-testing:2.2.3.FIXED")
+        test("org.springframework:spring-test:3.2.4.RELEASE")
     }
 }
 

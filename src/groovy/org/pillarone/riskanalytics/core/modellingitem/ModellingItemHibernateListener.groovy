@@ -49,7 +49,7 @@ class ModellingItemHibernateListener implements PostInsertEventListener, PostUpd
     }
 
     void onPostDelete(PostDeleteEvent postDeleteEvent) {
-        ModellingItem item = ModellingItemMapper.getModellingItem(postDeleteEvent.entity)
+        ModellingItem item = ModellingItemMapper.getModellingItem(postDeleteEvent.entity, false)
         if (item != null) {
             for (ModellingItemListener listener : _listeners) {
                 listener.modellingItemDeleted(item)

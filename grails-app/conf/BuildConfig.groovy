@@ -2,6 +2,7 @@
 grails.project.plugins.dir = "../local-plugins/RiskAnalyticsCore-master"
 
 grails.project.dependency.resolver = "maven"
+grails.project.plugin.includeSource = false
 
 grails.project.dependency.resolution = {
     inherits ("global") { // inherit Grails' default dependencies

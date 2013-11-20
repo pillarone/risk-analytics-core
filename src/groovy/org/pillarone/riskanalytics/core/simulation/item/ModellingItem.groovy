@@ -142,7 +142,7 @@ abstract class ModellingItem implements Serializable {
     }
 
     protected void logErrors(def dao) {
-        if (dao.hasErrors()) {
+        if (dao?.hasErrors()) {
             dao.errors.each {
                 LOG.error(it)
             }

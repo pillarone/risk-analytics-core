@@ -59,13 +59,10 @@ abstract class ResultAccessor {
             IterationFileAccessor ifa = new IterationFileAccessor(new File(GridHelper.getResultPathLocation(simulationRun.id, descriptor.path.id, descriptor.field.id, descriptor.collector.id, descriptor.period)));
             while (ifa.fetchNext()) {
                 for (DateTimeValuePair pair in ifa.getSingleValues()) {
-                    fileContent.
-                            append([ifa.iteration, descriptor.period, descriptor.path.pathName, descriptor.field.fieldName, pair.aDouble, descriptor.collector.collectorName, formatter.print(new DateTime(pair.dateTime))].join(",")).
-                            append("\n")
+                    file.append([ifa.iteration, descriptor.period, descriptor.path.pathName, descriptor.field.fieldName, pair.aDouble, descriptor.collector.collectorName, formatter.print(new DateTime(pair.dateTime))].join(",") + "\n")
                 }
             }
         }
-        file.text = fileContent.toString()
         return fileName
     }
 

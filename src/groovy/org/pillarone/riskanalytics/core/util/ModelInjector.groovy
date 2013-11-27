@@ -37,7 +37,7 @@ abstract class ModelInjector {
         if (!configObject.containsKey("model")) {
             throw new IllegalArgumentException("Configuration error in file ${configurationFileName}. No model specified.")
         }
-        if ((getClass().getClassLoader().loadClass(configObject.model.name).name != model.getModelClass().name)) {
+        if ((Thread.currentThread().contextClassLoader.loadClass(configObject.model.name).name != model.getModelClass().name)) {
             throw new IllegalArgumentException("Configuration error in file ${configurationFileName}. ${configObject.model} does not match model.")
         }
     }

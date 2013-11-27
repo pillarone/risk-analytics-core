@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.fileimport
 
+import org.junit.Before
 import org.junit.Test
 import org.pillarone.riskanalytics.core.ModelStructureDAO
 
@@ -10,6 +11,11 @@ class ModelStructureImportServiceTests {
 
     private FileImportService getService() {
         return new ModelStructureImportService()
+    }
+
+    @Before
+    void setup() {
+        ModelStructureDAO.list()*.delete()
     }
 
     @Test

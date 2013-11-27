@@ -29,7 +29,7 @@ abstract class AbstractCalculationsBulkInsert extends AbstractBulkInsert {
         if (!bulkClass) {
             return new GenericBulkInsert()
         }
-        return AbstractCalculationsBulkInsert.classLoader.loadClass(bulkClass.name).newInstance()
+        return Thread.currentThread().contextClassLoader.loadClass(bulkClass.name).newInstance()
     }
 
 }

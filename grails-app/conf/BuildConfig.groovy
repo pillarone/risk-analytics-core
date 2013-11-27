@@ -27,7 +27,6 @@ grails.project.dependency.resolution = {
             exclude "groovy"
         }
         runtime ":quartz:0.4.2"
-        runtime ":spring-security-core:2.0-RC2"
         runtime ":tomcat:7.0.42"
 
         test ":code-coverage:1.2.6"
@@ -35,6 +34,8 @@ grails.project.dependency.resolution = {
     }
 
     dependencies {
+        compile 'org.grails.plugins:spring-security-core:2.0-RC2-BINARY'
+
         runtime 'net.sf.jasperreports:jasperreports:4.0.1', {
             excludes "xml-apis", "commons-collections"
         }
@@ -60,6 +61,8 @@ grails.project.dependency.resolution = {
         compile 'com.google.collections:google-collections:1.0'
         compile 'ca.umontreal.iro:ssj:2.4'
         compile 'org.gridgain:gridgain:3.6.0c'
+        compile 'colt:colt:1.2.0'
+
         test("org.grails:grails-plugin-testing:2.2.3.FIXED")
         test("org.springframework:spring-test:3.2.4.RELEASE")
     }
@@ -75,7 +78,7 @@ grails.project.dependency.distribution = {
 
         user = properties.get("user")
         password = properties.get("password")
-        scpUrl = properties.get("url")
+        scpUrl = 'http://www.google.de'
     } catch (Throwable t) {
     }
     remoteRepository(id: "pillarone", url: scpUrl) {

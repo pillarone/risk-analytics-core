@@ -64,7 +64,7 @@ class ModelFileImportService extends FileImportService {
         } else if (components.empty) {
             throw new IllegalStateException("Model class not found for $fileName")
         } else {
-            return getClass().getClassLoader().loadClass(components.first().beanClassName)
+            return Thread.currentThread().contextClassLoader.loadClass(components.first().beanClassName)
         }
     }
 }

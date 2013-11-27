@@ -10,7 +10,7 @@ class ModellingItemMapper {
     static Parameterization getModellingItem(ParameterizationDAO detachedDao) {
         ParameterizationDAO.withNewSession {
             ParameterizationDAO dao = ParameterizationDAO.get(detachedDao.id) ?: detachedDao
-            Parameterization parameterization = new Parameterization(dao.name, ModellingItemMapper.classLoader.loadClass(dao.modelClassName))
+            Parameterization parameterization = new Parameterization(dao.name, Thread.currentThread().contextClassLoader.loadClass(dao.modelClassName))
             parameterization.id = dao.id
             parameterization.versionNumber = new VersionNumber(dao.itemVersion)
             parameterization.creationDate = dao.creationDate
@@ -28,7 +28,7 @@ class ModellingItemMapper {
     static ResultConfiguration getModellingItem(ResultConfigurationDAO dao) {
         ResultConfiguration resultConfiguration = new ResultConfiguration(dao.name)
         resultConfiguration.id = dao.id
-        resultConfiguration.modelClass = ModellingItemMapper.classLoader.loadClass(dao.modelClassName)
+        resultConfiguration.modelClass = Thread.currentThread().contextClassLoader.loadClass(dao.modelClassName)
         resultConfiguration.versionNumber = new VersionNumber(dao.itemVersion)
         resultConfiguration.creationDate = dao.creationDate
         resultConfiguration.modificationDate = dao.modificationDate
@@ -48,7 +48,7 @@ class ModellingItemMapper {
                 simulation.parameterization = getModellingItem(dao.parameterization)
                 simulation.template = getModellingItem(dao.resultConfiguration)
             }
-            simulation.modelClass = ModellingItemMapper.classLoader.loadClass(dao.model)
+            simulation.modelClass = Thread.currentThread().contextClassLoader.loadClass(dao.model)
             simulation.tags = dao.tags*.tag
             simulation.end = dao.endTime
             simulation.start = dao.startTime
@@ -62,7 +62,7 @@ class ModellingItemMapper {
     static Resource getModellingItem(ResourceDAO detachedDao) {
         ResourceDAO.withNewSession {
             ResourceDAO dao = ResourceDAO.get(detachedDao.id) ?: detachedDao
-            Resource resource = new Resource(dao.name, ModellingItemMapper.classLoader.loadClass(dao.resourceClassName))
+            Resource resource = new Resource(dao.name, Thread.currentThread().contextClassLoader.loadClass(dao.resourceClassName))
             resource.id = dao.id
             resource.versionNumber = new VersionNumber(dao.itemVersion)
             resource.creationDate = dao.creationDate

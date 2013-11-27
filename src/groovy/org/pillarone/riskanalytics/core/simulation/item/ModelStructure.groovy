@@ -53,7 +53,7 @@ public class ModelStructure extends ConfigObjectBasedModellingItem {
 
         modelClassNames.each {
             try {
-                Class modelClass = Model.class.classLoader.loadClass(it)
+                Class modelClass = Thread.currentThread().contextClassLoader.loadClass(it)
                 if (!modelFilter || modelFilter.contains(modelClass.simpleName)) {
                     availableModelClasses << modelClass
                 }

@@ -29,7 +29,7 @@ grails.project.dependency.resolution = {
         runtime ":quartz:0.4.2"
         runtime ":tomcat:7.0.42"
 
-        test ":code-coverage:1.2.6"
+        test ":code-coverage:1.2.7"
         runtime ":database-migration:1.3.6"
     }
 
@@ -78,7 +78,7 @@ grails.project.dependency.distribution = {
 
         user = properties.get("user")
         password = properties.get("password")
-        scpUrl = 'http://www.google.de'
+        scpUrl = properties.get("url")
     } catch (Throwable t) {
     }
     remoteRepository(id: "pillarone", url: scpUrl) {

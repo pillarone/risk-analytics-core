@@ -85,7 +85,7 @@ abstract class MigrationSupport extends AbstractMigration {
 
     @CompileStatic
     protected ClassLoader getNewModelClassLoader() {
-        currentTarget.getClass().getClassLoader()
+        Thread.currentThread().contextClassLoader
     }
 
 }

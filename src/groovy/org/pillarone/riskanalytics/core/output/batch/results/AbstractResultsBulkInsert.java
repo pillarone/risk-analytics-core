@@ -65,7 +65,7 @@ public abstract class AbstractResultsBulkInsert extends AbstractBulkInsert {
             if (bulkClass == null) {
                 return new GenericBulkInsert();
             }
-            return (AbstractResultsBulkInsert) AbstractResultsBulkInsert.class.getClassLoader().loadClass(bulkClass.getName()).newInstance();
+            return (AbstractResultsBulkInsert) Thread.currentThread().getContextClassLoader().loadClass(bulkClass.getName()).newInstance();
         } catch (Exception e) {
             return new GenericBulkInsert();
         }

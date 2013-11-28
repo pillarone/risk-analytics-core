@@ -176,7 +176,7 @@ class ParameterObjectParameterHolder extends ParameterHolder implements IMarkerV
         String classifierClass = inStream.readObject()
         String classifierType = inStream.readObject()
 
-        Class clazz = getClass().getClassLoader().loadClass(classifierClass)
+        Class clazz = Thread.currentThread().contextClassLoader.loadClass(classifierClass)
         this.classifier = clazz.valueOf(classifierType)
 
         classifierParameters = inStream.readObject()

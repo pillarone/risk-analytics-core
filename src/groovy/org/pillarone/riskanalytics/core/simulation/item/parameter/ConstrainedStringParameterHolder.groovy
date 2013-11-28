@@ -20,7 +20,7 @@ class ConstrainedStringParameterHolder extends ParameterHolder implements IMarke
 
     @Override
     void setParameter(Parameter parameter) {
-        this.value = new ConstrainedString(getClass().getClassLoader().loadClass(parameter.markerClass), parameter.parameterValue)
+        this.value = new ConstrainedString(Thread.currentThread().contextClassLoader.loadClass(parameter.markerClass), parameter.parameterValue)
     }
 
     @CompileStatic

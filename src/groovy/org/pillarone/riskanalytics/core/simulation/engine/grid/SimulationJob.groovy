@@ -49,9 +49,9 @@ class SimulationJob extends GridJobAdapterEx {
             TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
 
             //***** https://issuetracking.intuitive-collaboration.com/jira/browse/KTI-15
-            getClass().getClassLoader().loadClass("java.lang.Character")
-            getClass().getClassLoader().loadClass("java.lang.reflect.InvocationTargetException")
-            getClass().getClassLoader().loadClass("org.pillarone.riskanalytics.core.components.ComponentUtils")
+            Thread.currentThread().contextClassLoader.loadClass("java.lang.Character")
+            Thread.currentThread().contextClassLoader.loadClass("java.lang.reflect.InvocationTargetException")
+            Thread.currentThread().contextClassLoader.loadClass("org.pillarone.riskanalytics.core.components.ComponentUtils")
             //***** http://www.gridgainsystems.com/jiveforums/thread.jspa?threadID=1324&tstart=0
 
             for(Map.Entry<Class, IPacketAggregator> entry in aggregatorMap.entrySet()) {

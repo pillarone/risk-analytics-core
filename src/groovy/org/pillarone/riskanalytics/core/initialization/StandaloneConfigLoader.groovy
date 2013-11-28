@@ -23,7 +23,7 @@ class StandaloneConfigLoader {
     }
 
     private static ConfigObject loadConfig(String environment) {
-        Class configClass = StandaloneConfigLoader.class.getClassLoader().loadClass(GrailsApplication.CONFIG_CLASS)
+        Class configClass = Thread.currentThread().contextClassLoader.loadClass(GrailsApplication.CONFIG_CLASS)
 
         ConfigSlurper configSlurper = new ConfigSlurper(environment)
         ConfigObject configObject = configSlurper.parse(configClass)

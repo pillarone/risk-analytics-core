@@ -132,7 +132,7 @@ class Resource extends ParametrizedItem {
         creationDate = dao.creationDate
         modificationDate = dao.modificationDate
         valid = dao.valid
-        modelClass = getClass().getClassLoader().loadClass(dao.resourceClassName)
+        modelClass = Thread.currentThread().contextClassLoader.loadClass(dao.resourceClassName)
         creator = dao.creator
         lastUpdater = dao.lastUpdater
         status = dao.status

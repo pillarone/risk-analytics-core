@@ -57,6 +57,7 @@ class ModellingItemMapper {
             simulation.creationDate = dao.creationDate
             simulation.modificationDate = dao.modificationDate
             simulation.creator = dao.creator
+            simulation.numberOfIterations = dao.iterations
             return simulation
         }
     }

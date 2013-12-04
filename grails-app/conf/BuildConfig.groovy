@@ -1,3 +1,7 @@
+import org.codehaus.groovy.grails.io.support.UrlResource
+import org.codehaus.groovy.grails.plugins.BasicGrailsPluginInfo
+import org.codehaus.groovy.grails.plugins.GrailsPluginInfo
+
 //Use a custom plugins dir, because different branches use different plugin versions
 grails.project.plugins.dir = "../local-plugins/RiskAnalyticsCore-master"
 
@@ -63,11 +67,16 @@ grails.project.dependency.distribution = {
     String scpUrl = ""
     try {
         Properties properties = new Properties()
+        String version = new GroovyClassLoader().loadClass('RiskAnalyticsCoreGrailsPlugin').newInstance().version
         properties.load(new File("${userHome}/deployInfo.properties").newInputStream())
-
         user = properties.get("user")
         password = properties.get("password")
-        scpUrl = properties.get("url")
+
+        if (version?.endsWith('-SNAPSHOT')){
+            scpUrl = properties.get("url")
+        }else {
+            scpUrl = properties.get("urlSnapshot")
+        }
     } catch (Throwable t) {
     }
     remoteRepository(id: "pillarone", url: scpUrl) {

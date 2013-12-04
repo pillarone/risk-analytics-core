@@ -73,9 +73,9 @@ grails.project.dependency.distribution = {
         password = properties.get("password")
 
         if (version?.endsWith('-SNAPSHOT')){
-            scpUrl = properties.get("url")
-        }else {
             scpUrl = properties.get("urlSnapshot")
+        }else {
+            scpUrl = properties.get("url")
         }
     } catch (Throwable t) {
     }

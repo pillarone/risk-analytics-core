@@ -10,7 +10,6 @@ import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.parameter.comment.workflow.IssueStatus
 import org.pillarone.riskanalytics.core.parameterization.ParameterizationHelper
-import org.pillarone.riskanalytics.core.remoting.ITransactionService
 import org.pillarone.riskanalytics.core.remoting.TransactionInfo
 import org.pillarone.riskanalytics.core.remoting.impl.RemotingUtils
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
@@ -166,8 +165,7 @@ class StatusChangeService {
 
     @CompileStatic
     private String getTransactionName(long dealId) {
-        ITransactionService service = RemotingUtils.getTransactionService()
-        service.allTransactions.find { TransactionInfo it -> it.dealId == dealId }.name
+        return RemotingUtils.allTransactions.find { TransactionInfo it -> it.dealId == dealId }.name
     }
 }
 

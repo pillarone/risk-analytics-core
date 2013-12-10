@@ -24,4 +24,8 @@ class RemotingUtils {
             ] as ITransactionService
         }
     }
+
+    public static List<TransactionInfo> getAllTransactions() {
+        return getTransactionService().allTransactions.sort { it.name }
+    }
 }

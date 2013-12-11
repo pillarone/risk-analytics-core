@@ -25,7 +25,7 @@ class StatusChangeServiceTests extends GroovyTestCase {
         assertNotSame newParameterization, parameterization
 
         assertEquals NONE, parameterization.status
-        assertEquals RemotingUtils.transactionService.allTransactions.find {it.dealId == newParameterization.dealId}.name, newParameterization.name
+        assertEquals RemotingUtils.allTransactions.find {it.dealId == newParameterization.dealId}.name, newParameterization.name
 
         assertEquals DATA_ENTRY, newParameterization.status
         assertEquals "R1", newParameterization.versionNumber.toString()

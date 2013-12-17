@@ -40,6 +40,7 @@ target(main: "Checks if the plugin is already deployed to maven and deploys if n
             uc.setRequestProperty("Authorization", basicAuth);
             int responseCode = uc.getResponseCode()
             if (responseCode == 200) {
+                println "Artefact $artefactPattern already exists in repo: $repo.url. Skip deploy"
                 return
             }
         }

@@ -10,7 +10,7 @@ class ModellingItemMapper {
     static Parameterization getModellingItem(ParameterizationDAO detachedDao) {
         ParameterizationDAO.withNewSession {
             ParameterizationDAO dao = ParameterizationDAO.get(detachedDao.id) ?: detachedDao
-            Parameterization parameterization = new Parameterization(dao.name, ModellingItemMapper.classLoader.loadClass(dao.modelClassName))
+            Parameterization parameterization = new Parameterization(dao.name, Thread.currentThread().contextClassLoader.loadClass(dao.modelClassName))
             parameterization.id = dao.id
             parameterization.versionNumber = new VersionNumber(dao.itemVersion)
             parameterization.creationDate = dao.creationDate

@@ -18,7 +18,7 @@ grails.project.dependency.resolution = {
     plugins {
         runtime ":background-thread:1.3"
         runtime ":hibernate:2.2.1"
-        runtime ":joda-time:0.5"
+        compile ":joda-time:0.5"
         runtime ":maven-publisher:0.7.5", {
             exclude "groovy"
         }

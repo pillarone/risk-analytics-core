@@ -57,6 +57,24 @@
         </delete>
     </target>
 
+    <target name="cleanLocal" depends="init" description="--> Cleans a Grails application">
+        <delete dir="${dist.dir}"/>
+
+        <mkdir dir="${dist.dir}"/>
+        <exec executable="${grails}" failonerror="true" resolveexecutable="true">
+            <arg value="cleanLocal"/>
+            <arg value="--non-interactive"/>
+            <env key="GRAILS_HOME" value="${GRAILS_HOME}"/>
+            <env key="JAVA_OPTS" value="${GRAILS_JVM_OPTS}"/>
+        </exec>
+        <delete verbose="true">
+            <fileset dir="." includes="*Db.script"/>
+            <fileset dir="." includes="**Db.properties"/>
+            <fileset dir="." includes="*.tsl"/>
+            <fileset dir="." includes="*.log"/>
+        </delete>
+    </target>
+
     <target name="clean-plugins"
             description="Removes all plugins files from the plugin dir. Useful for build servers to avoid grails trying to uninstall an old plugin after an upgrade.">
         <delete includeemptydirs="true" failonerror="false">

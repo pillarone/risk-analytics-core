@@ -65,6 +65,10 @@ class Parameterization extends ParametrizedItem {
         }
     }
 
+    void logAttemptToDelete(){
+        LOG.info("Deleting ${getClass().simpleName}: ${name} v${versionNumber} (status: ${status})")
+    }
+
     @CompileStatic
     public Parameterization(String name) {
         super(name)

@@ -52,7 +52,7 @@ class Parameterization extends ParametrizedItem {
     boolean orderByPath = false
     boolean valid
 
-    List validationErrors
+    List<ParameterValidation> parameterValidations
 
     Status status
     Long dealId
@@ -96,14 +96,24 @@ class Parameterization extends ParametrizedItem {
     }
 
     void validate() {
-        valid = false
-        List<ParameterValidation> errors = []
+        List<ParameterValidation> validations = []
         for (IParameterizationValidator validator in ValidatorRegistry.getValidators()) {
-            errors.addAll(validator.validate(parameterHolders.findAll { ParameterHolder it -> !it.removed }))
+            validations.addAll(validator.validate(parameterHolders.findAll { ParameterHolder it -> !it.removed }))
         }
 
-        valid = errors.empty || errors.every {ParameterValidation validation -> validation.validationType != ValidationType.ERROR}
-        validationErrors = errors
+        valid = validations.empty || validations.every {ParameterValidation validation -> validation.validationType != ValidationType.ERROR}
+        parameterValidations = validations
+    }
+
+    private String getErrors( List<ParameterValidation> validations ){
+        StringBuilder errors = new StringBuilder();
+        validations.each {
+            if( it.validationType == ValidationType.ERROR ){
+                errors.append( "Error msg: ${it.msg} for path ${it.path}; " )
+                // Eg Error msg: period.value.below.min.period for path structures:subOverall:parmContractStrategy:structure;
+            }
+        }
+        return errors.toString();
     }
 
     public save() {
@@ -111,8 +121,8 @@ class Parameterization extends ParametrizedItem {
         daoClass.withTransaction {TransactionStatus status ->
             def daoToBeSaved = getDao()
             validate()
-            if (!validationErrors.empty) {
-                LOG.warn("${daoToBeSaved} is not valid")
+            if (!valid) {
+                LOG.warn("${daoToBeSaved} has validation errors: [" + getErrors(parameterValidations) + "]")
             }
 
             setChangeUserInfo()

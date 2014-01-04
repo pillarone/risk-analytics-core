@@ -2,11 +2,14 @@ package org.pillarone.riskanalytics.core.simulation.item
 
 import groovy.transform.CompileStatic
 import org.apache.commons.lang.builder.HashCodeBuilder
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.pillarone.riskanalytics.core.model.MigratableModel
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.parameter.Parameter
@@ -33,6 +36,8 @@ import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 
 class Parameterization extends ParametrizedItem {
+
+    private static Log LOG = LogFactory.getLog(Parameterization)
 
     public static final String PERIOD_DATE_FORMAT = "yyyy-MM-dd"
 
@@ -67,6 +72,24 @@ class Parameterization extends ParametrizedItem {
 
     void logAttemptToDelete(){
         LOG.info("Deleting ${getClass().simpleName}: ${name} v${versionNumber} (status: ${status})")
+    }
+
+    //frahman 20140104 Convenience method for occasional checkups outside of model migrations.
+    //Can just call this during BootStrap against a copy of your DB and present your users with any errors.
+    //
+    static void warnAllPnValidationErrors( Class<? extends MigratableModel> modelClass ){
+        LOG.info("Checking all ${modelClass.name} Pns for validation errors")
+        for( ParameterizationDAO dao in ParameterizationDAO.findAllByModelClassName(modelClass.name) ){
+            Parameterization parameterization = new Parameterization(dao.name)
+            parameterization.versionNumber = new VersionNumber(dao.itemVersion)
+            parameterization.modelClass = modelClass
+            parameterization.load(true)
+            LOG.info("Validating ${parameterization.nameAndVersion} for errors")
+            parameterization.validate()
+            if( !parameterization.valid ){
+                LOG.warn("${parameterization.nameAndVersion} has validation errors: [" + parameterization.getValidationErrors() + "]")
+            }
+        }
     }
 
     @CompileStatic
@@ -105,9 +128,9 @@ class Parameterization extends ParametrizedItem {
         parameterValidations = validations
     }
 
-    private String getErrors( List<ParameterValidation> validations ){
+    String getValidationErrors(){
         StringBuilder errors = new StringBuilder();
-        validations.each {
+        parameterValidations.each {
             if( it.validationType == ValidationType.ERROR ){
                 errors.append( "Error msg: ${it.msg} for path ${it.path}; " )
                 // Eg Error msg: period.value.below.min.period for path structures:subOverall:parmContractStrategy:structure;
@@ -122,7 +145,7 @@ class Parameterization extends ParametrizedItem {
             def daoToBeSaved = getDao()
             validate()
             if (!valid) {
-                LOG.warn("${daoToBeSaved} has validation errors: [" + getErrors(parameterValidations) + "]")
+                LOG.warn("${daoToBeSaved} has validation errors: [" + getValidationErrors() + "]")
             }
 
             setChangeUserInfo()
@@ -338,6 +361,8 @@ class Parameterization extends ParametrizedItem {
             parameterizationDAO = createDao()
             return parameterizationDAO
         } else {
+            //TODO If this is just a verbose way of repeating the prior return, refactor.
+            //Otherwise, a short explanation of the 'magic' would be useful for the non-wizards among us..
             return getDaoClass().get(parameterizationDAO.id)
         }
     }

@@ -185,6 +185,7 @@ class Parameterization extends ParametrizedItem {
             }
             return result
         } catch (Exception e) {
+            LOG.warn("Exception (ignored why?)", e)
             return null
         }
     }

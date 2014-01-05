@@ -131,7 +131,9 @@ class Parameterization extends ParametrizedItem {
         validationErrors = validations
     }
 
-    String getValidationErrors(){
+    //Beware of naming a method getXXX because it might suppress a generated field getter and then you screw up
+    //callers expecting to get the field instead. More joys of dynamic typed 'languages'.
+    String getRealValidationErrors(){
         StringBuilder errors = new StringBuilder();
         validationErrors.each {
             if( it.validationType == ValidationType.ERROR ){
@@ -148,7 +150,7 @@ class Parameterization extends ParametrizedItem {
             def daoToBeSaved = getDao()
             validate()
             if (!valid) {
-                LOG.warn("${daoToBeSaved} has validation errors: [" + getValidationErrors() + "]")
+                LOG.warn("${daoToBeSaved} has validation errors: [" + getRealValidationErrors() + "]")
             }
 
             setChangeUserInfo()

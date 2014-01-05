@@ -442,22 +442,22 @@ class ParameterizationTests extends GroovyTestCase {
 
     void testValidation() {
         Parameterization parameterization = new Parameterization("testValidationList")
-        assertNull parameterization.parameterValidations
+        assertNull parameterization.validationErrors
         parameterization.validate()
-        assertNotNull parameterization.parameterValidations
-        assertEquals 0, parameterization.parameterValidations.size()
+        assertNotNull parameterization.validationErrors
+        assertEquals 0, parameterization.validationErrors.size()
         assertTrue parameterization.valid
 
         parameterization.addParameter(new StringParameterHolder("path", 0, "VALID"))
         parameterization.validate()
 
-        assertEquals 0, parameterization.parameterValidations.size()
+        assertEquals 0, parameterization.validationErrors.size()
         assertTrue parameterization.valid
 
         parameterization.addParameter(new StringParameterHolder("path", 0, "INVALID"))
         parameterization.validate()
 
-        assertEquals 1, parameterization.parameterValidations.size()
+        assertEquals 1, parameterization.validationErrors.size()
         assertFalse parameterization.valid
 
         StringParameterHolder holder = new StringParameterHolder("path", 0, "INVALID")
@@ -466,7 +466,7 @@ class ParameterizationTests extends GroovyTestCase {
         parameterization.validate()
 
         // do not validate removed params
-        assertEquals 1, parameterization.parameterValidations.size()
+        assertEquals 1, parameterization.validationErrors.size()
         assertFalse parameterization.valid
     }
 

@@ -57,7 +57,10 @@ class Parameterization extends ParametrizedItem {
     boolean orderByPath = false
     boolean valid
 
-    List<ParameterValidation> parameterValidations
+    //Warning: Dont trust Intellij to refactor this to parameterValidations.
+    //There are references to existing name that don't get picked up because of the joys of dynamic typing.
+    //Then it crashes and burns when you try to open a parameterization in the gui five days later...
+    List<ParameterValidation> validationErrors
 
     Status status
     Long dealId
@@ -125,12 +128,12 @@ class Parameterization extends ParametrizedItem {
         }
 
         valid = validations.empty || validations.every {ParameterValidation validation -> validation.validationType != ValidationType.ERROR}
-        parameterValidations = validations
+        validationErrors = validations
     }
 
     String getValidationErrors(){
         StringBuilder errors = new StringBuilder();
-        parameterValidations.each {
+        validationErrors.each {
             if( it.validationType == ValidationType.ERROR ){
                 errors.append( "Error msg: ${it.msg} for path ${it.path}; " )
                 // Eg Error msg: period.value.below.min.period for path structures:subOverall:parmContractStrategy:structure;

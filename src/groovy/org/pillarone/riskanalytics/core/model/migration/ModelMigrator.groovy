@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.model.migration
 
 import groovy.transform.CompileStatic
+import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.pillarone.riskanalytics.core.ParameterizationDAO
@@ -31,6 +32,9 @@ public class ModelMigrator {
     public ModelMigrator(Class<? extends MigratableModel> modelClass) {
         this.modelClass = modelClass
         toVersion = Model.getModelVersion(modelClass);
+        if(ModelDAO.countByModelClassNameAndItemVersion(modelClass.name, toVersion.toString()) == 0) {
+            throw new IllegalArgumentException("ModelDAO not found for ${modelClass.simpleName} ${toVersion.toString()}. skipImport enabled?")
+        }
     }
 
     @CompileStatic

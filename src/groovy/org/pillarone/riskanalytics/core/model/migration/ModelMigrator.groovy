@@ -28,7 +28,7 @@ public class ModelMigrator {
         }
     }
 
-    @CompileStatic
+//    @CompileStatic Fails to compile the countBy... call with static compilation. Tested locally works fine!
     public ModelMigrator(Class<? extends MigratableModel> modelClass) {
         this.modelClass = modelClass
         toVersion = Model.getModelVersion(modelClass);

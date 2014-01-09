@@ -64,7 +64,7 @@ grails.project.dependency.resolution = {
 grails.project.dependency.distribution = {
     String password = ""
     String user = ""
-    String scpUrl = ""
+    String scpUrl = "scpUrl"
     try {
         Properties properties = new Properties()
         String version = new GroovyClassLoader().loadClass('RiskAnalyticsCoreGrailsPlugin').newInstance().version

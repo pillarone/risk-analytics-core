@@ -10,6 +10,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 class LoginController {
 
+    private static final String AUTH_URL = 'auth-p1'
 	/**
 	 * Dependency injection for the authenticationTrustResolver.
 	 */
@@ -44,7 +45,7 @@ class LoginController {
 			return
 		}
 
-		String view = 'auth'
+		String view = AUTH_URL
 		String postUrl = "${request.contextPath}${config.apf.filterProcessesUrl}"
 		render view: view, model: [postUrl: postUrl,
 		                           rememberMeParameter: config.rememberMe.parameter]
@@ -66,7 +67,7 @@ class LoginController {
 	 */
 	def full = {
 		def config = SpringSecurityUtils.securityConfig
-		render view: 'auth', params: params,
+		render view: AUTH_URL, params: params,
 			model: [hasCookie: authenticationTrustResolver.isRememberMe(SCH.context?.authentication),
 			        postUrl: "${request.contextPath}${config.apf.filterProcessesUrl}"]
 	}

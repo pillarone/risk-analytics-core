@@ -91,6 +91,7 @@ public class ComboBoxMatrixMultiDimensionalParameter extends MatrixMultiDimensio
                 Object[] validValues = comboBoxValues.keySet().toArray();
                 if (validValues.length > 0) {
                     columnTitles.set(i, validValues[0]);
+                    rowTitles.set(i, validValues[0]);
                 }
             }
             i++;

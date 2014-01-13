@@ -69,6 +69,17 @@ class SimulationRun {
         }
     }
 
+    static namedQueries = {
+        findSimulationForParameterization { name, modelClassName, version ->
+            parameterization {
+                eq('name', name)
+                eq('modelClassName', modelClassName)
+                eq('itemVersion', version)
+            }
+
+        }
+    }
+
     public boolean equals(Object obj) {
         if (obj instanceof SimulationRun) {
             return obj.id == id

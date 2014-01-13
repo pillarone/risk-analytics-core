@@ -232,6 +232,26 @@ abstract class ParametrizedItem extends CommentableItem {
         }
     }
 
+    ParameterHolder getParameterHoldersForFirstPeriod(String path) {
+        int parmIndex = path.indexOf(":parm")
+        int nestedIndex = path.indexOf(":", parmIndex + 1)
+        boolean isNested = nestedIndex > -1
+        if (!isNested) {
+            ParameterHolder parameterHolder = getAllParameterHolders().find { ParameterHolder it -> it.path == path }
+            if (!parameterHolder) {
+                throw new ParameterNotFoundException("Parameter $path does not exist")
+            }
+            return parameterHolder
+        } else {
+            String subPath = path.substring(0, nestedIndex)
+            ParameterHolder parameterHolder = getAllParameterHolders().find { ParameterHolder it -> it.path == subPath  && hasParameterAtPath(path, it.periodIndex)}
+            if (parameterHolder == null) {
+                throw new ParameterNotFoundException("Parameter $path does not exist (base path $subPath not found)")
+            }
+            return getNestedParameterHolder(parameterHolder, path.substring(nestedIndex + 1).split(":"), parameterHolder.periodIndex)
+        }
+    }
+
     boolean hasParameterAtPath(String path) { //TODO improve?
         try {
             getParameterHoldersForAllPeriods(path)

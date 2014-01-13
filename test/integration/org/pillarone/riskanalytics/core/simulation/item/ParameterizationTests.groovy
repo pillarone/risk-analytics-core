@@ -562,8 +562,8 @@ class ParameterizationTests {
         assertSame(holder.classifierParameters["nested"].classifierParameters["a"], parameterization.getParameterHolder("component:parmParameter:nested:a", 0))
 
         assertTrue(parameterization.hasParameterAtPath("component:parmParameter"))
-        assertTrue(parameterization.hasParameterAtPath("component:parmParameter",0))
-        assertFalse(parameterization.hasParameterAtPath("component:parmParameter",1))
+        assertTrue(parameterization.hasParameterAtPath("component:parmParameter", 0))
+        assertFalse(parameterization.hasParameterAtPath("component:parmParameter", 1))
 
         parameterization.addParameter(ParameterHolderFactory.getHolder("component:parmParameter", 1, ExampleParameterObjectClassifier.getStrategy(ExampleParameterObjectClassifier.NESTED_PARAMETER_OBJECT, ExampleParameterObjectClassifier.NESTED_PARAMETER_OBJECT.parameters)))
 
@@ -593,8 +593,29 @@ class ParameterizationTests {
         ParameterObjectParameterHolder newHolder = new ParameterObjectParameterHolder("newPath", 0, new ExampleParameterTypeOne())
         newHolder.added = true
         List<ParameterObjectParameterHolder> holders = [newHolder]
-        parameterization.loadParameters(holders,[new DoubleParameter(path: 'persistentPath',periodIndex: 0, doubleValue: 1)])
+        parameterization.loadParameters(holders, [new DoubleParameter(path: 'persistentPath', periodIndex: 0, doubleValue: 1)])
         assert 2 == holders.size()
+    }
+
+    @Test
+    void getParameterHolderForFirstPeriod() {
+        Parameterization parameterization = new Parameterization("name", CoreModel)
+        def paramHolderFirst = new StringParameterHolder("path", 0, "INVALID")
+        def paramHolderSecond = new StringParameterHolder("path", 1, "INVALID")
+        parameterization.addParameter(paramHolderFirst)
+        parameterization.addParameter(paramHolderSecond)
+        ParameterHolder holder = parameterization.getParameterHoldersForFirstPeriod('path')
+        assertEquals(paramHolderFirst, holder)
+    }
+
+    @Test(expected = ParameterNotFoundException)
+    void getParameterNotFound() {
+        Parameterization parameterization = new Parameterization("name", CoreModel)
+        def paramHolderFirst = new StringParameterHolder("path", 0, "INVALID")
+        def paramHolderSecond = new StringParameterHolder("path", 1, "INVALID")
+        parameterization.addParameter(paramHolderFirst)
+        parameterization.addParameter(paramHolderSecond)
+        ParameterHolder holder = parameterization.getParameterHoldersForFirstPeriod('notFound')
     }
 
 

@@ -299,5 +299,22 @@ class SimulationTests {
         assert !simulation1.equals(simulation2)
     }
 
+    @Test
+    void testIsUsedInSimulation() {
+        SimulationRun run1 = new SimulationRun()
+        run1.name = "simulation1"
+        ParameterizationDAO parameterization = createParameterization()
+        run1.parameterization = parameterization
+        run1.resultConfiguration = createResultConfiguration()
+        run1.model = CoreModel.name
+        run1.periodCount = 1
+        run1.iterations = 10
+        run1.save()
 
+        def query = SimulationRun.findSimulationForParameterization(parameterization.name, parameterization.modelClassName, parameterization.itemVersion)
+        assertEquals(1, query.count())
+        assertEquals(run1.id, query.get().id)
+        query = SimulationRun.findSimulationForParameterization('non-existance', parameterization.modelClassName, parameterization.itemVersion)
+        assertEquals(0, query.count())
+    }
 }

@@ -40,7 +40,6 @@ class RiskAnalyticsCoreGrailsPlugin {
     // the other plugins this plugin depends on
     def dependsOn = [
             "backgroundThread": "1.3",
-            "jodaTime": "0.5",
             "quartz": "0.4.2",
             "springSecurityCore": "2.0-RC2",
             "release": "3.0.1"

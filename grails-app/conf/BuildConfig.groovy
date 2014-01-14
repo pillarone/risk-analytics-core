@@ -25,7 +25,6 @@ grails.project.dependency.resolution = {
     plugins {
         runtime ":background-thread:1.3"
         runtime ":hibernate:3.6.10.3"
-        runtime ":joda-time:0.5"
         runtime ":release:3.0.1", {
             exclude "groovy"
         }
@@ -47,6 +46,7 @@ grails.project.dependency.resolution = {
         }
         compile("org.apache.xmlbeans:xmlbeans:2.3.0-without-w3c")
 
+        compile 'joda-time:joda-time:2.3'
         //gridgain & deps
 //        compile("org.gridgain:gridgain:3.6.0c") {
 //            transitive = false

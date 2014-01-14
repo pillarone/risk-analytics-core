@@ -23,4 +23,8 @@ public class SumAggregatorSingleValuePacket implements IPacketAggregator<SingleV
         return aggregatedPacket;
     }
 
+    @Override
+    public Class<SingleValuePacket> getPacketClass() {
+        return SingleValuePacket.class;
+    }
 }

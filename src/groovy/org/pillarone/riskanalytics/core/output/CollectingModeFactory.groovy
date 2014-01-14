@@ -3,12 +3,19 @@ package org.pillarone.riskanalytics.core.output
 import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.util.RegistryInitializationSupport
 
 @CompileStatic
 class CollectingModeFactory {
 
     private static Map<String, ICollectingModeStrategy> strategies = new HashMap()
     private static Log LOG = LogFactory.getLog(CollectingModeFactory)
+
+    static {
+        for(Class<ICollectingModeStrategy> clazz in RegistryInitializationSupport.findClasses(ICollectingModeStrategy)) {
+            registerStrategy(clazz.newInstance())
+        }
+    }
 
     static void registerStrategy(ICollectingModeStrategy strategy) {
         String identifier = strategy.identifier

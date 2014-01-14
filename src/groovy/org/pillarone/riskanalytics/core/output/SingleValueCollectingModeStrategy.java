@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.output;
 
 import org.pillarone.riskanalytics.core.packets.Packet;
 import org.pillarone.riskanalytics.core.packets.PacketList;
+import org.pillarone.riskanalytics.core.util.Manual;
 
 import java.util.ArrayList;
 import java.util.List;

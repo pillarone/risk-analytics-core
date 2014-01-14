@@ -29,5 +29,8 @@ class SumAggregator implements IPacketAggregator<Packet> {
         return aggregatedPacket
     }
 
-
+    @Override
+    Class<Packet> getPacketClass() {
+        return Packet
+    }
 }

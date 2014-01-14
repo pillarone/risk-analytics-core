@@ -5,6 +5,8 @@ import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.model.migration.ModelMigrator
+import org.pillarone.riskanalytics.core.output.ICollectingModeStrategy
+import org.pillarone.riskanalytics.core.util.RegistryInitializationSupport
 
 @CompileStatic
 class ConstraintsFactory {
@@ -12,6 +14,12 @@ class ConstraintsFactory {
     private static Log LOG = LogFactory.getLog(ConstraintsFactory)
 
     private static Map<String, IMultiDimensionalConstraints> constraints = new MapMaker().makeMap()
+
+    static {
+        for(Class<IMultiDimensionalConstraints> clazz in RegistryInitializationSupport.findClasses(IMultiDimensionalConstraints)) {
+            registerConstraint(clazz.newInstance())
+        }
+    }
 
     static void registerConstraint(IMultiDimensionalConstraints constraint) {
         String identifier = constraint.name

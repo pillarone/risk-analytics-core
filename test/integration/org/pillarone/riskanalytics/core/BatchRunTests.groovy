@@ -50,7 +50,6 @@ class BatchRunTests {
         Simulation simulation3 = createSimulation("simulation3")
         batch.batchRunService.addSimulationRun(batch, simulation3, OutputStrategy.BATCH_DB_OUTPUT)
         assertTrue batch.batchRunService.getSimulationRuns(bRun).size() == 3
-        println batchRun.batchRunService.getSimulationRunAt(bRun, 2).name
         assertTrue batchRun.batchRunService.getSimulationRunAt(bRun, 2).name == simulation3.name
 
         //change a priority

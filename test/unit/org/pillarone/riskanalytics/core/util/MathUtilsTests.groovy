@@ -121,7 +121,6 @@ class MathUtilsTests extends GroovyTestCase {
         while (st.hasMoreElements()) {
             sb.append(st.nextElement() + "\n")
         }
-        println sb
         return sb
 
     }

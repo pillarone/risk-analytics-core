@@ -95,7 +95,6 @@ class Parameterization extends ParametrizedItem {
         }
     }
 
-    @CompileStatic
     public Parameterization(String name) {
         super(name)
         setName(name)

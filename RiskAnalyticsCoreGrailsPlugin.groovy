@@ -165,16 +165,6 @@ Persistence & Simulation engine.
                 "keyFiguresToCalculate": standardCalculatorOutput
         ])
 
-        CollectingModeFactory.registerStrategy(new SingleValueCollectingModeStrategy())
-        CollectingModeFactory.registerStrategy(new AggregatedCollectingModeStrategy())
-        CollectingModeFactory.registerStrategy(new AggregatedWithSingleAvailableCollectingModeStrategy())
-
-        ConstraintsFactory.registerConstraint(new SimpleConstraint())
-        ConstraintsFactory.registerConstraint(new TestConstrainedTable())
-        ConstraintsFactory.registerConstraint(new ExampleResourceConstraints())
-
-        PacketAggregatorRegistry.registerAggregator(Packet, new SumAggregator())
-        PacketAggregatorRegistry.registerAggregator(SingleValuePacket, new SumAggregatorSingleValuePacket())
     }
 
     def onChange = {event ->

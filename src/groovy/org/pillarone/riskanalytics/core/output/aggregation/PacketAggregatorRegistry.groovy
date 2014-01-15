@@ -3,12 +3,21 @@ package org.pillarone.riskanalytics.core.output.aggregation
 import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.parameterization.IMultiDimensionalConstraints
+import org.pillarone.riskanalytics.core.util.RegistryInitializationSupport
 
 @CompileStatic
 class PacketAggregatorRegistry {
 
     private static Log LOG = LogFactory.getLog(PacketAggregatorRegistry)
     private static HashMap<Class, IPacketAggregator> aggregatorMap = [:]
+
+    static {
+        for(Class<IPacketAggregator> clazz in RegistryInitializationSupport.findClasses(IPacketAggregator)) {
+            IPacketAggregator instance = clazz.newInstance()
+            registerAggregator(instance.packetClass, instance)
+        }
+    }
 
     public static void registerAggregator(Class packetClass, IPacketAggregator aggregator) {
         IPacketAggregator existing = aggregatorMap.get(packetClass)

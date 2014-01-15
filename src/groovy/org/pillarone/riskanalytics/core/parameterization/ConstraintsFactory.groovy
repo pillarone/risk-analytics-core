@@ -16,8 +16,11 @@ class ConstraintsFactory {
     private static Map<String, IMultiDimensionalConstraints> constraints = new MapMaker().makeMap()
 
     static {
+        println("Initializing MDP constraints")
         for(Class<IMultiDimensionalConstraints> clazz in RegistryInitializationSupport.findClasses(IMultiDimensionalConstraints)) {
-            registerConstraint(clazz.newInstance())
+            IMultiDimensionalConstraints instance = clazz.newInstance()
+            println("Registering ${instance.name}")
+            registerConstraint(instance)
         }
     }
 

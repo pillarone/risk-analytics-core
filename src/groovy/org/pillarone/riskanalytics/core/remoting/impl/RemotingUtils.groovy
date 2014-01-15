@@ -28,4 +28,5 @@ class RemotingUtils {
     public static List<TransactionInfo> getAllTransactions() {
         return getTransactionService().allTransactions.sort { it.name?.toUpperCase() }
     }
+
 }

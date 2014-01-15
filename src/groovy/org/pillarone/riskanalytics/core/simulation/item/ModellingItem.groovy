@@ -149,11 +149,17 @@ abstract class ModellingItem implements Serializable {
         }
     }
 
+    void logAttemptToDelete(){
+        LOG.info("Deleting ${getClass().simpleName}: ${name})")
+    }
+
     final boolean delete() {
         boolean result = false
-        if (!loaded) { // make sure we have an id
-            LOG.warn "attempt to delete an unloaded dao: $dao"
-            load()     // todo: can't we simply return?
+
+        logAttemptToDelete();
+
+        if (!loaded) {
+            load()
         }
         daoClass.withTransaction { TransactionStatus status ->
             try {

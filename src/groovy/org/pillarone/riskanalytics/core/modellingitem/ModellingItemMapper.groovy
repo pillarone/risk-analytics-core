@@ -7,7 +7,7 @@ import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.item.*
 
 class ModellingItemMapper {
-    static Parameterization getModellingItem(ParameterizationDAO detachedDao) {
+    static Parameterization getModellingItem(ParameterizationDAO detachedDao, boolean withDependencies = true) {
         ParameterizationDAO.withNewSession {
             ParameterizationDAO dao = ParameterizationDAO.get(detachedDao.id) ?: detachedDao
             Parameterization parameterization = new Parameterization(dao.name, Thread.currentThread().contextClassLoader.loadClass(dao.modelClassName))
@@ -17,7 +17,9 @@ class ModellingItemMapper {
             parameterization.modificationDate = dao.modificationDate
             parameterization.creator = dao.creator
             parameterization.lastUpdater = dao.lastUpdater
-            parameterization.tags = dao.tags*.tag
+            if (withDependencies) {
+                parameterization.tags = dao.tags*.tag
+            }
             parameterization.valid = dao.valid
             parameterization.status = dao.status
             parameterization.dealId = dao.dealId
@@ -25,7 +27,7 @@ class ModellingItemMapper {
         }
     }
 
-    static ResultConfiguration getModellingItem(ResultConfigurationDAO dao) {
+    static ResultConfiguration getModellingItem(ResultConfigurationDAO dao, boolean withDependencies = true) {
         ResultConfiguration resultConfiguration = new ResultConfiguration(dao.name)
         resultConfiguration.id = dao.id
         resultConfiguration.modelClass = ModellingItemMapper.classLoader.loadClass(dao.modelClassName)
@@ -38,28 +40,29 @@ class ModellingItemMapper {
         return resultConfiguration
     }
 
-    static Simulation getModellingItem(SimulationRun detachedDao) {
+    static Simulation getModellingItem(SimulationRun detachedDao, boolean withDependencies = true) {
         SimulationRun.withNewSession {
             SimulationRun dao = SimulationRun.get(detachedDao.id) ?: detachedDao
             Simulation simulation = new Simulation(dao.name)
             simulation.id = dao.id
-            if (!dao.toBeDeleted){
+            if (!dao.toBeDeleted && withDependencies) {
                 // simulation runs that are to be deleted do not have p14n and resultConfigs anymore.
                 simulation.parameterization = getModellingItem(dao.parameterization)
                 simulation.template = getModellingItem(dao.resultConfiguration)
+                simulation.tags = dao.tags*.tag
             }
             simulation.modelClass = ModellingItemMapper.classLoader.loadClass(dao.model)
-            simulation.tags = dao.tags*.tag
             simulation.end = dao.endTime
             simulation.start = dao.startTime
             simulation.creationDate = dao.creationDate
             simulation.modificationDate = dao.modificationDate
             simulation.creator = dao.creator
+            simulation.numberOfIterations = dao.iterations
             return simulation
         }
     }
 
-    static Resource getModellingItem(ResourceDAO detachedDao) {
+    static Resource getModellingItem(ResourceDAO detachedDao, boolean withDependencies = true) {
         ResourceDAO.withNewSession {
             ResourceDAO dao = ResourceDAO.get(detachedDao.id) ?: detachedDao
             Resource resource = new Resource(dao.name, ModellingItemMapper.classLoader.loadClass(dao.resourceClassName))
@@ -69,14 +72,16 @@ class ModellingItemMapper {
             resource.modificationDate = dao.modificationDate
             resource.creator = dao.creator
             resource.lastUpdater = dao.lastUpdater
-            resource.tags = dao.tags*.tag
+            if (withDependencies) {
+                resource.tags = dao.tags*.tag
+            }
             resource.valid = dao.valid
             resource.status = dao.status
             return resource
         }
     }
 
-    static ModellingItem getModellingItem(Object dao) {
+    static ModellingItem getModellingItem(Object dao, boolean withDependencies = true) {
         return null
     }
 }

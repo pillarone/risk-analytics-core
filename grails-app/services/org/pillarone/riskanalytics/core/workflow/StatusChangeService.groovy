@@ -88,6 +88,14 @@ class StatusChangeService {
         return newParameterization
     }
 
+    void clearAudit(Parameterization parameterization) {
+        AuditLog.withTransaction {
+            parameterization.load(false)
+            List<AuditLog> auditLogs = AuditLog.findAllByFromParameterizationOrToParameterization(parameterization.dao, parameterization.dao)
+            auditLogs*.delete()
+        }
+    }
+
     //TODO: re-use MIF
 
     @CompileStatic

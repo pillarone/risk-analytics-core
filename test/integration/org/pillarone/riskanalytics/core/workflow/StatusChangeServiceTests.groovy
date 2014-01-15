@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.workflow
 
+import org.junit.Test
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.parameter.comment.workflow.IssueStatus
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
@@ -10,10 +11,14 @@ import static org.pillarone.riskanalytics.core.workflow.Status.*
 import org.pillarone.riskanalytics.core.remoting.impl.RemotingUtils
 import org.pillarone.riskanalytics.core.example.model.TracingTestModel
 
-class StatusChangeServiceTests extends GroovyTestCase {
+import static org.junit.Assert.*
+import static groovy.test.GroovyAssert.shouldFail
+
+class StatusChangeServiceTests {
 
     StatusChangeService statusChangeService
 
+    @Test
     void testToDataEntryFromNone() {
         Parameterization parameterization = new Parameterization("name")
         parameterization.modelClass = EmptyModel
@@ -25,12 +30,13 @@ class StatusChangeServiceTests extends GroovyTestCase {
         assertNotSame newParameterization, parameterization
 
         assertEquals NONE, parameterization.status
-        assertEquals RemotingUtils.allTransactions.find {it.dealId == newParameterization.dealId}.name, newParameterization.name
+        assertEquals RemotingUtils.allTransactions.find { it.dealId == newParameterization.dealId }.name, newParameterization.name
 
         assertEquals DATA_ENTRY, newParameterization.status
         assertEquals "R1", newParameterization.versionNumber.toString()
     }
 
+    @Test
     void testToDataEntryFromNoneAlreadyInWorkflow() {
         Parameterization existingParameterization = new Parameterization("name")
         existingParameterization.modelClass = EmptyModel
@@ -46,9 +52,10 @@ class StatusChangeServiceTests extends GroovyTestCase {
         parameterization.dealId = 1
         parameterization.save()
 
-        shouldFail(WorkflowException, { statusChangeService.changeStatus(parameterization, DATA_ENTRY)})
+        shouldFail(WorkflowException, { statusChangeService.changeStatus(parameterization, DATA_ENTRY) })
     }
 
+    @Test
     void testToDataEntryFromNoneAlreadyInWorkflowDifferentModelClassName() {
         Parameterization existingParameterization = new Parameterization("name")
         existingParameterization.modelClass = TracingTestModel
@@ -87,6 +94,7 @@ class StatusChangeServiceTests extends GroovyTestCase {
         assertEquals "R1", parameterization.versionNumber.toString()
     }
 
+    @Test
     void testToInReview() {
         Parameterization parameterization = new Parameterization("name")
         parameterization.status = DATA_ENTRY
@@ -102,6 +110,7 @@ class StatusChangeServiceTests extends GroovyTestCase {
         assertEquals "R1", parameterization.versionNumber.toString()
     }
 
+    @Test
     void testToDataEntryFromInReview() {
         Parameterization parameterization = new Parameterization("name")
         parameterization.status = IN_REVIEW
@@ -119,6 +128,7 @@ class StatusChangeServiceTests extends GroovyTestCase {
         assertEquals "R2", newParameterization.versionNumber.toString()
     }
 
+    @Test
     void testCopyNonClosedIssues() {
         Parameterization parameterization = new Parameterization("name")
         parameterization.status = IN_REVIEW
@@ -146,10 +156,11 @@ class StatusChangeServiceTests extends GroovyTestCase {
         assertNotSame newParameterization, parameterization
 
         assertEquals 2, newParameterization.comments.size()
-        assertEquals IssueStatus.OPEN, newParameterization.comments.findAll {it instanceof WorkflowComment}[0].status
+        assertEquals IssueStatus.OPEN, newParameterization.comments.findAll { it instanceof WorkflowComment }[0].status
 
     }
 
+    @Test
     void testCommentsToDataEntry() {
         Parameterization parameterization = new Parameterization("name")
         parameterization.status = IN_REVIEW
@@ -172,6 +183,7 @@ class StatusChangeServiceTests extends GroovyTestCase {
         assertEquals DATA_ENTRY, newParameterization.status
     }
 
+    @Test
     void testCommentsToDataEntryFailed() {
         Parameterization parameterization = new Parameterization("name")
         parameterization.status = IN_REVIEW
@@ -189,6 +201,7 @@ class StatusChangeServiceTests extends GroovyTestCase {
         shouldFail(WorkflowException, { statusChangeService.changeStatus(parameterization, DATA_ENTRY) })
     }
 
+    @Test
     void testCommentsToInReview() {
         Parameterization parameterization = new Parameterization("name")
         parameterization.status = DATA_ENTRY
@@ -248,6 +261,7 @@ class StatusChangeServiceTests extends GroovyTestCase {
         assertEquals IN_PRODUCTION, newParameterization.status
     }
 
+    @Test
     void testCommentsToInProductionFailed() {
         Parameterization parameterization = new Parameterization("name")
         parameterization.status = IN_REVIEW
@@ -264,6 +278,7 @@ class StatusChangeServiceTests extends GroovyTestCase {
         shouldFail(WorkflowException, { statusChangeService.changeStatus(parameterization, IN_PRODUCTION) })
     }
 
+    @Test
     void testNewVersion() {
         Parameterization parameterization = new Parameterization("name")
         parameterization.status = IN_PRODUCTION
@@ -279,5 +294,26 @@ class StatusChangeServiceTests extends GroovyTestCase {
 
         assertEquals "R2", newParameterization.versionNumber.toString()
         assertEquals DATA_ENTRY, newParameterization.status
+    }
+
+    @Test
+    void testClearAudit() {
+        Parameterization parameterization = new Parameterization("name")
+        parameterization.status = IN_REVIEW
+        parameterization.versionNumber = new VersionNumber("R1")
+        parameterization.modelClass = EmptyModel
+        parameterization.periodCount = 0
+
+        WorkflowComment comment3 = new WorkflowComment("path", 0)
+        comment3.text = "text"
+        comment3.resolve()
+        comment3.close()
+        parameterization.addComment(comment3)
+
+        parameterization.save()
+        Parameterization newParameterization = statusChangeService.changeStatus(parameterization, DATA_ENTRY)
+        assert 1 == AuditLog.count()
+        statusChangeService.clearAudit(newParameterization)
+        assert 0 == AuditLog.count()
     }
 }

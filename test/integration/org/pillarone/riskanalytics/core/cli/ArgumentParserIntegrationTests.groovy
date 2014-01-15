@@ -240,7 +240,7 @@ class ArgumentParserIntegrationTests {
         parameterizationToChange.modelClass = CoreModel
         parameterizationToChange.load()
 
-        ParameterObjectParameterHolder holder = parameterizationToChange.parameterHolders.find { it.path == "exampleInputOutputComponent:parmParameterObject"}
+        ParameterObjectParameterHolder holder = parameterizationToChange.parameterHolders.find {it.path=='exampleInputOutputComponent:parmNewParameterObject'}
         holder.setValue("TYPE1")
         parameterizationToChange.save()
 

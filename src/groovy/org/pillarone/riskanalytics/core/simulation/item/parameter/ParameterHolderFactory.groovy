@@ -145,7 +145,7 @@ class ParameterHolderFactory {
      */
     public static List<String> renamePathOfParameter(ParametrizedItem parameterization, String oldPath, String newPath, Component renamedComponent) {
         parameterization.getAllParameterHolders().each { ParameterHolder it ->
-            if (it.path.startsWith(newPath)){
+            if (it.path.startsWith("$newPath:")){
                 throw new NonUniqueComponentNameException("A component with the name ${renamedComponent.name} already exists in this dynamic composed component")
             }
         }

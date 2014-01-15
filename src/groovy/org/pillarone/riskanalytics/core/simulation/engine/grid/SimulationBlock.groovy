@@ -14,7 +14,8 @@ class SimulationBlock implements Serializable {
     }
 
     String toString() {
-        return "First iteration: $iterationOffset, last iteration: ${iterationOffset + blockSize - 1}"
+//      return "First iteration: $iterationOffset, last iteration: ${iterationOffset + blockSize - 1}"
+        return "Iters: [$iterationOffset,${iterationOffset + blockSize - 1}]" // Make it easier to read log
     }
 
 

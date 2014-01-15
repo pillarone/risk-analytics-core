@@ -44,6 +44,11 @@ abstract class ReportRegistry {
         List<IReportModel> allReports = getAllReportModels()
         for (Class clazz in modelClasses) {
             Collection<IReportModel> potentialReports = reportMap.get(clazz)
+
+            // If you can explain why this intersection is not a NOOP pls contact me -fr
+            // Possibly what was really wanted: to do was something like: iReportModels = iReportModels.intersect(potentialReports)
+            // THAT would keep all the reports that are compatible every report model supplied.
+            // But that might also return an empty set if things werent planned as carefully...
             iReportModels.addAll(potentialReports.intersect(allReports))
         }
         return iReportModels.flatten().toList()

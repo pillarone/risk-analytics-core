@@ -58,6 +58,8 @@ grails.project.dependency.resolution = {
         runtime("jboss:jboss-serialization:4.2.2.GA")
         runtime("trove:trove:1.0.2")
         runtime("org.fusesource.jansi:jansi:1.2.1")
+        //see http://jira.grails.org/browse/GRAILS-10671
+        build "com.lowagie:itext:2.1.7"
     }
 }
 

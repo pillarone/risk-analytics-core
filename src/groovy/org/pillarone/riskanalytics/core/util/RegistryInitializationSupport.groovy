@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.util
 
+import grails.util.Holders
 import org.springframework.core.type.filter.AssignableTypeFilter
 
 
@@ -9,10 +10,13 @@ class RegistryInitializationSupport {
 
     static {
         packages << "org.pillarone"
-    }
 
-    public static void addBasePackage(String name) {
-        packages << name
+        def basePackages = Holders.config.autoRegistrationBasePackages
+        if (basePackages instanceof String) {
+            packages << basePackages
+        } else if (basePackages instanceof Collection) {
+            packages.addAll(basePackages)
+        }
     }
 
     public static <E> List<Class<E>> findClasses(Class<E> assignableFrom) {
@@ -21,8 +25,10 @@ class RegistryInitializationSupport {
 
         List<Class> result = []
 
-        for(String packageName in packages) {
-            result.addAll(scanner.findCandidateComponents(packageName).collect { Thread.currentThread().contextClassLoader.loadClass(it.beanClassName) })
+        for (String packageName in packages) {
+            result.addAll(scanner.findCandidateComponents(packageName).collect {
+                Thread.currentThread().contextClassLoader.loadClass(it.beanClassName)
+            })
         }
 
         return result.findAll { !it.isAnnotationPresent(Manual) }

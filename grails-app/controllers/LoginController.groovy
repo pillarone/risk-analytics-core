@@ -10,6 +10,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 class LoginController {
 
+    static namespace = 'pillarone'
+
     private static final String AUTH_URL = 'auth-p1'
 	/**
 	 * Dependency injection for the authenticationTrustResolver.

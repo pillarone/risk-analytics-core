@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.simulation.item.parameter.comment
 
 import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.FileConstants
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 import org.pillarone.riskanalytics.core.parameter.comment.CommentFileDAO
 import org.pillarone.riskanalytics.core.parameter.comment.CommentTag
@@ -201,7 +202,17 @@ class Comment implements Cloneable {
         clone.comment = comment
         clone.lastChange = (DateTime) new DateTime(lastChange.millis)
         clone.tags = tags.findAll { it.name != POST_LOCKING }.clone() as Set
-        clone.files = (Set) files?.clone()
+        clone.files = new HashSet()
+
+        for(CommentFile file in files) {
+            File newFile = file.file
+            if(file.persistedId != null) {
+                newFile = File.createTempFile(file.filename, '', new File(FileConstants.TEMP_FILE_DIRECTORY))
+                newFile.bytes = file.content
+            }
+            CommentFile commentFile = new CommentFile(file.filename, newFile)
+            clone.files << commentFile
+        }
 
         clone.added = false
         clone.updated = false

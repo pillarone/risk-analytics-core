@@ -34,7 +34,8 @@ public class DeleteSimulationService {
         return simulationRun
     }
 
-    void deleteAllMarkedSimulations() {  // todo (dk): wait until no simulation is running
+    // Currently only called when someone chooses File --> Exit (Applet users *never* do that)
+    void deleteAllMarkedSimulations() {
         SimulationRun.withTransaction {
             SimulationRun.findAllByToBeDeleted(true).each {SimulationRun simulationRun ->
                 deleteBatchRunSimulationRun(simulationRun)

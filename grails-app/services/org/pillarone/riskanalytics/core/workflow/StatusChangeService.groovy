@@ -51,7 +51,11 @@ class StatusChangeService {
                     }
 
                     if (!p14nsInWorkflow.isEmpty()) {
-                        throw new WorkflowException(parameterization.name, DATA_ENTRY, "Parameterization is already in workflow.")
+                        throw new WorkflowException(
+                                parameterization.name,
+                                DATA_ENTRY,
+                                "there is already a workflow for model '${parameterization.modelClass.simpleName}' and transaction '${parameterization.dealId}'"
+                        )
                     }
                 }
                 Parameterization newParameterization = incrementVersion(parameterization, parameterization.status == NONE)

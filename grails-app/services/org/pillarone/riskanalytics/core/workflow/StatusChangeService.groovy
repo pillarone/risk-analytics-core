@@ -51,7 +51,15 @@ class StatusChangeService {
                     }
 
                     if (!p14nsInWorkflow.isEmpty()) {
-                        throw new WorkflowException(parameterization.name, DATA_ENTRY, "Parameterization is already in workflow.")
+                        ParameterizationDAO firstExistingWorkflowP14n = p14nsInWorkflow.first();
+                        String nameAndVersion = firstExistingWorkflowP14n?.name + " v" + firstExistingWorkflowP14n?.itemVersion;
+                        throw new WorkflowException(
+                                "P14n '" + parameterization.name + "'",
+                                DATA_ENTRY,
+                                "Deal '" + getTransactionName(parameterization.dealId) + "' already used in Model " + (parameterization.modelClass?.simpleName-"Model") +
+                                "\nEg in workflow P14n: '"+ nameAndVersion + "'" +
+                                "\nCan you work with one of the existing workflow P14ns, or choose a different deal ?"
+                        )
                     }
                 }
                 Parameterization newParameterization = incrementVersion(parameterization, parameterization.status == NONE)
@@ -181,6 +189,6 @@ class StatusChangeService {
 class WorkflowException extends RuntimeException {
 
     public WorkflowException(String itemName, Status to, String cause) {
-        super("Cannot change status of $itemName to ${to.displayName}. Cause: $cause".toString())
+        super("Cannot change status of $itemName to ${to.displayName}.\nCause: $cause".toString())
     }
 }

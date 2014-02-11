@@ -51,10 +51,14 @@ class StatusChangeService {
                     }
 
                     if (!p14nsInWorkflow.isEmpty()) {
+                        ParameterizationDAO firstExistingWorkflowP14n = p14nsInWorkflow.first();
+                        String nameAndVersion = firstExistingWorkflowP14n?.name + " v" + firstExistingWorkflowP14n?.itemVersion;
                         throw new WorkflowException(
-                                parameterization.name,
+                                "P14n '" + parameterization.name + "'",
                                 DATA_ENTRY,
-                                "there is already a workflow for model '${parameterization.modelClass.simpleName}' and transaction '${parameterization.dealId}'"
+                                "Deal '" + getTransactionName(parameterization.dealId) + "' already used in Model " + (parameterization.modelClass?.simpleName-"Model") +
+                                "\nEg in workflow P14n: '"+ nameAndVersion + "'" +
+                                "\nCan you work with one of the existing workflow P14ns, or choose a different deal ?"
                         )
                     }
                 }

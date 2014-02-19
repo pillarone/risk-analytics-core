@@ -30,11 +30,11 @@ class LogoutService {
     }
 
     private HttpServletRequest getRequest() {
-        WebUtils.retrieveGrailsWebRequest().request
+        WebUtils.retrieveGrailsWebRequest().currentRequest
     }
 
     private HttpServletResponse getResponse() {
-        WebUtils.retrieveGrailsWebRequest().response
+        WebUtils.retrieveGrailsWebRequest().currentResponse
     }
 
     private Authentication getAuthentication() {

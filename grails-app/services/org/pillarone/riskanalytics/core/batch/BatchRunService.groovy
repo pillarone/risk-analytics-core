@@ -52,6 +52,9 @@ class BatchRunService {
 
     @CompileStatic
     public synchronized void runSimulation(BatchRunSimulationRun batchRunSimulationRun) {
+        if (batchRunSimulationRun.simulationRun.endTime != null ) {
+            LOG.info "simulation ${batchRunSimulationRun.simulationRun.name} already executed at ${batchRunSimulationRun.simulationRun.endTime}"
+        } else
         if (batchRunSimulationRun.simulationRun.endTime == null && !batchRunInfoService.runningBatchSimulationRuns.contains(batchRunSimulationRun)) {
             ICollectorOutputStrategy strategy = OutputStrategyFactory.getInstance(batchRunSimulationRun.strategy)
 
@@ -62,7 +65,7 @@ class BatchRunService {
             getRunnerRegistry().put(configuration)
             notifySimulationStart(simulation, SimulationState.NOT_RUNNING)
         } else {
-            LOG.info "simulation ${batchRunSimulationRun.simulationRun.name} is already executed at ${batchRunSimulationRun.simulationRun.endTime}"
+            LOG.info "simulation ${batchRunSimulationRun.simulationRun.name} is already running"
         }
     }
 
@@ -144,6 +147,11 @@ class BatchRunService {
     }
 
 
+    // Returns the batches that are ready to run.
+    // BTW
+    // I think column 'executionTime' means: 'Please execute at this time or later'
+    // I don't think it means: 'The time it was executed'.
+    //
     public List<BatchRun> getActiveBatchRuns() {
         return BatchRun.executeQuery("from org.pillarone.riskanalytics.core.BatchRun as b where b.executed = :executed and b.executionTime <= :cDate order by b.executionTime asc ", ["cDate": new DateTime(), "executed": false])
     }

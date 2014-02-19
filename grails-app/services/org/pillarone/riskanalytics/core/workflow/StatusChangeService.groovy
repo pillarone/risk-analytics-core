@@ -189,6 +189,6 @@ class StatusChangeService {
 class WorkflowException extends RuntimeException {
 
     public WorkflowException(String itemName, Status to, String cause) {
-        super("Cannot change status of $itemName to ${to.displayName}. Cause: $cause".toString())
+        super("Cannot change status of $itemName to ${to.displayName}.\nCause: $cause".toString())
     }
 }

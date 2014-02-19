@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.modellingitem
 
 import models.core.CoreModel
 import org.junit.Test
+import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
@@ -26,4 +27,13 @@ class ModellingItemMapperTests {
         assert item.template == null
     }
 
+    // PMO-2681
+    @Test
+    void testMappingModelForSimulations() {
+        def versionString = "9.9.9.9"
+        SimulationRun run = new SimulationRun(model: CoreModel.name, usedModel: new ModelDAO(itemVersion: versionString))
+        Simulation item = ModellingItemMapper.getModellingItem(run)
+        assert item.modelVersionNumber.toString() == versionString
+        assert item.modelClass == CoreModel
+    }
 }

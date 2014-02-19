@@ -73,6 +73,10 @@ class Simulation extends ParametrizedItem {
         run.model = getModelClass()?.name
         run.parameterization = ParameterizationDAO.find(parameterization.name, run.model, parameterization.versionNumber.toString())
         run.resultConfiguration = ResultConfigurationDAO.find(template.name, run.model, template.versionNumber.toString())
+        if( run.resultConfiguration == null){ //PMO-2648
+            LOG.warn("Missing result template! name:${template.name}, ver:${template.versionNumber.toString()}, model:${run.model} referenced by sim: ${run.name}")
+            LOG.warn("Nulls saved to sim's result config id are known to BREAK GUI startup (PMO-2648)")
+        }
         run.startTime = start
         run.endTime = end
         run.iterations = numberOfIterations
@@ -256,7 +260,7 @@ class Simulation extends ParametrizedItem {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Simulation) {
-            return super.equals(obj) && obj.modelVersionNumber.equals(modelVersionNumber)
+            return super.equals(obj) && obj.modelVersionNumber.equals(modelVersionNumber) //20140115 PMO-2681
         } else {
             return false
         }

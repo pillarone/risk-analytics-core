@@ -52,6 +52,8 @@ class ModellingItemMapper {
                 simulation.tags = dao.tags*.tag
             }
             simulation.modelClass = ModellingItemMapper.classLoader.loadClass(dao.model)
+            //PMO-2681 Need to set correct modelVersionNumber matching existing sim in DB
+            simulation.modelVersionNumber = dao.usedModel?.itemVersion ? new VersionNumber(dao.usedModel.itemVersion) : null
             simulation.end = dao.endTime
             simulation.start = dao.startTime
             simulation.creationDate = dao.creationDate

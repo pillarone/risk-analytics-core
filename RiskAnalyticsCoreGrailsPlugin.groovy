@@ -131,9 +131,9 @@ Persistence & Simulation engine.
         modellingItemListener(ModellingItemHibernateListener)
 
         hibernateEventListeners(HibernateEventListeners) {
-            listenerMap = ['post-insert': modellingItemListener,
-                    'post-update': modellingItemListener,
-                    'post-delete': modellingItemListener]
+            listenerMap = ['post-commit-insert': modellingItemListener,
+                    'post-commit-update': modellingItemListener,
+                    'post-commit-delete': modellingItemListener]
         }
 
         mappingCache(MappingCache) {}

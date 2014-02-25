@@ -49,8 +49,8 @@ class ModellingItemCopyUtils {
         target.name = source.name
         target.id = source.id
         if (withDependencies) {
-            target.parameterization = updateModellingItem(source.parameterization, target.parameterization, withDependencies)
-            target.template = updateModellingItem(source.template, target.template, withDependencies)
+            target.parameterization = copyModellingItem(source.parameterization, target.parameterization, withDependencies)
+            target.template = copyModellingItem(source.template, target.template, withDependencies)
             target.tags = source.tags
         }
         target.modelClass = source.modelClass

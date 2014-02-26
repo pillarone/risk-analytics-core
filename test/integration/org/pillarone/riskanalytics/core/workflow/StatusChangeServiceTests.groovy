@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.workflow
 
+import org.hibernate.jdbc.Work
 import org.junit.Test
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.parameter.comment.workflow.IssueStatus
@@ -95,12 +96,14 @@ class StatusChangeServiceTests {
     }
 
     @Test
-    void testToInReview() {
+    void testToInReviewValid() {
         Parameterization parameterization = new Parameterization("name")
         parameterization.status = DATA_ENTRY
         parameterization.versionNumber = new VersionNumber("R1")
         parameterization.modelClass = EmptyModel
         parameterization.periodCount = 0
+        parameterization.metaClass.validate = {
+        }
         parameterization.save()
 
         Parameterization newParameterization = statusChangeService.changeStatus(parameterization, IN_REVIEW)
@@ -108,6 +111,21 @@ class StatusChangeServiceTests {
 
         assertEquals IN_REVIEW, parameterization.status
         assertEquals "R1", parameterization.versionNumber.toString()
+    }
+
+    @Test(expected = WorkflowException)
+    void testToInReviewNotValid() {
+        Parameterization parameterization = new Parameterization("name")
+        parameterization.status = DATA_ENTRY
+        parameterization.versionNumber = new VersionNumber("R1")
+        parameterization.modelClass = EmptyModel
+        parameterization.periodCount = 0
+        parameterization.metaClass.validate = {}
+        parameterization.metaClass.getRealValidationErrors = {
+            'bad error'
+        }
+        parameterization.save()
+        statusChangeService.changeStatus(parameterization, IN_REVIEW)
     }
 
     @Test

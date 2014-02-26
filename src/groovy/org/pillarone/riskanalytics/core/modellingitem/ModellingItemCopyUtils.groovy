@@ -3,71 +3,92 @@ package org.pillarone.riskanalytics.core.modellingitem
 import org.pillarone.riskanalytics.core.simulation.item.*
 
 class ModellingItemCopyUtils {
-    static Parameterization copyModellingItem(Parameterization source, boolean withDependencies = true) {
-        Parameterization parameterization = new Parameterization(source.name, source.modelClass)
-        parameterization.id = source.id
-        parameterization.versionNumber = source.versionNumber?.clone()
-        parameterization.creationDate = source.creationDate
-        parameterization.modificationDate = source.modificationDate
-        parameterization.creator = source.creator
-        parameterization.lastUpdater = source.lastUpdater
-        if (withDependencies) {
-            parameterization.tags = source.tags
+    static Parameterization copyModellingItem(Parameterization source, Parameterization target, boolean withDependencies = true) {
+        if (!source) {
+            return null
         }
-        parameterization.valid = source.valid
-        parameterization.status = source.status
-        parameterization.dealId = source.dealId
-        return parameterization
-    }
-
-    static ResultConfiguration copyModellingItem(ResultConfiguration dao, boolean withDependencies = true) {
-        ResultConfiguration resultConfiguration = new ResultConfiguration(dao.name)
-        resultConfiguration.id = dao.id
-        resultConfiguration.modelClass = dao.modelClass
-        resultConfiguration.versionNumber = dao.versionNumber?.clone()
-        resultConfiguration.creationDate = dao.creationDate
-        resultConfiguration.modificationDate = dao.modificationDate
-        resultConfiguration.creator = dao.creator
-        resultConfiguration.lastUpdater = dao.lastUpdater
-        return resultConfiguration
-    }
-
-    static Simulation copyModellingItem(Simulation dao, boolean withDependencies = true) {
-        Simulation simulation = new Simulation(dao.name)
-        simulation.id = dao.id
+        target = target ?: new Parameterization(source.name)
+        target.name = source.name
+        target.modelClass = source.modelClass
+        target.id = source.id
+        target.versionNumber = source.versionNumber?.clone()
+        target.creationDate = source.creationDate
+        target.modificationDate = source.modificationDate
+        target.creator = source.creator
+        target.lastUpdater = source.lastUpdater
         if (withDependencies) {
-            simulation.parameterization = copyModellingItem(dao.parameterization)
-            simulation.template = copyModellingItem(dao.template)
-            simulation.tags = dao.tags
+            target.tags = source.tags
         }
-        simulation.modelClass = dao.modelClass
-        simulation.modelVersionNumber = dao.modelVersionNumber?.clone()
-        simulation.end = dao.end
-        simulation.start = dao.start
-        simulation.creationDate = dao.creationDate
-        simulation.modificationDate = dao.modificationDate
-        simulation.creator = dao.creator
-        simulation.numberOfIterations = dao.numberOfIterations
-        return simulation
+        target.valid = source.valid
+        target.status = source.status
+        target.dealId = source.dealId
+        return target
     }
 
-    static Resource copyModellingItem(Resource dao, boolean withDependencies = true) {
-        Resource resource = new Resource(dao.name, dao.modelClass)
-        resource.id = dao.id
-        resource.versionNumber = dao.versionNumber?.clone()
-        resource.creationDate = dao.creationDate
-        resource.modificationDate = dao.modificationDate
-        resource.creator = dao.creator
-        resource.lastUpdater = dao.lastUpdater
+    static ResultConfiguration copyModellingItem(ResultConfiguration source, ResultConfiguration target, boolean withDependencies = true) {
+        if (!source) {
+            return null
+        }
+        target = target ?: new ResultConfiguration(source.name)
+        target.name = source.name
+        target.id = source.id
+        target.modelClass = source.modelClass
+        target.versionNumber = source.versionNumber?.clone()
+        target.creationDate = source.creationDate
+        target.modificationDate = source.modificationDate
+        target.creator = source.creator
+        target.lastUpdater = source.lastUpdater
+        return target
+    }
+
+    static Simulation copyModellingItem(Simulation source, Simulation target, boolean withDependencies = true) {
+        if (!source) {
+            return null
+        }
+        target = target ?: new Simulation(source.name)
+        target.name = source.name
+        target.id = source.id
         if (withDependencies) {
-            resource.tags = dao.tags
+            target.parameterization = copyModellingItem(source.parameterization, target.parameterization, withDependencies)
+            target.template = copyModellingItem(source.template, target.template, withDependencies)
+            target.tags = source.tags
         }
-        resource.valid = dao.valid
-        resource.status = dao.status
-        return resource
+        target.modelClass = source.modelClass
+        target.modelVersionNumber = source.modelVersionNumber?.clone()
+        target.end = source.end
+        target.start = source.start
+        target.creationDate = source.creationDate
+        target.modificationDate = source.modificationDate
+        target.creator = source.creator
+        target.numberOfIterations = source.numberOfIterations
+        return target
     }
 
-    static ModellingItem copyModellingItem(Object dao, boolean withDependencies = true) {
-        return null
+    static Resource copyModellingItem(Resource source, Resource target, boolean withDependencies = true) {
+        if (!source) {
+            return null
+        }
+        target = target ?: new Resource(source.name, source.modelClass)
+        target.name = source.name
+        target.modelClass = source.modelClass
+        target.id = source.id
+        target.versionNumber = source.versionNumber?.clone()
+        target.creationDate = source.creationDate
+        target.modificationDate = source.modificationDate
+        target.creator = source.creator
+        target.lastUpdater = source.lastUpdater
+        if (withDependencies) {
+            target.tags = source.tags
+        }
+        target.valid = source.valid
+        target.status = source.status
+        return target
+    }
+
+    static ModellingItem copyModellingItem(ModellingItem source, ModellingItem target, boolean withDependencies = true) {
+        if (!source) {
+            return null
+        }
+        return target
     }
 }

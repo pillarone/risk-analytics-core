@@ -85,8 +85,5 @@ class ModellingItemMapper {
 
     static ModellingItem getModellingItem(Object dao, boolean withDependencies = true) {
         return null
-//        throw new IllegalStateException(
-//          "getModellingItem called for ${dao.getClass().getSimpleName()}! Expected: ParameterizationDAO,ResourceDAO,ResultConfigurationDAO,SimulationRun.. "
-//        )
     }
 }

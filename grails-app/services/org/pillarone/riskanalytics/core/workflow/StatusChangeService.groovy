@@ -56,9 +56,9 @@ class StatusChangeService {
                         throw new WorkflowException(
                                 "P14n '" + parameterization.name + "'",
                                 DATA_ENTRY,
-                                "Deal '" + getTransactionName(parameterization.dealId) + "' already used in Model " + (parameterization.modelClass?.simpleName-"Model") +
-                                "\nEg in workflow P14n: '"+ nameAndVersion + "'" +
-                                "\nCan you work with one of the existing workflow P14ns, or choose a different deal ?"
+                                "Deal '" + getTransactionName(parameterization.dealId) + "' already used in Model " + (parameterization.modelClass?.simpleName - "Model") +
+                                        "\nEg in workflow P14n: '" + nameAndVersion + "'" +
+                                        "\nCan you work with one of the existing workflow P14ns, or choose a different deal ?"
                         )
                     }
                 }
@@ -73,6 +73,7 @@ class StatusChangeService {
                 return newParameterization
             },
             (IN_REVIEW): { Parameterization parameterization ->
+                validate(parameterization)
                 audit(parameterization.status, IN_REVIEW, parameterization, parameterization)
                 parameterization.status = IN_REVIEW
                 parameterization.save()
@@ -85,6 +86,15 @@ class StatusChangeService {
                 return parameterization
             }
     ]
+
+    void validate(Parameterization parameterization) {
+        //are there any validation errors ?
+        parameterization.validate()
+        if (parameterization.realValidationErrors) {
+            throw new WorkflowException("P14n '" + parameterization.name + "'", IN_REVIEW, "Pls fix validation errors in model.")
+        }
+
+    }
 
     @CompileStatic
     Parameterization changeStatus(Parameterization parameterization, Status to) {

@@ -35,6 +35,8 @@ public class SimulationScope {
     int numberOfIterations
     int iterationsDone
 
+    private boolean canceled = false
+
     Model model
     volatile Simulation simulation
     StructureInformation structureInformation
@@ -124,4 +126,11 @@ public class SimulationScope {
         simulation?.numberOfIterations = numberOfIterations
     }
 
+    void cancel() {
+        canceled = true
+    }
+
+    boolean isCanceled() {
+        canceled
+    }
 }

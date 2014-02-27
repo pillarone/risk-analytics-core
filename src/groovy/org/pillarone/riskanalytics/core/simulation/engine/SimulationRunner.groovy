@@ -165,6 +165,7 @@ public class SimulationRunner {
     @CompileStatic
     public synchronized void cancel() {
         LOG.info("Simulation cancelled by user")
+        currentScope.cancel()
         simulationAction.cancel()
         simulationState = SimulationState.CANCELED
     }

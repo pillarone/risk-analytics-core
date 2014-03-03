@@ -75,7 +75,7 @@ class ResultConfiguration extends ModellingItem {
         lastUpdater = dao.getLastUpdater()
 
         //These collectors are used by the UI only, therefore wildcard collectors must not be resolved here
-        collectors = dao.collectorInformation.collect {CollectorInformation ci ->
+        collectors = dao.collectorInformation.collect { CollectorInformation ci ->
             PacketCollector collector = new PacketCollector(CollectingModeFactory.getStrategy(ci.collectingStrategyIdentifier))
             collector.path = ci.path.pathName
             return collector
@@ -87,9 +87,9 @@ class ResultConfiguration extends ModellingItem {
             c.path == path
         }
         if (collector != null) {
-            if (mode){
+            if (mode) {
                 collector.mode = mode
-            }else {
+            } else {
                 collectors.remove(collector)
             }
         } else {
@@ -97,8 +97,8 @@ class ResultConfiguration extends ModellingItem {
         }
     }
 
-    public PacketCollector getCollector(String path){
-        collectors.find {it.path == path}
+    public PacketCollector getCollector(String path) {
+        collectors.find { it.path == path }
     }
 
     protected void mapToDao(Object dao) {
@@ -146,7 +146,7 @@ class ResultConfiguration extends ModellingItem {
     @CompileStatic
     void setModelClass(Class clazz) {
         super.setModelClass(clazz)
-        modelVersionNumber = Model.getModelVersion(clazz)
+        modelVersionNumber = clazz ? Model.getModelVersion(clazz) : null
     }
 
     public boolean isUsedInSimulation() {

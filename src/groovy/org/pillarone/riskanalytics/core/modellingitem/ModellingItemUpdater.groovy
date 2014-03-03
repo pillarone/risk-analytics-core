@@ -2,12 +2,12 @@ package org.pillarone.riskanalytics.core.modellingitem
 
 import org.pillarone.riskanalytics.core.simulation.item.*
 
-class ModellingItemCopyUtils {
-    static Parameterization copyModellingItem(Parameterization source, Parameterization target, boolean withDependencies = true) {
+class ModellingItemUpdater {
+    static Parameterization createOrUpdateModellingItem(ParameterizationCacheItem source, Parameterization target) {
         if (!source) {
             return null
         }
-        target = target ?: new Parameterization(source.name)
+        target = target ?: new Parameterization(source.name ?: [:])
         target.name = source.name
         target.modelClass = source.modelClass
         target.id = source.id
@@ -16,16 +16,14 @@ class ModellingItemCopyUtils {
         target.modificationDate = source.modificationDate
         target.creator = source.creator
         target.lastUpdater = source.lastUpdater
-        if (withDependencies) {
-            target.tags = source.tags
-        }
+        target.tags = source.tags
         target.valid = source.valid
         target.status = source.status
         target.dealId = source.dealId
         return target
     }
 
-    static ResultConfiguration copyModellingItem(ResultConfiguration source, ResultConfiguration target, boolean withDependencies = true) {
+    static ResultConfiguration createOrUpdateModellingItem(ResultConfigurationCacheItem source, ResultConfiguration target) {
         if (!source) {
             return null
         }
@@ -41,18 +39,16 @@ class ModellingItemCopyUtils {
         return target
     }
 
-    static Simulation copyModellingItem(Simulation source, Simulation target, boolean withDependencies = true) {
+    static Simulation createOrUpdateModellingItem(SimulationCacheItem source, Simulation target) {
         if (!source) {
             return null
         }
         target = target ?: new Simulation(source.name)
         target.name = source.name
         target.id = source.id
-        if (withDependencies) {
-            target.parameterization = copyModellingItem(source.parameterization, target.parameterization, withDependencies)
-            target.template = copyModellingItem(source.template, target.template, withDependencies)
-            target.tags = source.tags
-        }
+        target.parameterization = createOrUpdateModellingItem(source.parameterization, target.parameterization)
+        target.template = createOrUpdateModellingItem(source.resultConfiguration, target.template)
+        target.tags = source.tags
         target.modelClass = source.modelClass
         target.modelVersionNumber = source.modelVersionNumber?.clone()
         target.end = source.end
@@ -64,7 +60,7 @@ class ModellingItemCopyUtils {
         return target
     }
 
-    static Resource copyModellingItem(Resource source, Resource target, boolean withDependencies = true) {
+    static Resource createOrUpdateModellingItem(ResourceCacheItem source, Resource target) {
         if (!source) {
             return null
         }
@@ -77,15 +73,13 @@ class ModellingItemCopyUtils {
         target.modificationDate = source.modificationDate
         target.creator = source.creator
         target.lastUpdater = source.lastUpdater
-        if (withDependencies) {
-            target.tags = source.tags
-        }
+        target.tags = source.tags
         target.valid = source.valid
         target.status = source.status
         return target
     }
 
-    static ModellingItem copyModellingItem(ModellingItem source, ModellingItem target, boolean withDependencies = true) {
+    static ModellingItem createOrUpdateModellingItem(CacheItem source, ModellingItem target) {
         if (!source) {
             return null
         }

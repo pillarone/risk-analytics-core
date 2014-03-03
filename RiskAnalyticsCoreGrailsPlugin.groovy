@@ -6,23 +6,10 @@ import org.gridgain.grid.spi.collision.fifoqueue.GridFifoQueueCollisionSpi
 import org.gridgain.grid.spi.failover.never.GridNeverFailoverSpi
 import org.joda.time.DateTimeZone
 import org.pillarone.riskanalytics.core.FileConstants
-import org.pillarone.riskanalytics.core.example.migration.TestConstrainedTable
-import org.pillarone.riskanalytics.core.example.parameter.ExampleResourceConstraints
-import org.pillarone.riskanalytics.core.modellingitem.ModellingItemHibernateListener
 import org.pillarone.riskanalytics.core.log.TraceLogManager
-import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
-import org.pillarone.riskanalytics.core.output.AggregatedWithSingleAvailableCollectingModeStrategy
-import org.pillarone.riskanalytics.core.output.CollectingModeFactory
-import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
-import org.pillarone.riskanalytics.core.output.aggregation.PacketAggregatorRegistry
-import org.pillarone.riskanalytics.core.output.aggregation.SumAggregator
-import org.pillarone.riskanalytics.core.output.aggregation.SumAggregatorSingleValuePacket
+import org.pillarone.riskanalytics.core.modellingitem.CacheItemHibernateListener
 import org.pillarone.riskanalytics.core.output.batch.calculations.GenericBulkInsert as GenericCalculationBulkInsert
 import org.pillarone.riskanalytics.core.output.batch.results.GenericBulkInsert as GenericResultBulkInsert
-import org.pillarone.riskanalytics.core.packets.Packet
-import org.pillarone.riskanalytics.core.packets.SingleValuePacket
-import org.pillarone.riskanalytics.core.parameterization.ConstraintsFactory
-import org.pillarone.riskanalytics.core.parameterization.SimpleConstraint
 import org.pillarone.riskanalytics.core.remoting.IResultService
 import org.pillarone.riskanalytics.core.remoting.ITransactionService
 import org.pillarone.riskanalytics.core.remoting.impl.ResultService
@@ -127,12 +114,12 @@ Persistence & Simulation engine.
             configuration = ref('grid.cfg')
         }
 
-        modellingItemListener(ModellingItemHibernateListener)
+        cacheItemListener(CacheItemHibernateListener)
 
         hibernateEventListeners(HibernateEventListeners) {
-            listenerMap = ['post-commit-insert': modellingItemListener,
-                    'post-commit-update': modellingItemListener,
-                    'post-commit-delete': modellingItemListener]
+            listenerMap = ['post-commit-insert': cacheItemListener,
+                    'post-commit-update': cacheItemListener,
+                    'post-commit-delete': cacheItemListener]
         }
 
         mappingCache(MappingCache) {}

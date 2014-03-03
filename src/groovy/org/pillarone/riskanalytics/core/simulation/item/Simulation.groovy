@@ -73,7 +73,7 @@ class Simulation extends ParametrizedItem {
         run.model = getModelClass()?.name
         run.parameterization = ParameterizationDAO.find(parameterization.name, run.model, parameterization.versionNumber.toString())
         run.resultConfiguration = ResultConfigurationDAO.find(template.name, run.model, template.versionNumber.toString())
-        if( run.resultConfiguration == null){ //PMO-2648
+        if (run.resultConfiguration == null) { //PMO-2648
             LOG.warn("Missing result template! name:${template.name}, ver:${template.versionNumber.toString()}, model:${run.model} referenced by sim: ${run.name}")
             LOG.warn("Nulls saved to sim's result config id are known to BREAK GUI startup (PMO-2648)")
         }
@@ -177,7 +177,7 @@ class Simulation extends ParametrizedItem {
             run.removeFromTags(tag)
 
         }
-        tagsToRemove.each {it.delete()}
+        tagsToRemove.each { it.delete() }
 
         for (Tag tag in tags) {
             if (!run.tags*.tag?.contains(tag)) {
@@ -187,12 +187,12 @@ class Simulation extends ParametrizedItem {
     }
 
     public void setTags(Set selectedTags) {
-        selectedTags.each {Tag tag ->
+        selectedTags.each { Tag tag ->
             if (!tags.contains(tag))
                 tags << tag
         }
         List tagsToRemove = []
-        tags.each {Tag tag ->
+        tags.each { Tag tag ->
             if (!selectedTags.contains(tag))
                 tagsToRemove << tag
         }
@@ -237,7 +237,7 @@ class Simulation extends ParametrizedItem {
     @TypeChecked
     void setModelClass(Class clazz) {
         super.setModelClass(clazz)
-        modelVersionNumber = Model.getModelVersion(clazz)
+        modelVersionNumber = clazz ? Model.getModelVersion(clazz) : null
     }
 
     CommentDAO getItemCommentDAO(def dao) {
@@ -257,6 +257,7 @@ class Simulation extends ParametrizedItem {
         hashCodeBuilder.append(modelVersionNumber.toString())
         return hashCodeBuilder.toHashCode()
     }
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Simulation) {

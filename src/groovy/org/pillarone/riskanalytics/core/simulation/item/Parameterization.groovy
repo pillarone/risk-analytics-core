@@ -68,28 +68,28 @@ class Parameterization extends ParametrizedItem {
 
     public Parameterization(Map params) {
         this(params.remove("name").toString())
-        params.each {k, v ->
+        params.each { k, v ->
             this[k] = v
         }
     }
 
-    void logAttemptToDelete(){
+    void logAttemptToDelete() {
         LOG.info("Deleting ${getClass().simpleName}: ${name} v${versionNumber} (status: ${status})")
     }
 
     //frahman 20140104 Convenience method for occasional checkups outside of model migrations.
     //Can just call this during BootStrap against a copy of your DB and present your users with any errors.
     //
-    static void warnAllPnValidationErrors( Class<? extends MigratableModel> modelClass ){
+    static void warnAllPnValidationErrors(Class<? extends MigratableModel> modelClass) {
         LOG.info("Checking all ${modelClass.name} Pns for validation errors")
-        for( ParameterizationDAO dao in ParameterizationDAO.findAllByModelClassName(modelClass.name) ){
+        for (ParameterizationDAO dao in ParameterizationDAO.findAllByModelClassName(modelClass.name)) {
             Parameterization parameterization = new Parameterization(dao.name)
             parameterization.versionNumber = new VersionNumber(dao.itemVersion)
             parameterization.modelClass = modelClass
             parameterization.load(true)
             LOG.info("Validating ${parameterization.nameAndVersion} for errors")
             parameterization.validate()
-            if( !parameterization.valid ){
+            if (!parameterization.valid) {
                 LOG.warn("${parameterization.nameAndVersion} has validation errors: [" + parameterization.getValidationErrors() + "]")
             }
         }
@@ -125,17 +125,17 @@ class Parameterization extends ParametrizedItem {
             validations.addAll(validator.validate(parameterHolders.findAll { ParameterHolder it -> !it.removed }))
         }
 
-        valid = validations.empty || validations.every {ParameterValidation validation -> validation.validationType != ValidationType.ERROR}
+        valid = validations.empty || validations.every { ParameterValidation validation -> validation.validationType != ValidationType.ERROR }
         validationErrors = validations
     }
 
     //Beware of naming a method getXXX because it might suppress a generated field getter and then you screw up
     //callers expecting to get the field instead. More joys of dynamic typed 'languages'.
-    String getRealValidationErrors(){
+    String getRealValidationErrors() {
         StringBuilder errors = new StringBuilder();
         validationErrors.each {
-            if( it.validationType == ValidationType.ERROR ){
-                errors.append( "Error msg: ${it.msg} for path ${it.path}; " )
+            if (it.validationType == ValidationType.ERROR) {
+                errors.append("Error msg: ${it.msg} for path ${it.path}; ")
                 // Eg Error msg: period.value.below.min.period for path structures:subOverall:parmContractStrategy:structure;
             }
         }
@@ -144,7 +144,7 @@ class Parameterization extends ParametrizedItem {
 
     public save() {
         def result = null
-        daoClass.withTransaction {TransactionStatus status ->
+        daoClass.withTransaction { TransactionStatus status ->
             def daoToBeSaved = getDao()
             validate()
             if (!valid) {
@@ -244,7 +244,7 @@ class Parameterization extends ParametrizedItem {
             dao.removeFromTags(tag)
 
         }
-        tagsToRemove.each {it.delete()}
+        tagsToRemove.each { it.delete() }
 
         for (Tag tag in tags) {
             if (!dao.tags*.tag?.contains(tag)) {
@@ -453,8 +453,7 @@ class Parameterization extends ParametrizedItem {
         if (!tags.contains(locked) && isUsedInSimulation()) {
             tags << locked
             changed = true
-        }
-        else if (tags.contains(locked) && !isUsedInSimulation()) {
+        } else if (tags.contains(locked) && !isUsedInSimulation()) {
             tags.remove(locked)
             changed = true
         }
@@ -464,12 +463,12 @@ class Parameterization extends ParametrizedItem {
     }
 
     public void setTags(Set selectedTags) {
-        selectedTags.each {Tag tag ->
+        selectedTags.each { Tag tag ->
             if (!tags.contains(tag))
                 tags << tag
         }
         List tagsToRemove = []
-        tags.each {Tag tag ->
+        tags.each { Tag tag ->
             if (!selectedTags.contains(tag))
                 tagsToRemove << tag
         }
@@ -478,15 +477,15 @@ class Parameterization extends ParametrizedItem {
     }
 
     List getParameters(String path) {
-        def params = parameters.findAll {ParameterHolder parameter ->
+        def params = parameters.findAll { ParameterHolder parameter ->
             parameter.path == path && !parameter.removed
         }
-        ArrayList list = params.toList().sort {orderByPath ? it.path : it.periodIndex }
+        ArrayList list = params.toList().sort { orderByPath ? it.path : it.periodIndex }
         return list
     }
 
     List<ParameterHolder> getParameters() {
-        return (orderByPath) ? parameterHolders.sort { it.path} : parameterHolders
+        return (orderByPath) ? parameterHolders.sort { it.path } : parameterHolders
     }
 
     ConfigObject toConfigObject() {
@@ -502,11 +501,11 @@ class Parameterization extends ParametrizedItem {
         if (periodLabels) {
             original.periodLabels = periodLabels
         }
-        parameters.each {ParameterHolder p ->
+        parameters.each { ParameterHolder p ->
             ConfigObject configObject = original
 
             String[] keys = "components:${p.path}".split(":")
-            keys.eachWithIndex {key, index ->
+            keys.eachWithIndex { key, index ->
                 configObject = configObject[key]
                 if (index + 1 == keys.length) {
                     configObject[p.periodIndex] = p.businessObject
@@ -519,7 +518,7 @@ class Parameterization extends ParametrizedItem {
         }
 
         original.tags = []
-        tags.each {Tag tag ->
+        tags.each { Tag tag ->
             if (tag.toString() != Tag.LOCKED_TAG) {
                 original.tags << tag.toString()
             }
@@ -539,7 +538,7 @@ class Parameterization extends ParametrizedItem {
     @CompileStatic
     void setModelClass(Class clazz) {
         super.setModelClass(clazz)
-        modelVersionNumber = Model.getModelVersion(clazz)
+        modelVersionNumber = clazz ? Model.getModelVersion(clazz) : null
     }
 
     @CompileStatic

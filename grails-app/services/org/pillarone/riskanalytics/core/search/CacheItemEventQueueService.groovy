@@ -85,18 +85,5 @@ class CacheItemEventQueueService {
         }
     }
 
-    public static class CacheItemEvent {
 
-        CacheItem item
-        EventType eventType
-
-        @Override
-        String toString() {
-            return "$item $eventType"
-        }
-
-        enum EventType {
-            ADDED, REMOVED, UPDATED
-        }
-    }
 }

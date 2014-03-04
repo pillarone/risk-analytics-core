@@ -3,39 +3,34 @@ package org.pillarone.riskanalytics.core.search
 import grails.test.mixin.TestFor
 import org.junit.Before
 import org.junit.Test
-import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.modellingitem.CacheItem
 import org.pillarone.riskanalytics.core.modellingitem.CacheItemHibernateListener
 import org.pillarone.riskanalytics.core.modellingitem.ResourceCacheItem
 
-import static org.pillarone.riskanalytics.core.search.CacheItemEventQueueService.*
-import static org.pillarone.riskanalytics.core.search.CacheItemEventQueueService.CacheItemEvent.EventType.*
+import static org.pillarone.riskanalytics.core.search.CacheItemEvent.EventType.*
 
 @TestFor(CacheItemEventQueueService)
 class CacheItemEventQueueServiceTests {
 
-    CacheItemEventQueueService cacheItemEventQueueService
-    TestHibernateListener hibernateListener
+    TestHibernateListener hibernateListenerForTest
     CacheItemEventConsumer consumer
-
-    private ParameterizationDAO dao
 
     @Before
     void setUp() {
-        hibernateListener = new TestHibernateListener()
-        cacheItemEventQueueService = new CacheItemEventQueueService(cacheItemListener: hibernateListener)
-        cacheItemEventQueueService.init()
+        hibernateListenerForTest = new TestHibernateListener()
+        service.cacheItemListener = hibernateListenerForTest
+        service.init()
         consumer = new CacheItemEventConsumer(new Object(), new Object())
-        cacheItemEventQueueService.register(consumer)
-        assert hibernateListener._listeners.size() == 1
+        service.register(consumer)
+        assert hibernateListenerForTest._listeners.size() == 1
 
     }
 
     @Test
     void testAddEvent() {
         CacheItem item = createCacheItem()
-        hibernateListener.itemAdded(item)
-        List<CacheItemEvent> events = cacheItemEventQueueService.pollCacheItemEvents(consumer)
+        hibernateListenerForTest.itemAdded(item)
+        List<CacheItemEvent> events = service.pollCacheItemEvents(consumer)
         assert events.size() == 1
         CacheItemEvent first = events.first()
         assert first.eventType == ADDED
@@ -45,8 +40,8 @@ class CacheItemEventQueueServiceTests {
     @Test
     void testRemoveEvent() {
         CacheItem item = createCacheItem()
-        hibernateListener.itemDeleted(item)
-        List<CacheItemEvent> events = cacheItemEventQueueService.pollCacheItemEvents(consumer)
+        hibernateListenerForTest.itemDeleted(item)
+        List<CacheItemEvent> events = service.pollCacheItemEvents(consumer)
         assert events.size() == 1
         CacheItemEvent first = events.first()
         assert first.eventType == REMOVED
@@ -56,8 +51,8 @@ class CacheItemEventQueueServiceTests {
     @Test
     void testUpdateEvent() {
         CacheItem item = createCacheItem()
-        hibernateListener.itemChanged(item)
-        List<CacheItemEvent> events = cacheItemEventQueueService.pollCacheItemEvents(consumer)
+        hibernateListenerForTest.itemChanged(item)
+        List<CacheItemEvent> events = service.pollCacheItemEvents(consumer)
         assert events.size() == 1
         CacheItemEvent first = events.first()
         assert first.eventType == UPDATED
@@ -66,12 +61,12 @@ class CacheItemEventQueueServiceTests {
 
     @Test(expected = NullPointerException)
     void testCleanup() {
-        cacheItemEventQueueService.cleanUp()
-        assert hibernateListener._listeners.size() == 0
-        cacheItemEventQueueService.pollCacheItemEvents(consumer)
+        service.cleanUp()
+        assert hibernateListenerForTest._listeners.size() == 0
+        service.pollCacheItemEvents(consumer)
     }
 
-    private ResourceCacheItem createCacheItem() {
+    private static ResourceCacheItem createCacheItem() {
         new ResourceCacheItem(1l, 'resource', null, null, null, null, null, null, null, false, null)
     }
 

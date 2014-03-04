@@ -7,67 +7,64 @@ import org.junit.Test
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
 import org.pillarone.riskanalytics.core.modellingitem.CacheItem
-import org.pillarone.riskanalytics.core.simulation.item.ModellingItem
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 
 import static org.junit.Assert.*
 
 class CacheItemSearchServiceTests {
 
-    CacheItemSearchService modellingItemSearchService
+    CacheItemSearchService cacheItemSearchService
 
     @Before
     void setUp() {
-        modellingItemSearchService = Holders.grailsApplication.mainContext.getBean(CacheItemSearchService)
+        cacheItemSearchService = Holders.grailsApplication.mainContext.getBean(CacheItemSearchService)
         FileImportService.importModelsIfNeeded(['Core', 'Application'])
-        modellingItemSearchService.refresh()
+        cacheItemSearchService.refresh()
     }
 
     @Test
     void testService() {
-        final List<CacheItem> results = modellingItemSearchService.search([new AllFieldsFilter(query: "Parameters")])
+        List<CacheItem> results = cacheItemSearchService.search([new AllFieldsFilter(query: "Parameters")])
 
         assertEquals(3, results.size())
 
-        Parameterization parameterization = new Parameterization("MyParameters", CoreModel)
+        Parameterization parametrization = new Parameterization("MyParameters", CoreModel)
         ParameterizationDAO.withNewSession {
-            parameterization.save()
+            parametrization.save()
         }
 
-        results = modellingItemSearchService.search([new AllFieldsFilter(query: "Parameters")])
+        results = cacheItemSearchService.search([new AllFieldsFilter(query: "Parameters")])
 
         assertEquals(4, results.size())
 
-        assertNotNull(results.find { it.id == parameterization.id })
+        assertNotNull(results.find { it.id == parametrization.id })
 
         ParameterizationDAO.withNewSession {
-            parameterization.delete()
+            parametrization.delete()
         }
 
-        results = modellingItemSearchService.search([new AllFieldsFilter(query: "Parameters")])
+        results = cacheItemSearchService.search([new AllFieldsFilter(query: "Parameters")])
 
         assertEquals(3, results.size())
 
-        assertNull(results.find { it.id == parameterization.id })
+        assertNull(results.find { it.id == parametrization.id })
 
     }
 
     @Test
     void testRenameParametrization() {
-
-        Parameterization parameterization = new Parameterization("MyParameters", CoreModel)
+        Parameterization parametrization = new Parameterization("MyParameters", CoreModel)
         ParameterizationDAO.withNewSession {
-            parameterization.save()
+            parametrization.save()
         }
-        List<ModellingItem> results = modellingItemSearchService.search([new AllFieldsFilter(query: "MyParameters")])
+        List<CacheItem> results = cacheItemSearchService.search([new AllFieldsFilter(query: "MyParameters")])
         assertEquals(1, results.size())
-
         ParameterizationDAO.withNewSession {
-            parameterization.rename("RenamedParameters")
+            parametrization.rename("RenamedParameters")
         }
-        results = modellingItemSearchService.search([new AllFieldsFilter(query: "MyParameters")])
+        results = cacheItemSearchService.search([new AllFieldsFilter(query: "MyParameters")])
         assertEquals(0, results.size())
-        results = modellingItemSearchService.search([new AllFieldsFilter(query: "RenamedParameters")])
+        results = cacheItemSearchService.search([new AllFieldsFilter(query: "RenamedParameters")])
         assertEquals(1, results.size())
     }
 }

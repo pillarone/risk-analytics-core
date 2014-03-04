@@ -11,64 +11,39 @@ import org.pillarone.riskanalytics.core.output.SimulationRun
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
-import java.util.concurrent.ConcurrentHashMap
 
 class CacheItemSearchService {
 
     private final static Log LOG = LogFactory.getLog(CacheItemSearchService)
     private final
-    static boolean profileCacheFiltering = System.getProperty("disableProfileCacheFiltering", "false").equalsIgnoreCase("false")
+    static boolean PROFILE_CACHE_FILTERING = System.getProperty("disableProfileCacheFiltering", "false").equalsIgnoreCase("false")
 
     static transactional = false
 
     CacheItemHibernateListener cacheItemListener
 
-    private List<CacheItem> cache = []
-
-    private CacheItemListener listener = new SearchCacheItemListener()
-
-    private
-    final Map<CacheItemEventConsumer, List<CacheItemEvent>> queue = new ConcurrentHashMap<CacheItemEventConsumer, List<CacheItemEvent>>()
+    private List<CacheItem> cache
+    private CacheItemListener listener
 
     @PostConstruct
     void init() {
+        cache = []
         createInitialIndex()
+        listener = new SearchCacheItemListener()
         cacheItemListener.addCacheItemListener(listener)
     }
 
     @PreDestroy
     void cleanUp() {
         cacheItemListener.removeCacheItemListener(listener)
-        cache.clear()
-        queue.clear()
-    }
-
-    void register(CacheItemEventConsumer consumer) {
-        if (queue.containsKey(consumer)) {
-            LOG.warn("Consumer already registered $consumer")
-        }
-        queue[consumer] = new ArrayList<CacheItemEvent>()
-    }
-
-    void unregisterAllConsumersForSession(Object session) {
-        synchronized (queue) {
-            queue.keySet().findAll { CacheItemEventConsumer c -> c.session == session }.each { queue.remove(it) }
-        }
-    }
-
-    List<CacheItemEvent> getPendingEvents(CacheItemEventConsumer consumer) {
-        synchronized (queue) {
-            List<CacheItemEvent> result = queue[consumer]
-            queue[consumer] = new ArrayList<CacheItemEvent>()
-            return result
-        }
+        cache = null
     }
 
     protected synchronized void createInitialIndex() {
         LOG.info("start creating initial index.")
 
         long t;
-        if (profileCacheFiltering) {
+        if (PROFILE_CACHE_FILTERING) {
             LOG.info("-DdisableProfileCacheFiltering not set, will time search service")
             t = System.currentTimeMillis()
         } else {
@@ -91,7 +66,7 @@ class CacheItemSearchService {
             }
         }
         LOG.info("end creating initial index.")
-        if (profileCacheFiltering) {
+        if (PROFILE_CACHE_FILTERING) {
             t = System.currentTimeMillis() - t
             LOG.info("Timed " + t + " ms: creating initial index");
         }
@@ -107,14 +82,14 @@ class CacheItemSearchService {
         long t
         long start
 
-        if (profileCacheFiltering) {
+        if (PROFILE_CACHE_FILTERING) {
             start = System.currentTimeMillis()
         }
 
         List<CacheItem> results = []
         List<CacheItem> cacheCopy = new ArrayList<CacheItem>(cache)
 
-        if (profileCacheFiltering) {
+        if (PROFILE_CACHE_FILTERING) {
             t = System.currentTimeMillis()
             LOG.info("Timed " + (t - start) + " ms: copying cache")
         }
@@ -124,13 +99,13 @@ class CacheItemSearchService {
                 results << item
             }
         }
-        if (profileCacheFiltering) {
+        if (PROFILE_CACHE_FILTERING) {
             long now = System.currentTimeMillis()
             LOG.info("Timed " + (now - t) + " ms: filtered copy")
             t = now
         }
 
-        if (profileCacheFiltering) {
+        if (PROFILE_CACHE_FILTERING) {
             long now = System.currentTimeMillis()
             LOG.info("Timed " + (now - t) + " ms: collecting. Total: " + (now - start) / 1000 + " sec.");
         }
@@ -167,7 +142,9 @@ class CacheItemSearchService {
     }
 
     private synchronized void internalUpdateModellingItemInIndex(ResultConfigurationCacheItem item) {
-        List<CacheItem> allSimulations = cache.findAll { it instanceof SimulationCacheItem }
+        List<SimulationCacheItem> allSimulations = cache.findAll {
+            it instanceof SimulationCacheItem
+        } as List<SimulationCacheItem>
         for (SimulationCacheItem simulation in allSimulations) {
             if (simulation.resultConfiguration.equals(item)) {
                 simulation.resultConfiguration = item
@@ -183,46 +160,14 @@ class CacheItemSearchService {
 
         void itemAdded(CacheItem item) {
             addModellingItemToIndex(item)
-            synchronized (queue) {
-                for (List<CacheItemEvent> list in queue.values()) {
-                    list << new CacheItemEvent(item: item, eventType: EventType.ADDED)
-                }
-            }
         }
 
         void itemDeleted(CacheItem item) {
             removeModellingItemFromIndex(item)
-            synchronized (queue) {
-                for (List<CacheItemEvent> list in queue.values()) {
-                    list << new CacheItemEvent(item: item, eventType: EventType.REMOVED)
-                }
-            }
         }
 
         void itemChanged(CacheItem item) {
             updateModellingItemInIndex(item)
-            synchronized (queue) {
-                for (List<CacheItemEvent> list in queue.values()) {
-                    list << new CacheItemEvent(item: item, eventType: EventType.UPDATED)
-                }
-            }
         }
-    }
-
-    public static class CacheItemEvent {
-
-        CacheItem item
-        EventType eventType
-
-        @Override
-        String toString() {
-            return "$item $eventType"
-        }
-
-
-    }
-
-    public static enum EventType {
-        ADDED, REMOVED, UPDATED
     }
 }

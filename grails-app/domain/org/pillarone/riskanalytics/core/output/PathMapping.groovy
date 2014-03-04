@@ -6,8 +6,8 @@ class PathMapping implements Serializable {
 
     String toString() { pathName }
 
-    long pathID(){
-        return id
+    long pathID() {
+        id
     }
 
 }

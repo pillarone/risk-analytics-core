@@ -17,12 +17,12 @@ class ConfigObjectHolder {
         data type: 'text'
     }
 
-    public ConfigObject asConfigObject() {
+    ConfigObject asConfigObject() {
         ConfigObject result
         GroovyUtils.parseGroovyScript data, { ConfigObject config ->
             result = config
         }
-        return result
+        result
     }
 
 }

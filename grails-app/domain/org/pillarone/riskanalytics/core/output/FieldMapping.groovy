@@ -6,7 +6,7 @@ class FieldMapping implements Serializable {
 
     @Override
     String toString() {
-        return fieldName
+        fieldName
     }
 
 }

@@ -6,7 +6,7 @@ class CollectorMapping implements Serializable {
 
     @Override
     String toString() {
-        return collectorName
+        collectorName
     }
 
     static constraints = {

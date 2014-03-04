@@ -19,6 +19,7 @@ import static org.junit.Assert.*
 
 class BatchRunTests {
 
+    def batchRunService
 
     @Test
     public void testAddSimulationRun() {
@@ -30,40 +31,40 @@ class BatchRunTests {
         BatchRun batch = BatchRun.findByName("Test")
         assertNotNull batch
 
-        def bRuns = batch.batchRunService.getSimulationRuns(batch)
+        def bRuns = batchRunService.getSimulationRuns(batch)
         assertTrue bRuns.size() == 0
 
         Simulation simulation = createSimulation("simulation1")
-        batch.batchRunService.addSimulationRun(batch, simulation, OutputStrategy.BATCH_DB_OUTPUT)
+        batchRunService.addSimulationRun(batch, simulation, OutputStrategy.BATCH_DB_OUTPUT)
 
         BatchRun bRun = BatchRun.findByName(batch.name)
 
-        assertTrue batch.batchRunService.getSimulationRuns(bRun).size() == 1
-        assertTrue batchRun.batchRunService.getSimulationRunAt(bRun, 0).name == simulation.name
+        assertTrue batchRunService.getSimulationRuns(bRun).size() == 1
+        assertTrue batchRunService.getSimulationRunAt(bRun, 0).name == simulation.name
 
         Simulation simulation2 = createSimulation("simulation2")
-        batch.batchRunService.addSimulationRun(batch, simulation2, OutputStrategy.BATCH_DB_OUTPUT)
-        assertTrue batchRun.batchRunService.getSimulationRunAt(bRun, 1).name == simulation2.name
+        batchRunService.addSimulationRun(batch, simulation2, OutputStrategy.BATCH_DB_OUTPUT)
+        assertTrue batchRunService.getSimulationRunAt(bRun, 1).name == simulation2.name
 
-        assertTrue batch.batchRunService.getSimulationRuns(bRun).size() == 2
+        assertTrue batchRunService.getSimulationRuns(bRun).size() == 2
 
         Simulation simulation3 = createSimulation("simulation3")
-        batch.batchRunService.addSimulationRun(batch, simulation3, OutputStrategy.BATCH_DB_OUTPUT)
-        assertTrue batch.batchRunService.getSimulationRuns(bRun).size() == 3
-        assertTrue batchRun.batchRunService.getSimulationRunAt(bRun, 2).name == simulation3.name
+        batchRunService.addSimulationRun(batch, simulation3, OutputStrategy.BATCH_DB_OUTPUT)
+        assertTrue batchRunService.getSimulationRuns(bRun).size() == 3
+        assertTrue batchRunService.getSimulationRunAt(bRun, 2).name == simulation3.name
 
         //change a priority
-        batchRun.batchRunService.changePriority(bRun, simulation3.simulationRun, 1)
-        assertTrue batchRun.batchRunService.getSimulationRunAt(bRun, 2).name == simulation3.name
+        batchRunService.changePriority(bRun, simulation3.simulationRun, 1)
+        assertTrue batchRunService.getSimulationRunAt(bRun, 2).name == simulation3.name
 
-        batchRun.batchRunService.changePriority(bRun, simulation3.simulationRun, -1)
-        assertTrue batchRun.batchRunService.getSimulationRunAt(bRun, 2).name == simulation2.name
+        batchRunService.changePriority(bRun, simulation3.simulationRun, -1)
+        assertTrue batchRunService.getSimulationRunAt(bRun, 2).name == simulation2.name
 
-        batchRun.batchRunService.changePriority(bRun, simulation3.simulationRun, -1)
-        assertTrue batchRun.batchRunService.getSimulationRunAt(bRun, 1).name == simulation.name
+        batchRunService.changePriority(bRun, simulation3.simulationRun, -1)
+        assertTrue batchRunService.getSimulationRunAt(bRun, 1).name == simulation.name
 
-        batchRun.batchRunService.changePriority(bRun, simulation3.simulationRun, -1)
-        assertTrue batchRun.batchRunService.getSimulationRunAt(bRun, 1).name == simulation.name
+        batchRunService.changePriority(bRun, simulation3.simulationRun, -1)
+        assertTrue batchRunService.getSimulationRunAt(bRun, 1).name == simulation.name
     }
 
     @Test
@@ -76,15 +77,15 @@ class BatchRunTests {
 
         BatchRun batch = BatchRun.findByName("Test")
 
-        def bRuns = batch.batchRunService.getSimulationRuns(batch)
+        def bRuns = batchRunService.getSimulationRuns(batch)
         assertTrue bRuns.size() == 0
 
         Simulation simulation = createSimulation("simulation1")
-        batch.batchRunService.addSimulationRun(batch, simulation, OutputStrategy.BATCH_DB_OUTPUT)
+        batchRunService.addSimulationRun(batch, simulation, OutputStrategy.BATCH_DB_OUTPUT)
 
         BatchRun bRun = BatchRun.findByName(batch.name)
         assertNotNull bRun
-        bRun.batchRunService.deleteBatchRun(bRun)
+        batchRunService.deleteBatchRun(bRun)
 
         bRun = BatchRun.findByName(batch.name)
         assertNull bRun
@@ -102,25 +103,25 @@ class BatchRunTests {
 
         BatchRun batch = BatchRun.findByName("Test1")
 
-        def bRuns = batch.batchRunService.getSimulationRuns(batch)
+        def bRuns = batchRunService.getSimulationRuns(batch)
         assertTrue bRuns.size() == 0
 
         Simulation simulation = createSimulation("simulation1")
-        batch.batchRunService.addSimulationRun(batch, simulation, OutputStrategy.BATCH_DB_OUTPUT)
+        batchRunService.addSimulationRun(batch, simulation, OutputStrategy.BATCH_DB_OUTPUT)
 
         List<BatchRun> batchRuns = BatchRunner.getService().getActiveBatchRuns()
         assertNotNull batchRuns
         assertTrue batchRuns.size() == 1
         BatchRun bRun0 = batchRuns.get(0)
         assertNotNull bRun0
-        List<BatchRunSimulationRun> brsr = bRun0.batchRunService.getSimulationRuns(bRun0)
+        List<BatchRunSimulationRun> brsr = batchRunService.getSimulationRuns(bRun0)
         assertNotNull brsr
         assertTrue brsr.size() == 1
 
         simulation = createSimulation("simulation2")
-        batch.batchRunService.addSimulationRun(batch, simulation, OutputStrategy.BATCH_DB_OUTPUT)
+        batchRunService.addSimulationRun(batch, simulation, OutputStrategy.BATCH_DB_OUTPUT)
 
-        brsr = bRun0.batchRunService.getSimulationRuns(bRun0)
+        brsr = batchRunService.getSimulationRuns(bRun0)
         assertTrue brsr.size() == 2
         assertTrue brsr.get(0).simulationRun.name == "simulation1"
         assertTrue brsr.get(1).simulationRun.name == "simulation2"

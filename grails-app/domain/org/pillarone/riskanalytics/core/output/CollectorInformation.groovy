@@ -1,6 +1,6 @@
 package org.pillarone.riskanalytics.core.output
 
-public class CollectorInformation {
+class CollectorInformation {
 
     String collectingStrategyIdentifier
     PathMapping path

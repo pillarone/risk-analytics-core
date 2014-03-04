@@ -1,7 +1,5 @@
 package org.pillarone.riskanalytics.core
 
-import org.apache.commons.logging.Log
-import org.apache.commons.logging.LogFactory
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.ParameterizationTag
@@ -9,12 +7,12 @@ import org.pillarone.riskanalytics.core.parameter.comment.ParameterizationCommen
 import org.pillarone.riskanalytics.core.parameter.comment.workflow.WorkflowCommentDAO
 import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
 import org.pillarone.riskanalytics.core.user.Person
-import org.pillarone.riskanalytics.core.workflow.Status
 import org.pillarone.riskanalytics.core.util.DatabaseUtils
+import org.pillarone.riskanalytics.core.workflow.Status
+
+import javax.sql.DataSource
 
 class ParameterizationDAO {
-
-    private static Log LOG = LogFactory.getLog(ParameterizationDAO)
 
     String name
     String modelClassName
@@ -35,7 +33,7 @@ class ParameterizationDAO {
     Long dealId
     DateTime valuationDate
 
-    javax.sql.DataSource dataSource
+    DataSource dataSource
 
     static hasMany = [parameters: Parameter, comments: ParameterizationCommentDAO, issues: WorkflowCommentDAO, tags: ParameterizationTag]
     static transients = ['dataSource']
@@ -55,7 +53,7 @@ class ParameterizationDAO {
     }
 
     static mapping = {
-        comments(sort: "path", order: "asc")
+        comments(sort: 'path', order: 'asc')
         creator lazy: false
         lastUpdater lazy: false
         creationDate type: DateTimeMillisUserType
@@ -63,7 +61,7 @@ class ParameterizationDAO {
         valuationDate type: DateTimeMillisUserType
         if (DatabaseUtils.isOracleDatabase()) {
             comment(column: 'comment_value')
-            parameters(joinTable:[name: 'dao_parameter', key:'dao_id', column: 'parameter_id'])
+            parameters(joinTable: [name: 'dao_parameter', key: 'dao_id', column: 'parameter_id'])
         }
     }
 
@@ -76,15 +74,15 @@ class ParameterizationDAO {
      * A parameterization can be uniquely identified by Name, Model & Version.
      */
     static ParameterizationDAO find(String name, String modelClassName, String versionNumber) {
-        def criteria = ParameterizationDAO.createCriteria()
         //TODO: throw exception when there is more than one result? why can modelclass be null?
-        def results = criteria.list {
+        def results = createCriteria().list {
             eq('name', name)
             eq('itemVersion', versionNumber)
-            if (modelClassName != null)
+            if (modelClassName != null) {
                 eq('modelClassName', modelClassName)
+            }
         }
-        return results.size() > 0 ? results.get(0) : null
+        results.size() > 0 ? results.get(0) : null
     }
 
 }

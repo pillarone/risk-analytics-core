@@ -1,17 +1,16 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
-import groovy.transform.TypeChecked
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.components.Component
+import org.pillarone.riskanalytics.core.components.ComponentUtils
+import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterObjectParameterHolder
-import org.pillarone.riskanalytics.core.components.Component
-import org.pillarone.riskanalytics.core.util.GroovyUtils
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
-import org.pillarone.riskanalytics.core.model.Model
-import org.pillarone.riskanalytics.core.components.ComponentUtils
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 abstract class ParametrizedItem extends CommentableItem {
 
@@ -71,12 +70,12 @@ abstract class ParametrizedItem extends CommentableItem {
     }
 
     void removeComponent(String path) {
-        Model model = (Model) getModelClass().newInstance()
+        Model model = (Model) modelClass.newInstance()
         String pathWithoutModel = ComponentUtils.removeModelFromPath(path, model)
-        for (ParameterHolder holder in getAllParameterHolders().findAll { ParameterHolder it -> it.path.startsWith(pathWithoutModel) }) {
+        for (ParameterHolder holder in notDeletedParameterHolders.findAll { ParameterHolder it -> it.path.startsWith(pathWithoutModel) }) {
             removeParameter(holder)
         }
-        for (Comment comment in comments.findAll { Comment it -> it.path.startsWith(path) }) {
+        for (Comment comment in comments.findAll { Comment it -> it.path.startsWith(path) && !it.deleted }) {
             removeComment(comment)
         }
         fireComponentRemoved(pathWithoutModel)
@@ -188,19 +187,26 @@ abstract class ParametrizedItem extends CommentableItem {
         int parmIndex = path.indexOf(":parm")
         int nestedIndex = path.indexOf(":", parmIndex + 1)
         boolean isNested = nestedIndex > -1
-        if (!isNested) {
-            ParameterHolder parameterHolder = getAllParameterHolders().find { ParameterHolder it -> it.path == path && it.periodIndex == periodIndex }
-            if (parameterHolder == null) {
-                throw new ParameterNotFoundException("Parameter $path does not exist for period $periodIndex")
-            }
-            return parameterHolder
-        } else {
+        if (isNested) {
             String subPath = path.substring(0, nestedIndex)
-            ParameterHolder parameterHolder = getAllParameterHolders().find { ParameterHolder it -> it.path == subPath && it.periodIndex == periodIndex }
-            if (parameterHolder == null) {
+            List<ParameterHolder> findAll = notDeletedParameterHolders.findAll { ParameterHolder it -> it.path == subPath && it.periodIndex == periodIndex }
+            if (findAll.size() == 0) {
                 throw new ParameterNotFoundException("Parameter $path does not exist for period $periodIndex (base path $subPath not found)")
             }
+            if (findAll.size() > 1) {
+                throw new IllegalStateException("There is more than one not removed parameter for path $path (base path $subPath)")
+            }
+            ParameterHolder parameterHolder = findAll.first()
             return getNestedParameterHolder(parameterHolder, path.substring(nestedIndex + 1).split(":"), periodIndex)
+        } else {
+            List<ParameterHolder> findAll = notDeletedParameterHolders.findAll { ParameterHolder it -> it.path == path && it.periodIndex == periodIndex }
+            if (findAll.size() == 0) {
+                throw new ParameterNotFoundException("Parameter $path does not exist")
+            }
+            if (findAll.size() > 1) {
+                throw new IllegalStateException("There is more than one not removed parameter for path $path")
+            }
+            return findAll.first()
         }
     }
 
@@ -208,49 +214,39 @@ abstract class ParametrizedItem extends CommentableItem {
         int parmIndex = path.indexOf(":parm")
         int nestedIndex = path.indexOf(":", parmIndex + 1)
         boolean isNested = nestedIndex > -1
-        if (!isNested) {
-            Collection<ParameterHolder> parameterHolder = getAllParameterHolders().findAll { ParameterHolder it -> it.path == path }
-            if (parameterHolder.empty) {
-                throw new ParameterNotFoundException("Parameter $path does not exist")
-            }
-            return parameterHolder
-        } else {
+        if (isNested) {
             String subPath = path.substring(0, nestedIndex)
-            Collection<ParameterHolder> parameterHolder = getAllParameterHolders().findAll { ParameterHolder it -> it.path == subPath }
-            if (parameterHolder == null) {
+            List<ParameterHolder> parameterHolders = notDeletedParameterHolders.findAll { ParameterHolder it -> it.path == subPath }
+            if (parameterHolders.empty == 0) {
                 throw new ParameterNotFoundException("Parameter $path does not exist (base path $subPath not found)")
             }
-
             List<ParameterHolder> result = []
             String[] pathElements = path.substring(nestedIndex + 1).split(":")
-            for (ParameterHolder holder in parameterHolder) {
+            for (ParameterHolder holder in parameterHolders) {
                 if (hasParameterAtPath(path, holder.periodIndex)) {
                     result << getNestedParameterHolder(holder, pathElements, holder.periodIndex)
                 }
             }
             return result
+        } else {
+            Collection<ParameterHolder> parameterHolder = notDeletedParameterHolders.findAll { ParameterHolder it -> it.path == path }
+            if (parameterHolder.empty) {
+                throw new ParameterNotFoundException("Parameter $path does not exist")
+            }
+            return parameterHolder
         }
     }
 
     ParameterHolder getParameterHoldersForFirstPeriod(String path) {
-        int parmIndex = path.indexOf(":parm")
-        int nestedIndex = path.indexOf(":", parmIndex + 1)
-        boolean isNested = nestedIndex > -1
-        if (!isNested) {
-            ParameterHolder parameterHolder = getAllParameterHolders().find { ParameterHolder it -> it.path == path }
-            if (!parameterHolder) {
-                throw new ParameterNotFoundException("Parameter $path does not exist")
-            }
-            return parameterHolder
-        } else {
-            String subPath = path.substring(0, nestedIndex)
-            ParameterHolder parameterHolder = getAllParameterHolders().find { ParameterHolder it -> it.path == subPath  && hasParameterAtPath(path, it.periodIndex)}
-            if (parameterHolder == null) {
-                throw new ParameterNotFoundException("Parameter $path does not exist (base path $subPath not found)")
-            }
-            return getNestedParameterHolder(parameterHolder, path.substring(nestedIndex + 1).split(":"), parameterHolder.periodIndex)
+        int nestedIndex = path.indexOf(":", path.indexOf(":parm") + 1)
+        String basePath = nestedIndex > -1 ? path.substring(0, nestedIndex) : path
+        Integer minimalPeriodIndex = notDeletedParameterHolders.findAll { ParameterHolder it -> it.path == basePath }.periodIndex.min()
+        if (minimalPeriodIndex == null) {
+            throw new ParameterNotFoundException("No parameter found for path $path")
         }
+        getParameterHolder(path, minimalPeriodIndex)
     }
+
 
     boolean hasParameterAtPath(String path) { //TODO improve?
         try {
@@ -290,16 +286,20 @@ abstract class ParametrizedItem extends CommentableItem {
 
     abstract protected void removeFromDao(Parameter parameter, def dao)
 
-    abstract List<ParameterHolder> getAllParameterHolders()
+    abstract protected List<ParameterHolder> getAllParameterHolders()
+
+    List<ParameterHolder> getNotDeletedParameterHolders() {
+        allParameterHolders.findAll { !it.removed }
+    }
 
     void addParameter(ParameterHolder parameter) {
-        getAllParameterHolders().add(parameter)
+        allParameterHolders.add(parameter)
         parameter.added = true
     }
 
     void removeParameter(ParameterHolder parameter) {
         if (parameter.added) {
-            getAllParameterHolders().remove(parameter)
+            allParameterHolders.remove(parameter)
             return
         }
         parameter.removed = true
@@ -311,12 +311,12 @@ abstract class ParametrizedItem extends CommentableItem {
     }
 
     protected void updateParameterValue(ParameterHolder holder, def newValue) {
-        holder.setValue(newValue)
+        holder.value = newValue
         fireValuesChanged([holder.path])
     }
 
     protected void updateParameterValue(ParameterObjectParameterHolder holder, def newValue) {
-        holder.setValue(newValue)
+        holder.value = newValue
         for (Comment comment in comments.findAll { Comment it -> it.path.contains(holder.path) }) {
             removeComment(comment)
         }

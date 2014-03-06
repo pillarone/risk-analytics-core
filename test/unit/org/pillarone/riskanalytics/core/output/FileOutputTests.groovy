@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.output
 
+import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationScope
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
@@ -22,6 +23,7 @@ class FileOutputTests extends GroovyTestCase {
         result.simulationRun = new SimulationRun(name: "newRun")
         result.path = new PathMapping(pathName: "path")
         result.field = new FieldMapping(fieldName: "field")
+        result.date = new DateTime()
 
 
         assertFalse "File does already exist. Fix setup", file.exists()
@@ -40,6 +42,7 @@ class FileOutputTests extends GroovyTestCase {
         result.simulationRun = new SimulationRun(name: "new?Run:")
         result.path = new PathMapping(pathName: "path")
         result.field = new FieldMapping(fieldName: "field")
+        result.date = new DateTime()
 
         file = new File("new_Run_.tsl")
         assertFalse "File does already exist. Fix setup", file.exists()
@@ -57,6 +60,7 @@ class FileOutputTests extends GroovyTestCase {
         result.simulationRun = new SimulationRun(name: "newRun")
         result.path = new PathMapping(pathName: "path")
         result.field = new FieldMapping(fieldName: "field")
+        result.date = new DateTime()
 
 
         FileOutput output = new FileOutput(resultLocation: ".", simulationScope: new SimulationScope(simulation: new Simulation(result.simulationRun.name)))

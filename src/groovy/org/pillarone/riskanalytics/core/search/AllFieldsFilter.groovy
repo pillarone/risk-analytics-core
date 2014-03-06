@@ -307,7 +307,6 @@ class AllFieldsFilter implements ISearchFilter {
         // Only call this for things that have tags (Simulation, Parameterization or Resource)
         private static boolean matchTags(def item, String[] matchTerms) {
             return matchTerms.any { def it ->
-                println(it)
                 if (isTagAcceptor(it)) {
                     //e.g. term 'tag:Q4 2013' will match any sim or pn tagged 'Q4 2013' (but also eg 'Q4 2013 ReRun')
                     item.tags*.name.any { String tag -> StringUtils.containsIgnoreCase(tag, getText(it)) }

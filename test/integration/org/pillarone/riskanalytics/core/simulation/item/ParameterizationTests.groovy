@@ -50,12 +50,7 @@ class ParameterizationTests {
         assertEquals "Name not set after load", "unknown name", unknownParameterization.name
 
         ParameterizationDAO dao = createDao(EmptyModel, "myDao")
-        if (!dao.save()) {
-            dao.errors.each {
-                println it
-            }
-        }
-
+        dao.save()
         Parameterization parameterization = new Parameterization("myDao")
         assertEquals "wrong name", "myDao", parameterization.name
         assertNull parameterization.modelClass

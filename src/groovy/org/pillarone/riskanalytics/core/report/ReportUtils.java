@@ -69,7 +69,7 @@ public abstract class ReportUtils {
         return modellingItems;
     }
 
-    public static void loadAndApplyParameterizationToModel(Model model, Parameterization parameterization) {
+    public static void loadAndApplyParameterizationToModel(Model model, Parameterization parameterization) throws ParameterApplicator.ApplicableParameterCreationException {
         model.init();
 
         ParameterApplicator applicator = new ParameterApplicator();

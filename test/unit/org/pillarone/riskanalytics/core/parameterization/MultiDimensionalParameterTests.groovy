@@ -8,11 +8,6 @@ import org.pillarone.riskanalytics.core.example.parameter.ExampleMultiDimensiona
 
 class MultiDimensionalParameterTests extends GroovyTestCase {
 
-    protected void setUp() {
-        super.setUp();
-        ConstraintsFactory.registerConstraint(new SimpleConstraint())
-    }
-
     void testConstructor() {
         AbstractMultiDimensionalParameter param = new SimpleMultiDimensionalParameter([1, 2, 3])
         assertEquals "Z0C0", 1, param.getValueAt(0, 0)
@@ -65,10 +60,10 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertEquals(6, param.getValueAt(2, 1))
 
         // column index out of bound
-        shouldFail(IndexOutOfBoundsException, {param.setValueAt(7, 1, 2)})
+        shouldFail(IndexOutOfBoundsException, { param.setValueAt(7, 1, 2) })
 
         // row index out of bound
-        shouldFail(IndexOutOfBoundsException, {param.setValueAt(7, 3, 0)})
+        shouldFail(IndexOutOfBoundsException, { param.setValueAt(7, 3, 0) })
     }
 
     void testIncreaseDimension() {
@@ -80,7 +75,7 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         param.dimension = new MultiDimensionalParameterDimension(3, 3)
         assertEquals 3, param.rowCount
         assertEquals 3, param.columnCount
-        assertTrue param.values.every { it.size() == 3}
+        assertTrue param.values.every { it.size() == 3 }
 
         param.dimension = new MultiDimensionalParameterDimension(3, 4)
         assertEquals 4, param.rowCount
@@ -113,7 +108,7 @@ class MultiDimensionalParameterTests extends GroovyTestCase {
         assertEquals 1, param.valueRowCount
         assertEquals 2, param.columnCount
         assertEquals 2, param.values.size()
-        assertTrue param.values.every { it.size() == 1}
+        assertTrue param.values.every { it.size() == 1 }
 
     }
 

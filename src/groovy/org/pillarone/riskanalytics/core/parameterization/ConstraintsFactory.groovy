@@ -1,11 +1,10 @@
-package org.pillarone.riskanalytics.core.parameterization
 
+package org.pillarone.riskanalytics.core.parameterization
 import com.google.common.collect.MapMaker
 import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.model.migration.ModelMigrator
-import org.pillarone.riskanalytics.core.output.ICollectingModeStrategy
 import org.pillarone.riskanalytics.core.util.RegistryInitializationSupport
 
 @CompileStatic
@@ -16,10 +15,10 @@ class ConstraintsFactory {
     private static Map<String, IMultiDimensionalConstraints> constraints = new MapMaker().makeMap()
 
     static {
-        println("Initializing MDP constraints")
+        LOG.debug("Initializing MDP constraints")
         for(Class<IMultiDimensionalConstraints> clazz in RegistryInitializationSupport.findClasses(IMultiDimensionalConstraints)) {
             IMultiDimensionalConstraints instance = clazz.newInstance()
-            println("Registering ${instance.name}")
+            LOG.debug("Registering ${instance.name}")
             registerConstraint(instance)
         }
     }

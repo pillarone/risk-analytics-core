@@ -239,8 +239,17 @@ abstract class ParametrizedItem extends CommentableItem {
 
     ParameterHolder getParameterHoldersForFirstPeriod(String path) {
         int nestedIndex = path.indexOf(":", path.indexOf(":parm") + 1)
-        String basePath = nestedIndex > -1 ? path.substring(0, nestedIndex) : path
-        Integer minimalPeriodIndex = notDeletedParameterHolders.findAll { ParameterHolder it -> it.path == basePath }.periodIndex.min()
+        def isNested = nestedIndex > -1
+        String basePath = isNested ? path.substring(0, nestedIndex) : path
+        Integer minimalPeriodIndex = notDeletedParameterHolders.findAll { ParameterHolder it ->
+            boolean fits = it.path == basePath
+            //check if holder has correct classifiers
+            if (isNested) {
+                fits &= hasParameterAtPath(path, it.periodIndex)
+            }
+            fits
+
+        }.periodIndex.min()
         if (minimalPeriodIndex == null) {
             throw new ParameterNotFoundException("No parameter found for path $path")
         }

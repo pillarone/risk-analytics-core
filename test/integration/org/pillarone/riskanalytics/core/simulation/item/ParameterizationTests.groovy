@@ -562,7 +562,9 @@ class ParameterizationTests {
 
         parameterization.addParameter(ParameterHolderFactory.getHolder("component:parmParameter", 1, ExampleParameterObjectClassifier.getStrategy(ExampleParameterObjectClassifier.NESTED_PARAMETER_OBJECT, ExampleParameterObjectClassifier.NESTED_PARAMETER_OBJECT.parameters)))
 
-        List<ParameterHolder> parameterHolders = parameterization.getParameterHoldersForAllPeriods("component:parmParameter").sort { it.periodIndex }
+        List<ParameterHolder> parameterHolders = parameterization.getParameterHoldersForAllPeriods("component:parmParameter").sort {
+            it.periodIndex
+        }
         assertEquals(2, parameterHolders.size())
     }
 
@@ -603,6 +605,20 @@ class ParameterizationTests {
         assertEquals(paramHolderFirst, holder)
     }
 
+    @Test
+    void getParameterHolderForFirstPeriodWithQualifiers() {
+        List<ParameterHolder> parameters = new ArrayList()
+        parameters << ParameterHolderFactory.getHolder("path", 0, ExampleParameterObjectClassifier.TYPE0.getParameterObject(["a": 0, "b": 0]))
+        parameters << ParameterHolderFactory.getHolder("path", 2, ExampleParameterObjectClassifier.TYPE1.getParameterObject(["p1": 0, "p2": 0]))
+        Parameterization parametrization = new Parameterization("")
+        parameters.each { parametrization.addParameter(it) }
+        assert parametrization.getParameterHoldersForFirstPeriod("path:a").periodIndex == 0
+        assert parametrization.getParameterHoldersForFirstPeriod("path:b").periodIndex == 0
+        assert parametrization.getParameterHoldersForFirstPeriod("path:p1").periodIndex == 2
+        assert parametrization.getParameterHoldersForFirstPeriod("path:p2").periodIndex == 2
+
+    }
+
     @Test(expected = ParameterNotFoundException)
     void getParameterNotFound() {
         Parameterization parameterization = new Parameterization("name", CoreModel)
@@ -612,7 +628,6 @@ class ParameterizationTests {
         parameterization.addParameter(paramHolderSecond)
         ParameterHolder holder = parameterization.getParameterHoldersForFirstPeriod('notFound')
     }
-
 
     private def createDao(Class modelClass, String daoName) {
         ParameterizationDAO dao = new ParameterizationDAO()

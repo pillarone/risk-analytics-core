@@ -121,8 +121,8 @@ class Parameterization extends ParametrizedItem {
 
     void validate() {
         List<ParameterValidation> validations = []
-        for (IParameterizationValidator validator in ValidatorRegistry.getValidators()) {
-            validations.addAll(validator.validate(parameterHolders.findAll { ParameterHolder it -> !it.removed }))
+        for (IParameterizationValidator validator in ValidatorRegistry.validators) {
+            validations.addAll(validator.validate(notDeletedParameterHolders))
         }
 
         valid = validations.empty || validations.every { ParameterValidation validation -> validation.validationType != ValidationType.ERROR }

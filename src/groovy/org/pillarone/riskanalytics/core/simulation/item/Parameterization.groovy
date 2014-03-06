@@ -168,29 +168,31 @@ class Parameterization extends ParametrizedItem {
 
     @CompileStatic
     private List obtainPeriodLabelsFromParameters() {
+        Model model = (Model) modelClass.newInstance()
+        model.init()
+        ParameterApplicator applicator = new ParameterApplicator(model: model, parameterization: this)
         try {
-            Model model = (Model) modelClass.newInstance()
-            model.init()
-            ParameterApplicator applicator = new ParameterApplicator(model: model, parameterization: this)
             applicator.init()
-            applicator.applyParameterForPeriod(0)
-            DateTimeFormatter formatter = DateTimeFormat.forPattern(PERIOD_DATE_FORMAT)
-            IPeriodCounter counter = model.createPeriodCounter(null)
-            if (counter == null) {
-                return null
-            }
-            List result = []
-            if (counter instanceof ILimitedPeriodCounter) {
-                for (int i = 0; i < counter.periodCount(); i++) {
-                    result << formatter.print(counter.currentPeriodStart)
-                    counter.next()
-                }
-            }
-            return result
+        } catch (ParameterApplicator.ApplicableParameterCreationException ignored) {
+            LOG.warn("failed to init applicator")
+            return null
         } catch (Exception e) {
-            LOG.warn("Exception (ignored why?)", e)
+            LOG.error("failed to init applicator", e)
+        }
+        applicator.applyParameterForPeriod(0)
+        DateTimeFormatter formatter = DateTimeFormat.forPattern(PERIOD_DATE_FORMAT)
+        IPeriodCounter counter = model.createPeriodCounter(null)
+        if (counter == null) {
             return null
         }
+        List result = []
+        if (counter instanceof ILimitedPeriodCounter) {
+            for (int i = 0; i < counter.periodCount(); i++) {
+                result << formatter.print(counter.currentPeriodStart)
+                counter.next()
+            }
+        }
+        return result
     }
 
     protected void mapToDao(Object dao) {

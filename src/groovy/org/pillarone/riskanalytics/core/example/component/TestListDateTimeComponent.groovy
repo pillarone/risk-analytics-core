@@ -17,6 +17,5 @@ class TestListDateTimeComponent extends Component {
             ["2009-11-01", "2010-02-01", "2010-05-01", "2010-08-01", "2010-11-01"], ["Payment Dates"]);
 
     protected void doCalculation() {
-        println periodScope.currentPeriodStartDate
     }
 }

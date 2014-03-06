@@ -29,7 +29,7 @@ public class ParameterApplicator {
      * Creates the internal representation of all parameters defined by the ParameterizationDAO.
      */
     @TypeChecked
-    void init() {
+    void init() throws ApplicableParameterCreationException {
         assert model
         assert parameterization
         parameterPerPeriod = buildApplicableParameter(parameterization)
@@ -57,28 +57,39 @@ public class ParameterApplicator {
 
 
     @CompileStatic
-    protected List<List<ApplicableParameter>> buildApplicableParameter(Parameterization parameterization) {
+    protected List<List<ApplicableParameter>> buildApplicableParameter(Parameterization parameterization) throws ApplicableParameterCreationException {
         List<List<ApplicableParameter>> parameterPerPeriod = []
         parameterization.periodCount.times {
             parameterPerPeriod << []
         }
-        parameterization.parameterHolders.each {ParameterHolder p ->
+        parameterization.parameterHolders.each { ParameterHolder p ->
             parameterPerPeriod[p.periodIndex] << createApplicableParameter(model, p)
         }
 
         return parameterPerPeriod
     }
 
-    protected ApplicableParameter createApplicableParameter(Model model, ParameterHolder parameterHolder) {
+    protected ApplicableParameter createApplicableParameter(Model model, ParameterHolder parameterHolder) throws ApplicableParameterCreationException {
         String path = parameterHolder.path
-        def parameterValue = parameterHolder.businessObject
-
-        def pathElements = path.split("\\:")
-        def component = model
-        pathElements[0..-2].each {propertyName ->
-            component = getPropertyOrSubComponent(propertyName, component)
+        def parameterValue
+        try {
+            parameterValue = parameterHolder.businessObject
+        } catch (Exception e) {
+            throw new ApplicableParameterCreationException("failed to get businessObject from parameterHolder $parameterHolder", e)
         }
 
+        def pathElements = path.split("\\:")
+        if (pathElements.size() < 2) {
+            throw new ApplicableParameterCreationException("failed to create ApplicableParameter. Reason: path must have at least two elements (path: $path)")
+        }
+        def component = model
+        pathElements[0..-2].each { propertyName ->
+            try {
+                component = getPropertyOrSubComponent(propertyName, component)
+            } catch (MissingPropertyException e) {
+                throw new ApplicableParameterCreationException("failed to get property $propertyName for component $component", e)
+            }
+        }
         return new ApplicableParameter(component: component, parameterPropertyName: pathElements[-1], parameterValue: parameterValue)
     }
 
@@ -107,7 +118,7 @@ public class ParameterApplicator {
     @CompileStatic
     protected void prepareParameter(Model model, ConstrainedString parameterValue, String context) {
         List<Component> allMarkedComponents = model.getMarkedComponents(parameterValue.markerClass)
-        parameterValue.selectedComponent = allMarkedComponents.find {Component c -> c.name == parameterValue.stringValue }
+        parameterValue.selectedComponent = allMarkedComponents.find { Component c -> c.name == parameterValue.stringValue }
     }
 
     protected def getPropertyOrSubComponent(String propertyName, def component) {
@@ -127,5 +138,15 @@ public class ParameterApplicator {
         }
 
         return component[propertyName]
+    }
+
+    static class ApplicableParameterCreationException extends Exception {
+        ApplicableParameterCreationException(String s) {
+            super(s)
+        }
+
+        ApplicableParameterCreationException(String s, Throwable throwable) {
+            super(s, throwable)
+        }
     }
 }

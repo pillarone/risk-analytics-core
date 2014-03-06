@@ -156,7 +156,7 @@ public class SimulationRunner {
     @CompileStatic
     private void deleteCancelledSimulation() {
         if (simulationAction.isCancelled()) {
-            LOG.info "canceled simulation ${currentScope.simulation.name} will be deleted"
+            LOG.info "canceled simulation ${currentScope.simulation?.name} will be deleted"
         }
         cleanup()
     }

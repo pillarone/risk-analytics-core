@@ -45,6 +45,25 @@ class ParameterApplicatorTests {
     }
 
     @Test
+    void testCreateApplicableParameterFails() {
+
+        Model m = new CoreModel()
+        m.init()
+
+        String path = "exampleInputOutputComponent"
+
+        ParameterApplicator applicator = new ParameterApplicator()
+        shouldFail(ParameterApplicator.ApplicableParameterCreationException) {
+            applicator.createApplicableParameter(m, ParameterHolderFactory.getHolder(path, 0, "value"))
+        }
+
+        path = "foo:parmFoo"
+        shouldFail(ParameterApplicator.ApplicableParameterCreationException) {
+            applicator.createApplicableParameter(m, ParameterHolderFactory.getHolder(path, 0, "value"))
+        }
+    }
+
+    @Test
     void testBuildApplicableParameter() {
         Parameterization parameter = getParameterization(new File("src/java/models/core/CoreParameters.groovy"))
 
@@ -57,7 +76,7 @@ class ParameterApplicatorTests {
         List applicableParameter = applicator.buildApplicableParameter(parameter)
         assertNotNull applicableParameter
         assertEquals "periods", parameter.periodCount, applicableParameter.size()
-        applicableParameter.each {List parameterForPeriod ->
+        applicableParameter.each { List parameterForPeriod ->
             assertNotNull parameterForPeriod
             assertFalse "empty parameter for period", parameterForPeriod.empty
         }
@@ -82,7 +101,9 @@ class ParameterApplicatorTests {
     @Test
     void testInitWithNestedMdp() {
         Parameterization parameter = getParameterization(new File("src/java/models/core/CoreParameters.groovy"))
-        ParameterObjectParameterHolder param = parameter.parameterHolders.find { it.path = "exampleInputOutputComponent:parmParameterObject" }
+        ParameterObjectParameterHolder param = parameter.parameterHolders.find {
+            it.path = "exampleInputOutputComponent:parmParameterObject"
+        }
         param.setValue(ExampleParameterObjectClassifier.NESTED_MDP.toString())
         param.clearCachedValues()
         Model m = new CoreModel()
@@ -95,7 +116,9 @@ class ParameterApplicatorTests {
         applicator.init()
 
         assertNotNull applicator.parameterPerPeriod
-        ApplicableParameter mdpObject = applicator.parameterPerPeriod[0].find { it.parameterValue.parameters.keySet().contains("mdp") }
+        ApplicableParameter mdpObject = applicator.parameterPerPeriod[0].find {
+            it.parameterValue.parameters.keySet().contains("mdp")
+        }
         assertNotNull mdpObject
         AbstractMultiDimensionalParameter mdp = mdpObject.parameterValue.parameters.get("mdp")
         assertNotNull mdp
@@ -140,19 +163,15 @@ class ParameterApplicatorTests {
     }
 
 
-
     @Test
     void testGetPropertyOrSubComponent() {
         ParameterApplicator applicator = new ParameterApplicator()
         ExampleInputOutputComponent component = new ExampleInputOutputComponent()
         assertEquals component.parmParameterObject, applicator.getPropertyOrSubComponent("parmParameterObject", component)
 
-        // TODO (Oct 2, 2009, msh): check why hudson throws different exc
-/*
         shouldFail(MissingPropertyException) {
             applicator.getPropertyOrSubComponent("foo", component)
         }
-*/
 
         ExampleDynamicComponent dynamicComposedComponent = new ExampleDynamicComponent()
 
@@ -176,11 +195,11 @@ class ParameterApplicatorTests {
         ParameterApplicator applicator = new ParameterApplicator(model: model, parameterization: parameter)
         applicator.init()
 
-        def multiDimensionalParameters = applicator.parameterPerPeriod[0].findAll {ApplicableParameter p ->
+        def multiDimensionalParameters = applicator.parameterPerPeriod[0].findAll { ApplicableParameter p ->
             p.parameterValue instanceof AbstractMultiDimensionalParameter
         }
         assertFalse "no multiDimensionalParameter found in parameterization", multiDimensionalParameters.empty
-        multiDimensionalParameters.each {ApplicableParameter p ->
+        multiDimensionalParameters.each { ApplicableParameter p ->
             assertSame "model on parameter ${p.parameterPropertyName}", model, p.parameterValue.simulationModel
         }
 
@@ -197,11 +216,11 @@ class ParameterApplicatorTests {
         ParameterApplicator applicator = new ParameterApplicator(model: model, parameterization: parameter)
         applicator.init()
 
-        def constrainedStrings = applicator.parameterPerPeriod[0].findAll {ApplicableParameter p ->
+        def constrainedStrings = applicator.parameterPerPeriod[0].findAll { ApplicableParameter p ->
             p.parameterValue instanceof ConstrainedString
         }
         assertFalse "no ConstrainedString found in parameterization", constrainedStrings.empty
-        constrainedStrings.each {ApplicableParameter p ->
+        constrainedStrings.each { ApplicableParameter p ->
             assertNotNull "selectedComponent not set for ${p.parameterPropertyName}", p.parameterValue.selectedComponent
         }
     }

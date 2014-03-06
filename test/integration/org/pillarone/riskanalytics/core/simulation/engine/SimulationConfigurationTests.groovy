@@ -1,7 +1,5 @@
 package org.pillarone.riskanalytics.core.simulation.engine
-
 import models.core.CoreModel
-import org.junit.Before
 import org.junit.Test
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
@@ -37,7 +35,8 @@ class SimulationConfigurationTests {
 
         assertEquals(simulation.keyFiguresToPreCalculate, configuration.simulation.keyFiguresToPreCalculate)
 
-        assertEquals(simulation.parameterization.allParameterHolders.size(), configuration.simulation.parameterization.allParameterHolders.size())
+        assertEquals(simulation.parameterization.
+                allParameterHolders.size(), configuration.simulation.parameterization.allParameterHolders.size())
         for (ParameterHolder holder in simulation.parameterization.allParameterHolders) {
             ParameterHolder copiedHolder = configuration.simulation.parameterization.allParameterHolders.find {
                 it.path == holder.path && it.periodIndex == holder.periodIndex

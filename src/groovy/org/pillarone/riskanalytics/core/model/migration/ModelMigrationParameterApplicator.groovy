@@ -25,7 +25,7 @@ class ModelMigrationParameterApplicator extends ParameterApplicator {
         try {
             ApplicableParameter parameter = super.createApplicableParameter(model, parameterHolder)
             return new ModelMigrationApplicableParameter(parameter)
-        } catch (Exception e) {
+        } catch (ApplicableParameterCreationException e) {
             LOG.info "Error creating paramater for $parameterHolder.path - will be set to null and must be set by migration: $e.message"
             return new NullApplicableParameter()
         }

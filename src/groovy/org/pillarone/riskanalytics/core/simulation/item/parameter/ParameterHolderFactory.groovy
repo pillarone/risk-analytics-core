@@ -143,29 +143,31 @@ class ParameterHolderFactory {
      * Furthermore all parameters referencing it are renamed accordingly.
      * If the new path can be found within the configurations already, the method throws an exception to prevent an invalid state.
      */
-    public static List<String> renamePathOfParameter(ParametrizedItem parameterization, String oldPath, String newPath, Component renamedComponent) {
-        parameterization.getAllParameterHolders().each { ParameterHolder it ->
-            if (it.path.startsWith("$newPath:")){
+    public
+    static List<String> renamePathOfParameter(ParametrizedItem parameterization, String oldPath, String newPath, Component renamedComponent) {
+        parameterization.notDeletedParameterHolders.each { ParameterHolder it ->
+            if (it.path.startsWith("$newPath:")) {
                 throw new NonUniqueComponentNameException("A component with the name ${renamedComponent.name} already exists in this dynamic composed component")
             }
         }
         List removedParameters = []
         List clonedParameters = []
-        parameterization.getAllParameterHolders().each {ParameterHolder parameterHolder ->
+        parameterization.notDeletedParameterHolders.each { ParameterHolder parameterHolder ->
             if (parameterHolder.path.startsWith(oldPath + ":")) {
                 internalRenamePathOfParameter(parameterHolder, removedParameters, clonedParameters, oldPath, newPath, false)
             }
         }
-        removedParameters.each {ParameterHolder parameterHolder ->
+        removedParameters.each { ParameterHolder parameterHolder ->
             parameterization.removeParameter parameterHolder
         }
-        clonedParameters.each {ParameterHolder parameterHolder ->
+        clonedParameters.each { ParameterHolder parameterHolder ->
             parameterization.addParameter parameterHolder
         }
         return renameReferencingParameters(parameterization, oldPath, newPath, renamedComponent)
     }
 
-    private static ParameterHolder internalRenamePathOfParameter(ParameterHolder parameterHolder, List<ParameterHolder> removedParameters,
+    private
+    static ParameterHolder internalRenamePathOfParameter(ParameterHolder parameterHolder, List<ParameterHolder> removedParameters,
                                                          List<ParameterHolder> clonedParameters, String oldPath, String newPath, boolean isNested) {
         ParameterHolder cloned = (ParameterHolder) parameterHolder.clone()
         cloned.path = cloned.path.replace(oldPath, newPath)
@@ -176,7 +178,7 @@ class ParameterHolderFactory {
         if (cloned instanceof ParameterObjectParameterHolder) {
             // recursive step down
             cloned.getClassifierParameters().clear()
-            for (Map.Entry<String, ParameterHolder> nestedParameterHolder : ((ParameterObjectParameterHolder) parameterHolder).getClassifierParameters().entrySet()) {
+            for (Map.Entry<String, ParameterHolder> nestedParameterHolder : ((ParameterObjectParameterHolder) parameterHolder).classifierParameters.entrySet()) {
                 ParameterHolder clonedNested = internalRenamePathOfParameter(nestedParameterHolder.value, removedParameters, clonedParameters, oldPath, newPath, true)
                 cloned.getClassifierParameters().put(nestedParameterHolder.key, clonedNested)
             }
@@ -191,7 +193,8 @@ class ParameterHolderFactory {
      * @return all referencing components being renamed from oldComponentPath to newComponentPath using the marker
      *          interface of the component @ oldComponentPath
      */
-    private static List<String> renameReferencingParameters(ParametrizedItem parameterization, String oldComponentPath, String newComponentPath, Component renamedComponent) {
+    private
+    static List<String> renameReferencingParameters(ParametrizedItem parameterization, String oldComponentPath, String newComponentPath, Component renamedComponent) {
         String oldComponentName = ComponentUtils.getComponentNormalizedName(oldComponentPath)
         String newComponentName = ComponentUtils.getComponentNormalizedName(newComponentPath)
         List<Class> markerInterfaces = getMarkerInterface(renamedComponent)
@@ -220,7 +223,8 @@ class ParameterHolderFactory {
      * @param componentPath
      * @return model path of all parameters referencing the component using its marker interface
      */
-    public static List<String> referencingParametersPaths(Parameterization parameterization, String componentPath, Component component) {
+    public
+    static List<String> referencingParametersPaths(Parameterization parameterization, String componentPath, Component component) {
         String componentName = ComponentUtils.getComponentNormalizedName(componentPath)
         List<Class> markerInterfaces = getMarkerInterface(component)
         List<ParameterHolder> markerParameterHolders = []
@@ -243,10 +247,11 @@ class ParameterHolderFactory {
         return referencingPaths
     }
 
-    private static List<ParameterHolder> affectedParameterHolders(ParametrizedItem parameterization, Class markerInterface, String componentPath) {
+    private
+    static List<ParameterHolder> affectedParameterHolders(ParametrizedItem parameterization, Class markerInterface, String componentPath) {
         List<ParameterHolder> referencedParameterHolders = new ArrayList<ParameterHolder>()
         if (markerInterface) {
-            for (ParameterHolder parameterHolder : parameterization.getAllParameterHolders()) {
+            for (ParameterHolder parameterHolder : parameterization.notDeletedParameterHolders) {
                 if (parameterHolder instanceof IMarkerValueAccessor) {
                     referencedParameterHolders.add parameterHolder
                 }
@@ -272,14 +277,14 @@ class ParameterHolderFactory {
 
     public static void duplicateParameters(ParametrizedItem parameterization, String oldPath, String newPath) {
         List clonedParameters = []
-        parameterization.getAllParameterHolders().each {ParameterHolder parameterHolder ->
+        parameterization.notDeletedParameterHolders.each { ParameterHolder parameterHolder ->
             if (parameterHolder.path.startsWith(oldPath + ":")) {
                 ParameterHolder cloned = (ParameterHolder) parameterHolder.clone()
                 renamePath(cloned, oldPath, newPath)
                 clonedParameters << cloned
             }
         }
-        clonedParameters.each {ParameterHolder parameterHolder ->
+        clonedParameters.each { ParameterHolder parameterHolder ->
             parameterization.addParameter parameterHolder
         }
     }
@@ -287,12 +292,4 @@ class ParameterHolderFactory {
     private static void renamePath(ParameterHolder holder, String oldPath, String newPath) {
         holder.path = holder.path.replace(oldPath, newPath)
     }
-
-    private static void renamePath(ParameterObjectParameterHolder holder, String oldPath, String newPath) {
-        holder.path = holder.path.replace("${oldPath}".toString(), "${newPath}".toString())
-        for (ParameterHolder param in holder.classifierParameters.values()) {
-            renamePath(param, oldPath, newPath)
-        }
-    }
-
 }

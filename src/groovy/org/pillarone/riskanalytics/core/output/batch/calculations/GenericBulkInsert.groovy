@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.output.batch.calculations
 
 import groovy.transform.CompileStatic
+import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.output.PostSimulationCalculation
 import org.pillarone.riskanalytics.core.output.PathMapping
 import org.pillarone.riskanalytics.core.output.FieldMapping
@@ -8,10 +9,11 @@ import org.pillarone.riskanalytics.core.output.CollectorMapping
 import org.pillarone.riskanalytics.core.output.SimulationRun
 
 class GenericBulkInsert extends AbstractCalculationsBulkInsert {
+    private static final LOG = LogFactory.getLog(GenericBulkInsert)
 
     protected void save() {
         SimulationRun.withTransaction { status ->
-            tempFile.eachLine {String line ->
+            tempFile.eachLine { String line ->
                 String[] values = line.split(",")
                 PostSimulationCalculation result = new PostSimulationCalculation()
                 result.run = simulationRun
@@ -22,8 +24,8 @@ class GenericBulkInsert extends AbstractCalculationsBulkInsert {
                 result.keyFigure = values[5]
                 result.keyFigureParameter = values[6] != "null" ? Double.parseDouble(values[6]) : null
                 result.result = Double.parseDouble(values[7])
-                if(!result.save()) {
-                    println result.errors
+                if (!result.save()) {
+                    LOG.error(result.errors)
                 }
             }
         }

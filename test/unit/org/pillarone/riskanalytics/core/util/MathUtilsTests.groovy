@@ -27,10 +27,10 @@ class MathUtilsTests extends GroovyTestCase {
     }
 
     void testTvar() {
-        assertEquals 10, MathUtils.calculateTvar((double[]) [0, 10, 20], 50)
-        assertEquals 30 / 2.25 - 10, MathUtils.calculateTvar((double[]) [0, 10, 20], 25), 1E-8
-        assertEquals 20 / 0.3 - 10, MathUtils.calculateTvar((double[]) [0, 10, 20], 90), 1E-8
-        shouldFail(IllegalArgumentException, {MathUtils.calculateTvar((double[]) [0, 10, 20], 100)})
+        assertEquals 10, MathUtils.calculateTvar((double[]) [0, 10, 20], 50, QuantilePerspective.LOSS)
+        assertEquals 30 / 2.25 - 10, MathUtils.calculateTvar((double[]) [0, 10, 20], 25,QuantilePerspective.LOSS), 1E-8
+        assertEquals 20 / 0.3 - 10, MathUtils.calculateTvar((double[]) [0, 10, 20], 90,QuantilePerspective.LOSS), 1E-8
+        shouldFail(IllegalArgumentException, { MathUtils.calculateTvar((double[]) [0, 10, 20], 100,QuantilePerspective.LOSS) })
     }
 
     void testPercentileProfit() {
@@ -50,7 +50,9 @@ class MathUtilsTests extends GroovyTestCase {
         assertEquals(10, MathUtils.calculateTvar((double[]) [0, -10, -20], 50, QuantilePerspective.PROFIT))
         assertEquals((30 / 2.25 - 10), MathUtils.calculateTvar((double[]) [0, -10, -20], 25, QuantilePerspective.PROFIT), 1E-8)
         assertEquals((20 / 0.3 - 10), MathUtils.calculateTvar((double[]) [0, -10, -20], 90, QuantilePerspective.PROFIT), 1E-8)
-        shouldFail(IllegalArgumentException, {MathUtils.calculateTvar((double[]) [0, -10, -20], 100, QuantilePerspective.PROFIT)})
+        shouldFail(IllegalArgumentException, {
+            MathUtils.calculateTvar((double[]) [0, -10, -20], 100, QuantilePerspective.PROFIT)
+        })
     }
 
     static List linearSeed = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
@@ -109,7 +111,7 @@ class MathUtilsTests extends GroovyTestCase {
     private def toGString(String arg) {
 
         def str = """\
-          ${ getToken(arg)}
+          ${getToken(arg)}
         """
         return str
     }

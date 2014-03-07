@@ -2,18 +2,14 @@ package org.pillarone.riskanalytics.core.simulation.item.parameter
 
 import groovy.transform.TypeChecked
 import org.joda.time.DateTime
-import org.pillarone.riskanalytics.core.components.Component
-import org.pillarone.riskanalytics.core.components.ComponentUtils
-import org.pillarone.riskanalytics.core.components.IComponentMarker
-import org.pillarone.riskanalytics.core.components.NonUniqueComponentNameException
-import org.pillarone.riskanalytics.core.components.ResourceHolder
+import org.pillarone.riskanalytics.core.components.*
+import org.pillarone.riskanalytics.core.parameter.*
 import org.pillarone.riskanalytics.core.parameterization.AbstractMultiDimensionalParameter
 import org.pillarone.riskanalytics.core.parameterization.ConstrainedString
 import org.pillarone.riskanalytics.core.parameterization.IParameterObject
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
-import org.pillarone.riskanalytics.core.simulation.item.Resource
-import org.pillarone.riskanalytics.core.parameter.*
 import org.pillarone.riskanalytics.core.simulation.item.ParametrizedItem
+import org.pillarone.riskanalytics.core.simulation.item.Resource
 
 @TypeChecked
 class ParameterHolderFactory {
@@ -290,6 +286,11 @@ class ParameterHolderFactory {
     }
 
     private static void renamePath(ParameterHolder holder, String oldPath, String newPath) {
-        holder.path = holder.path.replace(oldPath, newPath)
+        holder.path = holder.path.replace(oldPath + ":", newPath + ":")
+        if (ParameterObjectParameterHolder.isInstance(holder)) {
+            ((ParameterObjectParameterHolder) holder).classifierParameters.values().each { ParameterHolder subHolder ->
+                renamePath(subHolder, oldPath, newPath)
+            }
+        }
     }
 }

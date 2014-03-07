@@ -148,6 +148,7 @@ abstract class ParametrizedItem extends CommentableItem {
     }
 
     protected void saveParameters(List<ParameterHolder> parameterHolders, Collection<Parameter> parameters, def dao) {
+        sanityCheck(parameterHolders)
         Iterator<ParameterHolder> iterator = parameterHolders.iterator()
         while (iterator.hasNext()) {
             ParameterHolder parameterHolder = iterator.next()
@@ -168,6 +169,23 @@ abstract class ParametrizedItem extends CommentableItem {
                 removeFromDao(parameter, dao)
                 parameter.delete()
                 iterator.remove()
+            }
+        }
+    }
+
+    private void sanityCheck(List<ParameterHolder> holders) {
+        Map<String, List<ParameterHolder>> groupedByPath = holders.groupBy { "$it.path-$it.periodIndex" }
+        groupedByPath.each { String path, List<ParameterHolder> paramsForPath ->
+            if (paramsForPath.size() > 2) {
+                throw new IllegalStateException("there are more than two parameterHolders for path-periodIndex: $path")
+            }
+            if (paramsForPath.size() == 2) {
+                if (!paramsForPath[0].removed) {
+                    throw new IllegalStateException("there are two parameterHolders for path $path. This is only allowed, when the first one is flagged as removed")
+                }
+                if (!paramsForPath[1].added) {
+                    throw new IllegalStateException("there are two parameterHolders for path $path. This is only allowed, when the second one is flagged as added")
+                }
             }
         }
     }

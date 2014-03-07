@@ -122,7 +122,11 @@ class CacheItemSearchService {
     }
 
     private synchronized void updateModellingItemInIndex(CacheItem item) {
-        cache[cache.indexOf(item)] = item
+        int indexOf = cache.indexOf(item)
+        if (indexOf == -1) {
+            throw new IllegalStateException("could not find item $item. Maybe cache is not initialized?")
+        }
+        cache[indexOf] = item
         internalUpdateModellingItemInIndex(item)
     }
 

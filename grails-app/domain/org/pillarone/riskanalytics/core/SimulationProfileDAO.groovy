@@ -22,12 +22,10 @@ class SimulationProfileDAO {
 
     static constraints = {
         name unique: true, blank: false
-        template nullable: false
         randomSeed nullable: true
         numberOfIterations nullable: true
         modificationDate nullable: true
         lastUpdater nullable: true
-        creator nullable: true
     }
 
     static mapping = {

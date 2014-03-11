@@ -48,6 +48,9 @@ class SimulationProfile extends ParametrizedItem {
         simulationSettingsDao.modificationDate = modificationDate
         simulationSettingsDao.randomSeed = randomSeed
         simulationSettingsDao.numberOfIterations = numberOfIterations
+        if (simulationSettingsDao.runtimeParameters == null) {
+            simulationSettingsDao.runtimeParameters = []
+        }
         saveParameters(runtimeParameters, simulationSettingsDao.runtimeParameters, simulationSettingsDao)
     }
 
@@ -70,7 +73,7 @@ class SimulationProfile extends ParametrizedItem {
 
     @Override
     Integer getPeriodCount() {
-        return null
+        throw new UnsupportedOperationException("Deterministic models are not supported yet")
     }
 
     @Override

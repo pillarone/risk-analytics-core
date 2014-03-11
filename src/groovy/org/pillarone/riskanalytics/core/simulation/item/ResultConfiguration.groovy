@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.simulation.item
 
 import groovy.transform.CompileStatic
 import org.apache.commons.lang.builder.HashCodeBuilder
+import org.pillarone.riskanalytics.core.SimulationProfileDAO
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.output.*
@@ -141,6 +142,14 @@ class ResultConfiguration extends ModellingItem {
             }
         }
 
+    }
+
+    @Override
+    protected Object deleteDaoImpl(Object dao) {
+        SimulationProfileDAO.findAllByTemplate(dao as ResultConfigurationDAO).each {
+            it.delete(flush: true)
+        }
+        return super.deleteDaoImpl(dao)
     }
 
     @CompileStatic

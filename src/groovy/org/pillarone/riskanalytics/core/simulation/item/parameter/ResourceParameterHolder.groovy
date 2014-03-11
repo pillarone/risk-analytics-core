@@ -81,5 +81,23 @@ class ResourceParameterHolder extends ParameterHolder {
             return new NameVersionPair(s.substring(0, s.lastIndexOf(" ")), s.substring(s.lastIndexOf(" ") + 2))
         }
 
+        boolean equals(o) {
+            if (this.is(o)) return true
+            if (!(o instanceof NameVersionPair)) return false
+
+            NameVersionPair that = (NameVersionPair) o
+
+            if (name != that.name) return false
+            if (version != that.version) return false
+
+            return true
+        }
+
+        int hashCode() {
+            int result
+            result = name.hashCode()
+            result = 31 * result + version.hashCode()
+            return result
+        }
     }
 }

@@ -125,7 +125,7 @@ abstract class ModellingItem implements Serializable {
     @CompileStatic
     protected void setChangeUserInfo() {
         DateTime date = new DateTime()
-        Person currentUser = UserManagement.getCurrentUser()
+        Person currentUser = UserManagement.currentUser
         if (creationDate == null) {
             creationDate = date
             creator = currentUser

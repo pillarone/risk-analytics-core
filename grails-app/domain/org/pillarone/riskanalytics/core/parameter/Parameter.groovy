@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.parameter
 
 import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.pillarone.riskanalytics.core.SimulationProfileDAO
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.ResourceDAO
 
@@ -11,7 +12,7 @@ class Parameter {
 
     static belongsTo = [
             ParameterizationDAO, ParameterEntry, ParameterObjectParameter,
-            MultiDimensionalParameterValue, SimulationRun, ResourceDAO
+            MultiDimensionalParameterValue, SimulationRun, ResourceDAO, SimulationProfileDAO
     ]
 
     Class persistedClass() {

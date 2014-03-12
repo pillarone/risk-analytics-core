@@ -1,13 +1,11 @@
 package org.pillarone.riskanalytics.core.components;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber;
 
 import java.io.Serializable;
 
 
-public class ResourceHolder<E extends IResource> implements Cloneable, Serializable {
+public class Resourc$eHolder<E extends IResource> implements Cloneable, Serializable {
 
     private static final long serialVersionUID = 89572958934031L;
 
@@ -54,20 +52,24 @@ public class ResourceHolder<E extends IResource> implements Cloneable, Serializa
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof ResourceHolder) {
-            ResourceHolder holder = (ResourceHolder) obj;
-            return new EqualsBuilder().append(name, holder.name).
-                    append(version.toString(), holder.version.toString()).
-                    append(resourceClass.getName(), holder.resourceClass.getName()).isEquals();
-        }
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ResourceHolder)) return false;
 
-        return false;
+        ResourceHolder that = (ResourceHolder) o;
+
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (!resourceClass.equals(that.resourceClass)) return false;
+        if (version != null ? !version.equals(that.version) : that.version != null) return false;
+
+        return true;
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(name).append(version.toString()).
-                append(resourceClass.getName()).toHashCode();
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + resourceClass.hashCode();
+        return result;
     }
 }

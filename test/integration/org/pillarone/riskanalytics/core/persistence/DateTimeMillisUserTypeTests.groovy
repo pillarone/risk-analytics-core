@@ -1,11 +1,11 @@
 package org.pillarone.riskanalytics.core.persistence
 
+import org.joda.time.DateTime
 import org.junit.Test
 import org.pillarone.riskanalytics.core.test.DateTimeMillisUserTypeTest
-import org.joda.time.DateTime
-import org.pillarone.riskanalytics.core.parameter.DateParameter
 
-import static org.junit.Assert.*
+import static org.junit.Assert.assertEquals
+import static org.junit.Assert.assertNull
 
 class DateTimeMillisUserTypeTests {
 

@@ -124,12 +124,17 @@ class ResultConfiguration extends ModellingItem {
                 info.path.pathName == collector.path
             }
             if (existingInformation) {
-                existingInformation.collectingStrategyIdentifier = collector.mode.getIdentifier()
+                existingInformation.collectingStrategyIdentifier = collector.mode.identifier
             } else {
-                dao.addToCollectorInformation(new CollectorInformation(
+                def information = new CollectorInformation(
                         path: getPathMapping(pathCache, collector.path),
-                        collectingStrategyIdentifier: collector.mode.getIdentifier()
-                ))
+                        collectingStrategyIdentifier: collector.mode.identifier,
+                        configuration: dao
+                )
+                if (dao.collectorInformation == null) {
+                    dao.collectorInformation = []
+                }
+                dao.collectorInformation << information
             }
         }
 

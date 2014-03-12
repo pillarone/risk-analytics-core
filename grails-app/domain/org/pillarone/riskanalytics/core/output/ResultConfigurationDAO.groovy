@@ -1,9 +1,9 @@
 package org.pillarone.riskanalytics.core.output
 
-import org.pillarone.riskanalytics.core.user.Person
+import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
-import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.util.DatabaseUtils
 
 public class ResultConfigurationDAO {
@@ -18,8 +18,6 @@ public class ResultConfigurationDAO {
     DateTime modificationDate
     Person creator
     Person lastUpdater
-
-    Set<CollectorInformation> collectorInformation
 
     static hasMany = [collectorInformation: CollectorInformation]
 
@@ -37,7 +35,7 @@ public class ResultConfigurationDAO {
         lastUpdater lazy: false
         creationDate type: DateTimeMillisUserType
         modificationDate type: DateTimeMillisUserType
-        if (DatabaseUtils.isOracleDatabase()) {
+        if (DatabaseUtils.oracleDatabase) {
             comment(column: 'comment_value')
         }
     }
@@ -47,7 +45,7 @@ public class ResultConfigurationDAO {
      * A parameterization can be uniquely identified by Name, Model & Version.
      */
     static ResultConfigurationDAO find(String name, String modelClassName, String versionNumber) {
-        def criteria = ResultConfigurationDAO.createCriteria()
+        def criteria = createCriteria()
         return criteria.get {
             eq('name', name)
             eq('itemVersion', versionNumber)

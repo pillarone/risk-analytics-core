@@ -26,6 +26,7 @@ class SimulationProfileDAO {
         numberOfIterations nullable: true
         modificationDate nullable: true
         lastUpdater nullable: true
+        creator nullable: true
     }
 
     static mapping = {

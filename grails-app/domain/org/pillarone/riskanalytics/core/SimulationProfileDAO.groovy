@@ -8,22 +8,29 @@ import org.pillarone.riskanalytics.core.user.Person
 
 class SimulationProfileDAO {
 
+    //mandatory
     String name
+    String modelClassName
+    boolean forPublic = false
+
+    //optional
     ResultConfigurationDAO template
     Integer numberOfIterations
     Integer randomSeed
+    static hasMany = [runtimeParameters: Parameter]
 
+    //technically
     DateTime creationDate
     DateTime modificationDate
     Person lastUpdater
     Person creator
 
-    static hasMany = [runtimeParameters: Parameter]
-
     static constraints = {
-        name unique: true, blank: false
-        randomSeed nullable: true
+        name unique: ['modelClassName'], blank: false
+        modelClassName blank: false
+        template nullable: true
         numberOfIterations nullable: true
+        randomSeed nullable: true
         modificationDate nullable: true
         lastUpdater nullable: true
         creator nullable: true
@@ -36,15 +43,26 @@ class SimulationProfileDAO {
         lastUpdater lazy: false
     }
 
+    @Override
+    String toString() {
+        "$name ($modelClassName)"
+    }
+
     static namedQueries = {
-        allNamesForModelClass { Class modelClass ->
-            template {
-                eq('modelClassName', modelClass.name)
+        withModelClass { Class modelClass ->
+            eq('modelClassName', modelClass?.name)
+        }
+        withCreator { Person creator ->
+            eq('creator', creator)
+        }
+        withForPublic { boolean forPublic ->
+            eq('forPublic', forPublic)
+        }
+        withCreatorOrForPublic { Person creator ->
+            or {
+                withForPublic(true)
+                withCreator(creator)
             }
-            projections {
-                property 'name'
-            }
-            order('name')
         }
     }
 }

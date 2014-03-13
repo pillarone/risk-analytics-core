@@ -6,6 +6,7 @@ import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
+import org.pillarone.riskanalytics.core.user.Person
 
 class SimulationProfile extends ParametrizedItem {
 
@@ -14,17 +15,26 @@ class SimulationProfile extends ParametrizedItem {
     Integer randomSeed
     List<ParameterHolder> runtimeParameters = []
     Integer numberOfIterations
+    boolean forPublic = false
 
-    SimulationProfile(String name) {
-        super(name)
+    SimulationProfile(String name, Class modelClass) {
+        super(preConditionCheck(name, modelClass))
+        this.modelClass = modelClass
     }
 
-    static boolean exists(String name) {
-        SimulationProfileDAO.countByName(name) != 0
+    private static String preConditionCheck(String name, Class modelClass) {
+        if (!(name && modelClass)) {
+            throw new IllegalStateException("name and modelClass must not be empty or null")
+        }
+        name
     }
 
-    static List<String> findAllNamesForModelClass(Class modelClass) {
-        SimulationProfileDAO.allNamesForModelClass(modelClass).list()
+    static boolean exists(String name, Class modelClass) {
+        SimulationProfileDAO.countByNameAndModelClassName(name, modelClass.name) != 0
+    }
+
+    static Person getCreator(String name, Class modelClass) {
+        SimulationProfileDAO.findByNameAndModelClassName(name, modelClass.name)?.creator
     }
 
     @Override
@@ -48,6 +58,8 @@ class SimulationProfile extends ParametrizedItem {
         simulationSettingsDao.modificationDate = modificationDate
         simulationSettingsDao.randomSeed = randomSeed
         simulationSettingsDao.numberOfIterations = numberOfIterations
+        simulationSettingsDao.forPublic = forPublic
+        simulationSettingsDao.modelClassName = modelClass.name
         if (simulationSettingsDao.runtimeParameters == null) {
             simulationSettingsDao.runtimeParameters = []
         }
@@ -57,7 +69,7 @@ class SimulationProfile extends ParametrizedItem {
     @Override
     protected void mapFromDao(Object dao, boolean completeLoad) {
         SimulationProfileDAO simulationSettingsDAO = dao as SimulationProfileDAO
-        modelClass = ModelRegistry.instance.getModelClass(simulationSettingsDAO.template.modelClassName)
+        modelClass = ModelRegistry.instance.getModelClass(simulationSettingsDAO.modelClassName)
         ResultConfiguration resultConfiguration = new ResultConfiguration(simulationSettingsDAO.template.name)
         resultConfiguration.versionNumber = new VersionNumber(simulationSettingsDAO.template.itemVersion)
         resultConfiguration.modelClass = modelClass
@@ -68,6 +80,7 @@ class SimulationProfile extends ParametrizedItem {
         lastUpdater = simulationSettingsDAO.lastUpdater
         modificationDate = simulationSettingsDAO.modificationDate
         randomSeed = simulationSettingsDAO.randomSeed
+        forPublic = simulationSettingsDAO.forPublic
         loadParameters(runtimeParameters, simulationSettingsDAO.runtimeParameters)
     }
 
@@ -113,6 +126,7 @@ class SimulationProfile extends ParametrizedItem {
 
     @Override
     protected loadFromDB() {
-        SimulationProfileDAO.findByName(name)
+        SimulationProfileDAO.findByNameAndModelClassName(name, modelClass.name)
     }
+
 }

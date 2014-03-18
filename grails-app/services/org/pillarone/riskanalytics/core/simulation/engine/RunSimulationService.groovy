@@ -47,8 +47,7 @@ public class RunSimulationService {
     public SimulationHandler runSimulationOnGrid(SimulationConfiguration configuration, ResultConfiguration resultConfiguration) {
         configuration.createMappingCache(resultConfiguration)
         configuration.prepareSimulationForGrid()
-        configuration.beans = SpringBeanDefinitionRegistry.getRequiredBeanDefinitions()
-
+        configuration.beans = SpringBeanDefinitionRegistry.requiredBeanDefinitions
         SimulationTask task = new SimulationTask()
         SimulationHandler handler = new SimulationHandler(simulationTask: task)
         handler.gridTaskFuture = grid.execute(task, configuration)

@@ -127,7 +127,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
                     simulationJob.setJobCount(tmpList.size());
                 }
             }
-
+            simulationConfiguration.getSimulation().save();
             return jobsToNodes;
         } catch (Exception e) {
             simulationErrors.add(e);

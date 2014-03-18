@@ -21,7 +21,7 @@ import org.springframework.context.support.GenericApplicationContext
 @CompileStatic
 class SimulationJob extends GridJobAdapterEx {
 
-    private SimulationConfiguration simulationConfiguration
+    protected SimulationConfiguration simulationConfiguration
     private SimulationRunner runner = SimulationRunner.createRunner()
     private UUID jobIdentifier
     private int jobCount = 0;
@@ -42,13 +42,13 @@ class SimulationJob extends GridJobAdapterEx {
             initSpringContext()
 /** Setting the default time zone to UTC avoids problems in multi user context with different time zones
  *  and switches off daylight saving capabilities and possible related problems.                */
-            DateTimeZone.setDefault(DateTimeZone.UTC)
-            TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
+            DateTimeZone.default = DateTimeZone.UTC
+            TimeZone.default = TimeZone.getTimeZone("UTC")
 
             //***** https://issuetracking.intuitive-collaboration.com/jira/browse/KTI-15
-            getClass().getClassLoader().loadClass("java.lang.Character")
-            getClass().getClassLoader().loadClass("java.lang.reflect.InvocationTargetException")
-            getClass().getClassLoader().loadClass("org.pillarone.riskanalytics.core.components.ComponentUtils")
+            getClass().classLoader.loadClass("java.lang.Character")
+            getClass().classLoader.loadClass("java.lang.reflect.InvocationTargetException")
+            getClass().classLoader.loadClass("org.pillarone.riskanalytics.core.components.ComponentUtils")
             //***** http://www.gridgainsystems.com/jiveforums/thread.jspa?threadID=1324&tstart=0
 
             for (Map.Entry<Class, IPacketAggregator> entry in aggregatorMap.entrySet()) {
@@ -58,8 +58,8 @@ class SimulationJob extends GridJobAdapterEx {
             ResourceRegistry.preLoad(loadedResources)
 
             ExpandoMetaClass.enableGlobally()
-            runner.setJobCount(jobCount)
-            runner.setSimulationConfiguration(simulationConfiguration)
+            runner.jobCount = jobCount
+            runner.simulationConfiguration = simulationConfiguration
             runner.start()
 
             GridOutputStrategy outputStrategy = (GridOutputStrategy) this.simulationConfiguration.outputStrategy
@@ -91,11 +91,6 @@ class SimulationJob extends GridJobAdapterEx {
 
     void setJobCount(int jobCount) {
         this.jobCount = jobCount;
-    }
-
-
-    UUID getJobIdentifier() {
-        return jobIdentifier
     }
 
     private void initSpringContext() {

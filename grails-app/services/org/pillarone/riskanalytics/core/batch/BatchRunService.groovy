@@ -43,7 +43,7 @@ class BatchRunService {
     }
 
     public void runBatch(BatchRun batchRun) {
-        getSimulationRuns(batchRun).each {BatchRunSimulationRun batchRunSimulationRun ->
+        getSimulationRuns(batchRun).each { BatchRunSimulationRun batchRunSimulationRun ->
             runSimulation(batchRunSimulationRun)
         }
         getRunnerRegistry().startTimer()
@@ -52,10 +52,9 @@ class BatchRunService {
 
     @CompileStatic
     public synchronized void runSimulation(BatchRunSimulationRun batchRunSimulationRun) {
-        if (batchRunSimulationRun.simulationRun.endTime != null ) {
+        if (batchRunSimulationRun.simulationRun.endTime != null) {
             LOG.info "simulation ${batchRunSimulationRun.simulationRun.name} already executed at ${batchRunSimulationRun.simulationRun.endTime}"
-        } else
-        if (batchRunSimulationRun.simulationRun.endTime == null && !batchRunInfoService.runningBatchSimulationRuns.contains(batchRunSimulationRun)) {
+        } else if (batchRunSimulationRun.simulationRun.endTime == null && !batchRunInfoService.runningBatchSimulationRuns.contains(batchRunSimulationRun)) {
             ICollectorOutputStrategy strategy = OutputStrategyFactory.getInstance(batchRunSimulationRun.strategy)
 
             Simulation simulation = createSimulation(batchRunSimulationRun.simulationRun.name)
@@ -131,7 +130,7 @@ class BatchRunService {
 
     boolean deleteBatchRun(BatchRun batchRun) {
         BatchRun.withTransaction {
-            for(BatchRunSimulationRun toDelete in BatchRunSimulationRun.findAllByBatchRun(batchRun)) {
+            for (BatchRunSimulationRun toDelete in BatchRunSimulationRun.findAllByBatchRun(batchRun)) {
                 deleteBatchRunSimulationRun(toDelete)
             }
             BatchRun.get(batchRun.id).delete()
@@ -145,7 +144,6 @@ class BatchRunService {
             SimulationRun.get(batchRunSimulationRun.simulationRun.id).delete()
         }
     }
-
 
     // Returns the batches that are ready to run.
     // BTW
@@ -237,11 +235,4 @@ class RunnerRegistry implements ActionListener {
     void stop() {
         timer.stop()
     }
-
-//    protected void notifySimulationStart(SimulationHandler simulationHandler) {
-//        if (simulationHandler)
-//            batchRunInfoService?.batchSimulationStart(simulationHandler)
-//    }
-
-
 }

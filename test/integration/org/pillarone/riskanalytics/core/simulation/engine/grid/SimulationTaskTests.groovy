@@ -1,6 +1,5 @@
 package org.pillarone.riskanalytics.core.simulation.engine.grid
 import grails.util.Holders
-import org.gridgain.grid.Grid
 import org.gridgain.grid.GridNode
 import org.gridgain.grid.kernal.GridRichNodeImpl
 import org.junit.After
@@ -9,6 +8,7 @@ import org.junit.Test
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
 import org.pillarone.riskanalytics.core.simulation.engine.grid.mapping.AbstractNodeMappingStrategy
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
+import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
 import static org.junit.Assert.*
@@ -43,7 +43,7 @@ class SimulationTaskTests {
         List<GridNode> mockNodes = new ArrayList<GridNode>();
         mockNodes.add(new TestGridNode(1));
 
-        Collection jobs = simulationTask.map(mockNodes, configuration).keySet();
+        Collection<SimulationJob> jobs = simulationTask.map(mockNodes, configuration).keySet() as Collection<SimulationJob>;
         assertEquals 1, jobs.size()
 
         SimulationConfiguration runner = jobs.iterator().next().simulationConfiguration
@@ -58,6 +58,7 @@ class SimulationTaskTests {
         assertNull configuration.simulation.end
     }
 
+    @Test
     void testReservedOffsets() {
         SimulationTask simulationTask = new TestSimulationTask(1)
 
@@ -82,6 +83,7 @@ class SimulationTaskTests {
 
     }
 
+    @Test
     void testSplitOneJobMultipleBlocks() {
         SimulationTask simulationTask = new TestSimulationTask(1)
 
@@ -93,7 +95,7 @@ class SimulationTaskTests {
         List<GridNode> mockNodes = new ArrayList<GridNode>();
         mockNodes.add(new TestGridNode(1));
 
-        Collection jobs = simulationTask.map(mockNodes, configuration).keySet();
+        Collection<SimulationJob> jobs = simulationTask.map(mockNodes, configuration).keySet() as Collection<SimulationJob>;
 
         assertEquals 1, jobs.size()
 
@@ -120,6 +122,7 @@ class SimulationTaskTests {
         assertNull configuration.simulation.end
     }
 
+    @Test
     void testSplitTwoJobsMultipleBlocks() {
         SimulationTask simulationTask = new TestSimulationTask(2)
 
@@ -131,7 +134,7 @@ class SimulationTaskTests {
         List<GridNode> mockNodes = new ArrayList<GridNode>();
         mockNodes.add(new TestGridNode(2));
 
-        Collection jobs = simulationTask.map(mockNodes, configuration).keySet();
+        Collection<SimulationJob> jobs = simulationTask.map(mockNodes, configuration).keySet() as Collection<SimulationJob>;
         assertEquals 2, jobs.size()
         jobs = jobs.sort { it.simulationConfiguration.simulationBlocks.size() }
 
@@ -162,16 +165,17 @@ class SimulationTaskTests {
         assertNull configuration.simulation.end
     }
 
-    SimulationConfiguration createConfig(int iterationCount) {
+    static SimulationConfiguration createConfig(int iterationCount) {
         SimulationConfiguration configuration = new SimulationConfiguration()
         Simulation simulation = new Simulation("test")
         simulation.id = 1L
         simulation.numberOfIterations = iterationCount
         simulation.parameterization = new Parameterization("test")
+        simulation.template = new ResultConfiguration('heinz')
+        simulation.periodCount = 1
         configuration.simulation = simulation
         assertNull simulation.start
         assertNull simulation.end
-
         return configuration
     }
 }
@@ -185,7 +189,7 @@ class TestNodeStrategy extends AbstractNodeMappingStrategy {
 
     @Override
     int getTotalCpuCount(List<GridNode> usableNodes) {
-        return usableNodes*.cpuCount.sum()
+        return (usableNodes as List<TestGridNode>)*.cpuCount.sum()
     }
 
 
@@ -207,11 +211,5 @@ class TestSimulationTask extends SimulationTask {
     def TestSimulationTask(cpuCount) {
         this.cpuCount = cpuCount;
     }
-
-    protected int getTotalProcessorCount(Grid grid) {
-        return cpuCount
-    }
-
-
 }
 

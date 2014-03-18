@@ -18,11 +18,11 @@ class SimulationHandler {
     }
 
     int getProgress() {
-        simulationTask.getProgress()
+        simulationTask.progress
     }
 
     SimulationState getSimulationState() {
-        return simulationTask.getSimulationState()
+        return simulationTask.simulationState
     }
 
     Simulation getSimulation() {
@@ -30,10 +30,10 @@ class SimulationHandler {
     }
 
     List<Throwable> getSimulationErrors() {
-        return simulationTask.getSimulationErrors()
+        return simulationTask.simulationErrors
     }
 
     DateTime getEstimatedSimulationEnd() {
-        return simulationTask.getEstimatedSimulationEnd()
+        return simulationTask.estimatedSimulationEnd
     }
 }

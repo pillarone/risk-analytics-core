@@ -10,7 +10,7 @@ import org.pillarone.riskanalytics.core.util.RegistryInitializationSupport
 @CompileStatic
 class ConstraintsFactory {
 
-    private static Log LOG = LogFactory.getLog(ConstraintsFactory)
+    private final static Log LOG = LogFactory.getLog(ConstraintsFactory)
 
     private static Map<String, IMultiDimensionalConstraints> constraints = new MapMaker().makeMap()
 

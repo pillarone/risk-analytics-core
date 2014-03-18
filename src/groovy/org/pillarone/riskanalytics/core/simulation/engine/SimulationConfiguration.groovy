@@ -1,7 +1,5 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
-import org.apache.commons.logging.Log
-import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.model.ModelHelper
 import org.pillarone.riskanalytics.core.output.*
@@ -32,8 +30,6 @@ public class SimulationConfiguration implements Serializable, Cloneable {
     IPacketListener packetListener;
     Map<String, BeanDefinition> beans = [:]
 
-    private static Log LOG = LogFactory.getLog(SimulationConfiguration)
-
     /**
      * This creates a new Simulation instance based on the existing one, which only contains the necessary info for the
      * simulation to make sure that this object can be serialized to the grid.
@@ -56,7 +52,9 @@ public class SimulationConfiguration implements Serializable, Cloneable {
         preparedSimulation.parameterization.dealId = simulation.parameterization.dealId
 
         //clone parameters to make sure they don't have any model or component references
-        preparedSimulation.parameterization.parameterHolders = simulation.parameterization.parameterHolders.collect { (ParameterHolder) it.clone() }
+        preparedSimulation.parameterization.parameterHolders = simulation.parameterization.parameterHolders.collect {
+            (ParameterHolder) it.clone()
+        }
         simulation.parameterization.parameterHolders*.clearCachedValues()
 
 
@@ -79,10 +77,6 @@ public class SimulationConfiguration implements Serializable, Cloneable {
 
     void addSimulationBlock(SimulationBlock simulationBlock) {
         simulationBlocks << simulationBlock
-    }
-
-    private void calculateTotalIterations() {
-        simulation.numberOfIterations = (int) simulationBlocks*.blockSize.sum()
     }
 
     /**

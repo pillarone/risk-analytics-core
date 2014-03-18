@@ -11,15 +11,11 @@ class RegistryInitializationSupport {
     private final Set<String> PACKAGES = new HashSet()
 
     private RegistryInitializationSupport() {
-        PackageProvider packageProvider
         try {
-            packageProvider = Holders.grailsApplication?.mainContext?.getBean('packageProvider', PackageProvider)
+            PackageProvider packageProvider = Holders.grailsApplication.mainContext.getBean('packageProvider', PackageProvider)
+            PACKAGES.addAll(packageProvider.packages)
         } catch (BeansException ignored) {
             log.warning('could not get PackageProvider from mainContext')
-        }
-        if (packageProvider) {
-            PACKAGES.addAll(packageProvider.packages)
-        } else {
             PACKAGES << 'org.pillarone'
         }
     }

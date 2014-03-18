@@ -16,7 +16,7 @@ class ConstraintsFactory {
 
     static {
         LOG.debug("Initializing MDP constraints")
-        for(Class<IMultiDimensionalConstraints> clazz in RegistryInitializationSupport.findClasses(IMultiDimensionalConstraints)) {
+        for(Class<IMultiDimensionalConstraints> clazz in RegistryInitializationSupport.instance.findClasses(IMultiDimensionalConstraints)) {
             IMultiDimensionalConstraints instance = clazz.newInstance()
             LOG.debug("Registering ${instance.name}")
             registerConstraint(instance)

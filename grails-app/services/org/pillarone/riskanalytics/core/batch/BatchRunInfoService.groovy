@@ -2,8 +2,7 @@ package org.pillarone.riskanalytics.core.batch
 
 import grails.util.Holders
 import groovy.transform.CompileStatic
-import org.apache.commons.logging.Log
-import org.apache.commons.logging.LogFactory
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.pillarone.riskanalytics.core.BatchRunSimulationRun
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.SimulationState
@@ -61,13 +60,13 @@ class BatchRunInfoService {
 
     @CompileStatic
     public BatchRunSimulationRun getBatchRunSimulationRun(BatchRunSimulationRun batchRunSimulationRun) {
-        return runningBatchSimulationRuns.find { BatchRunSimulationRun it -> it.id == batchRunSimulationRun.id}
+        return runningBatchSimulationRuns.find { BatchRunSimulationRun it -> it.id == batchRunSimulationRun.id }
     }
 
     @CompileStatic
     public List<Simulation> getFinished(long endTime) {
         List<Simulation> simulations = []
-        for (Simulation simulation: finishedSimulations) {
+        for (Simulation simulation : finishedSimulations) {
             if (simulation.end?.millis > endTime)
                 simulations << simulation
         }

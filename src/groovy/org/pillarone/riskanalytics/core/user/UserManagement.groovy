@@ -1,7 +1,7 @@
 package org.pillarone.riskanalytics.core.user
 
 import grails.plugin.springsecurity.SpringSecurityService
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import grails.util.Holders
 
 class UserManagement {
 
@@ -22,7 +22,7 @@ class UserManagement {
         if (_hasTriedFindingFixUserNameFromSystemProperty) {
             return _possiblyFixUser
         }
-        Person.withTransaction {e ->
+        Person.withTransaction { e ->
             String runAsUserName = System.getProperty("runAsUserName");
             _possiblyFixUser = runAsUserName != null ? Person.findByUsername(runAsUserName) : null
             if (_possiblyFixUser) {
@@ -33,9 +33,8 @@ class UserManagement {
             return _possiblyFixUser
         }
     }
-    
+
     static SpringSecurityService getSpringSecurityService() {
-        SpringSecurityService securityService = ApplicationHolder.application.mainContext.getBean("springSecurityService")
-        return securityService
+        Holders.grailsApplication.mainContext.getBean('springSecurityService', SpringSecurityService)
     }
 }

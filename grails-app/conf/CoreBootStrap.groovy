@@ -1,30 +1,25 @@
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.util.Environment
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.pillarone.riskanalytics.core.BatchRunSimulationRun
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
-import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
-import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
-import org.pillarone.riskanalytics.core.output.CollectorMapping
-import org.pillarone.riskanalytics.core.output.SimulationRun
+import org.pillarone.riskanalytics.core.output.*
 import org.pillarone.riskanalytics.core.parameter.comment.Tag
-import org.pillarone.riskanalytics.core.report.IReportModel
-import org.pillarone.riskanalytics.core.report.ReportRegistry
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.EnumTagType
-import org.springframework.transaction.TransactionStatus
 import org.pillarone.riskanalytics.core.user.*
-import org.apache.commons.logging.LogFactory
-import org.apache.commons.logging.Log
-import org.pillarone.riskanalytics.core.output.AggregatedWithSingleAvailableCollectingModeStrategy
+import org.springframework.transaction.TransactionStatus
 
 class CoreBootStrap {
 
     private static Log LOG = LogFactory.getLog(CoreBootStrap)
 
     SpringSecurityService authenticateService
+    GrailsApplication grailsApplication
 
-    def init = {servletContext ->
+    def init = { servletContext ->
 
         authenticateService = UserManagement.getSpringSecurityService()
 
@@ -102,9 +97,9 @@ class CoreBootStrap {
             }
         }
         //delete all unfinished simulations
-        SimulationRun.withTransaction {status ->
+        SimulationRun.withTransaction { status ->
             def unfinishedSimulations = SimulationRun.findAllByEndTime(null)
-            unfinishedSimulations.each {SimulationRun simulationRun ->
+            unfinishedSimulations.each { SimulationRun simulationRun ->
                 try {
                     BatchRunSimulationRun batchRunSimulationRun = BatchRunSimulationRun.findBySimulationRun(simulationRun)
                     if (!batchRunSimulationRun)
@@ -126,13 +121,13 @@ class CoreBootStrap {
 
         //File import must be executed after the registration of all Constraints and CollectingModeStrategies
         //-> registration in the plugin descriptors / fileimport in bootstrap
-        def modelFilter = ApplicationHolder.application.config?.models
+        def modelFilter = grailsApplication.config?.models
 
         List models = null
         if (modelFilter) {
-            models = modelFilter.collect {it - "Model"}
+            models = modelFilter.collect { it - "Model" }
         }
-        ParameterizationDAO.withTransaction {TransactionStatus status ->
+        ParameterizationDAO.withTransaction { TransactionStatus status ->
             FileImportService.importModelsIfNeeded(models)
         }
     }

@@ -1,11 +1,10 @@
 package org.pillarone.riskanalytics.core.report
 
+import com.google.common.collect.ArrayListMultimap
 import com.google.common.collect.Multimap
 import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import com.google.common.collect.ArrayListMultimap
-import org.pillarone.riskanalytics.core.parameterization.IMultiDimensionalConstraints
 import org.pillarone.riskanalytics.core.util.RegistryInitializationSupport
 
 @CompileStatic
@@ -16,7 +15,7 @@ abstract class ReportRegistry {
     private static Multimap<Class, IReportModel> reportMap = ArrayListMultimap.create()
 
     static {
-        for (Class<IReportModel> clazz in RegistryInitializationSupport.findClasses(IReportModel)) {
+        for (Class<IReportModel> clazz in RegistryInitializationSupport.instance.findClasses(IReportModel)) {
             IReportModel instance = clazz.newInstance()
             for (Class modelClass in instance.supportedModelClasses) {
                 registerReportModel(modelClass, instance)

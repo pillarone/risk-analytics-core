@@ -1,6 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.engine.grid;
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder;
+import grails.util.Holders;
 import org.gridgain.grid.Grid;
 import org.gridgain.grid.GridFactory;
 import org.pillarone.riskanalytics.core.FileConstants;
@@ -11,7 +11,7 @@ public class GridHelper {
 
     public static Grid getGrid() {
         try {
-            return (Grid) ApplicationHolder.getApplication().getMainContext().getBean("grid");
+            return Holders.getGrailsApplication().getMainContext().getBean("grid", Grid.class);
         } catch (Exception e) {
             return GridFactory.grid();
         }

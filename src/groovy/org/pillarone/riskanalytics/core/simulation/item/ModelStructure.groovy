@@ -1,13 +1,12 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
+import grails.util.Holders
 import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pillarone.riskanalytics.core.ModelStructureDAO
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.simulation.ModelStructureWriter
-
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 
 public class ModelStructure extends ConfigObjectBasedModellingItem {
@@ -49,7 +48,7 @@ public class ModelStructure extends ConfigObjectBasedModellingItem {
         }
 
         List availableModelClasses = []
-        def modelFilter = ApplicationHolder.application.getConfig()?.models
+        def modelFilter = Holders.config?.models
 
         modelClassNames.each {
             try {

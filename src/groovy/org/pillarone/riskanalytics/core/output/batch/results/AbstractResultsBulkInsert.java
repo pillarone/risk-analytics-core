@@ -3,7 +3,6 @@ package org.pillarone.riskanalytics.core.output.batch.results;
 import grails.util.Holders;
 import groovy.transform.CompileStatic;
 import groovy.util.ConfigObject;
-import org.codehaus.groovy.grails.commons.ApplicationHolder;
 import org.pillarone.riskanalytics.core.output.SingleValueResultPOJO;
 import org.pillarone.riskanalytics.core.output.batch.AbstractBulkInsert;
 import org.pillarone.riskanalytics.core.util.GroovyUtils;

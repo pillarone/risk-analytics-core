@@ -1,20 +1,17 @@
 package org.pillarone.riskanalytics.core.simulation.engine.grid
-
-
+import grails.util.Holders
 import org.gridgain.grid.Grid
+import org.gridgain.grid.GridNode
+import org.gridgain.grid.kernal.GridRichNodeImpl
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
-import org.pillarone.riskanalytics.core.simulation.item.Simulation
-import org.gridgain.grid.GridNode
 import org.pillarone.riskanalytics.core.simulation.engine.grid.mapping.AbstractNodeMappingStrategy
-import org.gridgain.grid.kernal.GridRichNodeImpl
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
 import static org.junit.Assert.*
-
 
 class SimulationTaskTests {
 
@@ -22,16 +19,16 @@ class SimulationTaskTests {
 
     @Before
     void setUp() {
-        Object clazz = ConfigurationHolder.config.get(AbstractNodeMappingStrategy.STRATEGY_CLASS_KEY)
+        Object clazz = Holders.config.get(AbstractNodeMappingStrategy.STRATEGY_CLASS_KEY)
         if (clazz instanceof Class) {
             oldValue = clazz
         }
-        ConfigurationHolder.config.put(AbstractNodeMappingStrategy.STRATEGY_CLASS_KEY, TestNodeStrategy)
+        Holders.config.put(AbstractNodeMappingStrategy.STRATEGY_CLASS_KEY, TestNodeStrategy)
     }
 
     @After
     void tearDown() {
-        ConfigurationHolder.config.put(AbstractNodeMappingStrategy.STRATEGY_CLASS_KEY, oldValue)
+        Holders.config.put(AbstractNodeMappingStrategy.STRATEGY_CLASS_KEY, oldValue)
 
     }
 

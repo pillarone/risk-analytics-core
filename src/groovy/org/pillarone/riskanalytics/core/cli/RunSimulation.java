@@ -1,9 +1,9 @@
 package org.pillarone.riskanalytics.core.cli;
 
+import grails.util.Holders;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.groovy.grails.commons.ApplicationHolder;
 import org.pillarone.riskanalytics.core.initialization.GrailsEnvironment;
 import org.pillarone.riskanalytics.core.initialization.IExternalDatabaseSupport;
 import org.pillarone.riskanalytics.core.initialization.StandaloneConfigLoader;
@@ -75,7 +75,7 @@ public class RunSimulation {
     }
 
     private static void shutdown(IExternalDatabaseSupport databaseSupport) {
-        AbstractApplicationContext applicationContext = (AbstractApplicationContext) ApplicationHolder.getApplication().getMainContext();
+        AbstractApplicationContext applicationContext = (AbstractApplicationContext) Holders.getGrailsApplication().getMainContext();
         applicationContext.close();
         try {
             StdSchedulerFactory.getDefaultScheduler().shutdown();

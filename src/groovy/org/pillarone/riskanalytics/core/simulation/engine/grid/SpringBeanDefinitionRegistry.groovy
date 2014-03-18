@@ -1,28 +1,24 @@
 package org.pillarone.riskanalytics.core.simulation.engine.grid
 
-import org.springframework.beans.factory.config.BeanDefinition
+import grails.util.Holders
 import org.springframework.beans.factory.BeanFactory
-import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.springframework.context.ApplicationContext
-
+import org.springframework.beans.factory.config.BeanDefinition
+import org.springframework.context.support.AbstractApplicationContext
 
 class SpringBeanDefinitionRegistry {
 
-    private static Set<String> beanDefinitionNames = new HashSet<String>()
+    private final static Set<String> BEAN_DEFINITION_NAMES = new HashSet<String>()
 
     public static void registerBean(String name) {
-        beanDefinitionNames << name
+        BEAN_DEFINITION_NAMES << name
     }
 
     public static Map<String, BeanDefinition> getRequiredBeanDefinitions() {
         Map result = [:]
-
-        BeanFactory beanFactory = ApplicationHolder.application.mainContext.beanFactory
-        for (String name in beanDefinitionNames) {
+        BeanFactory beanFactory = (Holders.grailsApplication.mainContext as AbstractApplicationContext).beanFactory
+        for (String name in BEAN_DEFINITION_NAMES) {
             result.put(name, beanFactory.getBeanDefinition(name))
         }
-
         return result
     }
-
 }

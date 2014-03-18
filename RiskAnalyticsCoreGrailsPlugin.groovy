@@ -1,7 +1,8 @@
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.codehaus.groovy.grails.orm.hibernate.HibernateEventListeners
 import org.gridgain.grid.GridConfigurationAdapter
 import org.gridgain.grid.GridSpringBean
+import org.gridgain.grid.marshaller.optimized.GridOptimizedMarshaller
 import org.gridgain.grid.spi.collision.fifoqueue.GridFifoQueueCollisionSpi
 import org.gridgain.grid.spi.failover.never.GridNeverFailoverSpi
 import org.joda.time.DateTimeZone
@@ -14,7 +15,9 @@ import org.pillarone.riskanalytics.core.remoting.IResultService
 import org.pillarone.riskanalytics.core.remoting.ITransactionService
 import org.pillarone.riskanalytics.core.remoting.impl.ResultService
 import org.pillarone.riskanalytics.core.simulation.engine.MappingCache
+import org.pillarone.riskanalytics.core.simulation.engine.grid.SpringBeanDefinitionRegistry
 import org.pillarone.riskanalytics.core.util.GrailsConfigValidator
+import org.pillarone.riskanalytics.core.util.PackageProvider
 import org.springframework.remoting.rmi.RmiProxyFactoryBean
 import org.springframework.remoting.rmi.RmiServiceExporter
 import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
@@ -47,12 +50,21 @@ Persistence & Simulation engine.
 
     def groupId = "org.pillarone"
 
-    def doWithWebDescriptor = {xml ->
+    def doWithWebDescriptor = { xml ->
         // TODO Implement additions to web.xml (optional), this event occurs before
     }
 
     def doWithSpring = {
-        ConfigObject config = ConfigurationHolder.config
+        ConfigObject config = application.config
+
+        packageProvider(PackageProvider) {
+            if (config.autoRegistrationBasePackages) {
+                packages = [config.autoRegistrationBasePackages, 'org.pillarone'].flatten() - null as Set<String>
+            } else {
+                packages = ['org.pillarone']
+            }
+        }
+        SpringBeanDefinitionRegistry.registerBean('packageProvider')
 
         traceLogManager(TraceLogManager)
 
@@ -87,7 +99,7 @@ Persistence & Simulation engine.
             transactionAttributes = attributes
         }
 
-        resultServiceBean(ResultService) { }
+        resultServiceBean(ResultService) {}
 
         "grid.cfg"(GridConfigurationAdapter) {
             gridName = "pillarone"
@@ -104,11 +116,11 @@ Persistence & Simulation engine.
             networkTimeout = 30000
 
         }
-        marshaller(org.gridgain.grid.marshaller.optimized.GridOptimizedMarshaller) { }
+        marshaller(GridOptimizedMarshaller) {}
         failoverSpi(GridNeverFailoverSpi)
         collisionSpi(GridFifoQueueCollisionSpi) {
-            parallelJobsNumber = ConfigurationHolder.config.containsKey("numberOfParallelJobsPerNode") ?
-                ConfigurationHolder.config."numberOfParallelJobsPerNode" : 100
+            parallelJobsNumber = config.containsKey("numberOfParallelJobsPerNode") ?
+                    config."numberOfParallelJobsPerNode" : 100
         }
         grid(GridSpringBean) {
             configuration = ref('grid.cfg')
@@ -125,11 +137,9 @@ Persistence & Simulation engine.
         mappingCache(MappingCache) {}
     }
 
-    def doWithDynamicMethods = {ctx ->
-        // TODO Implement registering dynamic methods to classes (optional)
-    }
+    def doWithDynamicMethods = { ctx -> }
 
-    def doWithApplicationContext = {applicationContext ->
+    def doWithApplicationContext = { applicationContext ->
 
         /** Setting the default time zone to UTC avoids problems in multi user context with different time zones
          *  and switches off daylight saving capabilities and possible related problems.                */
@@ -137,7 +147,6 @@ Persistence & Simulation engine.
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
 
         //Checks at startup if certain config options required for the core are set and sets defaults otherwise
-        ConfigObject grailsConfig = ConfigurationHolder.config
         def standardCalculatorOutput = [
                 'stdev': true,
                 'percentile': [0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0],
@@ -146,7 +155,7 @@ Persistence & Simulation engine.
                 'pdf': 200
         ]
 
-        GrailsConfigValidator.validateConfig(grailsConfig, [
+        GrailsConfigValidator.validateConfig(application.config, [
                 "resultBulkInsert": GenericResultBulkInsert,
                 "calculationBulkInsert": GenericCalculationBulkInsert,
                 "keyFiguresToCalculate": standardCalculatorOutput
@@ -154,14 +163,7 @@ Persistence & Simulation engine.
 
     }
 
-    def onChange = {event ->
-        // TODO Implement code that is executed when any artefact that this plugin is
-        // watching is modified and reloaded. The event contains: event.source,
-        // event.application, event.manager, event.ctx, and event.plugin.
-    }
+    def onChange = { event -> }
 
-    def onConfigChange = {event ->
-        // TODO Implement code that is executed when the project configuration changes.
-        // The event is the same as for 'onChange'.
-    }
+    def onConfigChange = { event -> }
 }

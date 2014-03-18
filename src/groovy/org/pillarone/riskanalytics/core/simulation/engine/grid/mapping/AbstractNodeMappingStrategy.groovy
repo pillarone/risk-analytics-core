@@ -2,12 +2,11 @@ package org.pillarone.riskanalytics.core.simulation.engine.grid.mapping
 
 import grails.util.Holders
 import groovy.transform.CompileStatic
-import org.gridgain.grid.GridNode
-import org.gridgain.grid.Grid
-import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.gridgain.grid.Grid
+import org.gridgain.grid.GridNode
+import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper
 
 @CompileStatic
 abstract class AbstractNodeMappingStrategy implements INodeMappingStrategy {

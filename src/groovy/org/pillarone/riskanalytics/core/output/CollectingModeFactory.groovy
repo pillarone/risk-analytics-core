@@ -12,7 +12,7 @@ class CollectingModeFactory {
     private static Log LOG = LogFactory.getLog(CollectingModeFactory)
 
     static {
-        for(Class<ICollectingModeStrategy> clazz in RegistryInitializationSupport.findClasses(ICollectingModeStrategy)) {
+        for(Class<ICollectingModeStrategy> clazz in RegistryInitializationSupport.instance.findClasses(ICollectingModeStrategy)) {
             registerStrategy(clazz.newInstance())
         }
     }

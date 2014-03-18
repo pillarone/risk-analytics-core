@@ -1,11 +1,8 @@
 package org.pillarone.riskanalytics.core.parameterization.validation
-
 import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.pillarone.riskanalytics.core.parameterization.IMultiDimensionalConstraints
 import org.pillarone.riskanalytics.core.util.RegistryInitializationSupport
-
 
 @CompileStatic
 class ValidatorRegistry {
@@ -15,7 +12,7 @@ class ValidatorRegistry {
     private static List<IParameterizationValidator> validators = new LinkedList<IParameterizationValidator>()
 
     static {
-        for(Class<IParameterizationValidator> clazz in RegistryInitializationSupport.findClasses(IParameterizationValidator)) {
+        for(Class<IParameterizationValidator> clazz in RegistryInitializationSupport.instance.findClasses(IParameterizationValidator)) {
             addValidator(clazz.newInstance())
         }
     }

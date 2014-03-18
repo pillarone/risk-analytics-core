@@ -14,8 +14,8 @@ import org.pillarone.riskanalytics.core.output.OutputStrategy
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.output.batch.OutputStrategyFactory
 import org.pillarone.riskanalytics.core.simulation.SimulationState
-import org.pillarone.riskanalytics.core.simulation.engine.RunSimulationService
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
+import org.pillarone.riskanalytics.core.simulation.engine.SimulationQueueService
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationRunner
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationHandler
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
@@ -226,7 +226,7 @@ class RunnerRegistry implements ActionListener {
         def item = queue.poll()
         if (item) {
             SimulationConfiguration configuration = (SimulationConfiguration) item["configuration"]
-            simulationHandler = RunSimulationService.getService().runSimulationOnGrid(configuration, configuration.simulation.template)
+            simulationHandler = Holders.grailsApplication.mainContext.getBean('simulationQueueService', SimulationQueueService).offer(configuration)
             LOG.info "executing a simulation ${configuration.simulation.name} at ${new DateTime()}"
         }
         return simulationHandler

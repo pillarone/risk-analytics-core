@@ -1,20 +1,19 @@
 package org.pillarone.riskanalytics.core.simulation.engine.grid
 
+import grails.util.Holders
 import groovy.transform.CompileStatic
-import org.gridgain.grid.GridTaskFuture
-import org.pillarone.riskanalytics.core.simulation.SimulationState
-import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.simulation.SimulationState
+import org.pillarone.riskanalytics.core.simulation.engine.SimulationQueueService
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
 @CompileStatic
 class SimulationHandler {
 
     SimulationTask simulationTask
-    GridTaskFuture gridTaskFuture
 
     void cancel() {
-        simulationTask.cancel()
-        gridTaskFuture.cancel()
+        Holders.grailsApplication.mainContext.getBean('simulationQueueService', SimulationQueueService).cancel(this)
     }
 
     int getProgress() {

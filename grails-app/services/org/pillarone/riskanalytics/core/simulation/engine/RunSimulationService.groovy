@@ -5,14 +5,10 @@ import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.gridgain.grid.Grid
-import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationHandler
-import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationTask
-import org.pillarone.riskanalytics.core.simulation.engine.grid.SpringBeanDefinitionRegistry
-import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 
 public class RunSimulationService {
 
-    private static Log LOG = LogFactory.getLog(RunSimulationService)
+    private static final Log LOG = LogFactory.getLog(RunSimulationService)
 
     def backgroundService
     Grid grid
@@ -30,30 +26,12 @@ public class RunSimulationService {
      *          A simulation configuration which defines the simulation run and output strategy
      */
     public synchronized SimulationRunner runSimulation(SimulationRunner runner, SimulationConfiguration configuration) {
-        backgroundService.execute(configuration.simulation.name) { //don't start a transaction here, but inside SimulationRunner (problems with certain dbs.)
+        backgroundService.execute(configuration.simulation.name) {
+            //don't start a transaction here, but inside SimulationRunner (problems with certain dbs.)
             runner.simulationConfiguration = configuration
             runner.start()
         }
 
         return runner
     }
-
-    /**
-     * Runs a simulation on a GridGain grid
-     * @param configuration the simulation details
-     * @return the result of the grid gain task
-     */
-    @CompileStatic
-    public SimulationHandler runSimulationOnGrid(SimulationConfiguration configuration, ResultConfiguration resultConfiguration) {
-        configuration.createMappingCache(resultConfiguration)
-        configuration.prepareSimulationForGrid()
-        configuration.beans = SpringBeanDefinitionRegistry.requiredBeanDefinitions
-        SimulationTask task = new SimulationTask()
-        SimulationHandler handler = new SimulationHandler(simulationTask: task)
-        handler.gridTaskFuture = grid.execute(task, configuration)
-
-        return handler
-    }
-
-
 }

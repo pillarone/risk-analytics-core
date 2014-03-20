@@ -15,12 +15,14 @@ class RegistryInitializationSupport {
         try {
             packageProvider = Holders.grailsApplication?.mainContext?.getBean('packageProvider', PackageProvider)
         } catch (BeansException ignored) {
-            log.warning('could not get PackageProvider from mainContext')
+            log.warning('could not get PackageProvider from mainContext. Try to configure packages directly from config.')
         }
         if (packageProvider) {
+            //We configure the package via a spring bean, because we have to do it on external grid nodes. There we have no config object.
             PACKAGES.addAll(packageProvider.packages)
         } else {
-            PACKAGES << 'org.pillarone'
+            //This is the fallback if we do not have a packageProvider in the applicationContext, e.g. in unit tests.
+            PACKAGES.addAll([Holders.config.autoRegistrationBasePackages, 'org.pillarone'].flatten() - null as Set<String>)
         }
     }
 

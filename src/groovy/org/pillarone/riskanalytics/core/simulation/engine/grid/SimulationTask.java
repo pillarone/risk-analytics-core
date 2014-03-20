@@ -213,7 +213,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         }
     }
 
-    public synchronized void onMessage(UUID uuid, Object serializable) {
+    public synchronized void onMessage(Object serializable) {
         ResultTransferObject result = (ResultTransferObject) serializable;
         if (!jobIds.contains(result.getJobIdentifier())) {
             return;

@@ -31,6 +31,9 @@ public class SimulationAction implements Action {
         LOG.debug "start perform"
         LOG.info "Using simulation blocks: ${simulationScope.simulationBlocks}"
         for (SimulationBlock simulationBlock: simulationScope.simulationBlocks) {
+            if (canceled) {
+                break
+            }
             initializeSimulationBlock(simulationBlock)
             for (int iteration = 0; iteration < numberOfIterationsLocal && !canceled; iteration++) {
                 iterationAction.perform()

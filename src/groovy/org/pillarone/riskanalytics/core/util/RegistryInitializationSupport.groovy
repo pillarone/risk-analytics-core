@@ -2,35 +2,40 @@ package org.pillarone.riskanalytics.core.util
 
 import grails.util.Holders
 import groovy.util.logging.Log
-import org.springframework.beans.BeansException
 import org.springframework.core.type.filter.AssignableTypeFilter
 
 @Singleton(lazy = true)
 @Log
 class RegistryInitializationSupport {
-    private final Set<String> PACKAGES = new HashSet()
+    public static final String AUTO_REGISTRATION_BASE_PACKAGES = 'autoRegistrationBasePackages'
+    public static final String DEFAULT_PACKAGE = 'org.pillarone'
+    private final Set<String> packages = new HashSet()
 
     private RegistryInitializationSupport() {
-        PackageProvider packageProvider
+        packages << DEFAULT_PACKAGE
         try {
-            packageProvider = Holders.grailsApplication?.mainContext?.getBean('packageProvider', PackageProvider)
-        } catch (BeansException ignored) {
-            log.warning('could not get PackageProvider from mainContext. Try to configure packages directly from config.')
+            log.info("trying to get additionDal packages from config")
+            //this will fail on external grid nodes and it will also fail during deserializing objects which call the findClasses method in static init blocks. There cannot be a Holder.config at this point.
+            if (Holders.config.containsKey(AUTO_REGISTRATION_BASE_PACKAGES)) {
+                packages.addAll([Holders.config."$AUTO_REGISTRATION_BASE_PACKAGES"].flatten() as Collection<String>)
+            }
+        } catch (Throwable ignored) {
+            log.warning("could not get additional packages from config. Trying from system property 'autoRegistrationBasePackages'.")
+            def property = System.getProperty(AUTO_REGISTRATION_BASE_PACKAGES, null)
+            if (property) {
+                packages.addAll(property.split(','))
+            } else {
+                log.warning("could not get additional packages from system property 'autoRegistrationBasePackages'.")
+            }
         }
-        if (packageProvider) {
-            //We configure the package via a spring bean, because we have to do it on external grid nodes. There we have no config object.
-            PACKAGES.addAll(packageProvider.packages)
-        } else {
-            //This is the fallback if we do not have a packageProvider in the applicationContext, e.g. in unit tests.
-            PACKAGES.addAll([Holders.config.autoRegistrationBasePackages, 'org.pillarone'].flatten() - null as Set<String>)
-        }
+        log.info("packages which are registered: $packages")
     }
 
     public <E> List<Class<E>> findClasses(Class<E> assignableFrom) {
         ClassPathScanner scanner = new ClassPathScanner()
         scanner.addIncludeFilter(new AssignableTypeFilter(assignableFrom))
         List<Class> result = []
-        for (String packageName in PACKAGES) {
+        for (String packageName in packages) {
             result.addAll(scanner.findCandidateComponents(packageName).collect {
                 Thread.currentThread().contextClassLoader.loadClass(it.beanClassName)
             })

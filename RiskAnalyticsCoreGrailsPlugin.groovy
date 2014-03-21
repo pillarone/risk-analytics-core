@@ -1,4 +1,3 @@
-import grails.util.Holders
 import org.codehaus.groovy.grails.orm.hibernate.HibernateEventListeners
 import org.gridgain.grid.GridConfigurationAdapter
 import org.gridgain.grid.GridSpringBean
@@ -15,9 +14,7 @@ import org.pillarone.riskanalytics.core.remoting.IResultService
 import org.pillarone.riskanalytics.core.remoting.ITransactionService
 import org.pillarone.riskanalytics.core.remoting.impl.ResultService
 import org.pillarone.riskanalytics.core.simulation.engine.MappingCache
-import org.pillarone.riskanalytics.core.simulation.engine.grid.SpringBeanDefinitionRegistry
 import org.pillarone.riskanalytics.core.util.GrailsConfigValidator
-import org.pillarone.riskanalytics.core.util.PackageProvider
 import org.springframework.remoting.rmi.RmiProxyFactoryBean
 import org.springframework.remoting.rmi.RmiServiceExporter
 import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
@@ -56,15 +53,6 @@ Persistence & Simulation engine.
 
     def doWithSpring = {
         ConfigObject config = application.config
-
-        packageProvider(PackageProvider) {
-            if (config.autoRegistrationBasePackages) {
-                packages = [config.autoRegistrationBasePackages, 'org.pillarone'].flatten() - null as Set<String>
-            } else {
-                packages = ['org.pillarone']
-            }
-        }
-        SpringBeanDefinitionRegistry.registerBean('packageProvider')
 
         traceLogManager(TraceLogManager)
 

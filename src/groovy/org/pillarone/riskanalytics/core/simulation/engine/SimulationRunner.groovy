@@ -307,13 +307,6 @@ public class SimulationRunner {
     }
 
     @CompileStatic
-    protected void notifySimulationStateChanged(Simulation simulation, SimulationState simulationState) {
-        if (!batchRunInfoService)
-            batchRunInfoService = BatchRunInfoService.getService()
-        batchRunInfoService.batchSimulationStateChanged(simulation, simulationState)
-    }
-
-    @CompileStatic
     public void setJobCount(int jobCount) {
         threadCount = jobCount;
     }

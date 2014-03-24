@@ -5,6 +5,7 @@ import com.google.common.collect.HashBiMap
 import org.gridgain.grid.Grid
 import org.gridgain.grid.GridTaskFuture
 import org.gridgain.grid.typedef.CI1
+import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationHandler
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationTask
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SpringBeanDefinitionRegistry
@@ -58,7 +59,10 @@ class SimulationQueueService {
     private void startSimulation(QueueEntry queueEntry) {
         SimulationHandler simulationHandler = handlers.inverse()[queueEntry]
         SimulationConfiguration configuration = queueEntry.simulationConfiguration
-        configuration.createMappingCache(configuration.simulation.template)
+        //TODO think about where to add the transaction
+        SimulationRun.withTransaction {
+            configuration.createMappingCache(configuration.simulation.template)
+        }
         configuration.prepareSimulationForGrid()
         configuration.beans = SpringBeanDefinitionRegistry.requiredBeanDefinitions
         GridTaskFuture gridTaskFuture = grid.execute(queueEntry.simulationTask, queueEntry.simulationConfiguration)
@@ -123,7 +127,6 @@ class SimulationQueueService {
             }
         }
     }
-
 
     private boolean isCurrent(SimulationHandler handler) {
         currentTask?.simulationHandler == handler

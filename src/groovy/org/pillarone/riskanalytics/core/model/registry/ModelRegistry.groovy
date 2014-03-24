@@ -1,18 +1,19 @@
 package org.pillarone.riskanalytics.core.model.registry
 
-import org.pillarone.riskanalytics.core.ModelStructureDAO
-import org.pillarone.riskanalytics.core.ModelDAO
-import java.util.concurrent.CopyOnWriteArrayList
-import org.pillarone.riskanalytics.core.output.ConfigObjectHolder
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import java.util.concurrent.CopyOnWriteArraySet
+import org.pillarone.riskanalytics.core.ModelDAO
+import org.pillarone.riskanalytics.core.ModelStructureDAO
+import org.pillarone.riskanalytics.core.output.ConfigObjectHolder
 import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
 
+import java.util.concurrent.CopyOnWriteArraySet
 
 class ModelRegistry {
 
     private static ModelRegistry registry
+
+    private static final Log LOG = LogFactory.getLog(ModelRegistry)
 
     public static ModelRegistry getInstance() {
         if (registry == null) {
@@ -20,8 +21,6 @@ class ModelRegistry {
         }
         return registry
     }
-
-    private Log LOG = LogFactory.getLog(ModelRegistry)
     private Set<Class> modelClasses
 
     private Set<IModelRegistryListener> listeners
@@ -121,7 +120,7 @@ class ModelRegistry {
     }
 
     private void notifyListeners(Class newModelClass) {
-        for (IModelRegistryListener listener: listeners) {
+        for (IModelRegistryListener listener : listeners) {
             listener.modelAdded(newModelClass)
         }
     }

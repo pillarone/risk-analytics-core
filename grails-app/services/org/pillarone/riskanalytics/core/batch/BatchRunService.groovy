@@ -2,8 +2,6 @@ package org.pillarone.riskanalytics.core.batch
 
 import grails.util.Holders
 import groovy.transform.CompileStatic
-import org.apache.commons.logging.Log
-import org.apache.commons.logging.LogFactory
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.BatchRun
 import org.pillarone.riskanalytics.core.BatchRunSimulationRun
@@ -16,19 +14,13 @@ import org.pillarone.riskanalytics.core.output.batch.OutputStrategyFactory
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationQueueService
-import org.pillarone.riskanalytics.core.simulation.engine.SimulationRunner
-import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationHandler
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
-
-import java.awt.event.ActionEvent
-import java.awt.event.ActionListener
 
 class BatchRunService {
 
     boolean transactional = false
     BatchRunInfoService batchRunInfoService
-    RunnerRegistry runnerRegistry
-    Log LOG = LogFactory.getLog(BatchRunService)
+    SimulationQueueService simulationQueueService
 
     @CompileStatic
     public static BatchRunService getService() {
@@ -37,7 +29,7 @@ class BatchRunService {
 
     @CompileStatic
     public void runBatches() {
-        getActiveBatchRuns()?.each { BatchRun batchRun ->
+        activeBatchRuns?.each { BatchRun batchRun ->
             runBatch(batchRun)
         }
     }
@@ -46,25 +38,26 @@ class BatchRunService {
         getSimulationRuns(batchRun).each { BatchRunSimulationRun batchRunSimulationRun ->
             runSimulation(batchRunSimulationRun)
         }
-        getRunnerRegistry().startTimer()
-        BatchRun.executeUpdate("update org.pillarone.riskanalytics.core.BatchRun as b set b.executed=? where b.id=? ", [true, batchRun.id])
+        BatchRun.withTransaction {
+            batchRun.refresh()
+            batchRun.executed = true
+            batchRun.save(flush: true)
+        }
     }
 
     @CompileStatic
     public synchronized void runSimulation(BatchRunSimulationRun batchRunSimulationRun) {
         if (batchRunSimulationRun.simulationRun.endTime != null) {
-            LOG.info "simulation ${batchRunSimulationRun.simulationRun.name} already executed at ${batchRunSimulationRun.simulationRun.endTime}"
+            log.info "simulation ${batchRunSimulationRun.simulationRun.name} already executed at ${batchRunSimulationRun.simulationRun.endTime}"
         } else if (batchRunSimulationRun.simulationRun.endTime == null && !batchRunInfoService.runningBatchSimulationRuns.contains(batchRunSimulationRun)) {
             ICollectorOutputStrategy strategy = OutputStrategyFactory.getInstance(batchRunSimulationRun.strategy)
-
-            Simulation simulation = createSimulation(batchRunSimulationRun.simulationRun.name)
+            Simulation simulation = loadSimulation(batchRunSimulationRun.simulationRun.name)
             SimulationConfiguration configuration = new SimulationConfiguration(simulation: simulation, outputStrategy: strategy)
-
-            ImportStructureInTransaction.importStructure(configuration);
-            getRunnerRegistry().put(configuration)
+            ImportStructureInTransaction.importStructure(configuration)
+            simulationQueueService.offer(configuration)
             notifySimulationStart(simulation, SimulationState.NOT_RUNNING)
         } else {
-            LOG.info "simulation ${batchRunSimulationRun.simulationRun.name} is already running"
+            log.info "simulation ${batchRunSimulationRun.simulationRun.name} is already running"
         }
     }
 
@@ -159,80 +152,18 @@ class BatchRunService {
     }
 
     @CompileStatic
-    private Simulation createSimulation(String simulationName) {
+    private Simulation loadSimulation(String simulationName) {
         Simulation simulation = new Simulation(simulationName)
         simulation.load()
-        simulation.getParameterization().load();
-        simulation.getTemplate().load();
+        simulation.parameterization.load();
+        simulation.template.load();
         return simulation
     }
 
     @CompileStatic
-    RunnerRegistry getRunnerRegistry() {
-        if (!runnerRegistry) runnerRegistry = new RunnerRegistry(batchRunInfoService)
-        return runnerRegistry
-    }
-
-    @CompileStatic
     protected void notifySimulationStart(Simulation simulation, SimulationState simulationState) {
-        LOG.info " notifySimulationStart ${simulation.name} : ${simulationState.toString()}"
+        log.info " notifySimulationStart ${simulation.name} : ${simulationState.toString()}"
         batchRunInfoService?.batchSimulationStart(simulation)
     }
 
-}
-
-@CompileStatic
-class RunnerRegistry implements ActionListener {
-    def batchRunInfoService
-    Queue queue = new LinkedList()
-    private javax.swing.Timer timer
-    SimulationRunner simulationRunner
-    SimulationHandler simulationHandler
-
-
-    Log LOG = LogFactory.getLog(RunnerRegistry)
-
-    public RunnerRegistry(def batchRunInfoService) {
-        this.batchRunInfoService = batchRunInfoService
-        queue = new LinkedList()
-        timer = new javax.swing.Timer(5000, this)
-        timer.setRepeats(true)
-    }
-
-    void put(SimulationConfiguration configuration) {
-        queue.offer(["configuration": configuration])
-    }
-
-    void startTimer() {
-        if (!timer.isRunning()) timer.start()
-    }
-
-
-    void actionPerformed(ActionEvent e) {
-        if (!simulationHandler) {
-            simulationHandler = pollAndRun()
-        } else if (simulationHandler.simulationState == SimulationState.FINISHED || simulationHandler.simulationState == SimulationState.ERROR) {
-            simulationHandler = pollAndRun()
-            if (!simulationHandler) {
-                stop()
-                LOG.info "no simulation to execute "
-            }
-        }
-    }
-
-
-    private SimulationHandler pollAndRun() {
-        SimulationHandler simulationHandler = null
-        def item = queue.poll()
-        if (item) {
-            SimulationConfiguration configuration = (SimulationConfiguration) item["configuration"]
-            simulationHandler = Holders.grailsApplication.mainContext.getBean('simulationQueueService', SimulationQueueService).offer(configuration)
-            LOG.info "executing a simulation ${configuration.simulation.name} at ${new DateTime()}"
-        }
-        return simulationHandler
-    }
-
-    void stop() {
-        timer.stop()
-    }
 }

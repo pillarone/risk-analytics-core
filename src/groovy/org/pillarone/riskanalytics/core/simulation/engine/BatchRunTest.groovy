@@ -30,8 +30,5 @@ abstract class BatchRunTest extends ModelTest {
             }
             batchRun.refresh()
         }
-
-        service.runnerRegistry.stop()
-
     }
 }

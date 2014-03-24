@@ -10,10 +10,16 @@ import org.pillarone.riskanalytics.core.simulation.item.Simulation
 @CompileStatic
 class SimulationHandler {
 
-    SimulationTask simulationTask
+    private SimulationTask simulationTask
+    private UUID id
+
+    SimulationHandler(SimulationTask simulationTask, UUID id) {
+        this.simulationTask = simulationTask
+        this.id = id
+    }
 
     void cancel() {
-        Holders.grailsApplication.mainContext.getBean('simulationQueueService', SimulationQueueService).cancel(this)
+        Holders.grailsApplication.mainContext.getBean('simulationQueueService', SimulationQueueService).cancel(id)
     }
 
     int getProgress() {

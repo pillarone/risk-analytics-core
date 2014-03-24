@@ -17,7 +17,7 @@ abstract class BatchRunTest extends ModelTest {
         assertNotNull batchRun
 
         BatchRunService service = BatchRunService.service
-        service.addSimulationRun(batchRun, run, OutputStrategy.FILE_OUTPUT)
+        service.createBatchRunSimulationRun(batchRun, run, OutputStrategy.FILE_OUTPUT)
         service.runBatch(batchRun)
 
         int totalWait = 0

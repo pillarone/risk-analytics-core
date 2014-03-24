@@ -2,50 +2,73 @@ package org.pillarone.riskanalytics.core.batch
 
 import grails.util.Holders
 import groovy.transform.CompileStatic
-import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.pillarone.riskanalytics.core.BatchRunSimulationRun
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.SimulationState
+import org.pillarone.riskanalytics.core.simulation.engine.ISimulationQueueListener
+import org.pillarone.riskanalytics.core.simulation.engine.QueueEntry
+import org.pillarone.riskanalytics.core.simulation.engine.SimulationQueueService
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
-/**
- * @author fouad.jaada@intuitive-collaboration.com
- */
+import javax.annotation.PostConstruct
+
+import static org.pillarone.riskanalytics.core.simulation.SimulationState.NOT_RUNNING
+
 class BatchRunInfoService {
 
-    List<BatchRunSimulationRun> runningBatchSimulationRuns
-    List<Simulation> finishedSimulations
+    SimulationQueueService simulationQueueService
 
-    public BatchRunInfoService() {
+    private final List<BatchRunSimulationRun> runningBatchSimulationRuns
+    private final Object lock = new Object()
+
+    BatchRunInfoService() {
         runningBatchSimulationRuns = []
-        finishedSimulations = []
+    }
+
+    @PostConstruct
+    void initialize() {
+        simulationQueueService.addSimulationQueueListener(new MySimulationListener())
     }
 
     @CompileStatic
-    public static BatchRunInfoService getService() {
+    static BatchRunInfoService getService() {
         return Holders.grailsApplication.mainContext.getBean(BatchRunInfoService)
     }
 
-    @CompileStatic
-    public synchronized void batchSimulationStart(Simulation simulation) {
-        BatchRunSimulationRun batchRunSimulationRun = update(simulation, SimulationState.NOT_RUNNING)
-        addRunning batchRunSimulationRun
-    }
 
     @CompileStatic
-    public synchronized void batchSimulationStateChanged(Simulation simulation, SimulationState simulationState) {
-        BatchRunSimulationRun brsr = runningBatchSimulationRuns.find { BatchRunSimulationRun it ->
-            (it.simulationRun.name == simulation.name) && (it.simulationRun.model == simulation.modelClass.name)
+    void batchSimulationStateChanged(Simulation simulation, SimulationState simulationState) {
+        synchronized (lock) {
+            BatchRunSimulationRun batchRunSimulationRun = runningBatchSimulationRuns.find { BatchRunSimulationRun it ->
+                (it.simulationRun.name == simulation.name) && (it.simulationRun.model == simulation.modelClass.name)
+            }
+            if (!batchRunSimulationRun) {
+                return
+            }
+            batchRunSimulationRun.simulationState = simulationState
+
+            update(simulation, simulationState)
         }
-        if (!brsr) return
-        brsr.simulationState = simulationState
-        update(simulation, simulationState)
-        if (simulationState == SimulationState.FINISHED)
-            finishedSimulations << simulation
     }
 
     @CompileStatic
-    public void addRunning(BatchRunSimulationRun batchRunSimulationRun) {
+    SimulationState getSimulationState(BatchRunSimulationRun batchRunSimulationRun) {
+        synchronized (lock) {
+            def run = runningBatchSimulationRuns.find { BatchRunSimulationRun it -> it.id == batchRunSimulationRun.id }
+            run ? run.simulationState : null
+        }
+    }
+
+    @CompileStatic
+    private void batchSimulationStart(Simulation simulation) {
+        synchronized (lock) {
+            BatchRunSimulationRun batchRunSimulationRun = update(simulation, NOT_RUNNING)
+            addRunning batchRunSimulationRun
+        }
+    }
+
+    @CompileStatic
+    private void addRunning(BatchRunSimulationRun batchRunSimulationRun) {
         runningBatchSimulationRuns.remove(runningBatchSimulationRuns.find { BatchRunSimulationRun it ->
             it.simulationRun.name == batchRunSimulationRun.simulationRun.name
         })
@@ -53,24 +76,29 @@ class BatchRunInfoService {
     }
 
     private BatchRunSimulationRun update(Simulation simulation, SimulationState simulationState) {
-        BatchRunSimulationRun batchRunSimulationRun = BatchRunSimulationRun.findBySimulationRun(SimulationRun.get(simulation.id))
+        BatchRunSimulationRun batchRunSimulationRun = BatchRunSimulationRun.findBySimulationRun(SimulationRun.get(simulation.id as Long))
         batchRunSimulationRun.simulationState = simulationState
         batchRunSimulationRun.save()
     }
 
-    @CompileStatic
-    public BatchRunSimulationRun getBatchRunSimulationRun(BatchRunSimulationRun batchRunSimulationRun) {
-        return runningBatchSimulationRuns.find { BatchRunSimulationRun it -> it.id == batchRunSimulationRun.id }
-    }
+    private class MySimulationListener implements ISimulationQueueListener {
 
-    @CompileStatic
-    public List<Simulation> getFinished(long endTime) {
-        List<Simulation> simulations = []
-        for (Simulation simulation : finishedSimulations) {
-            if (simulation.end?.millis > endTime)
-                simulations << simulation
+        @Override
+        void started(QueueEntry entry) {}
+
+        @Override
+        void finished(QueueEntry entry) {}
+
+        @Override
+        void offered(QueueEntry entry) {
+            Simulation simulation = entry.simulationConfiguration.simulation
+            if (BatchRunSimulationRun.findBySimulationRun(SimulationRun.get(simulation.id as Long))) {
+                batchSimulationStart(simulation)
+            }
         }
-        return simulations
+
+        @Override
+        void removed(UUID id) {}
     }
 }
 

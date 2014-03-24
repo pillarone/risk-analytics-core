@@ -1,28 +1,28 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
-import com.google.common.collect.BiMap
-import com.google.common.collect.HashBiMap
 import org.gridgain.grid.Grid
 import org.gridgain.grid.GridTaskFuture
 import org.gridgain.grid.typedef.CI1
+import org.pillarone.riskanalytics.core.BatchRunSimulationRun
+import org.pillarone.riskanalytics.core.cli.ImportStructureInTransaction
+import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
 import org.pillarone.riskanalytics.core.output.SimulationRun
+import org.pillarone.riskanalytics.core.output.batch.OutputStrategyFactory
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationHandler
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationTask
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SpringBeanDefinitionRegistry
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
 import javax.annotation.PostConstruct
 
 class SimulationQueueService {
-
-    //TODO just to be backwards compatible. will be removed
-    private final BiMap<SimulationHandler, QueueEntry> handlers = HashBiMap.create()
+    private final List<ISimulationQueueListener> listeners = []
     private final PriorityQueue<QueueEntry> queue = new PriorityQueue<QueueEntry>()
-    private CurrentTask currentTask
     private final Object lock = new Object()
+    private CurrentTask currentTask
     private CI1<GridTaskFuture> taskListener
     private boolean busy = false
     Grid grid
-
 
     @PostConstruct
     void initialize() {
@@ -30,15 +30,43 @@ class SimulationQueueService {
             @Override
             void apply(GridTaskFuture future) {
                 synchronized (lock) {
+                    if (!currentTask) {
+                        throw new IllegalStateException('simulation ended, but there is no currentTask')
+                    }
                     busy = false
                     future.stopListenAsync(taskListener)
-                    handlers.remove(currentTask.simulationHandler)
+                    notifyFinished(currentTask.entry)
                     currentTask = null
                     poll()
                 }
             }
         }
-        //TODO collect entries from db to populate queue
+        addSimulationQueueListener(new AddOrRemoveLockedTagListener())
+        BatchRunSimulationRun.listOrderByPriority().each { offer(it) }
+    }
+
+    private void notifyStarted(QueueEntry queueEntry) {
+        listeners.each { it.started(queueEntry) }
+    }
+
+    private void notifyFinished(QueueEntry queueEntry) {
+        listeners.each { it.finished(queueEntry) }
+    }
+
+    private void notifyOffered(QueueEntry queueEntry) {
+        listeners.each { it.offered(queueEntry) }
+    }
+
+    private void notifyRemoved(UUID uuid) {
+        listeners.each { it.removed(uuid) }
+    }
+
+    void addSimulationQueueListener(ISimulationQueueListener listener) {
+        listeners.add(listener)
+    }
+
+    void removeSimulationQueueListener(ISimulationQueueListener listener) {
+        listeners.remove(listener)
     }
 
     private void poll() {
@@ -50,16 +78,14 @@ class SimulationQueueService {
             if (queueEntry) {
                 busy = true
                 Thread.start {
-                    startSimulation(queueEntry)
+                    start(queueEntry)
                 }
             }
         }
     }
 
-    private void startSimulation(QueueEntry queueEntry) {
-        SimulationHandler simulationHandler = handlers.inverse()[queueEntry]
+    private void start(QueueEntry queueEntry) {
         SimulationConfiguration configuration = queueEntry.simulationConfiguration
-        //TODO think about where to add the transaction
         SimulationRun.withTransaction {
             configuration.createMappingCache(configuration.simulation.template)
         }
@@ -68,43 +94,59 @@ class SimulationQueueService {
         GridTaskFuture gridTaskFuture = grid.execute(queueEntry.simulationTask, queueEntry.simulationConfiguration)
         gridTaskFuture.listenAsync(taskListener)
         synchronized (lock) {
-            currentTask = new CurrentTask(gridTaskFuture: gridTaskFuture, simulationHandler: simulationHandler)
+            currentTask = new CurrentTask(gridTaskFuture: gridTaskFuture, entry: queueEntry)
+        }
+        notifyStarted(queueEntry)
+    }
+
+
+    QueueEntry[] getSortedQueueEntries() {
+        synchronized (lock) {
+            queue.toArray() as QueueEntry[]
         }
     }
 
-    static class QueueEntry implements Comparable<QueueEntry> {
-        int priority
-        SimulationTask simulationTask
-        SimulationConfiguration simulationConfiguration
-
-        @Override
-        int compareTo(QueueEntry o) {
-            return priority.compareTo(o.priority)
-        }
-    }
 
     static class CurrentTask {
         GridTaskFuture gridTaskFuture
-        SimulationHandler simulationHandler
+        QueueEntry entry
     }
 
-    public SimulationHandler offer(SimulationConfiguration configuration, int priority = 10) {
+    SimulationHandler offer(SimulationConfiguration configuration, int priority = 10) {
         preConditionCheck(configuration)
-
-        QueueEntry queueEntry = new QueueEntry(
-                priority: priority,
-                simulationTask: new SimulationTask(),
-                simulationConfiguration: configuration
-        )
-        SimulationHandler handler = new SimulationHandler(
-                simulationTask: queueEntry.simulationTask
-        )
+        QueueEntry queueEntry = new QueueEntry(new SimulationTask(), configuration, priority)
         synchronized (lock) {
-            handlers[handler] = queueEntry
             queue.offer(queueEntry)
         }
+        notifyOffered(queueEntry)
         poll()
-        handler
+        new SimulationHandler(queueEntry.simulationTask, queueEntry.id)
+    }
+
+
+    void offer(BatchRunSimulationRun batchRunSimulationRun) {
+        SimulationRun run = batchRunSimulationRun.simulationRun
+        if (run.endTime == null && run.startTime == null) {
+            ICollectorOutputStrategy strategy = OutputStrategyFactory.getInstance(batchRunSimulationRun.strategy)
+            Simulation simulation = loadSimulation(batchRunSimulationRun.simulationRun.name)
+            SimulationConfiguration configuration = new SimulationConfiguration(simulation: simulation, outputStrategy: strategy)
+            ImportStructureInTransaction.importStructure(configuration)
+            offer(configuration, 5)
+            return
+        }
+        if (run.endTime != null) {
+            log.info "simulation ${run.name} already executed at ${run.endTime}"
+            return
+        }
+        log.info "simulation ${batchRunSimulationRun.simulationRun.name} is already running"
+    }
+
+    private Simulation loadSimulation(String simulationName) {
+        Simulation simulation = new Simulation(simulationName)
+        simulation.load()
+        simulation.parameterization.load();
+        simulation.template.load();
+        return simulation
     }
 
     private static void preConditionCheck(SimulationConfiguration configuration) {
@@ -114,22 +156,16 @@ class SimulationQueueService {
         }
     }
 
-    void cancel(SimulationHandler handler) {
+    void cancel(UUID uuid) {
         synchronized (lock) {
-            QueueEntry entry = handlers.remove(handler)
-            if (entry) {
-                entry.simulationTask.cancel()
-                queue.remove(entry)
-            }
-            if (isCurrent(handler)) {
-                currentTask.simulationHandler.simulationTask.cancel()
+            def entry = new QueueEntry(uuid)
+            queue.remove(entry)
+            notifyRemoved(uuid)
+            if (currentTask && currentTask?.entry?.id == uuid) {
+                currentTask.entry.simulationTask.cancel()
                 currentTask.gridTaskFuture.cancel()
             }
         }
-    }
-
-    private boolean isCurrent(SimulationHandler handler) {
-        currentTask?.simulationHandler == handler
     }
 }
 

@@ -31,10 +31,14 @@ public class SimulationAction implements Action {
         LOG.debug "start perform"
         LOG.info "Using simulation blocks: ${simulationScope.simulationBlocks}"
         for (SimulationBlock simulationBlock: simulationScope.simulationBlocks) {
+            if (canceled) {
+                break
+            }
             initializeSimulationBlock(simulationBlock)
             for (int iteration = 0; iteration < numberOfIterationsLocal && !canceled; iteration++) {
                 iterationAction.perform()
-                simulationScope.iterationsDone = simulationScope.iterationsDone + 1 // do not use simulationScope.iterationsDone++ because of a issue in StubFor
+                simulationScope.iterationsDone += 1
+                // do not use simulationScope.iterationsDone++ because of a issue in StubFor
             }
         }
 

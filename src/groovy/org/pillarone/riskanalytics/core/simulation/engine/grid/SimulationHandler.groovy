@@ -1,28 +1,33 @@
 package org.pillarone.riskanalytics.core.simulation.engine.grid
 
+import grails.util.Holders
 import groovy.transform.CompileStatic
-import org.gridgain.grid.GridTaskFuture
-import org.pillarone.riskanalytics.core.simulation.SimulationState
-import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.simulation.SimulationState
+import org.pillarone.riskanalytics.core.simulation.engine.SimulationQueueService
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
 @CompileStatic
 class SimulationHandler {
 
-    SimulationTask simulationTask
-    GridTaskFuture gridTaskFuture
+    private SimulationTask simulationTask
+    private UUID id
+
+    SimulationHandler(SimulationTask simulationTask, UUID id) {
+        this.simulationTask = simulationTask
+        this.id = id
+    }
 
     void cancel() {
-        simulationTask.cancel()
-        gridTaskFuture.cancel()
+        Holders.grailsApplication.mainContext.getBean('simulationQueueService', SimulationQueueService).cancel(id)
     }
 
     int getProgress() {
-        simulationTask.getProgress()
+        simulationTask.progress
     }
 
     SimulationState getSimulationState() {
-        return simulationTask.getSimulationState()
+        return simulationTask.simulationState
     }
 
     Simulation getSimulation() {
@@ -30,10 +35,10 @@ class SimulationHandler {
     }
 
     List<Throwable> getSimulationErrors() {
-        return simulationTask.getSimulationErrors()
+        return simulationTask.simulationErrors
     }
 
     DateTime getEstimatedSimulationEnd() {
-        return simulationTask.getEstimatedSimulationEnd()
+        return simulationTask.estimatedSimulationEnd
     }
 }

@@ -78,7 +78,7 @@ public class MappingCache implements Serializable {
      * If the path does not exist yet, it gets persisted and added to the cache.
      */
     public synchronized PathMapping lookupPath(String path) {
-        PathMapping pathMapping = paths.get(path)
+        PathMapping pathMapping = paths[path]
         if (pathMapping == null) {
             pathMapping = PathMapping.findByPathName(path)
             if (pathMapping == null) {
@@ -91,7 +91,7 @@ public class MappingCache implements Serializable {
                                                  "\nPlease contact development providing them the missing path if the error occurred in a sub component.", ex)
                 }
             }
-            paths.put(path, pathMapping)
+            paths[path] = pathMapping
         }
         return pathMapping;
     }

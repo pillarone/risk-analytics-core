@@ -17,11 +17,10 @@ abstract class BatchRunTest extends ModelTest {
         assertNotNull batchRun
 
         BatchRunService service = BatchRunService.service
-        service.addSimulationRun(batchRun, run, OutputStrategy.FILE_OUTPUT)
+        service.createBatchRunSimulationRun(batchRun, run, OutputStrategy.FILE_OUTPUT)
         service.runBatch(batchRun)
-
+        sleep(5000)
         int totalWait = 0
-
         while (!batchRun.executed) {
             sleep 2000
             totalWait += 2000
@@ -30,8 +29,5 @@ abstract class BatchRunTest extends ModelTest {
             }
             batchRun.refresh()
         }
-
-        service.runnerRegistry.stop()
-
     }
 }

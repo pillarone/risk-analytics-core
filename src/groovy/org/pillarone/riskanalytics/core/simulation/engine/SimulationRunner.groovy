@@ -52,7 +52,7 @@ public class SimulationRunner {
 
     private int threadCount;
     private static AtomicInteger messageCount;
-    private static Object lockObj = new Object();
+    private static final Object lockObj = new Object();
     private static final int WAIT_TIMEOUT = 30000;
 
     private IPacketListener packetListener;
@@ -304,13 +304,6 @@ public class SimulationRunner {
     @CompileStatic
     protected void setSimulationState(SimulationState newState) {
         currentScope.simulationState = newState
-    }
-
-    @CompileStatic
-    protected void notifySimulationStateChanged(Simulation simulation, SimulationState simulationState) {
-        if (!batchRunInfoService)
-            batchRunInfoService = BatchRunInfoService.getService()
-        batchRunInfoService.batchSimulationStateChanged(simulation, simulationState)
     }
 
     @CompileStatic

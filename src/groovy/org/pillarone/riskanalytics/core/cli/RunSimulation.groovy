@@ -1,23 +1,18 @@
-package org.pillarone.riskanalytics.core.cli;
+package org.pillarone.riskanalytics.core.cli
 
-import grails.util.Holders;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.pillarone.riskanalytics.core.initialization.GrailsEnvironment;
-import org.pillarone.riskanalytics.core.initialization.IExternalDatabaseSupport;
-import org.pillarone.riskanalytics.core.initialization.StandaloneConfigLoader;
-import org.pillarone.riskanalytics.core.simulation.engine.RunSimulationService;
-import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration;
-import org.pillarone.riskanalytics.core.simulation.engine.SimulationRunner;
-import org.pillarone.riskanalytics.core.simulation.item.Simulation;
-import org.quartz.SchedulerException;
-import org.quartz.impl.StdSchedulerFactory;
-import org.springframework.context.support.AbstractApplicationContext;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
+import grails.util.Holders
+import org.apache.commons.cli.CommandLine
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.initialization.GrailsEnvironment
+import org.pillarone.riskanalytics.core.initialization.IExternalDatabaseSupport
+import org.pillarone.riskanalytics.core.initialization.StandaloneConfigLoader
+import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
+import org.pillarone.riskanalytics.core.simulation.engine.SimulationRunner
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
+import org.quartz.SchedulerException
+import org.quartz.impl.StdSchedulerFactory
+import org.springframework.context.support.AbstractApplicationContext
 
 public class RunSimulation {
 
@@ -49,8 +44,12 @@ public class RunSimulation {
             SimulationConfiguration configuration = createConfiguration(parser, commandLine);
 
             ImportStructureInTransaction.importStructure(configuration);
-
-            RunSimulationService.getService().runSimulation(runner, configuration);
+            def backgroundService = Holders.getGrailsApplication().getMainContext().getBean("backgroundService");
+            backgroundService.execute(configuration.simulation.name) {
+                //don't start a transaction here, but inside SimulationRunner (problems with certain dbs.)
+                runner.simulationConfiguration = configuration
+                runner.start()
+            }
             SimulationLogger logger = new SimulationLogger(runner, LOG);
             synchronized (logger) {
                 logger.wait();
@@ -64,7 +63,8 @@ public class RunSimulation {
     }
 
 
-    private static SimulationConfiguration createConfiguration(ArgumentParser parser, CommandLine commandLine) throws Exception {
+    private
+    static SimulationConfiguration createConfiguration(ArgumentParser parser, CommandLine commandLine) throws Exception {
         SimulationConfiguration configuration = new SimulationConfiguration();
         configuration.setOutputStrategy(parser.getOutputStrategy(commandLine));
         Simulation simulation = parser.createSimulation(commandLine);

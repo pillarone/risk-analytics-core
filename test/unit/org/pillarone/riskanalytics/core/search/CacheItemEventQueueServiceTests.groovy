@@ -22,7 +22,7 @@ class CacheItemEventQueueServiceTests {
         service.init()
         consumer = new CacheItemEventConsumer(new Object(), new Object())
         service.register(consumer)
-        assert hibernateListenerForTest._listeners.size() == 1
+        assert hibernateListenerForTest.listeners.size() == 1
 
     }
 
@@ -62,7 +62,7 @@ class CacheItemEventQueueServiceTests {
     @Test(expected = NullPointerException)
     void testCleanup() {
         service.cleanUp()
-        assert hibernateListenerForTest._listeners.size() == 0
+        assert hibernateListenerForTest.listeners.size() == 0
         service.pollCacheItemEvents(consumer)
     }
 
@@ -72,15 +72,15 @@ class CacheItemEventQueueServiceTests {
 
     private static class TestHibernateListener extends CacheItemHibernateListener {
         void itemAdded(CacheItem item) {
-            _listeners.each { it.itemAdded(item) }
+            listeners.each { it.itemAdded(item) }
         }
 
         void itemChanged(CacheItem item) {
-            _listeners.each { it.itemChanged(item) }
+            listeners.each { it.itemChanged(item) }
         }
 
         void itemDeleted(CacheItem item) {
-            _listeners.each { it.itemDeleted(item) }
+            listeners.each { it.itemDeleted(item) }
         }
     }
 }

@@ -19,7 +19,7 @@ public class ResultTransferListener extends GridListenActor<ResultTransferObject
     @Override
     public void receive(UUID nodeId, ResultTransferObject msg) throws GridException {
         try {
-            simulationTask.onMessage(nodeId, msg);
+            simulationTask.onMessage(msg);
         } catch (Exception e) {
             simulationTask.getSimulationErrors().add(e);
             simulationTask.setSimulationState(SimulationState.ERROR);

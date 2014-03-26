@@ -404,7 +404,7 @@ class Parameterization extends ParametrizedItem {
         if (status != Status.NONE && status != Status.DATA_ENTRY) {
             return false
         }
-        return !isUsedInSimulation()
+        return !usedInSimulation
     }
 
     @CompileStatic
@@ -449,13 +449,15 @@ class Parameterization extends ParametrizedItem {
     }
 
     public void addRemoveLockTag() {
-        if (!isLoaded()) load()
+        if (!loaded) {
+            load()
+        }
         Tag locked = Tag.findByName(Tag.LOCKED_TAG)
         boolean changed = false
-        if (!tags.contains(locked) && isUsedInSimulation()) {
+        if (!tags.contains(locked) && usedInSimulation) {
             tags << locked
             changed = true
-        } else if (tags.contains(locked) && !isUsedInSimulation()) {
+        } else if (tags.contains(locked) && !usedInSimulation) {
             tags.remove(locked)
             changed = true
         }

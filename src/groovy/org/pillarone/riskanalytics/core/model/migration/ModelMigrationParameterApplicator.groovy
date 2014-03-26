@@ -13,7 +13,7 @@ import org.apache.commons.logging.LogFactory
 @CompileStatic
 class ModelMigrationParameterApplicator extends ParameterApplicator {
 
-    private static Log LOG = LogFactory.getLog(ModelMigrationParameterApplicator)
+    private static final Log LOG = LogFactory.getLog(ModelMigrationParameterApplicator)
 
     ModelMigrationParameterApplicator(Model model, Parameterization parameterization) {
         this.model = model
@@ -25,6 +25,7 @@ class ModelMigrationParameterApplicator extends ParameterApplicator {
         try {
             ApplicableParameter parameter = super.createApplicableParameter(model, parameterHolder)
             return new ModelMigrationApplicableParameter(parameter)
+
         } catch (ApplicableParameterCreationException e) {
             LOG.info "Error creating paramater for $parameterHolder.path - will be set to null and must be set by migration: $e.message"
             return new NullApplicableParameter()
@@ -38,10 +39,8 @@ class ModelMigrationParameterApplicator extends ParameterApplicator {
 
 
 
-    @Override
     protected void prepareParameter(Model model, AbstractMultiDimensionalParameter parameterValue) {
 
     }
-
 
 }

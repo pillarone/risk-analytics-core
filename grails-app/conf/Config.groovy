@@ -77,8 +77,7 @@ environments {
                     'org.pillarone.riskanalytics.core.fileimport',
                     'org.pillarone.riskanalytics.core.parameterization',
                     'org.pillarone.riskanalytics.core.jobs.JobScheduler',
-                    'org.pillarone.riskanalytics.core.simulation.engine',
-                    'org.pillarone.riskanalytics.core.jobs.BatchRunner'
+                    'org.pillarone.riskanalytics.core.simulation.engine'
         }
     }
     mysql {
@@ -99,8 +98,8 @@ environments {
                     'org.pillarone.riskanalytics.core.fileimport',
                     'org.pillarone.riskanalytics.core.parameterization',
                     'org.pillarone.riskanalytics.core.jobs.JobScheduler',
-                    'org.pillarone.riskanalytics.core.simulation.engine',
-                    'org.pillarone.riskanalytics.core.jobs.BatchRunner')
+                    'org.pillarone.riskanalytics.core.simulation.engine'
+            )
         }
         keyFiguresToCalculate = [
                 'stdev': true,

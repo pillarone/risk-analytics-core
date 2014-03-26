@@ -35,7 +35,7 @@ class SimulationRun {
 
     javax.sql.DataSource dataSource
 
-    static transients = ['deleteSimulationService', 'dataSource']
+    static transients = ['dataSource']
 
     static hasMany = [comments: ResultCommentDAO, runtimeParameters: Parameter, tags: SimulationTag]
 

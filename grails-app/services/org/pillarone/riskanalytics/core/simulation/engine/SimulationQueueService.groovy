@@ -34,9 +34,10 @@ class SimulationQueueService {
                         throw new IllegalStateException('simulation ended, but there is no currentTask')
                     }
                     busy = false
-                    future.stopListenAsync(taskListener)
-                    notifyFinished(currentTask.entry)
+                    QueueEntry entry = currentTask.entry
                     currentTask = null
+                    future.stopListenAsync(taskListener)
+                    notifyFinished(entry)
                     poll()
                 }
             }
@@ -45,9 +46,9 @@ class SimulationQueueService {
         BatchRunSimulationRun.listOrderByPriority().each { offer(it) }
     }
 
-    private void notifyStarted(QueueEntry queueEntry) {
+    private void notifyStarting(QueueEntry queueEntry) {
         synchronized (listeners) {
-            listeners.each { it.started(queueEntry) }
+            listeners.each { it.starting(queueEntry) }
         }
     }
 
@@ -92,6 +93,7 @@ class SimulationQueueService {
                 Thread.start {
                     start(queueEntry)
                 }
+                notifyStarting(queueEntry)
             }
         }
     }
@@ -108,7 +110,6 @@ class SimulationQueueService {
         synchronized (lock) {
             currentTask = new CurrentTask(gridTaskFuture: gridTaskFuture, entry: queueEntry)
         }
-        notifyStarted(queueEntry)
     }
 
 

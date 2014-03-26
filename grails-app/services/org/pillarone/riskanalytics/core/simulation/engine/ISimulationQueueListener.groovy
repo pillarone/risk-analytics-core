@@ -2,7 +2,7 @@ package org.pillarone.riskanalytics.core.simulation.engine
 
 interface ISimulationQueueListener {
 
-    void started(QueueEntry entry)
+    void starting(QueueEntry entry)
 
     void finished(QueueEntry entry)
 

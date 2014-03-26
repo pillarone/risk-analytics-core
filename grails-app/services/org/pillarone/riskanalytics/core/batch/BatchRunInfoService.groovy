@@ -84,7 +84,7 @@ class BatchRunInfoService {
     private class MySimulationListener implements ISimulationQueueListener {
 
         @Override
-        void started(QueueEntry entry) {}
+        void starting(QueueEntry entry) {}
 
         @Override
         void finished(QueueEntry entry) {}

@@ -16,7 +16,7 @@ class SimulationRuntimeService implements ISimulationQueueListener {
     }
 
     @Override
-    void started(QueueEntry entry) {
+    void starting(QueueEntry entry) {
         println("simulation started")
     }
 

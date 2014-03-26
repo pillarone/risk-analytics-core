@@ -94,7 +94,10 @@ class BatchRunInfoService {
         void starting(QueueEntry entry) {}
 
         @Override
-        void finished(QueueEntry entry) {}
+        void finished(UUID id) {}
+
+        @Override
+        void canceled(UUID id) {}
 
         @Override
         void offered(QueueEntry entry) {

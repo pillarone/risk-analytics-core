@@ -53,7 +53,11 @@ class SimulationProfileDAO {
             eq('modelClassName', modelClass?.name)
         }
         withCreator { Person creator ->
-            eq('creator', creator)
+            if (creator) {
+                eq('creator', creator)
+            } else {
+                isNull('creator')
+            }
         }
         withForPublic { boolean forPublic ->
             eq('forPublic', forPublic)

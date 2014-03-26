@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
 import org.pillarone.riskanalytics.core.simulation.SimulationState
+import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationTask
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
 class SimulationRuntimeInfo {
@@ -15,6 +16,10 @@ class SimulationRuntimeInfo {
 
     Simulation getSimulation() {
         queueEntry.simulationConfiguration.simulation
+    }
+
+    SimulationTask getSimulationTask() {
+        queueEntry.simulationTask
     }
 
     String getP14n() {

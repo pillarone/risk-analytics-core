@@ -1,6 +1,10 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
+import org.pillarone.riskanalytics.core.simulation.SimulationState
+
 import javax.annotation.PostConstruct
+
+import static org.pillarone.riskanalytics.core.simulation.SimulationState.*
 
 /**
  * holds runtime information about running, queued and finished simulations.
@@ -19,6 +23,7 @@ class SimulationRuntimeService {
     void initialize() {
         queued.addAll(simulationQueueService.sortedQueueEntries.collect { QueueEntry entry -> new SimulationRuntimeInfo(entry) })
         simulationQueueService.addSimulationQueueListener(new MyQueueListener())
+        addListener(new AddOrRemoveLockedTagListener())
     }
 
     void addListener(ISimulationRuntimeInfoListener listener) {
@@ -65,25 +70,45 @@ class SimulationRuntimeService {
         @Override
         void starting(QueueEntry entry) {
             synchronized (lock) {
-                running = findByQueueEntry(entry)
+                running = findByQueueId(entry.id)
                 fireSimulationInfoEvent(new ChangeSimulationRuntimeInfoEvent(info: running))
                 startTimer()
             }
         }
 
         @Override
-        void finished(QueueEntry entry) {
+        void canceled(UUID id) {
             synchronized (lock) {
-                if (timer) {
-                    timer.cancel()
-                    timer = null
-                }
-                running == null
-                def info = findByQueueEntry(entry)
+                def info = findByQueueId(id)
                 if (info) {
                     queued.remove(info)
                     finished.add(info)
+                    info.simulationTask.cancel()
                     fireSimulationInfoEvent(new DeleteSimulationRuntimeInfoEvent(info: info))
+                }
+            }
+        }
+
+        @Override
+        void finished(UUID id) {
+            synchronized (lock) {
+                if (id == running?.id) {
+                    if (timer) {
+                        timer.cancel()
+                        timer = null
+                    }
+                    running == null
+                }
+                def info = findByQueueId(id)
+                if (info) {
+                    queued.remove(info)
+                    finished.add(info)
+                    SimulationState state = info.simulationState
+                    if (state == FINISHED) {
+                        fireSimulationInfoEvent(new DeleteSimulationRuntimeInfoEvent(info: info))
+                    } else {
+                        fireSimulationInfoEvent(new ChangeSimulationRuntimeInfoEvent(info: info))
+                    }
                 }
             }
         }
@@ -100,8 +125,8 @@ class SimulationRuntimeService {
             }
         }
 
-        private SimulationRuntimeInfo findByQueueEntry(QueueEntry entry) {
-            queued.find { SimulationRuntimeInfo info -> info.id == entry.id }
+        private SimulationRuntimeInfo findByQueueId(UUID id) {
+            queued.find { SimulationRuntimeInfo info -> info.id == id }
         }
     }
 }

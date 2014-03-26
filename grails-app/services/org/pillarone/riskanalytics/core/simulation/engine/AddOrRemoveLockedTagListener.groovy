@@ -1,14 +1,13 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
-class AddOrRemoveLockedTagListener implements ISimulationQueueListener {
-    @Override
-    void starting(QueueEntry entry) {}
+import static org.pillarone.riskanalytics.core.simulation.SimulationState.FINISHED
 
+class AddOrRemoveLockedTagListener implements ISimulationRuntimeInfoListener {
     @Override
-    void finished(QueueEntry entry) {
-        entry.simulationConfiguration.simulation.parameterization.addRemoveLockTag()
+    void onEvent(SimulationRuntimeInfoEvent event) {
+        SimulationRuntimeInfo info = event.info
+        if (info.simulationState.equals(FINISHED)) {
+            info.simulation.parameterization.addRemoveLockTag()
+        }
     }
-
-    @Override
-    void offered(QueueEntry entry) {}
 }

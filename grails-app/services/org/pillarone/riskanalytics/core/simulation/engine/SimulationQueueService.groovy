@@ -37,12 +37,11 @@ class SimulationQueueService {
                     QueueEntry entry = currentTask.entry
                     currentTask = null
                     future.stopListenAsync(taskListener)
-                    notifyFinished(entry)
+                    notifyFinished(entry.id)
                     poll()
                 }
             }
         }
-        addSimulationQueueListener(new AddOrRemoveLockedTagListener())
     }
 
     private void notifyStarting(QueueEntry queueEntry) {
@@ -51,9 +50,15 @@ class SimulationQueueService {
         }
     }
 
-    private void notifyFinished(QueueEntry queueEntry) {
+    private void notifyCanceled(UUID id) {
         synchronized (listeners) {
-            listeners.each { it.finished(queueEntry) }
+            listeners.each { it.canceled(id) }
+        }
+    }
+
+    private void notifyFinished(UUID id) {
+        synchronized (listeners) {
+            listeners.each { it.finished(id) }
         }
     }
 
@@ -168,12 +173,11 @@ class SimulationQueueService {
         synchronized (lock) {
             def entry = new QueueEntry(uuid)
             queue.remove(entry)
-            entry.simulationTask.cancel()
             if (currentTask && currentTask?.entry?.id == uuid) {
                 currentTask.gridTaskFuture.cancel()
-                //notifyFinished is not necessary here, because it will be called in taskListener
+                //notifyCanceled is not necessary here. Instead notifyFinished will be called in taskListener
             } else {
-                notifyFinished(entry)
+                notifyCanceled(uuid)
             }
         }
     }

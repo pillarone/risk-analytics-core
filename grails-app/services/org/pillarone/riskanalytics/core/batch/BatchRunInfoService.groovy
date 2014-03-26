@@ -70,7 +70,11 @@ class BatchRunInfoService {
     private void batchSimulationStart(Simulation simulation) {
         synchronized (lock) {
             BatchRunSimulationRun batchRunSimulationRun = update(simulation, NOT_RUNNING)
-            addRunning batchRunSimulationRun
+            if (!batchRunSimulationRun) {
+                log.warn("BatchRunSimulationRun with simulation $simulation does not exist")
+            } else {
+                addRunning batchRunSimulationRun
+            }
         }
     }
 
@@ -84,8 +88,13 @@ class BatchRunInfoService {
 
     private BatchRunSimulationRun update(Simulation simulation, SimulationState simulationState) {
         BatchRunSimulationRun batchRunSimulationRun = BatchRunSimulationRun.findBySimulationRun(SimulationRun.get(simulation.id as Long))
-        batchRunSimulationRun.simulationState = simulationState
-        batchRunSimulationRun.save()
+        if (!batchRunSimulationRun) {
+            log.warn("BatchRunSimulationRun with simulation $simulation does not exist")
+            null
+        } else {
+            batchRunSimulationRun.simulationState = simulationState
+            batchRunSimulationRun.save()
+        }
     }
 
     private class UpdateListener implements ISimulationQueueListener {

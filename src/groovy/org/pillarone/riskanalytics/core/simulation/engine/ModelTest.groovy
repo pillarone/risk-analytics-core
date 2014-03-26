@@ -123,7 +123,7 @@ abstract class ModelTest {
             run.beginOfFirstPeriod = new DateTime(2009, 1, 1, 0, 0, 0, 0)
         }
 
-        for(ParameterHolder parameterHolder in getRuntimeParameters()) {
+        for (ParameterHolder parameterHolder in getRuntimeParameters()) {
             run.addParameter(parameterHolder)
         }
 
@@ -246,8 +246,7 @@ abstract class ModelTest {
             assertNotNull "No result found for I$iteration P$period $path $field", expectedResult
             if (stopAtFirstDifference()) {
                 assertEquals("Different value at I$iteration P$period $path $field", expectedResult, value, EPSILON)
-            }
-            else if (Math.abs(expectedResult - value) > EPSILON) {
+            } else if (Math.abs(expectedResult - value) > EPSILON) {
                 LOG.error("Different value at I$iteration P$period $path $field, expected $expectedResult, $value")
                 countDifferences++
             }

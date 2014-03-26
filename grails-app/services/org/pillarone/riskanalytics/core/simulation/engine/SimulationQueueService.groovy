@@ -44,28 +44,50 @@ class SimulationQueueService {
         }
     }
 
+    private void doExceptionSave(Closure closure) {
+        try {
+            closure.call()
+        } catch (Throwable t) {
+            log.error("failed to call method on ISimulationQueueListener", t)
+        }
+    }
+
     private void notifyStarting(QueueEntry queueEntry) {
         synchronized (listeners) {
-            listeners.each { it.starting(queueEntry) }
+            listeners.each { ISimulationQueueListener listener ->
+                doExceptionSave {
+                    listener.starting(queueEntry)
+                }
+            }
         }
     }
 
     private void notifyCanceled(UUID id) {
         synchronized (listeners) {
-            listeners.each { it.canceled(id) }
+            listeners.each { ISimulationQueueListener listener ->
+                doExceptionSave {
+                    listener.canceled(id)
+                }
+            }
         }
     }
 
     private void notifyFinished(UUID id) {
         synchronized (listeners) {
-            listeners.each { it.finished(id) }
+            listeners.each {  ISimulationQueueListener listener ->
+                doExceptionSave {
+                    listener.finished(id)
+                }
+            }
         }
     }
 
     private void notifyOffered(QueueEntry queueEntry) {
         synchronized (listeners) {
             listeners.each { ISimulationQueueListener listener ->
-                listener.offered(queueEntry)
+                doExceptionSave {
+                    listener.offered(queueEntry)
+                }
             }
         }
     }

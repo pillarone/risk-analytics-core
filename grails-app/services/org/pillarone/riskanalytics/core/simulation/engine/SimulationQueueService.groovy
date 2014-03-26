@@ -16,7 +16,7 @@ import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import javax.annotation.PostConstruct
 
 class SimulationQueueService {
-    private final List<ISimulationQueueListener> listeners = []
+    private final List<ISimulationQueueListener> listeners = new ArrayList<ISimulationQueueListener>()
     private final PriorityQueue<QueueEntry> queue = new PriorityQueue<QueueEntry>()
     private final Object lock = new Object()
     private CurrentTask currentTask
@@ -43,7 +43,6 @@ class SimulationQueueService {
             }
         }
         addSimulationQueueListener(new AddOrRemoveLockedTagListener())
-        BatchRunSimulationRun.listOrderByPriority().each { offer(it) }
     }
 
     private void notifyStarting(QueueEntry queueEntry) {
@@ -60,13 +59,9 @@ class SimulationQueueService {
 
     private void notifyOffered(QueueEntry queueEntry) {
         synchronized (listeners) {
-            listeners.each { it.offered(queueEntry) }
-        }
-    }
-
-    private void notifyRemoved(UUID uuid) {
-        synchronized (listeners) {
-            listeners.each { it.removed(uuid) }
+            listeners.each { ISimulationQueueListener listener ->
+                listener.offered(queueEntry)
+            }
         }
     }
 
@@ -113,9 +108,9 @@ class SimulationQueueService {
     }
 
 
-    QueueEntry[] getSortedQueueEntries() {
+    List<QueueEntry> getSortedQueueEntries() {
         synchronized (lock) {
-            queue.toArray() as QueueEntry[]
+            queue.toArray().toList() as List<QueueEntry>
         }
     }
 
@@ -173,10 +168,12 @@ class SimulationQueueService {
         synchronized (lock) {
             def entry = new QueueEntry(uuid)
             queue.remove(entry)
-            notifyRemoved(uuid)
+            entry.simulationTask.cancel()
             if (currentTask && currentTask?.entry?.id == uuid) {
-                currentTask.entry.simulationTask.cancel()
                 currentTask.gridTaskFuture.cancel()
+                //notifyFinished is not necessary here, because it will be called in taskListener
+            } else {
+                notifyFinished(entry)
             }
         }
     }

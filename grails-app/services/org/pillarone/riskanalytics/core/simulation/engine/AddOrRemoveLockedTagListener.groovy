@@ -11,7 +11,4 @@ class AddOrRemoveLockedTagListener implements ISimulationQueueListener {
 
     @Override
     void offered(QueueEntry entry) {}
-
-    @Override
-    void removed(UUID id) {}
 }

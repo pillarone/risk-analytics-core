@@ -11,6 +11,7 @@ import org.pillarone.riskanalytics.core.simulation.engine.SimulationQueueService
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
 import javax.annotation.PostConstruct
+import javax.annotation.PreDestroy
 
 import static org.pillarone.riskanalytics.core.simulation.SimulationState.NOT_RUNNING
 
@@ -20,6 +21,7 @@ class BatchRunInfoService {
 
     private final List<BatchRunSimulationRun> runningBatchSimulationRuns
     private final Object lock = new Object()
+    private UpdateListener listener
 
     BatchRunInfoService() {
         runningBatchSimulationRuns = []
@@ -27,7 +29,13 @@ class BatchRunInfoService {
 
     @PostConstruct
     void initialize() {
-        simulationQueueService.addSimulationQueueListener(new MySimulationListener())
+        listener = new UpdateListener()
+        simulationQueueService.addSimulationQueueListener(listener)
+    }
+
+    @PreDestroy
+    void destroy() {
+        simulationQueueService.removeSimulationQueueListener(listener)
     }
 
     @CompileStatic
@@ -46,7 +54,6 @@ class BatchRunInfoService {
                 return
             }
             batchRunSimulationRun.simulationState = simulationState
-
             update(simulation, simulationState)
         }
     }
@@ -81,7 +88,7 @@ class BatchRunInfoService {
         batchRunSimulationRun.save()
     }
 
-    private class MySimulationListener implements ISimulationQueueListener {
+    private class UpdateListener implements ISimulationQueueListener {
 
         @Override
         void starting(QueueEntry entry) {}
@@ -96,9 +103,6 @@ class BatchRunInfoService {
                 batchSimulationStart(simulation)
             }
         }
-
-        @Override
-        void removed(UUID id) {}
     }
 }
 

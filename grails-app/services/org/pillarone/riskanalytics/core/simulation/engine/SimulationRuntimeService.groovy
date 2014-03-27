@@ -3,8 +3,9 @@ package org.pillarone.riskanalytics.core.simulation.engine
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 
 import javax.annotation.PostConstruct
+import javax.annotation.PreDestroy
 
-import static org.pillarone.riskanalytics.core.simulation.SimulationState.*
+import static org.pillarone.riskanalytics.core.simulation.SimulationState.FINISHED
 
 /**
  * holds runtime information about running, queued and finished simulations.
@@ -18,12 +19,20 @@ class SimulationRuntimeService {
     private final List<ISimulationRuntimeInfoListener> listeners = []
     private final Object lock = new Object()
     private Timer timer
+    private MyQueueListener queueListener
 
     @PostConstruct
     void initialize() {
-        queued.addAll(simulationQueueService.sortedQueueEntries.collect { QueueEntry entry -> new SimulationRuntimeInfo(entry) })
-        simulationQueueService.addSimulationQueueListener(new MyQueueListener())
+        queued.addAll(simulationQueueService.queueEntries.collect { QueueEntry entry -> new SimulationRuntimeInfo(entry) })
+        queueListener = new MyQueueListener()
+        simulationQueueService.addSimulationQueueListener(queueListener)
         addListener(new AddOrRemoveLockedTagListener())
+    }
+
+    @PreDestroy
+    void destroy() {
+        simulationQueueService.removeSimulationQueueListener(queueListener)
+        queueListener = null
     }
 
     void addListener(ISimulationRuntimeInfoListener listener) {
@@ -116,7 +125,7 @@ class SimulationRuntimeService {
         @Override
         void offered(QueueEntry entry) {
             synchronized (lock) {
-                def index = simulationQueueService.sortedQueueEntries.indexOf(entry)
+                def index = simulationQueueService.queueEntries.indexOf(entry)
                 if (index != -1) {
                     SimulationRuntimeInfo info = new SimulationRuntimeInfo(entry)
                     queued.add(index, info)

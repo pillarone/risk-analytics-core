@@ -6,9 +6,13 @@ import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.BatchRun
 import org.pillarone.riskanalytics.core.BatchRunSimulationRun
 import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.pillarone.riskanalytics.core.cli.ImportStructureInTransaction
+import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
 import org.pillarone.riskanalytics.core.output.OutputStrategy
 import org.pillarone.riskanalytics.core.output.SimulationRun
+import org.pillarone.riskanalytics.core.output.batch.OutputStrategyFactory
 import org.pillarone.riskanalytics.core.simulation.SimulationState
+import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationQueueService
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
@@ -23,7 +27,7 @@ class BatchRunService {
 
     void runBatch(BatchRun batchRun) {
         getSimulationRuns(batchRun).each { BatchRunSimulationRun batchRunSimulationRun ->
-            simulationQueueService.offer(batchRunSimulationRun)
+            offer(batchRunSimulationRun)
         }
         BatchRun.withTransaction {
             BatchRun reload = BatchRun.get(batchRun.id)
@@ -33,7 +37,7 @@ class BatchRunService {
     }
 
     void runBatchRunSimulation(BatchRun batchRun, SimulationRun simulationRun) {
-        simulationQueueService.offer(getSimulationRun(batchRun, simulationRun))
+        offer(getSimulationRun(batchRun, simulationRun))
     }
 
     List<BatchRun> findBatchRunsWhichShouldBeExecuted() {
@@ -42,6 +46,32 @@ class BatchRunService {
             le('executionTime', new DateTime())
             order('executionTime', 'asc')
         }
+    }
+
+
+    void offer(BatchRunSimulationRun batchRunSimulationRun) {
+        SimulationRun run = batchRunSimulationRun.simulationRun
+        if (run.endTime == null && run.startTime == null) {
+            ICollectorOutputStrategy strategy = OutputStrategyFactory.getInstance(batchRunSimulationRun.strategy)
+            Simulation simulation = loadSimulation(batchRunSimulationRun.simulationRun.name)
+            SimulationConfiguration configuration = new SimulationConfiguration(simulation: simulation, outputStrategy: strategy)
+            ImportStructureInTransaction.importStructure(configuration)
+            simulationQueueService.offer(configuration, 5)
+            return
+        }
+        if (run.endTime != null) {
+            log.info "simulation ${run.name} already executed at ${run.endTime}"
+            return
+        }
+        log.info "simulation ${batchRunSimulationRun.simulationRun.name} is already running"
+    }
+
+    private static Simulation loadSimulation(String simulationName) {
+        Simulation simulation = new Simulation(simulationName)
+        simulation.load()
+        simulation.parameterization.load();
+        simulation.template.load();
+        return simulation
     }
 
     BatchRunSimulationRun createBatchRunSimulationRun(BatchRun batchRun, Simulation simulation, OutputStrategy strategy) {

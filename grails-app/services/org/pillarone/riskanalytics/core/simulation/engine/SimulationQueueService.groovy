@@ -12,6 +12,8 @@ import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationHandler
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationTask
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SpringBeanDefinitionRegistry
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
+import org.pillarone.riskanalytics.core.user.Person
+import org.pillarone.riskanalytics.core.user.UserManagement
 
 import javax.annotation.PostConstruct
 
@@ -74,7 +76,7 @@ class SimulationQueueService {
 
     private void notifyFinished(UUID id) {
         synchronized (listeners) {
-            listeners.each {  ISimulationQueueListener listener ->
+            listeners.each { ISimulationQueueListener listener ->
                 doExceptionSave {
                     listener.finished(id)
                 }
@@ -149,7 +151,7 @@ class SimulationQueueService {
 
     SimulationHandler offer(SimulationConfiguration configuration, int priority = 10) {
         preConditionCheck(configuration)
-        QueueEntry queueEntry = new QueueEntry(new SimulationTask(), configuration, priority)
+        QueueEntry queueEntry = new QueueEntry(new SimulationTask(), configuration, priority, currentUser)
         synchronized (lock) {
             queue.offer(queueEntry)
         }
@@ -158,6 +160,9 @@ class SimulationQueueService {
         new SimulationHandler(queueEntry.simulationTask, queueEntry.id)
     }
 
+    private Person getCurrentUser() {
+        UserManagement.currentUser
+    }
 
     void offer(BatchRunSimulationRun batchRunSimulationRun) {
         SimulationRun run = batchRunSimulationRun.simulationRun

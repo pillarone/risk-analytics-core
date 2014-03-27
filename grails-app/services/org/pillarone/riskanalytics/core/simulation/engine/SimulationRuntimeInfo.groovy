@@ -2,7 +2,10 @@ package org.pillarone.riskanalytics.core.simulation.engine
 
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationTask
+import org.pillarone.riskanalytics.core.simulation.item.Parameterization
+import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
+import org.pillarone.riskanalytics.core.user.Person
 
 class SimulationRuntimeInfo {
     private final QueueEntry queueEntry
@@ -22,12 +25,12 @@ class SimulationRuntimeInfo {
         queueEntry.simulationTask
     }
 
-    String getP14n() {
-        simulation.parameterization?.nameAndVersion
+    Parameterization getParameterization() {
+        simulation.parameterization
     }
 
-    String getResultConfiguration() {
-        simulation.template?.nameAndVersion
+    ResultConfiguration getResultConfiguration() {
+        simulation.template
     }
 
     Integer getIterations() {
@@ -38,9 +41,8 @@ class SimulationRuntimeInfo {
         queueEntry.priority
     }
 
-    String getConfiguredAt() {
-        //TODO format
-        queueEntry.offeredAt.toString()
+    Date getConfiguredAt() {
+        queueEntry.offeredAt
     }
 
     UUID getId() {
@@ -53,6 +55,10 @@ class SimulationRuntimeInfo {
 
     SimulationState getSimulationState() {
         queueEntry.simulationTask.simulationState
+    }
+
+    Person getOfferedBy() {
+        queueEntry.offeredBy
     }
 
     boolean equals(o) {

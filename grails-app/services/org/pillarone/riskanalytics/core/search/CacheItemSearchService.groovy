@@ -36,6 +36,7 @@ class CacheItemSearchService {
     @PreDestroy
     void cleanUp() {
         cacheItemListener.removeCacheItemListener(listener)
+        listener = null
         cache = null
     }
 
@@ -113,20 +114,22 @@ class CacheItemSearchService {
         return results;
     }
 
-    private synchronized void addModellingItemToIndex(CacheItem modellingItem) {
-        cache.add(modellingItem)
+    private synchronized void addModellingItemToIndex(CacheItem item) {
+        cache.add(item)
     }
 
-    private synchronized void removeModellingItemFromIndex(CacheItem modellingItem) {
-        cache.remove(modellingItem)
+    private synchronized void removeModellingItemFromIndex(CacheItem item) {
+        cache.remove(item)
     }
 
     private synchronized void updateModellingItemInIndex(CacheItem item) {
         int indexOf = cache.indexOf(item)
         if (indexOf == -1) {
-            throw new IllegalStateException("could not find item $item. Maybe cache is not initialized?")
+            log.warn("could not find item $item in cache. Probably it was inserted outside this application. Please do not ever do this!!. For now will add it to the cache.")
+            addModellingItemToIndex(item)
+        } else {
+            cache[indexOf] = item
         }
-        cache[indexOf] = item
         internalUpdateModellingItemInIndex(item)
     }
 

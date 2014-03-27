@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationTask
+import org.pillarone.riskanalytics.core.user.Person
 
 class QueueEntry implements Comparable<QueueEntry> {
     final UUID id
@@ -8,8 +9,10 @@ class QueueEntry implements Comparable<QueueEntry> {
     int priority
     final SimulationTask simulationTask
     final SimulationConfiguration simulationConfiguration
+    final Person offeredBy
 
-    QueueEntry(SimulationTask simulationTask, SimulationConfiguration simulationConfiguration, int priority) {
+    QueueEntry(SimulationTask simulationTask, SimulationConfiguration simulationConfiguration, int priority, Person offeredBy) {
+        this.offeredBy = offeredBy
         this.priority = priority
         this.simulationTask = simulationTask
         this.simulationConfiguration = simulationConfiguration
@@ -22,6 +25,7 @@ class QueueEntry implements Comparable<QueueEntry> {
         this.priority = 0
         this.simulationTask = null
         this.simulationConfiguration = null
+        this.offeredBy = null
         offeredAt = null
     }
 

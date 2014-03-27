@@ -65,7 +65,9 @@ class SimulationQueueService {
                 QueueEntry queueEntry = queue.poll()
                 if (queueEntry) {
                     busy = true
-                    simulationStartService.start(queueEntry) { GridTaskFuture future, QueueEntry entry -> setCurrentTask(future, entry) }
+                    simulationStartService.start(queueEntry) { GridTaskFuture future, QueueEntry entry ->
+                        setCurrentTask(future, entry)
+                    }
                     notifyStarting(queueEntry)
                 }
             }
@@ -74,6 +76,7 @@ class SimulationQueueService {
 
     private void setCurrentTask(GridTaskFuture future, QueueEntry entry) {
         synchronized (lock) {
+            future.listenAsync(taskListener)
             currentTask = new CurrentTask(gridTaskFuture: future, entry: entry)
         }
     }

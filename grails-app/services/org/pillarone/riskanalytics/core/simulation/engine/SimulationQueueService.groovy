@@ -65,10 +65,10 @@ class SimulationQueueService {
                 QueueEntry queueEntry = queue.poll()
                 if (queueEntry) {
                     busy = true
+                    notifyStarting(queueEntry)
                     simulationStartService.start(queueEntry) { GridTaskFuture future, QueueEntry entry ->
                         setCurrentTask(future, entry)
                     }
-                    notifyStarting(queueEntry)
                 }
             }
         }

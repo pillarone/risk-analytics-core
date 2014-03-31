@@ -23,7 +23,6 @@ class SimulationRuntimeService {
 
     @PostConstruct
     void initialize() {
-        queued.addAll(simulationQueueService.queueEntries.collect { QueueEntry entry -> new SimulationRuntimeInfo(entry) })
         queueListener = new MyQueueListener()
         simulationQueueService.addSimulationQueueListener(queueListener)
         addListener(new AddOrRemoveLockedTagListener())
@@ -50,7 +49,11 @@ class SimulationRuntimeService {
 
     List<SimulationRuntimeInfo> getQueued() {
         synchronized (lock) {
-            new ArrayList<SimulationRuntimeInfo>(queued)
+            List<SimulationRuntimeInfo> infos = new ArrayList<SimulationRuntimeInfo>(queued)
+            if (running) {
+                infos.add(0, running)
+            }
+            infos
         }
     }
 
@@ -79,7 +82,14 @@ class SimulationRuntimeService {
         @Override
         void starting(QueueEntry entry) {
             synchronized (lock) {
+                if (running) {
+                    throw new IllegalStateException("starting called, but there is already a running simulation $running.id")
+                }
                 running = findByQueueId(entry.id)
+                if (!running) {
+                    throw new IllegalStateException("no info found for id: ${entry.id}")
+                }
+                queued.remove(running)
                 fireSimulationInfoEvent(new ChangeSimulationRuntimeInfoEvent(info: running))
                 startTimer()
             }
@@ -101,36 +111,31 @@ class SimulationRuntimeService {
         @Override
         void finished(UUID id) {
             synchronized (lock) {
-                if (id == running?.id) {
-                    if (timer) {
-                        timer.cancel()
-                        timer = null
-                    }
-                    running == null
+                if (!running || running.id != id) {
+                    throw new IllegalStateException("called finished with id $id. But no running task wikth this id was found.")
                 }
-                def info = findByQueueId(id)
-                if (info) {
-                    queued.remove(info)
-                    finished.add(info)
-                    SimulationState state = info.simulationState
-                    if (state == FINISHED) {
-                        fireSimulationInfoEvent(new DeleteSimulationRuntimeInfoEvent(info: info))
-                    } else {
-                        fireSimulationInfoEvent(new ChangeSimulationRuntimeInfoEvent(info: info))
-                    }
+                if (timer) {
+                    timer.cancel()
+                    timer = null
                 }
+                finished.add(running)
+                SimulationState state = running.simulationState
+                if (state == FINISHED) {
+                    fireSimulationInfoEvent(new DeleteSimulationRuntimeInfoEvent(info: running))
+                } else {
+                    fireSimulationInfoEvent(new ChangeSimulationRuntimeInfoEvent(info: running))
+                }
+                running = null
             }
         }
 
         @Override
         void offered(QueueEntry entry) {
             synchronized (lock) {
-                def index = simulationQueueService.queueEntries.indexOf(entry)
-                if (index != -1) {
-                    SimulationRuntimeInfo info = new SimulationRuntimeInfo(entry)
-                    queued.add(index, info)
-                    fireSimulationInfoEvent(new AddSimulationRuntimeInfoEvent(info: info, index: index))
-                }
+                SimulationRuntimeInfo info = new SimulationRuntimeInfo(entry)
+                queued.add(info)
+                queued.sort()
+                fireSimulationInfoEvent(new AddSimulationRuntimeInfoEvent(info: info, index: queued.indexOf(info)))
             }
         }
 

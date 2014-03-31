@@ -67,12 +67,12 @@ class SimulationRuntimeInfo {
 
         SimulationRuntimeInfo that = (SimulationRuntimeInfo) o
 
-        if (queueEntry != that.queueEntry) return false
+        if (id != that.id) return false
 
         return true
     }
 
     int hashCode() {
-        return queueEntry.hashCode()
+        return id.hashCode()
     }
 }

@@ -50,4 +50,9 @@ class QueueEntry implements Comparable<QueueEntry> {
     int hashCode() {
         return id.hashCode()
     }
+
+    @Override
+    String toString() {
+        id
+    }
 }

@@ -5,6 +5,7 @@ import org.pillarone.riskanalytics.core.simulation.SimulationState
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 
+import static org.pillarone.riskanalytics.core.simulation.SimulationState.CANCELED
 import static org.pillarone.riskanalytics.core.simulation.SimulationState.FINISHED
 
 /**
@@ -120,7 +121,7 @@ class SimulationRuntimeService {
                 }
                 finished.add(running)
                 SimulationState state = running.simulationState
-                if (state == FINISHED) {
+                if (state == FINISHED || state == CANCELED) {
                     fireSimulationInfoEvent(new DeleteSimulationRuntimeInfoEvent(info: running))
                 } else {
                     fireSimulationInfoEvent(new ChangeSimulationRuntimeInfoEvent(info: running))

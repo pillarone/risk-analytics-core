@@ -20,11 +20,12 @@ class SimulationQueueService {
     private CurrentTask currentTask
     private TaskListener taskListener
     private boolean busy = false
-    private final Timer pollingTimer = new Timer()
+    private Timer pollingTimer
 
     @PostConstruct
     private void initialize() {
         taskListener = new TaskListener()
+        pollingTimer = new Timer()
         pollingTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             void run() {
@@ -36,6 +37,8 @@ class SimulationQueueService {
     @PreDestroy
     void stopPollingTimer() {
         pollingTimer.cancel()
+        pollingTimer = null
+        taskListener = null
     }
 
     SimulationHandler offer(SimulationConfiguration configuration, int priority = 10) {

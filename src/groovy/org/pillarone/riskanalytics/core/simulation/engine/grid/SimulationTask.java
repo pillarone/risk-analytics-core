@@ -171,6 +171,8 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
                     } catch (InterruptedException e) {
                         error = true;
                         simulationErrors.add(e);
+                        // Restore the interrupted status - http://www.ibm.com/developerworks/library/j-jtp05236/
+                        Thread.currentThread().interrupt();
                         break;
                     }
                     if (System.currentTimeMillis() - timeout > MESSAGE_TIMEOUT) {
@@ -185,7 +187,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
 
             if (error || cancelled) {
                 simulation.delete();
-                setSimulationState(error ? SimulationState.ERROR : SimulationState.CANCELED);
+                setSimulationState(cancelled ? SimulationState.CANCELED : SimulationState.ERROR );
                 return false;
             }
             LOG.info("Received " + messageCount + " messages. Sent " + totalMessageCount + " messages.");

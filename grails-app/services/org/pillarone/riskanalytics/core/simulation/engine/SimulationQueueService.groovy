@@ -7,6 +7,7 @@ import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.user.UserManagement
 
 import javax.annotation.PostConstruct
+import javax.annotation.PreDestroy
 
 import static com.google.common.base.Preconditions.checkNotNull
 
@@ -19,10 +20,22 @@ class SimulationQueueService {
     private CurrentTask currentTask
     private TaskListener taskListener
     private boolean busy = false
+    private final Timer pollingTimer = new Timer()
 
     @PostConstruct
     private void initialize() {
         taskListener = new TaskListener()
+        pollingTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            void run() {
+                poll()
+            }
+        }, 1000, 500)
+    }
+
+    @PreDestroy
+    void stopPollingTimer() {
+        pollingTimer.cancel()
     }
 
     SimulationHandler offer(SimulationConfiguration configuration, int priority = 10) {
@@ -31,7 +44,6 @@ class SimulationQueueService {
             QueueEntry queueEntry = new QueueEntry(configuration, priority, currentUser)
             queue.offer(queueEntry)
             notifyOffered(queueEntry)
-            poll()
             new SimulationHandler(queueEntry.simulationTask, queueEntry.id)
         }
     }
@@ -91,7 +103,6 @@ class SimulationQueueService {
             currentTask = null
             future.stopListenAsync(taskListener)
             notifyFinished(entry.id)
-            poll()
         }
     }
 

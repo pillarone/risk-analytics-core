@@ -19,6 +19,7 @@ import org.pillarone.riskanalytics.core.simulation.item.Simulation
 class BatchRunService {
 
     SimulationQueueService simulationQueueService
+    BatchRunInfoService batchRunInfoService
 
     @CompileStatic
     static BatchRunService getService() {
@@ -56,6 +57,7 @@ class BatchRunService {
             Simulation simulation = loadSimulation(batchRunSimulationRun.simulationRun.name)
             SimulationConfiguration configuration = new SimulationConfiguration(simulation: simulation, outputStrategy: strategy)
             ImportStructureInTransaction.importStructure(configuration)
+            batchRunInfoService.batchSimulationStart(simulation)
             simulationQueueService.offer(configuration, 5)
             return
         }

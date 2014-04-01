@@ -2,12 +2,12 @@ package org.pillarone.riskanalytics.core.parameter
 
 import groovy.sql.GroovyRowResult
 import groovy.sql.Sql
-import org.pillarone.riskanalytics.core.parameterization.AbstractMultiDimensionalParameter
+import net.sf.jasperreports.engine.util.ContextClassLoaderObjectInputStream
 import org.pillarone.riskanalytics.core.parameterization.*
+import org.pillarone.riskanalytics.core.util.DatabaseUtils
 import org.springframework.jdbc.datasource.DataSourceUtils
 
-import org.pillarone.riskanalytics.core.util.DatabaseUtils
-import net.sf.jasperreports.engine.util.ContextClassLoaderObjectInputStream
+import javax.sql.DataSource
 
 class MultiDimensionalParameter extends Parameter {
 
@@ -19,7 +19,7 @@ class MultiDimensionalParameter extends Parameter {
 
     Object parameterObject
 
-    javax.sql.DataSource dataSource
+    DataSource dataSource
 
     static transients = ['parameterObject', 'dataSource']
 
@@ -31,7 +31,7 @@ class MultiDimensionalParameter extends Parameter {
         constraintName(nullable: true)
     }
 
-    public void setParameterInstance(Object value) {
+    void setParameterInstance(Object value) {
         value = value as AbstractMultiDimensionalParameter
         this.className = value.class.name
         extractValues(value.values)
@@ -78,7 +78,7 @@ class MultiDimensionalParameter extends Parameter {
             multiDimensionalParameterValuesAsList.clear()
             multiDimensionalParameterValuesAsList.addAll(multiDimensionalParameterValues)
         }
-        if (values.any {it instanceof List}) {
+        if (values.any { it instanceof List }) {
             for (int i = 0; i < values.size(); i++) {
                 for (int j = 0; j < values[i].size(); j++) {
                     modifyOrCreateParameterValue(j, i, values[i][j], multiDimensionalParameterValuesAsList)
@@ -111,7 +111,7 @@ class MultiDimensionalParameter extends Parameter {
 
         MultiDimensionalParameterValue parameterValue = null
         for (int i = 0; i < values.size() && parameterValue == null; i++) {
-            def candidate = values[i]
+            MultiDimensionalParameterValue candidate = values[i] as MultiDimensionalParameterValue
             if (candidate.col == col && candidate.row == row) {
                 parameterValue = candidate
             }
@@ -138,7 +138,7 @@ class MultiDimensionalParameter extends Parameter {
     }
 
     private void modifyOrCreateParameterTitle(int row, int col, String value) {
-        MultiDimensionalParameterTitle title = multiDimensionalParameterTitles.find {it.col == col && it.row == row }
+        MultiDimensionalParameterTitle title = multiDimensionalParameterTitles.find { it.col == col && it.row == row }
         if (title != null) {
             title.title = value
         } else {
@@ -150,9 +150,9 @@ class MultiDimensionalParameter extends Parameter {
      * This method should only be called on a persisted, non-dirty object, because the data is read directly from the DB
      * for performance reasons.
      */
-    public Object getParameterInstance() {
+    Object getParameterInstance() {
         Class clazz = Thread.currentThread().contextClassLoader.loadClass(className)
-        Class markerClass
+        Class markerClass = null
         if (markerClassName != null) {
             markerClass = Thread.currentThread().contextClassLoader.loadClass(markerClassName)
         }
@@ -206,15 +206,15 @@ class MultiDimensionalParameter extends Parameter {
         Sql sql = new Sql(DataSourceUtils.getConnection(dataSource))
         int i = 0
         String query = DatabaseUtils.isOracleDatabase() ?
-            "SELECT value FROM mdp_value v where v.mdp_id = ? and v.col = ? order by v.row_number" :
-            "SELECT value FROM multi_dimensional_parameter_value v where v.multi_dimensional_parameter_id = ? and v.col = ? order by v.row"
+                "SELECT value FROM mdp_value v where v.mdp_id = ? and v.col = ? order by v.row_number" :
+                "SELECT value FROM multi_dimensional_parameter_value v where v.multi_dimensional_parameter_id = ? and v.col = ? order by v.row"
 
         List column = sql.rows(query, [this.id, i])
         while (column.size() > 0) {
-            result << column.collect {GroovyRowResult res ->
+            result << column.collect { GroovyRowResult res ->
                 ByteArrayInputStream str = new ByteArrayInputStream(res.getAt(0))
                 ObjectInputStream str2 = new ContextClassLoaderObjectInputStream(str)
-                return str2.readObject()
+                str2.readObject()
             }
             i++
             column = sql.rows(query, [this.id, i])
@@ -228,5 +228,4 @@ class MultiDimensionalParameter extends Parameter {
     Class persistedClass() {
         MultiDimensionalParameter
     }
-
 }

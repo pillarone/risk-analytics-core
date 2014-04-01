@@ -9,7 +9,7 @@ abstract class AbstractParameterValidationService {
 
     boolean transactional = false
 
-    protected Map validators = [:] // maps keys to a list of validating closures
+    protected final Map validators = [:] // maps keys to a list of validating closures
 
     /**
      * @param classifier is the object used to find the validation closure for a candidate object in the registry.

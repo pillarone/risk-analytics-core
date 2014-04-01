@@ -1,10 +1,10 @@
 package org.pillarone.riskanalytics.core.parameter.comment.workflow
 
+import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.parameter.comment.CommentFileDAO
-import org.pillarone.riskanalytics.core.user.Person
-import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
+import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.util.DatabaseUtils
 
 class WorkflowCommentDAO {
@@ -18,7 +18,7 @@ class WorkflowCommentDAO {
     IssueStatus status
 
     static belongsTo = ParameterizationDAO
-    static hasMany = [commentFile : CommentFileDAO]
+    static hasMany = [commentFile: CommentFileDAO]
 
 
     static constraints = {
@@ -32,7 +32,7 @@ class WorkflowCommentDAO {
     static mapping = {
         timeStamp type: DateTimeMillisUserType
         if (DatabaseUtils.isOracleDatabase()) {
-            comment(column: "comment_value")
+            comment(column: 'comment_value')
         }
     }
 }

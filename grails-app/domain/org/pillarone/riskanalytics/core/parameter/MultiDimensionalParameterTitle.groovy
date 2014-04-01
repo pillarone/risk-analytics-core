@@ -18,7 +18,7 @@ class MultiDimensionalParameterTitle {
 
     static mapping = {
         if (DatabaseUtils.isOracleDatabase()) {
-            table("mdp_title")
+            table('mdp_title')
             row(column: 'row_number')
         }
     }

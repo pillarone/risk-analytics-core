@@ -6,7 +6,7 @@ import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.util.DatabaseUtils
 
-public class ResultConfigurationDAO {
+class ResultConfigurationDAO {
 
     String name
     String comment

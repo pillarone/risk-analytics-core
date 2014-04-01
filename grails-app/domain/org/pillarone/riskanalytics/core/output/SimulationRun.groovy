@@ -8,8 +8,10 @@ import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.SimulationTag
 import org.pillarone.riskanalytics.core.parameter.comment.ResultCommentDAO
 import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
-import org.pillarone.riskanalytics.core.util.DatabaseUtils
 import org.pillarone.riskanalytics.core.user.Person
+import org.pillarone.riskanalytics.core.util.DatabaseUtils
+
+import javax.sql.DataSource
 
 class SimulationRun {
 
@@ -33,7 +35,7 @@ class SimulationRun {
 
     // more to come here
 
-    javax.sql.DataSource dataSource
+    DataSource dataSource
 
     static transients = ['dataSource']
 
@@ -56,7 +58,7 @@ class SimulationRun {
     }
 
     static mapping = {
-        comments(sort: "path", order: "asc")
+        comments(sort: 'path', order: 'asc')
         beginOfFirstPeriod type: DateTimeMillisUserType
         startTime type: DateTimeMillisUserType
         endTime type: DateTimeMillisUserType
@@ -80,18 +82,16 @@ class SimulationRun {
         }
     }
 
-    public boolean equals(Object obj) {
+    boolean equals(Object obj) {
         if (obj instanceof SimulationRun) {
             return obj.id == id
         }
         return false
     }
 
-    public int hashCode() {
+    int hashCode() {
         HashCodeBuilder builder = new HashCodeBuilder()
         builder.append(id)
         builder.toHashCode()
     }
-
-
 }

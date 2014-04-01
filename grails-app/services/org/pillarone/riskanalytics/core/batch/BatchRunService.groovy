@@ -11,10 +11,11 @@ import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
 import org.pillarone.riskanalytics.core.output.OutputStrategy
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.output.batch.OutputStrategyFactory
-import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationQueueService
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
+
+import static org.pillarone.riskanalytics.core.simulation.SimulationState.NOT_RUNNING
 
 class BatchRunService {
 
@@ -71,8 +72,8 @@ class BatchRunService {
     private static Simulation loadSimulation(String simulationName) {
         Simulation simulation = new Simulation(simulationName)
         simulation.load()
-        simulation.parameterization.load();
-        simulation.template.load();
+        simulation.parameterization.load()
+        simulation.template.load()
         return simulation
     }
 
@@ -81,7 +82,13 @@ class BatchRunService {
             simulation.save()
             batchRun = BatchRun.findByName(batchRun.name)
             int priority = BatchRunSimulationRun.countByBatchRun(batchRun)
-            BatchRunSimulationRun addedBatchRunSimulationRun = new BatchRunSimulationRun(batchRun: batchRun, simulationRun: simulation.simulationRun, priority: priority, strategy: strategy, simulationState: SimulationState.NOT_RUNNING)
+            BatchRunSimulationRun addedBatchRunSimulationRun = new BatchRunSimulationRun(
+                    batchRun: batchRun,
+                    simulationRun: simulation.simulationRun,
+                    priority: priority,
+                    strategy: strategy,
+                    simulationState: NOT_RUNNING
+            )
             addedBatchRunSimulationRun.save()
             if (batchRun.executed) {
                 batchRun.executed = false
@@ -99,7 +106,7 @@ class BatchRunService {
     }
 
     List<BatchRunSimulationRun> getSimulationRuns(BatchRun batchRun) {
-        return BatchRunSimulationRun.findAllByBatchRun(batchRun, [sort: "priority", order: "asc"])
+        return BatchRunSimulationRun.findAllByBatchRun(batchRun, [sort: 'priority', order: 'asc'])
     }
 
     BatchRunSimulationRun getSimulationRun(BatchRun batchRun, SimulationRun simulationRun) {
@@ -120,7 +127,7 @@ class BatchRunService {
         }
     }
 
-    synchronized void changePriority(BatchRun batchRun, SimulationRun simulationRun, int step) {
+    void changePriority(BatchRun batchRun, SimulationRun simulationRun, int step) {
         BatchRun.withTransaction {
             BatchRunSimulationRun batchRunSimulationRun = BatchRunSimulationRun.findByBatchRunAndSimulationRun(batchRun, simulationRun)
             int newPriority = batchRunSimulationRun.priority + step

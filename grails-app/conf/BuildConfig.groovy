@@ -119,6 +119,7 @@ codenarc.properties = {
     SpaceAroundMapEntryColon.enabled = false
     SpaceBeforeOpeningBrace.enabled = false
     SpaceAfterIf.enabled = false
+    UnnecessaryReturnKeyword.enabled = false
     //TODO discuss about rules together
 //    GrailsPublicControllerMethod.enabled = false
 //    SimpleDateFormatMissingLocale.enabled = false
@@ -135,6 +136,7 @@ codenarc.properties = {
 
     MethodName.doNotApplyToClassNames = allTestClasses
     AbcComplexity.doNotApplyToClassNames = allTestClasses
+    UnnecessaryGString.doNotApplyToClassNames = allTestClasses
 }
 
 private List testClasses() {

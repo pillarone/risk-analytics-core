@@ -1,39 +1,34 @@
 package org.pillarone.riskanalytics.core.fileimport
 
 import groovy.transform.CompileStatic
-
-import java.util.jar.JarInputStream
-import java.util.zip.ZipEntry
-import java.util.zip.ZipInputStream
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.joda.time.DateTimeZone
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.util.ConfigObjectUtils
 
+import java.util.jar.JarInputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+
 abstract class FileImportService {
 
-    protected static final Log LOG = LogFactory.getLog(FileImportService)
+    private static final Log LOG = LogFactory.getLog(FileImportService)
 
     abstract String getFileSuffix()
 
-    abstract public def getDaoClass()
+    abstract def getDaoClass()
 
     abstract protected boolean saveItemObject(String fileContent)
 
     abstract String prepare(URL file, String itemName)
 
-    /** Setting the default time zone to UTC avoids problems in multi user context with different time zones
-     *  and switches off daylight saving capabilities and possible related problems.  */
-    DateTimeZone utc = DateTimeZone.setDefault(DateTimeZone.UTC)
-
     @CompileStatic
-    public int compareFilesAndWriteToDB(List modelNames = null) {
+    int compareFilesAndWriteToDB(List modelNames = null) {
 
         int recordCount = 0
-        scanImportFolder(modelNames).each {URL url ->
+        scanImportFolder(modelNames).each { URL url ->
             if (importFile(url)) {
                 recordCount++
             }
@@ -44,7 +39,7 @@ abstract class FileImportService {
     @CompileStatic
     protected List scanImportFolder(List modelNames = null) {
         URL modelSourceFolder = searchModelImportFolder()
-        return modelSourceFolder.toExternalForm().startsWith("jar") ? findURLsInJar(modelSourceFolder, modelNames) : findURLsInDirectory(modelSourceFolder, modelNames)
+        return modelSourceFolder.toExternalForm().startsWith('jar') ? findURLsInJar(modelSourceFolder, modelNames) : findURLsInDirectory(modelSourceFolder, modelNames)
     }
 
     @CompileStatic
@@ -67,17 +62,17 @@ abstract class FileImportService {
         List<URL> matchingFiles = []
 
         JarURLConnection connection
-        ZipInputStream inputStream
+        ZipInputStream inputStream = null
 
         try {
             connection = (JarURLConnection) url.openConnection()
             URL jarUrl = connection.getJarFileURL()
             inputStream = new JarInputStream(jarUrl.openStream())
-            ZipEntry entry = null
+            ZipEntry entry
             while ((entry = inputStream.getNextEntry()) != null) {
                 String entryName = entry.getName()
-                if (entryName.contains("models") && entryName.endsWith("${fileSuffix}.groovy") && shouldImportModel(entryName.substring(entryName.lastIndexOf("/") + 1), modelNames)) {
-                    URL resource = getClass().getResource("/" + entryName)
+                if (entryName.contains('models') && entryName.endsWith("${fileSuffix}.groovy") && shouldImportModel(entryName.substring(entryName.lastIndexOf('/') + 1), modelNames)) {
+                    URL resource = getClass().getResource('/' + entryName)
                     if (resource != null) {
                         matchingFiles << resource
                     }
@@ -86,18 +81,18 @@ abstract class FileImportService {
 
             }
         } finally {
-            inputStream.close()
+            inputStream?.close()
         }
 
         return matchingFiles
     }
 
     @CompileStatic
-    public boolean importFile(URL url) {
+    boolean importFile(URL url) {
         LOG.debug("importing ${url.toExternalForm()}")
         boolean success = false
         String urlString = url.toExternalForm()
-        String itemName = prepare(url, urlString.substring(urlString.lastIndexOf("/") + 1))
+        String itemName = prepare(url, urlString.substring(urlString.lastIndexOf('/') + 1))
 
         boolean alreadyImported = lookUpItem(getDaoClass(), itemName)
         if (!alreadyImported) {
@@ -138,31 +133,31 @@ abstract class FileImportService {
             return true
         }
         LOG.trace "filtering $filename with $models"
-        models.any {String it ->
+        models.any { String it ->
             filename.startsWith(it)
         }
     }
 
     @CompileStatic
     protected URL searchModelImportFolder() {
-        URL modelFolder = getClass().getResource("/models")
+        URL modelFolder = getClass().getResource('/models')
         if (modelFolder == null) {
-            throw new RuntimeException("Model folder not found")
+            throw new RuntimeException('Model folder not found')
         }
         LOG.debug "Model source URL: ${modelFolder.toExternalForm()}"
         return modelFolder
     }
 
     @CompileStatic
-    public static void spreadRanges(ConfigObject config) {
+    static void spreadRanges(ConfigObject config) {
         ConfigObjectUtils.spreadRanges config
     }
 
 
     @CompileStatic
     static void importModelsIfNeeded(List modelNames) {
-        if (!Boolean.getBoolean("skipImport")) {
-            String models = modelNames != null && !modelNames.empty ? modelNames.join(", ") : "all models"
+        if (!Boolean.getBoolean('skipImport')) {
+            String models = modelNames != null && !modelNames.empty ? modelNames.join(', ') : 'all models'
             LOG.info "Importing files for ${models}"
             new ModelFileImportService().compareFilesAndWriteToDB(modelNames)
             new ModelStructureImportService().compareFilesAndWriteToDB(modelNames)
@@ -176,5 +171,4 @@ abstract class FileImportService {
     String getModelClassName() {
         return null
     }
-
 }

@@ -2,14 +2,12 @@ package org.pillarone.riskanalytics.core.fileimport
 
 import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.ModelDAO
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
-import org.springframework.core.type.filter.RegexPatternTypeFilter
-import java.util.regex.Pattern
-import org.springframework.beans.factory.config.BeanDefinition
-import org.pillarone.riskanalytics.core.model.MigratableModel
-import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.util.ClassPathScanner
+import org.springframework.beans.factory.config.BeanDefinition
+import org.springframework.core.type.filter.RegexPatternTypeFilter
+
+import java.util.regex.Pattern
 
 /**
  * @author sebastian.cartier (at) intuitive-collaboration (dot) com
@@ -20,7 +18,7 @@ class ModelFileImportService extends FileImportService {
     private String versionNumber
     private Class modelClass
 
-    final String fileSuffix = "Model"
+    final String fileSuffix = 'Model'
 
     protected boolean saveItemObject(String srcCode) {
         ModelDAO dao = new ModelDAO()
@@ -33,12 +31,12 @@ class ModelFileImportService extends FileImportService {
     }
 
     @CompileStatic
-    public getDaoClass() {
+    def getDaoClass() {
         return ModelDAO
     }
 
     @CompileStatic
-    public String prepare(URL file, String itemName) {
+    String prepare(URL file, String itemName) {
         fileName = itemName - '.groovy'
 
         modelClass = findModelClass()
@@ -58,9 +56,10 @@ class ModelFileImportService extends FileImportService {
     protected Class findModelClass() {
         ClassPathScanner scanner = new ClassPathScanner()
         scanner.addIncludeFilter(new RegexPatternTypeFilter(Pattern.compile('(.*)\\.' + fileName + '$')))
-        Set<BeanDefinition> components = scanner.findCandidateComponents("models") //classes in jars are not found when the base package is empty PMO-2524
+        Set<BeanDefinition> components = scanner.findCandidateComponents('models')
+        //classes in jars are not found when the base package is empty PMO-2524                     $
         if (components.size() > 1) {
-            throw new IllegalStateException("More than one model class found with name $fileName: ${components.collect { BeanDefinition it -> it.beanClassName }.join(" ")}")
+            throw new IllegalStateException("More than one model class found with name $fileName: ${components.collect { BeanDefinition it -> it.beanClassName }.join(' ')}")
         } else if (components.empty) {
             throw new IllegalStateException("Model class not found for $fileName")
         } else {

@@ -9,7 +9,7 @@ class ParameterObjectParameter extends Parameter {
 
     static transients = ['parameterObject']
 
-    public void setPeriodIndex(int index) {
+    void setPeriodIndex(int index) {
         super.setPeriodIndex(index)
         type?.periodIndex = index
         parameterEntries.each {
@@ -21,5 +21,4 @@ class ParameterObjectParameter extends Parameter {
     Class persistedClass() {
         ParameterObjectParameter
     }
-
 }

@@ -1,8 +1,5 @@
 package org.pillarone.riskanalytics.core.user
 
-/**
- * User domain class.
- */
 class Person {
 
     String username
@@ -24,7 +21,7 @@ class Person {
 
     Set<Authority> getAuthorities() {
         withTransaction {
-            return PersonAuthority.findAllByPerson(this).collect { it.authority } as Set
+            PersonAuthority.findAllByPerson(this).authority as Set
         }
     }
 }

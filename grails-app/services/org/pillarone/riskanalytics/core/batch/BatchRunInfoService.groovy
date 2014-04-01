@@ -1,17 +1,15 @@
 package org.pillarone.riskanalytics.core.batch
+
 import grails.util.Holders
 import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.BatchRunSimulationRun
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.SimulationState
-import org.pillarone.riskanalytics.core.simulation.engine.SimulationQueueService
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
 import static org.pillarone.riskanalytics.core.simulation.SimulationState.NOT_RUNNING
 
 class BatchRunInfoService {
-
-    SimulationQueueService simulationQueueService
 
     private final List<BatchRunSimulationRun> runningBatchSimulationRuns
     private final Object lock = new Object()

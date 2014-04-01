@@ -21,6 +21,7 @@ class BatchRunService {
 
     SimulationQueueService simulationQueueService
     BatchRunInfoService batchRunInfoService
+    def backgroundService
 
     @CompileStatic
     static BatchRunService getService() {
@@ -54,19 +55,24 @@ class BatchRunService {
     void offer(BatchRunSimulationRun batchRunSimulationRun) {
         SimulationRun run = batchRunSimulationRun.simulationRun
         if (run.endTime == null && run.startTime == null) {
-            ICollectorOutputStrategy strategy = OutputStrategyFactory.getInstance(batchRunSimulationRun.strategy)
-            Simulation simulation = loadSimulation(batchRunSimulationRun.simulationRun.name)
-            SimulationConfiguration configuration = new SimulationConfiguration(simulation: simulation, outputStrategy: strategy)
-            ImportStructureInTransaction.importStructure(configuration)
-            batchRunInfoService.batchSimulationStart(simulation)
-            simulationQueueService.offer(configuration, 5)
-            return
+            configureAndSendToQueue(batchRunSimulationRun)
         }
         if (run.endTime != null) {
             log.info "simulation ${run.name} already executed at ${run.endTime}"
             return
         }
         log.info "simulation ${batchRunSimulationRun.simulationRun.name} is already running"
+    }
+
+    private configureAndSendToQueue(BatchRunSimulationRun batchRunSimulationRun) {
+        backgroundService.execute("offering $batchRunSimulationRun to queue") {
+            ICollectorOutputStrategy strategy = OutputStrategyFactory.getInstance(batchRunSimulationRun.strategy)
+            Simulation simulation = loadSimulation(batchRunSimulationRun.simulationRun.name)
+            SimulationConfiguration configuration = new SimulationConfiguration(simulation: simulation, outputStrategy: strategy)
+            ImportStructureInTransaction.importStructure(configuration)
+            batchRunInfoService.batchSimulationStart(simulation)
+            simulationQueueService.offer(configuration, 5)
+        }
     }
 
     private static Simulation loadSimulation(String simulationName) {

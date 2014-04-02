@@ -66,7 +66,6 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
             if (!cancelled) {
                 setSimulationState(SimulationState.INITIALIZING);
             }
-            Thread.currentThread().sleep(10000);
             time = System.currentTimeMillis();
             simulationConfiguration.getSimulation().setStart(new DateTime());
 
@@ -113,7 +112,6 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
             if (!cancelled) {
                 setSimulationState(SimulationState.RUNNING);
             }
-            Thread.currentThread().sleep(3000);
             totalJobs = jobs.size();
 
             for (int i = 0; i < jobs.size(); i++) {

@@ -14,7 +14,7 @@ class RegistryInitializationSupport {
     private RegistryInitializationSupport() {
         packages << DEFAULT_PACKAGE
         try {
-            log.info("trying to get additionDal packages from config")
+            log.info("trying to get additional packages from config")
             //this will fail on external grid nodes and it will also fail during deserializing objects which call the findClasses method in static init blocks. There cannot be a Holder.config at this point.
             if (Holders.config.containsKey(AUTO_REGISTRATION_BASE_PACKAGES)) {
                 packages.addAll([Holders.config."$AUTO_REGISTRATION_BASE_PACKAGES"].flatten() as Collection<String>)

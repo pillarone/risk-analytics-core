@@ -237,6 +237,7 @@ class Parameterization extends ParametrizedItem {
 
     protected void saveTags(ParameterizationDAO dao) {
         List<ParameterizationTag> tagsToRemove = []
+        String logTagNames = "" //PMO-2737
         for (ParameterizationTag tag in dao.tags) {
             if (!tags.contains(tag.tag)) {
                 tagsToRemove << tag
@@ -244,15 +245,18 @@ class Parameterization extends ParametrizedItem {
         }
         for (ParameterizationTag tag in tagsToRemove) {
             dao.removeFromTags(tag)
-            LOG.info("Drop tag: ${tag.tag.name} from P14n: ${getNameAndVersion()}") //PMO-2737
+            logTagNames += "-'${tag.tag.name}',"
         }
         tagsToRemove.each { it.delete() }
 
         for (Tag tag in tags) {
             if (!dao.tags*.tag?.contains(tag)) {
                 dao.addToTags(new ParameterizationTag(tag: tag))
-                LOG.info("Add tag: ${tag.name} to P14n: ${getNameAndVersion()}") //PMO-2737
+                logTagNames += "+'${tag.name}',"
             }
+        }
+        if(logTagNames.length()>0){
+            LOG.info(getNameAndVersion() + " Tags changed:" + logTagNames)
         }
     }
 

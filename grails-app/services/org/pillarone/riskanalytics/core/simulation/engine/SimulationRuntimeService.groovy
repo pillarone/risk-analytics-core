@@ -17,16 +17,17 @@ class SimulationRuntimeService {
     private final List<SimulationRuntimeInfo> finished = []
     private final List<SimulationRuntimeInfo> queued = []
     private SimulationRuntimeInfo running
-    private final List<ISimulationRuntimeInfoListener> listeners = []
     private final Object lock = new Object()
     private Timer timer
     private MyQueueListener queueListener
+    @Delegate
+    private final SimulationRuntimeInfoEventSupport support = new SimulationRuntimeInfoEventSupport()
 
     @PostConstruct
     void initialize() {
         queueListener = new MyQueueListener()
         simulationQueueService.addSimulationQueueListener(queueListener)
-        addListener(new AddOrRemoveLockedTagListener())
+        addSimulationRuntimeInfoListener(new AddOrRemoveLockedTagListener())
     }
 
     @PreDestroy
@@ -34,19 +35,6 @@ class SimulationRuntimeService {
         simulationQueueService.removeSimulationQueueListener(queueListener)
         queueListener = null
     }
-
-    void addListener(ISimulationRuntimeInfoListener listener) {
-        synchronized (listener) {
-            listeners << listener
-        }
-    }
-
-    void removeListener(ISimulationRuntimeInfoListener listener) {
-        synchronized (listener) {
-            listeners.remove(listener)
-        }
-    }
-
 
     List<SimulationRuntimeInfo> getQueued() {
         synchronized (lock) {
@@ -71,12 +59,6 @@ class SimulationRuntimeService {
                 }
             }
         }, 2000, 2000);
-    }
-
-    void fireSimulationInfoEvent(SimulationRuntimeInfoEvent event) {
-        synchronized (listeners) {
-            listeners.each { ISimulationRuntimeInfoListener listener -> listener.onEvent(event) }
-        }
     }
 
     private class MyQueueListener implements ISimulationQueueListener {

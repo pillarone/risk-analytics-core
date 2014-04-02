@@ -11,7 +11,6 @@ import javax.annotation.PreDestroy
 
 import static com.google.common.base.Preconditions.checkNotNull
 
-@Mixin(SimulationQueueNotifyingMixin)
 class SimulationQueueService {
     SimulationStartService simulationStartService
 
@@ -21,6 +20,8 @@ class SimulationQueueService {
     private TaskListener taskListener
     private boolean busy = false
     private Timer pollingTimer
+    @Delegate
+    private SimulationQueueNotifyingSupport support = new SimulationQueueNotifyingSupport()
 
     @PostConstruct
     private void initialize() {

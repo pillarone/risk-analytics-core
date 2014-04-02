@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.simulation.engine
 
 import org.gridgain.grid.GridTaskFuture
 import org.gridgain.grid.typedef.CI1
+import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationHandler
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.user.UserManagement
@@ -55,13 +56,15 @@ class SimulationQueueService {
     void cancel(UUID uuid) {
         checkNotNull(uuid)
         synchronized (lock) {
-            def entry = new QueueEntry(uuid)
-            queue.remove(entry)
             if (currentTask?.entry?.id == uuid) {
-                currentTask.gridTaskFuture.cancel()
-                //notifyCanceled is not necessary here. Instead notifyFinished will be called in taskListener
-            } else {
-                notifyCanceled(uuid)
+                currentTask.entry.simulationTask.cancel()
+                GridTaskFuture future = currentTask.gridTaskFuture
+                taskListener.apply(currentTask.gridTaskFuture)
+                future.cancel()
+                return
+            }
+            if (queue.remove(new QueueEntry(uuid))) {
+                notifyRemoved(uuid)
             }
         }
     }
@@ -106,7 +109,20 @@ class SimulationQueueService {
             QueueEntry entry = currentTask.entry
             currentTask = null
             future.stopListenAsync(taskListener)
-            notifyFinished(entry.id)
+            SimulationState simulationState = entry.simulationTask.simulationState
+            switch (simulationState) {
+                case SimulationState.FINISHED:
+                case SimulationState.ERROR:
+                case SimulationState.CANCELED:
+                    notifyFinished(entry.id)
+                    break
+                case SimulationState.NOT_RUNNING:
+                case SimulationState.INITIALIZING:
+                case SimulationState.RUNNING:
+                case SimulationState.SAVING_RESULTS:
+                case SimulationState.POST_SIMULATION_CALCULATIONS:
+                default: throw new IllegalStateException("task $entry has finished, but state was $simulationState")
+            }
         }
     }
 

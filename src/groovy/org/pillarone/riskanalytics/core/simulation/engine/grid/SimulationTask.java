@@ -63,7 +63,10 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
             Map<SimulationJob, GridNode> jobsToNodes = new HashMap<SimulationJob, GridNode>(nodes.size());
             HashMap<Integer, List<SimulationJob>> jobCountPerGrid = new HashMap<Integer, List<SimulationJob>>();
 
-            setSimulationState(SimulationState.INITIALIZING);
+            if (!cancelled) {
+                setSimulationState(SimulationState.INITIALIZING);
+            }
+            Thread.currentThread().sleep(10000);
             time = System.currentTimeMillis();
             simulationConfiguration.getSimulation().setStart(new DateTime());
 
@@ -107,7 +110,10 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
             //grid.addMessageListener(this);
             grid.listen(resultTransferListener);
 
-            setSimulationState(SimulationState.RUNNING);
+            if (!cancelled) {
+                setSimulationState(SimulationState.RUNNING);
+            }
+            Thread.currentThread().sleep(3000);
             totalJobs = jobs.size();
 
             for (int i = 0; i < jobs.size(); i++) {
@@ -131,7 +137,9 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
             return jobsToNodes;
         } catch (Exception e) {
             simulationErrors.add(e);
-            setSimulationState(SimulationState.ERROR);
+            if (!cancelled) {
+                setSimulationState(SimulationState.ERROR);
+            }
             LOG.error("Error setting up simulation task.", e);
             throw new RuntimeException(e);
         }
@@ -163,7 +171,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
             synchronized (this) {
                 while (messageCount.get() < totalMessageCount) {
                     long timeout = System.currentTimeMillis();
-                    if (LOG.isDebugEnabled()){
+                    if (LOG.isDebugEnabled()) {
                         LOG.debug("Not all messages received yet - waiting");
                     }
                     try {
@@ -187,7 +195,9 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
 
             if (error || cancelled) {
                 simulation.delete();
-                setSimulationState(cancelled ? SimulationState.CANCELED : SimulationState.ERROR );
+                if (!cancelled) {
+                    setSimulationState(SimulationState.ERROR);
+                }
                 return false;
             }
             LOG.info("Received " + messageCount + " messages. Sent " + totalMessageCount + " messages.");
@@ -196,10 +206,8 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
             calculator.calculate();
             if (cancelled) {
                 simulation.delete();
-                setSimulationState(SimulationState.CANCELED);
                 return false;
             }
-
             simulation.setEnd(new DateTime());
             simulation.setNumberOfIterations(completedIterations);
             simulation.setPeriodCount(periodCount);
@@ -209,7 +217,9 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
             return true;
         } catch (Exception e) {
             simulationErrors.add(e);
-            setSimulationState(SimulationState.ERROR);
+            if (!cancelled) {
+                setSimulationState(SimulationState.ERROR);
+            }
             LOG.error("Error reducing simulation task.", e);
             throw new RuntimeException(e);
         }
@@ -249,9 +259,10 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
 
     public void cancel() {
         cancelled = true;
-        if(currentState == SimulationState.POST_SIMULATION_CALCULATIONS) {
+        if (currentState == SimulationState.POST_SIMULATION_CALCULATIONS) {
             calculator.setStopped(true);
         }
+        setSimulationState(SimulationState.CANCELED);
     }
 
     public int getProgress() {

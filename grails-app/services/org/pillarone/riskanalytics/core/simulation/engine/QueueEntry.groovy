@@ -12,7 +12,7 @@ class QueueEntry implements Comparable<QueueEntry> {
     final Person offeredBy
 
     QueueEntry(SimulationConfiguration simulationConfiguration, int priority, Person offeredBy) {
-        this.simulationTask = new SimulationTask()
+        this.simulationTask = new SimulationTask(simulationConfiguration: simulationConfiguration)
         this.offeredBy = offeredBy
         this.priority = priority
         this.simulationConfiguration = simulationConfiguration

@@ -1,12 +1,7 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
-import org.pillarone.riskanalytics.core.simulation.SimulationState
-
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
-
-import static org.pillarone.riskanalytics.core.simulation.SimulationState.CANCELED
-import static org.pillarone.riskanalytics.core.simulation.SimulationState.FINISHED
 
 /**
  * holds runtime information about running, queued and finished simulations.
@@ -39,6 +34,7 @@ class SimulationRuntimeService {
     List<SimulationRuntimeInfo> getQueued() {
         synchronized (lock) {
             List<SimulationRuntimeInfo> infos = new ArrayList<SimulationRuntimeInfo>(queued)
+            infos.sort()
             if (running) {
                 infos.add(0, running)
             }
@@ -79,35 +75,27 @@ class SimulationRuntimeService {
         }
 
         @Override
-        void canceled(UUID id) {
-            synchronized (lock) {
-                def info = findByQueueId(id)
-                if (info) {
-                    queued.remove(info)
-                    finished.add(info)
-                    info.simulationTask.cancel()
-                    fireSimulationInfoEvent(new DeleteSimulationRuntimeInfoEvent(info: info))
-                }
+        void removed(UUID id) {
+            SimulationRuntimeInfo info = findByQueueId(id)
+            if (!info) {
+                throw new IllegalStateException("no info found for id $id")
             }
+            info.simulationTask.cancel()
+            queued.remove(info)
+            finished.add(info)
+            fireSimulationInfoEvent(new ChangeSimulationRuntimeInfoEvent(info: info))
         }
 
         @Override
         void finished(UUID id) {
             synchronized (lock) {
                 if (!running || running.id != id) {
-                    throw new IllegalStateException("called finished with id $id. But no running task wikth this id was found.")
+                    throw new IllegalStateException("finished was called, but there is a different task running")
                 }
-                if (timer) {
-                    timer.cancel()
-                    timer = null
-                }
+                stopTimer()
+                queued.remove(running)
                 finished.add(running)
-                SimulationState state = running.simulationState
-                if (state == FINISHED || state == CANCELED) {
-                    fireSimulationInfoEvent(new DeleteSimulationRuntimeInfoEvent(info: running))
-                } else {
-                    fireSimulationInfoEvent(new ChangeSimulationRuntimeInfoEvent(info: running))
-                }
+                fireSimulationInfoEvent(new ChangeSimulationRuntimeInfoEvent(info: running))
                 running = null
             }
         }
@@ -122,8 +110,14 @@ class SimulationRuntimeService {
             }
         }
 
+        private stopTimer() {
+            timer?.cancel()
+            timer = null
+        }
+
         private SimulationRuntimeInfo findByQueueId(UUID id) {
             queued.find { SimulationRuntimeInfo info -> info.id == id }
         }
     }
+
 }

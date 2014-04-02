@@ -6,7 +6,8 @@ interface ISimulationQueueListener {
 
     void finished(UUID id)
 
-    void canceled(UUID id)
+    void removed(UUID id)
 
     void offered(QueueEntry entry)
+
 }

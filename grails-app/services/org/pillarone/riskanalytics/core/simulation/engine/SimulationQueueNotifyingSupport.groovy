@@ -31,11 +31,11 @@ class SimulationQueueNotifyingSupport {
         }
     }
 
-    void notifyCanceled(UUID id) {
+    void notifyRemoved(UUID id) {
         synchronized (listeners) {
             listeners.each { ISimulationQueueListener listener ->
                 doExceptionSave {
-                    listener.canceled(id)
+                    listener.removed(id)
                 }
             }
         }

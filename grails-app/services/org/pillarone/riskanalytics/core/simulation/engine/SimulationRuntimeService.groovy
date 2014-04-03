@@ -34,11 +34,16 @@ class SimulationRuntimeService {
     List<SimulationRuntimeInfo> getQueued() {
         synchronized (lock) {
             List<SimulationRuntimeInfo> infos = new ArrayList<SimulationRuntimeInfo>(queued)
-            infos.sort()
             if (running) {
-                infos.add(0, running)
+                infos.add(running)
             }
             infos
+        }
+    }
+
+    List<SimulationRuntimeInfo> getFinished() {
+        synchronized (lock) {
+            new ArrayList<SimulationRuntimeInfo>(finished)
         }
     }
 

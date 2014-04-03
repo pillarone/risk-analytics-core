@@ -72,9 +72,11 @@ class Parameterization extends ParametrizedItem {
             this[k] = v
         }
     }
-
-    void logAttemptToDelete() {
-        LOG.info("Deleting ${getClass().simpleName}: ${name} v${versionNumber} (status: ${status})")
+    void logDeleteAttempt() {
+        LOG.info("DELETING ${name} v${versionNumber} (status: ${status})")
+    }
+    void logDeleteSuccess(){
+        LOG.info("DELETED  ${name} v${versionNumber} (status: ${status})")
     }
 
     //frahman 20140104 Convenience method for occasional checkups outside of model migrations.
@@ -339,7 +341,7 @@ class Parameterization extends ParametrizedItem {
             tags = dao.tags*.tag
             if (!tags) tags = []
         }
-        LOG.info("Parameterization $name loaded in ${System.currentTimeMillis() - time}ms")
+        LOG.info("${name} v${versionNumber} (status: ${status}) LOADED in ${System.currentTimeMillis() - time}ms")
     }
 
     private void loadComments(ParameterizationDAO dao) {

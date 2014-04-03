@@ -149,14 +149,18 @@ abstract class ModellingItem implements Serializable {
         }
     }
 
-    void logAttemptToDelete(){
-        LOG.info("Deleting ${getClass().simpleName}: ${name})")
+//    void logDeleteAttempt(){
+//        LOG.info("DELETING ${getClass().simpleName}: ${name})")
+//    }
+
+    void logDeleteSuccess(){
+        LOG.info("DELETED ${getClass().simpleName}: ${name})")
     }
 
     final boolean delete() {
         boolean result = false
 
-        logAttemptToDelete();
+//        logDeleteAttempt(); i think logfile will be less cluttered without this, and its unneeded ?
 
         if (!loaded) {
             load()
@@ -166,7 +170,7 @@ abstract class ModellingItem implements Serializable {
                 def dao = getDao()
                 if (dao != null && deleteDaoImpl(dao)) {
                     result = true
-                    LOG.info "${this.getClass().simpleName} $name deleted"
+                    logDeleteSuccess()
                 } else {
                     logErrors(dao)
                 }

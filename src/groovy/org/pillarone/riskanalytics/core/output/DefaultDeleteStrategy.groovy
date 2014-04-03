@@ -17,7 +17,7 @@ class DefaultDeleteStrategy extends DeleteSimulationStrategy {
             SingleValueResult.executeUpdate("delete from $SingleValueResult.name where simulationRun = ?", [simulationRun])
             simulationRun.delete(flush: true)
         }
-        LOG.info "Simulation ${simulationRun.name} deleted"
+//        LOG.info "Simulation ${simulationRun.name} deleted" already logged by ModellingItem (which calls us)
     }
 
     private void deleteBatchRunSimulationRun(SimulationRun simulationRun) {

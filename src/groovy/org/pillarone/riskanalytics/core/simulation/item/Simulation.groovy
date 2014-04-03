@@ -167,6 +167,7 @@ class Simulation extends ParametrizedItem {
     }
 
     protected void saveTags(SimulationRun run) {
+        String tagDeltas = "" //PMO-2737
         List tagsToRemove = []
         for (SimulationTag tag in run.tags) {
             if (!tags.contains(tag.tag)) {
@@ -175,14 +176,18 @@ class Simulation extends ParametrizedItem {
         }
         for (SimulationTag tag in tagsToRemove) {
             run.removeFromTags(tag)
-
+            tagDeltas += "-${tag.tag.name},"
         }
         tagsToRemove.each { it.delete() }
 
         for (Tag tag in tags) {
             if (!run.tags*.tag?.contains(tag)) {
                 run.addToTags(new SimulationTag(tag: tag))
+                tagDeltas += "+${tag.name},"
             }
+        }
+        if(tagDeltas.length()>0){
+            LOG.info( "+/-TAGS on '${getNameAndVersion()}': $tagDeltas" )
         }
     }
 

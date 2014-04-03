@@ -16,7 +16,7 @@ class CacheItemSearchService {
 
     private final static Log LOG = LogFactory.getLog(CacheItemSearchService)
     private final
-    static boolean PROFILE_CACHE_FILTERING = System.getProperty("disableProfileCacheFiltering", "false").equalsIgnoreCase("false")
+    static boolean PROFILE_CACHE_FILTERING = System.getProperty("disableProfileCacheFiltering", "true").equalsIgnoreCase("false")
 
     static transactional = false
 

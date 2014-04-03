@@ -2,19 +2,14 @@ package org.pillarone.riskanalytics.core.simulation.engine
 
 
 interface ISimulationRuntimeInfoListener {
-    void onEvent(SimulationRuntimeInfoEvent event)
+    void starting(SimulationRuntimeInfo info)
+
+    void finished(SimulationRuntimeInfo info)
+
+    void removed(SimulationRuntimeInfo info)
+
+    void offered(SimulationRuntimeInfo info)
+
+    void changed(SimulationRuntimeInfo info)
 }
 
-abstract class SimulationRuntimeInfoEvent {
-    SimulationRuntimeInfo info
-}
-
-class AddSimulationRuntimeInfoEvent extends SimulationRuntimeInfoEvent {
-    int index
-}
-
-class ChangeSimulationRuntimeInfoEvent extends SimulationRuntimeInfoEvent {
-}
-
-class DeleteSimulationRuntimeInfoEvent extends SimulationRuntimeInfoEvent {
-}

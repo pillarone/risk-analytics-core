@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
+import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationTask
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
@@ -57,8 +58,16 @@ class SimulationRuntimeInfo {
         queueEntry.simulationTask.simulationState
     }
 
+    DateTime getEstimatedSimulationEnd() {
+        simulationTask.estimatedSimulationEnd
+    }
+
     Person getOfferedBy() {
         queueEntry.offeredBy
+    }
+
+    List<Throwable> getSimulationErrors() {
+        simulationTask.simulationErrors
     }
 
     boolean equals(o) {
@@ -75,4 +84,6 @@ class SimulationRuntimeInfo {
     int hashCode() {
         return id.hashCode()
     }
+
+
 }

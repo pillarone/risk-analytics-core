@@ -51,7 +51,7 @@ class SimulationRuntimeService {
             @Override
             public void run() {
                 if (running != null) {
-                    fireSimulationInfoEvent(new ChangeSimulationRuntimeInfoEvent(info: running))
+                    changed(running)
                 }
             }
         }, 2000, 2000);
@@ -69,7 +69,7 @@ class SimulationRuntimeService {
                     throw new IllegalStateException("no info found for id: ${entry.id}")
                 }
                 queued.remove(running)
-                fireSimulationInfoEvent(new ChangeSimulationRuntimeInfoEvent(info: running))
+                starting(running)
                 startTimer()
             }
         }
@@ -83,7 +83,7 @@ class SimulationRuntimeService {
             info.simulationTask.cancel()
             queued.remove(info)
             finished.add(info)
-            fireSimulationInfoEvent(new ChangeSimulationRuntimeInfoEvent(info: info))
+            removed(info)
         }
 
         @Override
@@ -95,7 +95,7 @@ class SimulationRuntimeService {
                 stopTimer()
                 queued.remove(running)
                 finished.add(running)
-                fireSimulationInfoEvent(new ChangeSimulationRuntimeInfoEvent(info: running))
+                finished(running)
                 running = null
             }
         }
@@ -106,7 +106,7 @@ class SimulationRuntimeService {
                 SimulationRuntimeInfo info = new SimulationRuntimeInfo(entry)
                 queued.add(info)
                 queued.sort()
-                fireSimulationInfoEvent(new AddSimulationRuntimeInfoEvent(info: info, index: queued.indexOf(info)))
+                offered(info)
             }
         }
 
@@ -119,5 +119,4 @@ class SimulationRuntimeService {
             queued.find { SimulationRuntimeInfo info -> info.id == id }
         }
     }
-
 }

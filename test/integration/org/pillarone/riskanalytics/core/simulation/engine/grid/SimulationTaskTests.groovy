@@ -1,10 +1,12 @@
 package org.pillarone.riskanalytics.core.simulation.engine.grid
 import grails.util.Holders
+import models.core.CoreModel
 import org.gridgain.grid.GridNode
 import org.gridgain.grid.kernal.GridRichNodeImpl
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.pillarone.riskanalytics.core.cli.ImportStructureInTransaction
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
 import org.pillarone.riskanalytics.core.simulation.engine.grid.mapping.AbstractNodeMappingStrategy
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
@@ -37,6 +39,8 @@ class SimulationTaskTests {
         SimulationTask simulationTask = new TestSimulationTask(1)
 
         SimulationConfiguration configuration = createConfig(999)
+        ImportStructureInTransaction.importStructure(configuration);
+
 
         //tests will have to be adjusted for other values
         assertEquals 1000, SimulationTask.SIMULATION_BLOCK_SIZE
@@ -63,13 +67,15 @@ class SimulationTaskTests {
         SimulationTask simulationTask = new TestSimulationTask(1)
 
         SimulationConfiguration configuration = createConfig(100500)
+        ImportStructureInTransaction.importStructure(configuration);
+
         //tests will have to be adjusted for other values
         assertEquals 1000, SimulationTask.SIMULATION_BLOCK_SIZE
 
         List<GridNode> mockNodes = new ArrayList<GridNode>();
         mockNodes.add(new TestGridNode(1));
 
-        Collection jobs = simulationTask.map(mockNodes, configuration).keySet();
+        Collection<SimulationJob> jobs = simulationTask.map(mockNodes, configuration).keySet() as Collection<SimulationJob>;
 
         assertEquals 1, jobs.size()
 
@@ -88,6 +94,7 @@ class SimulationTaskTests {
         SimulationTask simulationTask = new TestSimulationTask(1)
 
         SimulationConfiguration configuration = createConfig(2500)
+        ImportStructureInTransaction.importStructure(configuration);
 
         //tests will have to be adjusted for other values
         assertEquals 1000, SimulationTask.SIMULATION_BLOCK_SIZE
@@ -127,6 +134,7 @@ class SimulationTaskTests {
         SimulationTask simulationTask = new TestSimulationTask(2)
 
         SimulationConfiguration configuration = createConfig(2500)
+        ImportStructureInTransaction.importStructure(configuration);
 
         //tests will have to be adjusted for other values
         assertEquals 1000, SimulationTask.SIMULATION_BLOCK_SIZE
@@ -169,6 +177,7 @@ class SimulationTaskTests {
         SimulationConfiguration configuration = new SimulationConfiguration()
         Simulation simulation = new Simulation("test")
         simulation.id = 1L
+        simulation.modelClass = CoreModel
         simulation.numberOfIterations = iterationCount
         simulation.parameterization = new Parameterization("test")
         simulation.template = new ResultConfiguration('heinz')

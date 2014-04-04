@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
+import org.gridgain.grid.Grid
 import org.gridgain.grid.GridTaskFuture
 import org.gridgain.grid.typedef.CI1
 import org.pillarone.riskanalytics.core.simulation.SimulationState
@@ -13,7 +14,7 @@ import javax.annotation.PreDestroy
 import static com.google.common.base.Preconditions.checkNotNull
 
 class SimulationQueueService {
-    SimulationStartService simulationStartService
+    Grid grid
 
     private final PriorityQueue<QueueEntry> queue = new PriorityQueue<QueueEntry>()
     private final Object lock = new Object()
@@ -21,6 +22,7 @@ class SimulationQueueService {
     private TaskListener taskListener
     private boolean busy = false
     private Timer pollingTimer
+
     @Delegate
     private SimulationQueueNotifyingSupport support = new SimulationQueueNotifyingSupport()
 
@@ -85,18 +87,11 @@ class SimulationQueueService {
                 if (queueEntry) {
                     busy = true
                     notifyStarting(queueEntry)
-                    simulationStartService.start(queueEntry) { GridTaskFuture future, QueueEntry entry ->
-                        setCurrentTask(future, entry)
-                    }
+                    GridTaskFuture future = grid.execute(queueEntry.simulationTask, queueEntry.simulationConfiguration)
+                    future.listenAsync(taskListener)
+                    currentTask = new CurrentTask(gridTaskFuture: future, entry: queueEntry)
                 }
             }
-        }
-    }
-
-    private void setCurrentTask(GridTaskFuture future, QueueEntry entry) {
-        synchronized (lock) {
-            future.listenAsync(taskListener)
-            currentTask = new CurrentTask(gridTaskFuture: future, entry: entry)
         }
     }
 

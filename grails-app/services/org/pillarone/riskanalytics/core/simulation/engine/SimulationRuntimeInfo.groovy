@@ -8,7 +8,7 @@ import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.user.Person
 
-class SimulationRuntimeInfo {
+class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo> {
     private final QueueEntry queueEntry
 
     SimulationRuntimeInfo(QueueEntry queueEntry) {
@@ -85,5 +85,8 @@ class SimulationRuntimeInfo {
         return id.hashCode()
     }
 
-
+    @Override
+    int compareTo(SimulationRuntimeInfo o) {
+        queueEntry.compareTo(o.queueEntry)
+    }
 }

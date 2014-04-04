@@ -41,7 +41,7 @@ public class ModelStructure extends ConfigObjectBasedModellingItem {
 
     static List findAllModelClasses() {
         def c = ModelStructureDAO.createCriteria()
-        List modelClassNames = c.list {
+        List<String> modelClassNames = c.list {
             projections {
                 property("modelClassName")
             }
@@ -56,7 +56,7 @@ public class ModelStructure extends ConfigObjectBasedModellingItem {
                 if (!modelFilter || modelFilter.contains(modelClass.simpleName)) {
                     availableModelClasses << modelClass
                 }
-            } catch (java.lang.ClassNotFoundException e) {
+            } catch (ClassNotFoundException e) {
                 LOG.error "Model ${it} is in db, but dont exist as classfile"
             }
         }

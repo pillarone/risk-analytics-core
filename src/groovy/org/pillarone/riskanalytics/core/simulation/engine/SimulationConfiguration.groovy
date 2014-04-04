@@ -86,35 +86,37 @@ public class SimulationConfiguration implements Serializable, Cloneable {
      * @return a mapping cache filled with all necessary mappings for this simulation.
      */
     MappingCache createMappingCache(ResultConfiguration resultConfiguration) {
-        Model model = (Model) simulation.modelClass.newInstance()
-        model.init()
+        SimulationRun.withTransaction {
+            Model model = (Model) simulation.modelClass.newInstance()
+            model.init()
 
-        ParameterApplicator parameterApplicator = new ParameterApplicator(model: model, parameterization: simulation.parameterization)
-        parameterApplicator.init()
-        parameterApplicator.applyParameterForPeriod(0)
+            ParameterApplicator parameterApplicator = new ParameterApplicator(model: model, parameterization: simulation.parameterization)
+            parameterApplicator.init()
+            parameterApplicator.applyParameterForPeriod(0)
 
-        SimulationRunner runner = SimulationRunner.createRunner()
-        CollectorFactory collectorFactory = runner.currentScope.collectorFactory
-        List<PacketCollector> drillDownCollectors = resultConfiguration.getResolvedCollectors(model, collectorFactory)
-        List<String> drillDownPaths = getDrillDownPaths(drillDownCollectors, DrillDownMode.BY_SOURCE)
-        Set paths = ModelHelper.getAllPossibleOutputPaths(model, drillDownPaths)
-        Set<String> inceptionPeriodPaths = getSplitByInceptionDateDrillDownPaths(drillDownCollectors, model)
-        paths.addAll(inceptionPeriodPaths)
-        Set<String> typeDrillDownPaths = getPotentialTypeDrillDowns(drillDownCollectors)
-        paths.addAll(typeDrillDownPaths)
+            SimulationRunner runner = SimulationRunner.createRunner()
+            CollectorFactory collectorFactory = runner.currentScope.collectorFactory
+            List<PacketCollector> drillDownCollectors = resultConfiguration.getResolvedCollectors(model, collectorFactory)
+            List<String> drillDownPaths = getDrillDownPaths(drillDownCollectors, DrillDownMode.BY_SOURCE)
+            Set paths = ModelHelper.getAllPossibleOutputPaths(model, drillDownPaths)
+            Set<String> inceptionPeriodPaths = getSplitByInceptionDateDrillDownPaths(drillDownCollectors, model)
+            paths.addAll(inceptionPeriodPaths)
+            Set<String> typeDrillDownPaths = getPotentialTypeDrillDowns(drillDownCollectors)
+            paths.addAll(typeDrillDownPaths)
 
-        Set fields = ModelHelper.getAllPossibleFields(model, !inceptionPeriodPaths.empty)
-        MappingCache cache = MappingCache.instance
+            Set fields = ModelHelper.getAllPossibleFields(model, !inceptionPeriodPaths.empty)
+            MappingCache cache = MappingCache.instance
 
-        for (String path in paths) {
-            cache.lookupPath(path)
+            for (String path in paths) {
+                cache.lookupPath(path)
+            }
+
+            for (String field in fields) {
+                cache.lookupField(field)
+            }
+
+            this.mappingCache = cache
         }
-
-        for (String field in fields) {
-            cache.lookupField(field)
-        }
-
-        this.mappingCache = cache
     }
 
     Set<String> getPotentialTypeDrillDowns(List<PacketCollector> collectors) {

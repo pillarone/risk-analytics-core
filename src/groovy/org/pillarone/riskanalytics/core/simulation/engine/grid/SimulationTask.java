@@ -67,7 +67,14 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
                 setSimulationState(SimulationState.INITIALIZING);
             }
             time = System.currentTimeMillis();
-            simulationConfiguration.getSimulation().setStart(new DateTime());
+            DateTime start = new DateTime();
+
+            //this was done originally before sending the configuration to the grid.
+            //if something does not work, we can move it back or remove the comment
+            simulationConfiguration.createMappingCache(simulationConfiguration.getSimulation().getTemplate());
+            simulationConfiguration.prepareSimulationForGrid();
+            simulationConfiguration.setBeans(SpringBeanDefinitionRegistry.getRequiredBeanDefinitions());
+            simulationConfiguration.getSimulation().setStart(start);
 
             resultTransferListener = new ResultTransferListener(this);
 

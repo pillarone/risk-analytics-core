@@ -164,7 +164,7 @@ class Parameterization extends ParametrizedItem {
             id = daoToBeSaved.id
             notifyItemSaved()
         }
-        LOG.info("Saved parameterization ${this}")
+        LOG.info("SAVED ${name} v${versionNumber} (status: ${status})")
         return result
     }
 
@@ -341,7 +341,7 @@ class Parameterization extends ParametrizedItem {
             tags = dao.tags*.tag
             if (!tags) tags = []
         }
-        LOG.info("${name} v${versionNumber} (status: ${status}) LOADED in ${System.currentTimeMillis() - time}ms")
+        LOG.debug("LOADED ${name} v${versionNumber} (status: ${status}) in ${System.currentTimeMillis() - time}ms")
     }
 
     private void loadComments(ParameterizationDAO dao) {

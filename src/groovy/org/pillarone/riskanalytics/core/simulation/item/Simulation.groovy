@@ -4,6 +4,8 @@ import grails.util.Holders
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 import org.apache.commons.lang.builder.HashCodeBuilder
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.ParameterizationDAO
@@ -22,6 +24,7 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Functi
 
 class Simulation extends ParametrizedItem {
 
+    protected static Log LOG = LogFactory.getLog(Simulation)
     Parameterization parameterization
     ResultConfiguration template
     ModelStructure structure // TODO (Sep 9, 2009, msh): implement as query

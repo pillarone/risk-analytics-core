@@ -24,7 +24,7 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Functi
 
 class Simulation extends ParametrizedItem {
 
-    protected static Log LOG = LogFactory.getLog(Simulation)
+    private final static Log LOG = LogFactory.getLog(Simulation)
     Parameterization parameterization
     ResultConfiguration template
     ModelStructure structure // TODO (Sep 9, 2009, msh): implement as query
@@ -189,8 +189,8 @@ class Simulation extends ParametrizedItem {
                 tagDeltas += "+${tag.name},"
             }
         }
-        if(tagDeltas.length()>0){
-            LOG.info( "+/-TAGS on '${getNameAndVersion()}': $tagDeltas" )
+        if (tagDeltas.length() > 0) {
+            LOG.info("+/-TAGS on '${getNameAndVersion()}': $tagDeltas")
         }
     }
 

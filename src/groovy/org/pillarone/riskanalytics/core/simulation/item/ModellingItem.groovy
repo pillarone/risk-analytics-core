@@ -9,7 +9,7 @@ import org.pillarone.riskanalytics.core.util.GroovyUtils
 import org.springframework.transaction.TransactionStatus
 
 abstract class ModellingItem implements Serializable {
-    protected static final Logger LOG = Logger.getLogger(ModellingItem)
+    private static final Logger LOG = Logger.getLogger(ModellingItem)
 
     String name
     Class modelClass
@@ -153,7 +153,7 @@ abstract class ModellingItem implements Serializable {
 //        LOG.info("DELETING ${getClass().simpleName}: ${name})")
 //    }
 
-    void logDeleteSuccess(){
+    void logDeleteSuccess() {
         LOG.info("DELETED ${getClass().simpleName}: ${name})")
     }
 

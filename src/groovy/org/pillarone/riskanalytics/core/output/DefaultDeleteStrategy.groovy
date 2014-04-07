@@ -1,13 +1,9 @@
 package org.pillarone.riskanalytics.core.output
 
-import org.apache.commons.logging.LogFactory
-import org.apache.commons.logging.Log
 import org.pillarone.riskanalytics.core.BatchRunSimulationRun
 import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper
 
 class DefaultDeleteStrategy extends DeleteSimulationStrategy {
-
-    private static Log LOG = LogFactory.getLog(DefaultDeleteStrategy)
 
     void deleteSimulation(SimulationRun simulationRun) {
         new File(GridHelper.getResultLocation(simulationRun.id)).deleteDir()
@@ -17,7 +13,6 @@ class DefaultDeleteStrategy extends DeleteSimulationStrategy {
             SingleValueResult.executeUpdate("delete from $SingleValueResult.name where simulationRun = ?", [simulationRun])
             simulationRun.delete(flush: true)
         }
-//        LOG.info "Simulation ${simulationRun.name} deleted" already logged by ModellingItem (which calls us)
     }
 
     private void deleteBatchRunSimulationRun(SimulationRun simulationRun) {
@@ -25,6 +20,4 @@ class DefaultDeleteStrategy extends DeleteSimulationStrategy {
             batchRunSimulationRun.delete()
         }
     }
-
-
 }

@@ -37,7 +37,7 @@ import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 
 class Parameterization extends ParametrizedItem {
 
-    private static Log LOG = LogFactory.getLog(Parameterization)
+    private static final Log LOG = LogFactory.getLog(Parameterization)
 
     public static final String PERIOD_DATE_FORMAT = "yyyy-MM-dd"
 

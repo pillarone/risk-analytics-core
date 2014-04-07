@@ -11,8 +11,11 @@ import org.pillarone.riskanalytics.core.output.SimulationRun
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
+import java.util.concurrent.CopyOnWriteArraySet
 
 class CacheItemSearchService {
+
+    private final Set<ICacheItemEventListener> listeners = new CopyOnWriteArraySet<ICacheItemEventListener>()
 
     private final static Log LOG = LogFactory.getLog(CacheItemSearchService)
     private final
@@ -38,6 +41,18 @@ class CacheItemSearchService {
         cacheItemListener.removeCacheItemListener(listener)
         listener = null
         cache = null
+    }
+
+    void addItemEventListener(ICacheItemEventListener listener) {
+        listeners.add(listener)
+    }
+
+    void removeItemEventListener(ICacheItemEventListener listener) {
+        listeners.remove(listener)
+    }
+
+    private void fireItemEvent(CacheItemEvent event) {
+        listeners.each { it.onEvent(event) }
     }
 
     protected synchronized void createInitialIndex() {
@@ -116,10 +131,12 @@ class CacheItemSearchService {
 
     private synchronized void addModellingItemToIndex(CacheItem item) {
         cache.add(item)
+        fireItemEvent(new CacheItemEvent(item: item, eventType: CacheItemEvent.EventType.ADDED))
     }
 
     private synchronized void removeModellingItemFromIndex(CacheItem item) {
         cache.remove(item)
+        fireItemEvent(new CacheItemEvent(item: item, eventType: CacheItemEvent.EventType.REMOVED))
     }
 
     private synchronized void updateModellingItemInIndex(CacheItem item) {
@@ -131,6 +148,7 @@ class CacheItemSearchService {
             cache[indexOf] = item
         }
         internalUpdateModellingItemInIndex(item)
+        fireItemEvent(new CacheItemEvent(item: item, eventType: CacheItemEvent.EventType.UPDATED))
     }
 
     private synchronized void internalUpdateModellingItemInIndex(CacheItem item) {

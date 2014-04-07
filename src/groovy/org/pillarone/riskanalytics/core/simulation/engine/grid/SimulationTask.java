@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.gridgain.grid.*;
 import org.joda.time.DateTime;
 import org.pillarone.riskanalytics.core.batch.BatchRunInfoService;
+import org.pillarone.riskanalytics.core.cli.ImportStructureInTransaction;
 import org.pillarone.riskanalytics.core.output.Calculator;
 import org.pillarone.riskanalytics.core.output.PathMapping;
 import org.pillarone.riskanalytics.core.output.aggregation.PacketAggregatorRegistry;
@@ -71,6 +72,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
 
             //this was done originally before sending the configuration to the grid.
             //if something does not work, we can move it back or remove the comment
+            ImportStructureInTransaction.importStructure(simulationConfiguration);
             simulationConfiguration.createMappingCache(simulationConfiguration.getSimulation().getTemplate());
             simulationConfiguration.prepareSimulationForGrid();
             simulationConfiguration.setBeans(SpringBeanDefinitionRegistry.getRequiredBeanDefinitions());

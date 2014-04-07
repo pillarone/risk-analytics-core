@@ -23,7 +23,7 @@ class ModelRegistry {
     }
     private Set<Class> modelClasses
 
-    private Set<IModelRegistryListener> listeners
+    Set<IModelRegistryListener> listeners
 
     private ModelRegistry() {
         listeners = new HashSet<IModelRegistryListener>()

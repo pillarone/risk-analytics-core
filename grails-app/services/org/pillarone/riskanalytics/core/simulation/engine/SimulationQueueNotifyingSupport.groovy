@@ -4,10 +4,12 @@ import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 
+import java.util.concurrent.CopyOnWriteArraySet
+
 @CompileStatic
 class SimulationQueueNotifyingSupport {
     private static final Log LOG = LogFactory.getLog(SimulationQueueNotifyingSupport)
-    private final List<ISimulationQueueListener> listeners = new ArrayList<ISimulationQueueListener>()
+    private final Set<ISimulationQueueListener> listeners = new CopyOnWriteArraySet<ISimulationQueueListener>()
 
     void addSimulationQueueListener(ISimulationQueueListener listener) {
         synchronized (listeners) {

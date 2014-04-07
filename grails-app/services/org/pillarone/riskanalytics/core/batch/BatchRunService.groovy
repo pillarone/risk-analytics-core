@@ -6,7 +6,6 @@ import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.BatchRun
 import org.pillarone.riskanalytics.core.BatchRunSimulationRun
 import org.pillarone.riskanalytics.core.ParameterizationDAO
-import org.pillarone.riskanalytics.core.cli.ImportStructureInTransaction
 import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
 import org.pillarone.riskanalytics.core.output.OutputStrategy
 import org.pillarone.riskanalytics.core.output.SimulationRun
@@ -29,9 +28,7 @@ class BatchRunService {
     }
 
     void runBatch(BatchRun batchRun) {
-        getSimulationRuns(batchRun).each { BatchRunSimulationRun batchRunSimulationRun ->
-            offer(batchRunSimulationRun)
-        }
+        offer(getSimulationRuns(batchRun))
         BatchRun.withTransaction {
             BatchRun reload = BatchRun.get(batchRun.id)
             reload.executed = true
@@ -51,28 +48,36 @@ class BatchRunService {
         }
     }
 
-
-    void offer(BatchRunSimulationRun batchRunSimulationRun) {
+    private boolean shouldRun(BatchRunSimulationRun batchRunSimulationRun) {
         SimulationRun run = batchRunSimulationRun.simulationRun
-        if (run.endTime == null && run.startTime == null) {
-            configureAndSendToQueue(batchRunSimulationRun)
-        }
-        if (run.endTime != null) {
-            log.info "simulation ${run.name} already executed at ${run.endTime}"
-            return
-        }
-        log.info "simulation ${batchRunSimulationRun.simulationRun.name} is already running"
+        run.endTime == null && run.startTime == null
     }
 
-    private configureAndSendToQueue(BatchRunSimulationRun batchRunSimulationRun) {
-        backgroundService.execute("offering $batchRunSimulationRun to queue") {
-            ICollectorOutputStrategy strategy = OutputStrategyFactory.getInstance(batchRunSimulationRun.strategy)
-            Simulation simulation = loadSimulation(batchRunSimulationRun.simulationRun.name)
-            SimulationConfiguration configuration = new SimulationConfiguration(simulation: simulation, outputStrategy: strategy)
-            ImportStructureInTransaction.importStructure(configuration)
-            batchRunInfoService.batchSimulationStart(simulation)
-            simulationQueueService.offer(configuration, 5)
+    private void offer(List<BatchRunSimulationRun> batchRunSimulationRuns) {
+        backgroundService.execute("execute bathcRunSimulationRuns $batchRunSimulationRuns") {
+            List<SimulationConfiguration> configurations = batchRunSimulationRuns.findAll { BatchRunSimulationRun batchRunSimulationRun -> shouldRun(batchRunSimulationRun) }.collect {
+                configure(it)
+            }
+            configurations.each { start(it) }
         }
+    }
+
+    private void offer(BatchRunSimulationRun batchRunSimulationRun) {
+        if (shouldRun(batchRunSimulationRun)) {
+            start(configure(batchRunSimulationRun))
+        }
+    }
+
+    private void start(SimulationConfiguration simulationConfiguration) {
+        batchRunInfoService.batchSimulationStart(simulationConfiguration.simulation)
+        simulationQueueService.offer(simulationConfiguration, 5)
+
+    }
+
+    private SimulationConfiguration configure(BatchRunSimulationRun batchRunSimulationRun) {
+        ICollectorOutputStrategy strategy = OutputStrategyFactory.getInstance(batchRunSimulationRun.strategy)
+        Simulation simulation = loadSimulation(batchRunSimulationRun.simulationRun.name)
+        new SimulationConfiguration(simulation: simulation, outputStrategy: strategy)
     }
 
     private static Simulation loadSimulation(String simulationName) {
@@ -95,10 +100,10 @@ class BatchRunService {
                     strategy: strategy,
                     simulationState: NOT_RUNNING
             )
-            addedBatchRunSimulationRun.save()
+            addedBatchRunSimulationRun.save(flush: true)
             if (batchRun.executed) {
                 batchRun.executed = false
-                batchRun.save()
+                batchRun.save(flush: true)
             }
             addedBatchRunSimulationRun
         }
@@ -111,11 +116,11 @@ class BatchRunService {
         }
     }
 
-    List<BatchRunSimulationRun> getSimulationRuns(BatchRun batchRun) {
+    protected List<BatchRunSimulationRun> getSimulationRuns(BatchRun batchRun) {
         return BatchRunSimulationRun.findAllByBatchRun(batchRun, [sort: 'priority', order: 'asc'])
     }
 
-    BatchRunSimulationRun getSimulationRun(BatchRun batchRun, SimulationRun simulationRun) {
+    private BatchRunSimulationRun getSimulationRun(BatchRun batchRun, SimulationRun simulationRun) {
         BatchRunSimulationRun item = null
         BatchRunSimulationRun.withTransaction {
             item = BatchRunSimulationRun.findByBatchRunAndSimulationRun(batchRun, simulationRun)
@@ -124,7 +129,6 @@ class BatchRunService {
         }
         return item
     }
-
 
     void deleteSimulationRun(BatchRun batchRun, SimulationRun simulationRun) {
         BatchRun.withTransaction {

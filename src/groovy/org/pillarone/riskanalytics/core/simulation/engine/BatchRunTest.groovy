@@ -13,21 +13,33 @@ abstract class BatchRunTest extends ModelTest {
 
     @Test
     final void testBatchRun() {
-        BatchRun batchRun = new BatchRun(name: "testBatchRun", executionTime: new DateTime(2100, 1, 1, 0, 0, 0, 0)).save()
-        assertNotNull batchRun
-
         BatchRunService service = BatchRunService.service
-        service.createBatchRunSimulationRun(batchRun, run, OutputStrategy.FILE_OUTPUT)
+        BatchRun batchRun = null
+        BatchRun.withNewSession {  def session ->
+            batchRun = new BatchRun(name: "testBatchRun", executionTime: new DateTime(2100, 1, 1, 0, 0, 0, 0)).save(flush: true)
+            assertNotNull batchRun
+            service.createBatchRunSimulationRun(batchRun, run, OutputStrategy.FILE_OUTPUT)
+            session.flush()
+        }
         service.runBatch(batchRun)
         sleep(5000)
         int totalWait = 0
-        while (!batchRun.executed) {
+        while (!isBatchRunExecuted(batchRun)) {
             sleep 2000
             totalWait += 2000
             if (totalWait > 60000) {
                 throw new RuntimeException("Batch run did not finish.")
             }
             batchRun.refresh()
+        }
+    }
+
+    private boolean isBatchRunExecuted(BatchRun batchRun) {
+        BatchRun.createCriteria().get {
+            eq('id', batchRun.id)
+            projections {
+                property('executed')
+            }
         }
     }
 }

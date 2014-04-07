@@ -1,7 +1,10 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
+import java.util.concurrent.CopyOnWriteArrayList
+
 class SimulationRuntimeInfoEventSupport {
-    private final Set<ISimulationRuntimeInfoListener> infoListeners = Collections.synchronizedSet([] as Set)
+    private
+    final Set<ISimulationRuntimeInfoListener> infoListeners = new CopyOnWriteArrayList<ISimulationRuntimeInfoListener>()
 
     void addSimulationRuntimeInfoListener(ISimulationRuntimeInfoListener listener) {
         synchronized (listener) {

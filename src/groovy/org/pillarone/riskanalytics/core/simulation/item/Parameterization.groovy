@@ -255,8 +255,8 @@ class Parameterization extends ParametrizedItem {
                 tagDeltas += "+${tag.name},"
             }
         }
-        if(tagDeltas.length()>0){
-            LOG.info( "+/-TAGS on '${getNameAndVersion()}': $tagDeltas" )
+        if (tagDeltas.length() > 0) {
+            LOG.info("+/-TAGS on '${getNameAndVersion()}': $tagDeltas")
         }
     }
 
@@ -449,15 +449,18 @@ class Parameterization extends ParametrizedItem {
     }
 
     @CompileStatic
-    public List<Tag> getTags() {
+    List<Tag> getTags() {
         return tags
     }
 
-    public void addRemoveLockTag() {
+    void addRemoveLockTag() {
         if (!loaded) {
             load()
         }
         Tag locked = Tag.findByName(Tag.LOCKED_TAG)
+        if (!locked) {
+            throw new IllegalStateException("Tag with name $Tag.LOCKED_TAG has to be in database")
+        }
         boolean changed = false
         if (!tags.contains(locked) && usedInSimulation) {
             tags << locked

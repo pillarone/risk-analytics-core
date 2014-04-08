@@ -7,6 +7,7 @@ import org.pillarone.riskanalytics.core.batch.BatchRunService
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.output.OutputStrategy
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
+import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
@@ -41,31 +42,38 @@ class BatchRunTests {
         BatchRun bRun = BatchRun.findByName(batch.name)
 
         assertTrue batchRunService.getSimulationRuns(bRun).size() == 1
-        assertTrue batchRunService.getSimulationRunAt(bRun, 0).name == simulation.name
+        assertTrue getSimulationRunAt(bRun, 0).name == simulation.name
 
         Simulation simulation2 = createSimulation("simulation2")
         batchRunService.createBatchRunSimulationRun(batch, simulation2, OutputStrategy.BATCH_DB_OUTPUT)
-        assertTrue batchRunService.getSimulationRunAt(bRun, 1).name == simulation2.name
+        assertTrue getSimulationRunAt(bRun, 1).name == simulation2.name
 
         assertTrue batchRunService.getSimulationRuns(bRun).size() == 2
 
         Simulation simulation3 = createSimulation("simulation3")
         batchRunService.createBatchRunSimulationRun(batch, simulation3, OutputStrategy.BATCH_DB_OUTPUT)
         assertTrue batchRunService.getSimulationRuns(bRun).size() == 3
-        assertTrue batchRunService.getSimulationRunAt(bRun, 2).name == simulation3.name
+        assertTrue getSimulationRunAt(bRun, 2).name == simulation3.name
 
         //change a priority
         batchRunService.changePriority(bRun, simulation3.simulationRun, 1)
-        assertTrue batchRunService.getSimulationRunAt(bRun, 2).name == simulation3.name
+        assertTrue getSimulationRunAt(bRun, 2).name == simulation3.name
 
         batchRunService.changePriority(bRun, simulation3.simulationRun, -1)
-        assertTrue batchRunService.getSimulationRunAt(bRun, 2).name == simulation2.name
+        assertTrue getSimulationRunAt(bRun, 2).name == simulation2.name
 
         batchRunService.changePriority(bRun, simulation3.simulationRun, -1)
-        assertTrue batchRunService.getSimulationRunAt(bRun, 1).name == simulation.name
+        assertTrue getSimulationRunAt(bRun, 1).name == simulation.name
 
         batchRunService.changePriority(bRun, simulation3.simulationRun, -1)
-        assertTrue batchRunService.getSimulationRunAt(bRun, 1).name == simulation.name
+        assertTrue getSimulationRunAt(bRun, 1).name == simulation.name
+    }
+
+    private SimulationRun getSimulationRunAt(BatchRun batchRun, int index) {
+        BatchRun.withTransaction {
+            List<SimulationRun> runs = batchRunService.getSimulationRuns(batchRun)*.simulationRun
+            runs?.get(index)
+        }
     }
 
     @Test

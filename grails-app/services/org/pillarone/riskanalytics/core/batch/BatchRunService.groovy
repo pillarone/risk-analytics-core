@@ -71,7 +71,6 @@ class BatchRunService {
     private void start(SimulationConfiguration simulationConfiguration) {
         batchRunInfoService.batchSimulationStart(simulationConfiguration.simulation)
         simulationQueueService.offer(simulationConfiguration, 5)
-
     }
 
     private SimulationConfiguration configure(BatchRunSimulationRun batchRunSimulationRun) {
@@ -91,28 +90,21 @@ class BatchRunService {
     BatchRunSimulationRun createBatchRunSimulationRun(BatchRun batchRun, Simulation simulation, OutputStrategy strategy) {
         BatchRun.withTransaction {
             simulation.save()
-            batchRun = BatchRun.findByName(batchRun.name)
-            int priority = BatchRunSimulationRun.countByBatchRun(batchRun)
+            BatchRun attachedBatchRun = BatchRun.findByName(batchRun.name)
+            int priority = BatchRunSimulationRun.countByBatchRun(attachedBatchRun)
             BatchRunSimulationRun addedBatchRunSimulationRun = new BatchRunSimulationRun(
-                    batchRun: batchRun,
+                    batchRun: attachedBatchRun,
                     simulationRun: simulation.simulationRun,
                     priority: priority,
                     strategy: strategy,
                     simulationState: NOT_RUNNING
             )
             addedBatchRunSimulationRun.save(flush: true)
-            if (batchRun.executed) {
-                batchRun.executed = false
-                batchRun.save(flush: true)
+            if (attachedBatchRun.executed) {
+                attachedBatchRun.executed = false
+                attachedBatchRun.save(flush: true)
             }
             addedBatchRunSimulationRun
-        }
-    }
-
-    SimulationRun getSimulationRunAt(BatchRun batchRun, int index) {
-        BatchRun.withTransaction {
-            List<SimulationRun> runs = getSimulationRuns(batchRun)*.simulationRun
-            runs?.get(index)
         }
     }
 

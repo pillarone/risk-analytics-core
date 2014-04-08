@@ -1,8 +1,6 @@
 package org.pillarone.riskanalytics.core.batch
-
 import grails.util.Holders
 import groovy.transform.CompileStatic
-import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.BatchRun
 import org.pillarone.riskanalytics.core.BatchRunSimulationRun
 import org.pillarone.riskanalytics.core.ParameterizationDAO
@@ -38,14 +36,6 @@ class BatchRunService {
 
     void runBatchRunSimulation(BatchRun batchRun, SimulationRun simulationRun) {
         offer(getSimulationRun(batchRun, simulationRun))
-    }
-
-    List<BatchRun> findBatchRunsWhichShouldBeExecuted() {
-        BatchRun.withCriteria {
-            eq('executed', false)
-            le('executionTime', new DateTime())
-            order('executionTime', 'asc')
-        }
     }
 
     private boolean shouldRun(BatchRunSimulationRun batchRunSimulationRun) {

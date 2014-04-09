@@ -212,7 +212,13 @@ abstract class ParametrizedItem extends CommentableItem {
                 throw new ParameterNotFoundException("Parameter $path does not exist for period $periodIndex (base path $subPath not found)")
             }
             if (findAll.size() > 1) {
-                throw new IllegalStateException("There is more than one not removed parameter for path $path (base path $subPath)")
+                //On Windoze I get this compile error, go figure:
+                //Fatal error during compilation org.apache.tools.ant.BuildException: BUG! exception in phase 'class generation' in source unit 'C:\dev\risk-analytics-core\src\groovy\org\pillarone\riskanalytics\core\simulation\item\ParametrizedItem.groovy' Trying to access private constant field [org.pillarone.riskanalytics.core.simulation.item.ModellingItem#LOG] from inner class
+                //findAll.each { LOG.warn( it.toString()) }
+                for(ParameterHolder it : findAll){
+                    LOG.warn( it.toString()) //So try it the old fashioned way
+                }
+                throw new IllegalStateException("Found ${findAll.size()} 'not removed' parameters: PeriodIndex=$periodIndex, path=$path (subPath=$subPath)")
             }
             ParameterHolder parameterHolder = findAll.first()
             return getNestedParameterHolder(parameterHolder, path.substring(nestedIndex + 1).split(":"), periodIndex)
@@ -222,7 +228,11 @@ abstract class ParametrizedItem extends CommentableItem {
                 throw new ParameterNotFoundException("Parameter $path does not exist")
             }
             if (findAll.size() > 1) {
-                throw new IllegalStateException("There is more than one not removed parameter for path $path")
+                LOG.warn("List of ${findAll.size()} parameters for path: $path and periodIndex: $periodIndex: ");
+                for(ParameterHolder it : findAll){
+                    LOG.warn( it.toString()) //Again.. old fashioned way
+                }
+                throw new IllegalStateException("Found ${findAll.size()} 'not removed' parameters: PeriodIndex=$periodIndex, path=$path")
             }
             return findAll.first()
         }

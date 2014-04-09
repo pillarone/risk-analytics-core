@@ -173,7 +173,7 @@ class ResultConfiguration extends ModellingItem {
     }
 
     public List<SimulationRun> getSimulations() {
-        if (!isLoaded()) {
+        if (!loaded) {
             load()
         }
         return SimulationRun.findAllByResultConfigurationAndToBeDeleted(dao, false)
@@ -181,7 +181,7 @@ class ResultConfiguration extends ModellingItem {
 
 
     ConfigObject toConfigObject() {
-        if (!isLoaded()) {
+        if (!loaded) {
             load()
         }
 

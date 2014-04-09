@@ -7,7 +7,7 @@ class ModellingItemUpdater {
         if (!source) {
             return null
         }
-        target = target ?: new Parameterization(source.name ?: [:])
+        target = target ?: new Parameterization(source.name)
         target.name = source.name
         target.modelClass = source.modelClass
         target.id = source.id

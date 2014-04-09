@@ -1,13 +1,12 @@
 package org.pillarone.riskanalytics.core.itemuse
 
-import org.junit.Test
-import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
-import org.pillarone.riskanalytics.core.simulation.item.Parameterization
-import org.pillarone.riskanalytics.core.user.itemuse.item.UserUsedParameterization
 import org.joda.time.DateTime
-import org.pillarone.riskanalytics.core.user.Person
+import org.junit.Test
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
+import org.pillarone.riskanalytics.core.simulation.item.Parameterization
+import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
+import org.pillarone.riskanalytics.core.user.itemuse.item.UserUsedParameterization
 
 import static org.junit.Assert.assertNotNull
 
@@ -23,11 +22,13 @@ class UserUsedItemTests {
     void testUserUsedParameterization() {
         UserUsedParameterization userUsedParameterization = new UserUsedParameterization()
         userUsedParameterization.time = new DateTime();
-        Parameterization parameterization = new Parameterization(versionNumber: new VersionNumber('1'), name: 'testUserUsedParameterization', modelClass: EmptyModel)
+        Parameterization parameterization = new Parameterization('testUserUsedParameterization')
+        parameterization.versionNumber = new VersionNumber('1')
+        parameterization.modelClass = EmptyModel
         parameterization.save()
         userUsedParameterization.parameterization = parameterization.dao
         userUsedParameterization.save();
 
-        assertNotNull(UserUsedParameterization.findByParameterization (ParameterizationDAO.findByName("testUserUsedParameterization")))
+        assertNotNull(UserUsedParameterization.findByParameterization(ParameterizationDAO.findByName("testUserUsedParameterization")))
     }
 }

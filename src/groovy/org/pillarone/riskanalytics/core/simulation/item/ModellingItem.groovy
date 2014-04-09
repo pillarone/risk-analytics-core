@@ -20,7 +20,6 @@ abstract class ModellingItem implements Serializable {
     Person creator
     Person lastUpdater
 
-//    protected def dao
     boolean changed = false
 
     protected List<IModellingItemChangeListener> itemChangedListener
@@ -46,8 +45,8 @@ abstract class ModellingItem implements Serializable {
     protected void deleteDependentData(def dao) {}
 
     @CompileStatic
-    public void setChanged(boolean newChangedValue) {
-        this.changed = newChangedValue
+    public void setChanged(boolean changed) {
+        this.changed = changed
         notifyItemChanged()
     }
 
@@ -76,14 +75,14 @@ abstract class ModellingItem implements Serializable {
     }
 
     @CompileStatic
-    public boolean isEditable() {
+    boolean isEditable() {
         return false
     }
 
     abstract protected def loadFromDB()
 
     @CompileStatic
-    public void rename(String newName) {
+    void rename(String newName) {
         if (!isLoaded()) {
             load()
         }
@@ -94,8 +93,7 @@ abstract class ModellingItem implements Serializable {
         }
     }
 
-    public def save() {
-        def result = null
+    Long save() {
         daoClass.withTransaction { status ->
             def daoToBeSaved = dao
 
@@ -117,9 +115,8 @@ abstract class ModellingItem implements Serializable {
             changed = false
             // TODO (msh): error handling
             dao = daoToBeSaved
-            result = daoToBeSaved.id
+            daoToBeSaved.id
         }
-        return result
     }
 
     @CompileStatic
@@ -135,7 +132,7 @@ abstract class ModellingItem implements Serializable {
         lastUpdater = currentUser
     }
 
-    public void updateChangeUserAndDate() {
+    void updateChangeUserAndDate() {
         if (GroovyUtils.getProperties(this).keySet().contains("modificationDate")) {
             this.modificationDate = new DateTime()
         }
@@ -149,10 +146,6 @@ abstract class ModellingItem implements Serializable {
         }
     }
 
-//    void logDeleteAttempt(){
-//        LOG.info("DELETING ${getClass().simpleName}: ${name})")
-//    }
-
     void logDeleteSuccess() {
         LOG.info("DELETED ${getClass().simpleName}: ${name})")
     }
@@ -160,14 +153,12 @@ abstract class ModellingItem implements Serializable {
     final boolean delete() {
         boolean result = false
 
-//        logDeleteAttempt(); i think logfile will be less cluttered without this, and its unneeded ?
-
         if (!loaded) {
             load()
         }
         daoClass.withTransaction { TransactionStatus status ->
             try {
-                def dao = getDao()
+                def dao = dao
                 if (dao != null && deleteDaoImpl(dao)) {
                     result = true
                     logDeleteSuccess()
@@ -190,36 +181,36 @@ abstract class ModellingItem implements Serializable {
 
 
     @CompileStatic
-    public void addModellingItemChangeListener(IModellingItemChangeListener listener) {
+    void addModellingItemChangeListener(IModellingItemChangeListener listener) {
         itemChangedListener << listener
     }
 
     @CompileStatic
-    public void removeModellingItemChangeListener(IModellingItemChangeListener listener) {
+    void removeModellingItemChangeListener(IModellingItemChangeListener listener) {
         itemChangedListener.remove(listener)
     }
 
     @CompileStatic
-    public void removeAllModellingItemChangeListener() {
+    void removeAllModellingItemChangeListener() {
         itemChangedListener.clear()
     }
 
     //fja: changed to public, it will be by edit a comment belonging to used item
 
-    public void notifyItemChanged() {
+    void notifyItemChanged() {
         itemChangedListener.each {
             it.itemChanged(this)
         }
     }
 
-    public void notifyItemSaved() {
+    void notifyItemSaved() {
         itemChangedListener.each {
             it.itemSaved(this)
         }
     }
 
 
-    protected def saveDao(def dao) {
+    def saveDao(def dao) {
         if (dao.hasErrors()) {
             logErrors(dao)
         }
@@ -233,26 +224,26 @@ abstract class ModellingItem implements Serializable {
         return result
     }
 
-    public getDao() {
+    protected def getDao() {
         if (this.id) {
             return daoClass.get(this.id)
         }
         return null
     }
 
-    public void setDao(def newDao) {
+    protected void setDao(def newDao) {
         if (newDao) {
             this.id = newDao.id
         }
     }
 
     @CompileStatic
-    public boolean isUsedInSimulation() {
+    boolean isUsedInSimulation() {
         return false
     }
 
     @CompileStatic
-    public List getSimulations() {
+    List getSimulations() {
         return []
     }
 

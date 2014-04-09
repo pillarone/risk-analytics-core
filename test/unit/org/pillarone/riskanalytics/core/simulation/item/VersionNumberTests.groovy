@@ -48,7 +48,8 @@ class VersionNumberTests {
             [dao]
         }
 
-        Parameterization parameterization = new Parameterization(versionNumber: new VersionNumber('1'), name: '')
+        Parameterization parameterization = new Parameterization('')
+        parameterization.versionNumber = new VersionNumber('1')
         parameterization.modelClass = EmptyModel
         assertEquals '2', VersionNumber.incrementVersion(parameterization).toString()
 
@@ -58,7 +59,8 @@ class VersionNumberTests {
             [dao]
         }
 
-        parameterization = new Parameterization(versionNumber: new VersionNumber('R1'), name: '')
+        parameterization = new Parameterization('')
+        parameterization.versionNumber = new VersionNumber('R1')
         parameterization.modelClass = EmptyModel
         assertEquals 'R2', VersionNumber.incrementVersion(parameterization).toString()
 
@@ -69,7 +71,8 @@ class VersionNumberTests {
             [dao, dao2]
         }
 
-        parameterization = new Parameterization(versionNumber: new VersionNumber('1'), name: '')
+        parameterization = new Parameterization('')
+        parameterization.versionNumber = new VersionNumber('1')
         parameterization.modelClass = EmptyModel
         assertEquals '1.1', VersionNumber.incrementVersion(parameterization).toString()
 
@@ -81,7 +84,8 @@ class VersionNumberTests {
             [dao, dao2, dao3]
         }
 
-        parameterization = new Parameterization(versionNumber: new VersionNumber('1.1'), name: '')
+        parameterization = new Parameterization('')
+        parameterization.versionNumber = new VersionNumber('1.1')
         parameterization.modelClass = EmptyModel
         assertEquals '1.2', VersionNumber.incrementVersion(parameterization).toString()
 
@@ -93,7 +97,8 @@ class VersionNumberTests {
             [dao, dao2, dao3]
         }
 
-        parameterization = new Parameterization(versionNumber: new VersionNumber('1'), name: '')
+        parameterization = new Parameterization('')
+        parameterization.versionNumber = new VersionNumber('1')
         parameterization.modelClass = EmptyModel
         assertEquals '1.2', VersionNumber.incrementVersion(parameterization).toString()
     }

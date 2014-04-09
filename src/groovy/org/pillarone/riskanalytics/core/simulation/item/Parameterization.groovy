@@ -11,6 +11,7 @@ import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.model.MigratableModel
 import org.pillarone.riskanalytics.core.model.Model
+import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.ParameterizationTag
@@ -33,7 +34,9 @@ import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.util.PropertiesUtils
 import org.pillarone.riskanalytics.core.workflow.Status
 import org.springframework.transaction.TransactionStatus
-import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
+
+import static org.pillarone.riskanalytics.core.workflow.Status.DATA_ENTRY
+import static org.pillarone.riskanalytics.core.workflow.Status.NONE
 
 class Parameterization extends ParametrizedItem {
 
@@ -66,16 +69,20 @@ class Parameterization extends ParametrizedItem {
     Long dealId
     DateTime valuationDate
 
-    public Parameterization(Map params) {
-        this(params.remove("name").toString())
-        params.each { k, v ->
-            this[k] = v
-        }
+    public Parameterization(String name) {
+        super(name)
+        versionNumber = new VersionNumber('1')
+        parameterHolders = []
+        status = NONE
+        periodCount = 1
     }
-    void logDeleteAttempt() {
-        LOG.info("DELETING ${name} v${versionNumber} (status: ${status})")
+
+    Parameterization(String name, Class modelClass) {
+        this(name)
+        this.modelClass = modelClass
     }
-    void logDeleteSuccess(){
+
+    void logDeleteSuccess() {
         LOG.info("DELETED  ${name} v${versionNumber} (status: ${status})")
     }
 
@@ -95,20 +102,6 @@ class Parameterization extends ParametrizedItem {
                 LOG.warn("${parameterization.nameAndVersion} has validation errors: [" + parameterization.getValidationErrors() + "]")
             }
         }
-    }
-
-    public Parameterization(String name) {
-        super(name)
-        setName(name)
-        versionNumber = new VersionNumber('1')
-        parameterHolders = []
-        status = Status.NONE
-        periodCount = 1
-    }
-
-    public Parameterization(String name, Class modelClass) {
-        this(name)
-        this.modelClass = modelClass
     }
 
     @CompileStatic
@@ -144,13 +137,13 @@ class Parameterization extends ParametrizedItem {
         return errors.toString();
     }
 
-    public save() {
+    Long save() {
         def result = null
         daoClass.withTransaction { TransactionStatus status ->
-            def daoToBeSaved = getDao()
+            def daoToBeSaved = dao
             validate()
             if (!valid) {
-                LOG.warn("${daoToBeSaved} has validation errors: [" + getRealValidationErrors() + "]")
+                LOG.warn("${daoToBeSaved} has validation errors: [" + realValidationErrors + "]")
             }
 
             setChangeUserInfo()
@@ -198,43 +191,41 @@ class Parameterization extends ParametrizedItem {
     }
 
     protected void mapToDao(Object dao) {
-        dao = dao as ParameterizationDAO
-        dao.itemVersion = versionNumber.toString()
-        dao.name = name
-        dao.periodCount = periodCount
+        ParameterizationDAO parameterizationDAO = dao as ParameterizationDAO
+        parameterizationDAO.itemVersion = versionNumber.toString()
+        parameterizationDAO.name = name
+        parameterizationDAO.periodCount = periodCount
         List periodDates = obtainPeriodLabelsFromParameters()
         if (periodDates != null) {
             periodLabels = periodDates
         }
-        dao.periodLabels = periodLabels != null && !periodLabels.empty ? periodLabels.join(";") : null
-        dao.creationDate = creationDate
-        dao.modificationDate = modificationDate
-        dao.valid = valid
-        dao.modelClassName = modelClass.name
+        parameterizationDAO.periodLabels = periodLabels != null && !periodLabels.empty ? periodLabels.join(";") : null
+        parameterizationDAO.creationDate = creationDate
+        parameterizationDAO.modificationDate = modificationDate
+        parameterizationDAO.valid = valid
+        parameterizationDAO.modelClassName = modelClass.name
         if (modelVersionNumber != null) {
-            dao.model = ModelDAO.findByModelClassNameAndItemVersion(modelClass.name, modelVersionNumber.toString())
+            parameterizationDAO.model = ModelDAO.findByModelClassNameAndItemVersion(modelClass.name, modelVersionNumber.toString())
         }
-        dao.creator = creator
-        dao.lastUpdater = lastUpdater
-        dao.comment = comment
-        dao.status = status
-        dao.dealId = dealId
-        dao.valuationDate = valuationDate
-        saveParameters(parameterHolders, dao.parameters, dao)
-        saveComments(dao)
-        saveTags(dao)
+        parameterizationDAO.creator = creator
+        parameterizationDAO.lastUpdater = lastUpdater
+        parameterizationDAO.comment = comment
+        parameterizationDAO.status = status
+        parameterizationDAO.dealId = dealId
+        parameterizationDAO.valuationDate = valuationDate
+        saveParameters(parameterHolders, parameterizationDAO.parameters, parameterizationDAO)
+        saveComments(parameterizationDAO)
+        saveTags(parameterizationDAO)
     }
 
     @Override
     protected void addToDao(Parameter parameter, Object dao) {
-        dao = dao as ParameterizationDAO
-        dao.addToParameters(parameter)
+        (dao as ParameterizationDAO).addToParameters(parameter)
     }
 
     @Override
     protected void removeFromDao(Parameter parameter, Object dao) {
-        dao = dao as ParameterizationDAO
-        dao.removeFromParameters(parameter)
+        (dao as ParameterizationDAO).removeFromParameters(parameter)
     }
 
     protected void saveTags(ParameterizationDAO dao) {
@@ -258,14 +249,14 @@ class Parameterization extends ParametrizedItem {
             }
         }
         if (tagDeltas.length() > 0) {
-            LOG.info("+/-TAGS on '${getNameAndVersion()}': $tagDeltas")
+            LOG.info("+/-TAGS on '${nameAndVersion}': $tagDeltas")
         }
     }
 
     @Override
     @CompileStatic
     void addComment(Comment comment) {
-        setChanged(true)
+        changed = true
         super.addComment(comment)
     }
 
@@ -281,7 +272,7 @@ class Parameterization extends ParametrizedItem {
     @Override
     @CompileStatic
     void removeComment(Comment comment) {
-        setChanged(true)
+        changed = true
         super.removeComment(comment)
     }
 
@@ -315,30 +306,30 @@ class Parameterization extends ParametrizedItem {
     }
 
     protected void mapFromDao(Object dao, boolean completeLoad) {
-        dao = dao as ParameterizationDAO
+        ParameterizationDAO parameterizationDAO = dao as ParameterizationDAO
         long time = System.currentTimeMillis()
-        id = dao.id
-        versionNumber = new VersionNumber(dao.itemVersion)
-        name = dao.name
-        periodCount = dao.periodCount
-        periodLabels = dao.periodLabels != null && dao.periodLabels.trim().length() > 0 ? dao.periodLabels.split(';') : []
-        creationDate = dao.creationDate
-        modificationDate = dao.modificationDate
-        valid = dao.valid
-        modelClass = ModelRegistry.instance.getModelClass(dao.modelClassName)
-        if (dao.model != null) {
-            modelVersionNumber = new VersionNumber(dao.model.itemVersion)
+        id = parameterizationDAO.id
+        versionNumber = new VersionNumber(parameterizationDAO.itemVersion)
+        name = parameterizationDAO.name
+        periodCount = parameterizationDAO.periodCount
+        periodLabels = parameterizationDAO.periodLabels != null && parameterizationDAO.periodLabels.trim().length() > 0 ? parameterizationDAO.periodLabels.split(';') : []
+        creationDate = parameterizationDAO.creationDate
+        modificationDate = parameterizationDAO.modificationDate
+        valid = parameterizationDAO.valid
+        modelClass = ModelRegistry.instance.getModelClass(parameterizationDAO.modelClassName)
+        if (parameterizationDAO.model != null) {
+            modelVersionNumber = new VersionNumber(parameterizationDAO.model.itemVersion)
         }
-        creator = dao.creator
-        lastUpdater = dao.lastUpdater
-        status = dao.status
-        dealId = dao.dealId
-        valuationDate = dao.valuationDate
-        comment = dao.comment
+        creator = parameterizationDAO.creator
+        lastUpdater = parameterizationDAO.lastUpdater
+        status = parameterizationDAO.status
+        dealId = parameterizationDAO.dealId
+        valuationDate = parameterizationDAO.valuationDate
+        comment = parameterizationDAO.comment
         if (completeLoad) {
-            loadParameters(parameterHolders, dao.parameters)
-            loadComments(dao)
-            tags = dao.tags*.tag
+            loadParameters(parameterHolders, parameterizationDAO.parameters)
+            loadComments(parameterizationDAO)
+            tags = parameterizationDAO.tags*.tag
             if (!tags) tags = []
         }
         LOG.debug("LOADED ${name} v${versionNumber} (status: ${status}) in ${System.currentTimeMillis() - time}ms")
@@ -357,7 +348,7 @@ class Parameterization extends ParametrizedItem {
     }
 
     protected loadFromDB() {
-        return ParameterizationDAO.find(name, getModelClass()?.name, versionNumber.toString())
+        return ParameterizationDAO.find(name, modelClass?.name, versionNumber.toString())
     }
 
     @Override
@@ -369,23 +360,23 @@ class Parameterization extends ParametrizedItem {
         tags?.clear()
     }
 
-    public getDao() {
+    def getDao() {
         if (parameterizationDAO?.id == null) {
-            parameterizationDAO = createDao()
+            parameterizationDAO = createDao() as ParameterizationDAO
             return parameterizationDAO
         } else {
             //TODO If this is just a verbose way of repeating the prior return, refactor.
             //Otherwise, a short explanation of the 'magic' would be useful for the non-wizards among us..
-            return getDaoClass().get(parameterizationDAO.id)
+            return daoClass.get(parameterizationDAO.id)
         }
     }
 
-    public void setDao(def newDao) {
+    void setDao(def newDao) {
         parameterizationDAO = newDao
     }
 
     @CompileStatic
-    public int hashCode() {
+    int hashCode() {
         HashCodeBuilder hashCodeBuilder = new HashCodeBuilder()
         hashCodeBuilder.append(name)
         hashCodeBuilder.append(modelClass)
@@ -393,7 +384,7 @@ class Parameterization extends ParametrizedItem {
         return hashCodeBuilder.toHashCode()
     }
 
-    public boolean equals(Object obj) {
+    boolean equals(Object obj) {
         if (obj instanceof Parameterization) {
             return super.equals(obj) && obj.versionNumber.equals(versionNumber)
         } else {
@@ -401,21 +392,21 @@ class Parameterization extends ParametrizedItem {
         }
     }
 
-    public boolean isUsedInSimulation() {
+    boolean isUsedInSimulation() {
         return SimulationRun.find("from ${SimulationRun.class.name} as run where run.parameterization.name = ? and run.parameterization.modelClassName = ? and run.parameterization.itemVersion =?", [name, modelClass.name, versionNumber.toString()]) != null
     }
 
 
     @CompileStatic
-    public boolean isEditable() {
-        if (status != Status.NONE && status != Status.DATA_ENTRY) {
+    boolean isEditable() {
+        if (status != NONE && status != DATA_ENTRY) {
             return false
         }
         return !usedInSimulation
     }
 
     @CompileStatic
-    public List<String> getAllEditablePaths() {
+    List<String> getAllEditablePaths() {
         List result = []
         for (Comment comment in comments) {
             if (comment instanceof WorkflowComment) {
@@ -426,23 +417,16 @@ class Parameterization extends ParametrizedItem {
     }
 
     @CompileStatic
-    public boolean newVersionAllowed() {
-        return status == Status.NONE || status == Status.DATA_ENTRY
+    boolean newVersionAllowed() {
+        return status == NONE || status == DATA_ENTRY
     }
 
-    public List<SimulationRun> getSimulations() {
-        if (!isLoaded()) {
+    List<SimulationRun> getSimulations() {
+        if (!loaded) {
             load()
         }
-        List<SimulationRun> result
-        try {
-            result = SimulationRun.findAllByParameterizationAndToBeDeleted(dao, false)
-        } catch (Exception e) {
-            LOG.error("Exception in method isUsedInSimulation : $e.message", e)
-        }
-        return result
+        SimulationRun.findAllByParameterizationAndToBeDeleted(dao, false)
     }
-
 
     @Override
     @CompileStatic
@@ -476,18 +460,21 @@ class Parameterization extends ParametrizedItem {
         }
     }
 
-    public void setTags(Set selectedTags) {
+    void setTags(Set selectedTags) {
         selectedTags.each { Tag tag ->
-            if (!tags.contains(tag))
+            if (!tags.contains(tag)) {
                 tags << tag
+            }
         }
         List tagsToRemove = []
         tags.each { Tag tag ->
-            if (!selectedTags.contains(tag))
+            if (!selectedTags.contains(tag)) {
                 tagsToRemove << tag
+            }
         }
-        if (tagsToRemove.size() > 0)
+        if (tagsToRemove.size() > 0) {
             tags.removeAll(tagsToRemove)
+        }
     }
 
     List getParameters(String path) {
@@ -503,12 +490,11 @@ class Parameterization extends ParametrizedItem {
     }
 
     ConfigObject toConfigObject() {
-        if (!isLoaded()) {
+        if (!loaded) {
             load()
         }
-
         ConfigObject original = new ConfigObject()
-        original.model = getModelClass()
+        original.model = modelClass
         original.periodCount = periodCount
         original.displayName = name
         original.applicationVersion = new PropertiesUtils().getProperties("/version.properties").getProperty("version", "N/A")
@@ -551,7 +537,7 @@ class Parameterization extends ParametrizedItem {
 
     @CompileStatic
     void setModelClass(Class clazz) {
-        super.setModelClass(clazz)
+        super.modelClass = clazz
         modelVersionNumber = clazz ? Model.getModelVersion(clazz) : null
     }
 

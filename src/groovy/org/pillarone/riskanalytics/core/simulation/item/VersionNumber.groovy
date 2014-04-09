@@ -72,7 +72,7 @@ class VersionNumber implements Comparable, Cloneable, Serializable {
 
     static VersionNumber getHighestNonWorkflowVersion(ModellingItem item) {
         List<VersionNumber> allVersions = getExistingVersions(item).findAll { !it.workflow }
-        if(allVersions.empty) {
+        if (allVersions.empty) {
             return null
         }
         return allVersions.sort()[-1]
@@ -147,10 +147,10 @@ class VersionNumber implements Comparable, Cloneable, Serializable {
     }
 
     @CompileStatic
-    Object clone() {
+    VersionNumber clone() {
         VersionNumber newObject = (VersionNumber) super.clone();
         newObject.versionNumbers = new LinkedList()
-        versionNumbers.each {Integer it ->
+        versionNumbers.each { Integer it ->
             newObject.versionNumbers << new Integer(it.intValue())
         }
         newObject

@@ -2,8 +2,14 @@ package org.pillarone.riskanalytics.core.simulation.item
 
 import groovy.transform.CompileStatic
 import org.apache.commons.lang.builder.HashCodeBuilder
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.ResourceDAO
+import org.pillarone.riskanalytics.core.components.IResource
+import org.pillarone.riskanalytics.core.components.ResourceHolder
 import org.pillarone.riskanalytics.core.parameter.Parameter
+import org.pillarone.riskanalytics.core.parameter.ResourceParameter
+import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 import org.pillarone.riskanalytics.core.parameter.comment.ResourceCommentDAO
 import org.pillarone.riskanalytics.core.parameter.comment.ResourceTag
 import org.pillarone.riskanalytics.core.parameter.comment.Tag
@@ -12,16 +18,11 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolde
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.workflow.WorkflowComment
 import org.pillarone.riskanalytics.core.workflow.Status
-import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
-import org.pillarone.riskanalytics.core.components.IResource
-import org.pillarone.riskanalytics.core.components.ResourceHolder
-import org.pillarone.riskanalytics.core.output.SimulationRun
-import org.pillarone.riskanalytics.core.parameter.ResourceParameter
 
 class Resource extends ParametrizedItem {
+    private static final Log LOG = LogFactory.getLog(Resource)
 
     String comment
-    VersionNumber versionNumber
     List<ParameterHolder> parameterHolders
     List<Tag> tags = []
     boolean valid

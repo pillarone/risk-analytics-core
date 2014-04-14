@@ -2,34 +2,30 @@ package org.pillarone.riskanalytics.core.simulation.item
 
 import groovy.transform.CompileStatic
 import org.apache.commons.lang.builder.HashCodeBuilder
+import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.SimulationProfileDAO
 import org.pillarone.riskanalytics.core.model.Model
-import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
-import org.pillarone.riskanalytics.core.output.*
-import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
+import org.pillarone.riskanalytics.core.output.*
+import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
+
+import static com.google.common.base.Preconditions.checkNotNull
 
 class ResultConfiguration extends ModellingItem {
 
     String comment
-    VersionNumber versionNumber
     VersionNumber modelVersionNumber
     List<PacketCollector> collectors
 
-    public ResultConfiguration(String name) {
-        super(name)
+    ResultConfiguration(String name, Class modelClass) {
+        super(checkNotNull(name), checkNotNull(modelClass))
+        modelVersionNumber = Model.getModelVersion(modelClass)
         versionNumber = new VersionNumber("1")
         collectors = []
     }
 
-    public ResultConfiguration(String name, Class modelClass) {
-        this(name)
-        this.modelClass = modelClass
-    }
-
-    public ResultConfiguration(ConfigObject configObject, String name) {
-        this(configObject.containsKey("displayName") ? configObject.displayName : name)
-        modelClass = configObject.model
+    ResultConfiguration(ConfigObject configObject, String name) {
+        this(getName(configObject, name), getModelClass(configObject))
         ConfigObject flatConfigObject = configObject.components.flatten()
         for (Map.Entry entry in flatConfigObject.entrySet()) {
             String newPath = entry.key.replace(".", ":")
@@ -38,13 +34,25 @@ class ResultConfiguration extends ModellingItem {
         }
     }
 
-    protected ResultConfigurationDAO createDao() {
-        return getDaoClass().newInstance()
+    @Override
+    void setModelClass(Class modelClass) {
+        throw new IllegalStateException('modelClass has to be set in constructor')
     }
 
-    @CompileStatic
-    public Object getDaoClass() {
-        return ResultConfigurationDAO
+    private static Class getModelClass(ConfigObject configObject) {
+        configObject.model
+    }
+
+    private static String getName(ConfigObject configObject, String name) {
+        configObject.containsKey("displayName") ? configObject.displayName : name
+    }
+
+    protected ResultConfigurationDAO createDao() {
+        return new ResultConfigurationDAO()
+    }
+
+    Class getDaoClass() {
+        ResultConfigurationDAO
     }
 
     protected ResultConfigurationDAO loadFromDB() {
@@ -64,7 +72,6 @@ class ResultConfiguration extends ModellingItem {
     protected void mapFromDao(Object dao, boolean completeLoad) {
         dao = dao as ResultConfigurationDAO
         name = dao.name
-        modelClass = ModelRegistry.instance.getModelClass(dao.modelClassName)
         if (dao.model != null) {
             modelVersionNumber = new VersionNumber(dao.model.itemVersion)
         }
@@ -155,12 +162,6 @@ class ResultConfiguration extends ModellingItem {
             it.delete(flush: true)
         }
         return super.deleteDaoImpl(dao)
-    }
-
-    @CompileStatic
-    void setModelClass(Class clazz) {
-        super.setModelClass(clazz)
-        modelVersionNumber = clazz ? Model.getModelVersion(clazz) : null
     }
 
     public boolean isUsedInSimulation() {

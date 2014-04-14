@@ -212,10 +212,8 @@ public class ArgumentParser {
         ResultConfiguration newestResultConfiguration = null;
         if (!versionNumbers.isEmpty()) {
             Collections.sort(versionNumbers);
-            newestResultConfiguration = new ResultConfiguration(resultConfiguration.getName());
+            newestResultConfiguration = new ResultConfiguration(resultConfiguration.getName(), resultConfiguration.getModelClass());
             VersionNumber newestVersion = versionNumbers.get(versionNumbers.size() - 1);
-
-            newestResultConfiguration.setModelClass(resultConfiguration.getModelClass());
             newestResultConfiguration.setVersionNumber(newestVersion);
             newestResultConfiguration.load(true);
         }

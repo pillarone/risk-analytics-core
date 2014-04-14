@@ -65,7 +65,7 @@ class ParameterizationHelperTests {
         ResourceModel model = new ResourceModel()
         Parameterization parameterization = ParameterizationHelper.createDefaultParameterization(model)
         assertEquals 5, parameterization.parameters.size()
-        ResourceParameterHolder resource = parameterization.parameterHolders.find { it instanceof ResourceParameterHolder}
+        ResourceParameterHolder resource = parameterization.parameterHolders.find { it instanceof ResourceParameterHolder} as ResourceParameterHolder
         assertNotNull(resource)
         assertEquals(ExampleResource, resource.resourceClass)
         parameterization.save()
@@ -74,7 +74,7 @@ class ParameterizationHelperTests {
         def stringWriter = new StringWriter()
         BufferedWriter writer = new BufferedWriter(stringWriter)
         new ParameterWriter().write(parameterization.toConfigObject(), writer)
-        assertTrue(stringWriter.toString().contains("parmResource[0]=new org.pillarone.riskanalytics.core.components.ResourceHolder(org.pillarone.riskanalytics.core.example.component.ExampleResource)"))
+        assertTrue(stringWriter.toString().contains("parmResource[0]=new org.pillarone.riskanalytics.core.components.ResourceHolder(org.pillarone.riskanalytics.core.example.component.ExampleResource,'exampleResource', new org.pillarone.riskanalytics.core.simulation.item.VersionNumber(1))"))
     }
 
     @Test

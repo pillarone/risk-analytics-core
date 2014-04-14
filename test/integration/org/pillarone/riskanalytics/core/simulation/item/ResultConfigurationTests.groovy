@@ -14,8 +14,7 @@ class ResultConfigurationTests {
         new ResultConfigurationImportService().compareFilesAndWriteToDB(['Core'])
 
         String configName = "CoreResultConfiguration"
-        ResultConfiguration configuration = new ResultConfiguration(configName)
-        configuration.modelClass = CoreModel
+        ResultConfiguration configuration = new ResultConfiguration(configName, CoreModel)
         configuration.load()
 
         assertEquals CoreModel.name, configuration.modelClass.name
@@ -24,7 +23,7 @@ class ResultConfigurationTests {
 
         assertEquals 4, configuration.collectors.size()
 
-        List<PacketCollector> sortedCollectors = configuration.collectors.sort {PacketCollector pc -> pc.path }
+        List<PacketCollector> sortedCollectors = configuration.collectors.sort { PacketCollector pc -> pc.path }
         assertEquals AggregatedCollectingModeStrategy.IDENTIFIER, sortedCollectors.get(0).mode.identifier
         assertEquals AggregatedCollectingModeStrategy.IDENTIFIER, sortedCollectors.get(1).mode.identifier
         assertEquals SingleValueCollectingModeStrategy.IDENTIFIER, sortedCollectors.get(2).mode.identifier
@@ -37,9 +36,7 @@ class ResultConfigurationTests {
         int initialConfigurationCount = ResultConfigurationDAO.count()
         int initialCollectorCount = CollectorInformation.count()
 
-        ResultConfiguration configuration = new ResultConfiguration("newConfig")
-        configuration.modelClass = CoreModel
-
+        ResultConfiguration configuration = new ResultConfiguration("newConfig", CoreModel)
         configuration.collectors << new PacketCollector(path: "CoreModel:exampleInputOutputComponent:outValue", mode: CollectingModeFactory.getStrategy(SingleValueCollectingModeStrategy.IDENTIFIER))
         configuration.collectors << new PacketCollector(path: "CoreModel:exampleOutputComponent:outValue1", mode: CollectingModeFactory.getStrategy(AggregatedCollectingModeStrategy.IDENTIFIER))
         configuration.collectors << new PacketCollector(path: "CoreModel:exampleOutputComponent:outValue2", mode: CollectingModeFactory.getStrategy(SingleValueCollectingModeStrategy.IDENTIFIER))
@@ -54,7 +51,7 @@ class ResultConfigurationTests {
 
         assertEquals 3, configuration.collectors.size()
 
-        List<PacketCollector> sortedCollectors = configuration.collectors.sort {PacketCollector pc -> pc.path }
+        List<PacketCollector> sortedCollectors = configuration.collectors.sort { PacketCollector pc -> pc.path }
         assertEquals SingleValueCollectingModeStrategy.IDENTIFIER, sortedCollectors.get(0).mode.identifier
         assertEquals AggregatedCollectingModeStrategy.IDENTIFIER, sortedCollectors.get(1).mode.identifier
         assertEquals SingleValueCollectingModeStrategy.IDENTIFIER, sortedCollectors.get(2).mode.identifier
@@ -76,7 +73,7 @@ class ResultConfigurationTests {
 
         assertEquals 3, configuration.collectors.size()
 
-        sortedCollectors = configuration.collectors.sort {PacketCollector pc -> pc.path }
+        sortedCollectors = configuration.collectors.sort { PacketCollector pc -> pc.path }
         assertEquals AggregatedCollectingModeStrategy.IDENTIFIER, sortedCollectors.get(0).mode.identifier
         assertEquals SingleValueCollectingModeStrategy.IDENTIFIER, sortedCollectors.get(1).mode.identifier
         assertEquals AggregatedCollectingModeStrategy.IDENTIFIER, sortedCollectors.get(2).mode.identifier
@@ -97,7 +94,7 @@ class ResultConfigurationTests {
 
         assertEquals 2, configuration.collectors.size()
 
-        sortedCollectors = configuration.collectors.sort {PacketCollector pc -> pc.path }
+        sortedCollectors = configuration.collectors.sort { PacketCollector pc -> pc.path }
         assertEquals AggregatedCollectingModeStrategy.IDENTIFIER, sortedCollectors.get(0).mode.identifier
         assertEquals SingleValueCollectingModeStrategy.IDENTIFIER, sortedCollectors.get(1).mode.identifier
 
@@ -118,7 +115,7 @@ class ResultConfigurationTests {
 
         assertEquals 3, configuration.collectors.size()
 
-        sortedCollectors = configuration.collectors.sort {PacketCollector pc -> pc.path }
+        sortedCollectors = configuration.collectors.sort { PacketCollector pc -> pc.path }
         assertEquals AggregatedCollectingModeStrategy.IDENTIFIER, sortedCollectors.get(0).mode.identifier
         assertEquals SingleValueCollectingModeStrategy.IDENTIFIER, sortedCollectors.get(1).mode.identifier
         assertEquals SingleValueCollectingModeStrategy.IDENTIFIER, sortedCollectors.get(2).mode.identifier
@@ -142,8 +139,7 @@ class ResultConfigurationTests {
         new ResultConfigurationImportService().compareFilesAndWriteToDB(['Core'])
 
         String configName = "CoreResultConfiguration"
-        ResultConfiguration configuration = new ResultConfiguration(configName)
-        configuration.modelClass = CoreModel
+        ResultConfiguration configuration = new ResultConfiguration(configName, CoreModel)
         configuration.load()
 
         ConfigObject configObject = configuration.toConfigObject()
@@ -173,23 +169,23 @@ class ResultConfigurationTests {
     @Test
     void testSetCollector() {
         String configName = "CoreResultConfiguration"
-        ResultConfiguration configuration = new ResultConfiguration(configName)
+        ResultConfiguration configuration = new ResultConfiguration(configName, CoreModel)
         AggregatedCollectingModeStrategy strategy = new AggregatedCollectingModeStrategy()
         AggregatedCollectingModeStrategy newStrategy = new AggregatedCollectingModeStrategy()
         configuration.setCollector("path", strategy)
         assert configuration.getCollector("path").mode == strategy
-        configuration.setCollector("path",null)
+        configuration.setCollector("path", null)
         assert 0 == configuration.collectors.size()
         assert !configuration.getCollector("path")
-        configuration.setCollector("path",strategy)
-        configuration.setCollector("path",newStrategy)
+        configuration.setCollector("path", strategy)
+        configuration.setCollector("path", newStrategy)
         assert 1 == configuration.collectors.size()
         assert configuration.getCollector("path").mode == newStrategy
         assert 1 == configuration.collectors.size()
     }
 
     @Test
-    void testEquals(){
+    void testEquals() {
         ResultConfiguration resultConfiguration1 = new ResultConfiguration('test', Resource)
         ResultConfiguration resultConfiguration2 = new ResultConfiguration('test', Resource)
         resultConfiguration1.versionNumber = new VersionNumber('1.1')

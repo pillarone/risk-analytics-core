@@ -103,8 +103,7 @@ abstract class ModelTest {
         def resultConfig = ResultConfigurationDAO.findByName(getResultConfigurationDisplayName())
         assertNotNull resultConfig
 
-        ResultConfiguration resultConfiguration = new ResultConfiguration(resultConfig.name)
-        resultConfiguration.modelClass = getModelClass()
+        ResultConfiguration resultConfiguration = new ResultConfiguration(resultConfig.name, getModelClass())
         resultConfiguration.load()
 
         Class modelClass = getModelClass()

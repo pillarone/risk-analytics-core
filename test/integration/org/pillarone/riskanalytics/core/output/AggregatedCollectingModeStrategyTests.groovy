@@ -42,8 +42,7 @@ class AggregatedCollectingModeStrategyTests {
         Parameterization parameterization = new Parameterization("CoreParameters")
         parameterization.load()
 
-        ResultConfiguration resultConfiguration = new ResultConfiguration("CoreResultConfiguration")
-        resultConfiguration.modelClass = CoreModel
+        ResultConfiguration resultConfiguration = new ResultConfiguration("CoreResultConfiguration", CoreModel)
         resultConfiguration.load()
 
         run = new Simulation("name")

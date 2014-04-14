@@ -1,5 +1,6 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
+import models.core.CoreModel
 import org.junit.Test
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
@@ -19,8 +20,8 @@ class ItemComparatorTests {
 
     @Test
     void testCompareTemplates() {
-        ResultConfiguration a = new ResultConfiguration("a")
-        ResultConfiguration b = new ResultConfiguration("b")
+        ResultConfiguration a = new ResultConfiguration("a", CoreModel)
+        ResultConfiguration b = new ResultConfiguration("b", CoreModel)
         assertTrue ItemComparator.contentEquals(a, b)
 
         a.collectors.add(new PacketCollector(path: "path", mode: CollectingModeFactory.getStrategy(SingleValueCollectingModeStrategy.IDENTIFIER)))

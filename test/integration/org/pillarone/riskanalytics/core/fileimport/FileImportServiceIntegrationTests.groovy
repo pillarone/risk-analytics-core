@@ -41,8 +41,7 @@ class FileImportServiceIntegrationTests  {
         ResultConfigurationDAO dao2 = ResultConfigurationDAO.findByName("CoreResultConfiguration")
         assertNotNull dao2.model
 
-        ResultConfiguration resultConfiguration = new ResultConfiguration("CoreResultConfiguration")
-        resultConfiguration.modelClass = CoreModel
+        ResultConfiguration resultConfiguration = new ResultConfiguration("CoreResultConfiguration", CoreModel)
         resultConfiguration.load()
 
         assertEquals "1", resultConfiguration.modelVersionNumber.toString()
@@ -63,8 +62,7 @@ class FileImportServiceIntegrationTests  {
         ResultConfigurationDAO dao2 = ResultConfigurationDAO.findByName("MigratableCoreResultConfiguration")
         assertNotNull dao2.model
 
-        ResultConfiguration resultConfiguration = new ResultConfiguration("MigratableCoreResultConfiguration")
-        resultConfiguration.modelClass = MigratableCoreModel
+        ResultConfiguration resultConfiguration = new ResultConfiguration("MigratableCoreResultConfiguration", MigratableCoreModel)
         resultConfiguration.load()
 
         assertEquals "2", resultConfiguration.modelVersionNumber.toString()

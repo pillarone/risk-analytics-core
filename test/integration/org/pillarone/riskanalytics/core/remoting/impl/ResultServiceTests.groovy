@@ -1,31 +1,30 @@
 package org.pillarone.riskanalytics.core.remoting.impl
-
+import models.core.CoreModel
+import org.joda.time.DateTime
 import org.junit.Before
 import org.junit.Test
-
-import java.text.SimpleDateFormat
-import models.core.CoreModel
 import org.pillarone.riskanalytics.core.example.model.EmptyModel
+import org.pillarone.riskanalytics.core.fileimport.FileImportService
+import org.pillarone.riskanalytics.core.output.*
+import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.remoting.IResultService
 import org.pillarone.riskanalytics.core.remoting.ParameterizationInfo
 import org.pillarone.riskanalytics.core.remoting.ResultInfo
 import org.pillarone.riskanalytics.core.remoting.SimulationInfo
+import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultDescriptor
+import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultTransferObject
+import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultWriter
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
-import org.pillarone.riskanalytics.core.output.*
-import org.pillarone.riskanalytics.core.workflow.Status
-import org.joda.time.DateTime
-import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultTransferObject
-import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultDescriptor
-import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultWriter
-import org.pillarone.riskanalytics.core.fileimport.FileImportService
-import org.pillarone.riskanalytics.core.simulation.item.parameter.DateParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
-import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.EnumTagType
+import org.pillarone.riskanalytics.core.workflow.Status
 
-import static org.junit.Assert.*
+import java.text.SimpleDateFormat
+
+import static org.junit.Assert.assertEquals
+import static org.junit.Assert.assertNotNull
 
 class ResultServiceTests {
 
@@ -130,8 +129,7 @@ class ResultServiceTests {
         parameterization1.periodCount = 1
         parameterization1.save()
 
-        ResultConfiguration resultConfiguration = new ResultConfiguration("rc1")
-        resultConfiguration.modelClass = CoreModel
+        ResultConfiguration resultConfiguration = new ResultConfiguration("rc1", CoreModel)
         resultConfiguration.save()
 
         Simulation simulation = new Simulation("s1")
@@ -171,8 +169,7 @@ class ResultServiceTests {
         parameterization1.periodLabels = [dateFormat.format(first), dateFormat.format(second)]
         parameterization1.save()
 
-        ResultConfiguration resultConfiguration = new ResultConfiguration("rc1")
-        resultConfiguration.modelClass = EmptyModel
+        ResultConfiguration resultConfiguration = new ResultConfiguration("rc1", EmptyModel)
         resultConfiguration.save()
 
         Simulation simulation = new Simulation("s1")

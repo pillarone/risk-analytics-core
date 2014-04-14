@@ -70,9 +70,8 @@ class SimulationProfile extends ParametrizedItem {
     protected void mapFromDao(Object dao, boolean completeLoad) {
         SimulationProfileDAO simulationSettingsDAO = dao as SimulationProfileDAO
         modelClass = ModelRegistry.instance.getModelClass(simulationSettingsDAO.modelClassName)
-        ResultConfiguration resultConfiguration = new ResultConfiguration(simulationSettingsDAO.template.name)
+        ResultConfiguration resultConfiguration = new ResultConfiguration(simulationSettingsDAO.template.name, modelClass)
         resultConfiguration.versionNumber = new VersionNumber(simulationSettingsDAO.template.itemVersion)
-        resultConfiguration.modelClass = modelClass
         template = resultConfiguration
         numberOfIterations = simulationSettingsDAO.numberOfIterations
         creationDate = simulationSettingsDAO.creationDate

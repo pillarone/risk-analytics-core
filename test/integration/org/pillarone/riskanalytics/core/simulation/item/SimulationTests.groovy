@@ -111,7 +111,7 @@ class SimulationTests {
 
         Simulation simulation = new Simulation("newSimulation")
         simulation.parameterization = new Parameterization("params")
-        simulation.template = new ResultConfiguration("template")
+        simulation.template = new ResultConfiguration("template", CoreModel)
         simulation.periodCount = 1
         simulation.numberOfIterations = 10
 
@@ -270,7 +270,7 @@ class SimulationTests {
         createResultConfiguration()
         Simulation simulation = new Simulation(simulationName)
         simulation.parameterization = new Parameterization("params")
-        simulation.template = new ResultConfiguration("template")
+        simulation.template = new ResultConfiguration("template", EmptyModel)
         simulation.periodCount = 1
         simulation.numberOfIterations = 10
         simulation.modelClass = EmptyModel

@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList
 import models.core.CoreModel
 import org.joda.time.DateTime
 import org.junit.Test
+import org.pillarone.riskanalytics.core.example.model.EmptyModel
 import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.simulation.item.*
 import org.pillarone.riskanalytics.core.user.Person
@@ -50,7 +51,7 @@ class ModellingItemUpdaterTests {
 
     @Test
     void testCopyResultConfiguration() {
-        assert !ModellingItemUpdater.createOrUpdateModellingItem(null, new ResultConfiguration('name'))
+        assert !ModellingItemUpdater.createOrUpdateModellingItem(null, new ResultConfiguration('name', CoreModel))
 
         ResultConfigurationCacheItem source = new ResultConfigurationCacheItem(
                 100l, 'name', CoreModel, new VersionNumber('1.2'), new DateTime(), new DateTime(), new Person(), new Person()
@@ -66,7 +67,7 @@ class ModellingItemUpdaterTests {
         assert source.creator == target.creator
         assert source.lastUpdater == target.lastUpdater
 
-        ResultConfiguration toUpdate = new ResultConfiguration('target')
+        ResultConfiguration toUpdate = new ResultConfiguration('target', CoreModel)
         target = ModellingItemUpdater.createOrUpdateModellingItem(source, toUpdate)
         assert !target.is(source)
         assert target.is(toUpdate)
@@ -84,7 +85,7 @@ class ModellingItemUpdaterTests {
     void testCopySimulation() {
         assert !ModellingItemUpdater.createOrUpdateModellingItem(null, new Simulation('name'))
         SimulationCacheItem source = new SimulationCacheItem(
-                100l, 'name', new ParameterizationCacheItem(1l, null, null, null,), new ResultConfigurationCacheItem(1l, null, null, null), ImmutableList.copyOf([new Tag(name: 'tagName')]), CoreModel, new VersionNumber('7.0'), new DateTime(), new DateTime(), new DateTime(), new DateTime(), new Person(), 0
+                100l, 'name', new ParameterizationCacheItem(1l, 'name', null, null,), new ResultConfigurationCacheItem(1l, 'name', EmptyModel, null), ImmutableList.copyOf([new Tag(name: 'tagName')]), CoreModel, new VersionNumber('7.0'), new DateTime(), new DateTime(), new DateTime(), new DateTime(), new Person(), 0
         )
 
         Simulation result = ModellingItemUpdater.createOrUpdateModellingItem(source, null)

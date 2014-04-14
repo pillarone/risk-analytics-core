@@ -102,7 +102,7 @@ class BatchRunTests {
         createResultConfiguration()
         Simulation simulation = new Simulation(simulationName)
         simulation.parameterization = new Parameterization("params")
-        simulation.template = new ResultConfiguration("template")
+        simulation.template = new ResultConfiguration("template", EmptyModel)
         simulation.periodCount = 1
         simulation.numberOfIterations = 10
         simulation.modelClass = EmptyModel

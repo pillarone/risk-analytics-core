@@ -27,10 +27,9 @@ class ModellingItemUpdater {
         if (!source) {
             return null
         }
-        target = target ?: new ResultConfiguration(source.name)
+        target = target ?: new ResultConfiguration(source.name, source.modelClass)
         target.name = source.name
         target.id = source.id
-        target.modelClass = source.modelClass
         target.versionNumber = source.versionNumber?.clone()
         target.creationDate = source.creationDate
         target.modificationDate = source.modificationDate

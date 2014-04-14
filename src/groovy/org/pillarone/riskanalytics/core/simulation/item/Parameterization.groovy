@@ -45,7 +45,6 @@ class Parameterization extends ParametrizedItem {
     public static final String PERIOD_DATE_FORMAT = "yyyy-MM-dd"
 
     String comment
-    VersionNumber versionNumber
     VersionNumber modelVersionNumber
     private ParameterizationDAO parameterizationDAO
     /**

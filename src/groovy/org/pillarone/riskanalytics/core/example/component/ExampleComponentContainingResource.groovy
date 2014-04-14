@@ -18,13 +18,13 @@ class ExampleComponentContainingResource extends Component {
     PacketList<SingleValuePacket> input = new PacketList<SingleValuePacket>(SingleValuePacket)
     PacketList<SingleValuePacket> output = new PacketList<SingleValuePacket>(SingleValuePacket)
 
-    ResourceHolder<ExampleResource> parmResource = new ResourceHolder<ExampleResource>(ExampleResource)
-    ExampleParameterObject parmParameterObject = ExampleParameterObjectClassifier.RESOURCE.getParameterObject(["resource": new ConstrainedMultiDimensionalParameter([[new ResourceHolder(ExampleResource, "a", new VersionNumber("1"))]], ['title'], ConstraintsFactory.getConstraints(ExampleResourceConstraints.IDENTIFIER))] )
+    ResourceHolder<ExampleResource> parmResource = new ResourceHolder<ExampleResource>(ExampleResource, 'exampleResource', new VersionNumber('1'))
+    ExampleParameterObject parmParameterObject = ExampleParameterObjectClassifier.RESOURCE.getParameterObject(["resource": new ConstrainedMultiDimensionalParameter([[new ResourceHolder(ExampleResource, "a", new VersionNumber("1"))]], ['title'], ConstraintsFactory.getConstraints(ExampleResourceConstraints.IDENTIFIER))])
 
 
     @Override
     protected void doCalculation() {
-        for (SingleValuePacket inPacket: input) {
+        for (SingleValuePacket inPacket : input) {
             output << new SingleValuePacket(inPacket.value * parmResource.resource.parmInteger)
         }
 

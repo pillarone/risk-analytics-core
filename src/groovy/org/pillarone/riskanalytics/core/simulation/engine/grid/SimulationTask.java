@@ -114,7 +114,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
                 LOG.info("Created a new job with block count " + configurations.get(i).getSimulationBlocks().size());
             }
 
-            resultWriter = new ResultWriter((Long) simulationConfiguration.getSimulation().id);
+            resultWriter = new ResultWriter(simulationConfiguration.getSimulation().getId());
             //grid.addMessageListener(this);
             grid.listen(resultTransferListener);
 

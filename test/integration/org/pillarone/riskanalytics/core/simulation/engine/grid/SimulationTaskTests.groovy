@@ -175,7 +175,7 @@ class SimulationTaskTests {
         simulation.modelClass = CoreModel
         simulation.numberOfIterations = iterationCount
         simulation.parameterization = new Parameterization("test")
-        simulation.template = new ResultConfiguration('heinz')
+        simulation.template = new ResultConfiguration('heinz', CoreModel)
         simulation.periodCount = 1
         configuration.simulation = simulation
         assertNull simulation.start

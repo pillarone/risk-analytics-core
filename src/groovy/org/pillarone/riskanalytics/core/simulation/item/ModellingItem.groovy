@@ -5,8 +5,9 @@ import org.apache.log4j.Logger
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.user.UserManagement
-import org.pillarone.riskanalytics.core.util.GroovyUtils
 import org.springframework.transaction.TransactionStatus
+
+import static com.google.common.base.Preconditions.checkNotNull
 
 abstract class ModellingItem implements Serializable {
     private static final Logger LOG = Logger.getLogger(ModellingItem)
@@ -20,15 +21,22 @@ abstract class ModellingItem implements Serializable {
     Person creator
     Person lastUpdater
 
+    VersionNumber versionNumber
+
     boolean changed = false
 
     protected List<IModellingItemChangeListener> itemChangedListener
 
-    public def id
+    Long id
     protected boolean loaded
 
-    public ModellingItem(String name) {
-        this.name = name;
+    ModellingItem(String name) {
+        this(name, null)
+    }
+
+    ModellingItem(String name, Class modelClass) {
+        this.name = checkNotNull(name)
+        this.modelClass = modelClass
         itemChangedListener = []
     }
 
@@ -45,20 +53,20 @@ abstract class ModellingItem implements Serializable {
     protected void deleteDependentData(def dao) {}
 
     @CompileStatic
-    public void setChanged(boolean changed) {
+    void setChanged(boolean changed) {
         this.changed = changed
         notifyItemChanged()
     }
 
     @CompileStatic
-    public void unload() {
+    void unload() {
         this.dao = null
         this.id = null
         changed = false
         loaded = false
     }
 
-    public void load(boolean completeLoad = true) {
+    void load(boolean completeLoad = true) {
         daoClass.withTransaction { TransactionStatus status ->
             def loadedDao = loadFromDB()
             if (loadedDao) {
@@ -133,9 +141,7 @@ abstract class ModellingItem implements Serializable {
     }
 
     void updateChangeUserAndDate() {
-        if (GroovyUtils.getProperties(this).keySet().contains("modificationDate")) {
-            this.modificationDate = new DateTime()
-        }
+        modificationDate = new DateTime()
     }
 
     protected void logErrors(def dao) {
@@ -209,7 +215,6 @@ abstract class ModellingItem implements Serializable {
         }
     }
 
-
     def saveDao(def dao) {
         if (dao.hasErrors()) {
             logErrors(dao)
@@ -225,15 +230,15 @@ abstract class ModellingItem implements Serializable {
     }
 
     protected def getDao() {
-        if (this.id) {
-            return daoClass.get(this.id)
+        if (id) {
+            return daoClass.get(id)
         }
         return null
     }
 
     protected void setDao(def newDao) {
         if (newDao) {
-            this.id = newDao.id
+            id = newDao.id
         }
     }
 

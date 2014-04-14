@@ -5,7 +5,6 @@ import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 
 class ModelItem extends ModellingItem {
-    VersionNumber versionNumber
     String srcCode
 
     public ModelItem(String name) {
@@ -24,23 +23,24 @@ class ModelItem extends ModellingItem {
     }
 
     protected void mapToDao(def target) {
-        target.name = name
-        target.itemVersion = versionNumber.toString()
-        target.srcCode = srcCode
-        target.modelClassName = modelClass.name
+        ModelDAO modelDAO = target
+        modelDAO.name = name
+        modelDAO.itemVersion = versionNumber.toString()
+        modelDAO.srcCode = srcCode
+        modelDAO.modelClassName = modelClass.name
     }
 
     protected void mapFromDao(def dao, boolean completeLoad) {
-        if (dao) {
-            versionNumber = new VersionNumber(dao.itemVersion)
-            srcCode = dao.srcCode
-            name = dao.name
-            modelClass = ModelRegistry.instance.getModelClass(dao.modelClassName)
+        ModelDAO modelDAO = dao as ModelDAO
+        if (modelDAO) {
+            versionNumber = new VersionNumber(modelDAO.itemVersion)
+            srcCode = modelDAO.srcCode
+            name = modelDAO.name
+            modelClass = ModelRegistry.instance.getModelClass(modelDAO.modelClassName)
         }
     }
 
-    protected def loadFromDB() {
-        daoClass.findByNameAndItemVersion(name, versionNumber.toString())
+    protected ModelDAO loadFromDB() {
+        ModelDAO.findByNameAndItemVersion(name, versionNumber.toString())
     }
-
 }

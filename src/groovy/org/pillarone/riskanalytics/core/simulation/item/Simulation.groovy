@@ -106,9 +106,8 @@ class Simulation extends ParametrizedItem {
         parameterization.versionNumber = new VersionNumber(run.parameterization.itemVersion)
         parameterization.modelClass = modelClass
         this.parameterization = parameterization
-        ResultConfiguration resultConfiguration = new ResultConfiguration(run.resultConfiguration.name)
+        ResultConfiguration resultConfiguration = new ResultConfiguration(run.resultConfiguration.name, modelClass)
         resultConfiguration.versionNumber = new VersionNumber(run.resultConfiguration.itemVersion)
-        resultConfiguration.modelClass = modelClass
         template = resultConfiguration
         structure = ModelStructure.getStructureForModel(modelClass)
         numberOfIterations = run.iterations

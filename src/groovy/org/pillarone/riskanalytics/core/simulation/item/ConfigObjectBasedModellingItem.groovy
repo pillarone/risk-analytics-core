@@ -1,17 +1,13 @@
 package org.pillarone.riskanalytics.core.simulation.item
-
 import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
 import org.pillarone.riskanalytics.core.output.ConfigObjectHolder
-import org.pillarone.riskanalytics.core.simulation.item.ModellingItem
-import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
-import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.util.GroovyUtils
+import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 
 abstract class ConfigObjectBasedModellingItem extends ModellingItem {
 
     ConfigObject data
-    VersionNumber versionNumber
     String comment
 
     public ConfigObjectBasedModellingItem(String name) {
@@ -53,8 +49,6 @@ abstract class ConfigObjectBasedModellingItem extends ModellingItem {
         super.unload();
         data = null
     }
-
-
 
     protected void mapToDao(def target) {
         target.name = name

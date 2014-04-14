@@ -29,15 +29,14 @@ public class ResultConfigurationImportService extends FileImportService {
 
     protected boolean saveItemObject(String fileContent) {
         List<PathMapping> pathCache = PathMapping.list()
-        ResultConfiguration configuration = new ResultConfiguration(name)
         Class modelClass = configObject.model
+        ResultConfiguration configuration = new ResultConfiguration(name, modelClass)
         Map flatConfig = configObject.components.flatten()
-        flatConfig.each {path, mode ->
+        flatConfig.each { String path, mode ->
             String fixedPath = (modelClass.simpleName - "Model") + ":" + path.replace(".", ":")
             configuration.collectors << new PacketCollector(path: getPathMapping(pathCache, fixedPath).pathName, mode: CollectingModeFactory.getStrategy(mode))
         }
         pathCache.clear()
-        configuration.modelClass = modelClass
 
         return configuration.save() != null
     }

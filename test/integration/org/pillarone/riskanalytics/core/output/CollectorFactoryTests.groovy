@@ -48,7 +48,7 @@ class CollectorFactoryTests {
         collectorInformation2.path = "Core:exampleOutputComponent:outValue2"
         collectorInformation2.mode = CollectingModeFactory.getStrategy(SingleValueCollectingModeStrategy.IDENTIFIER)
 
-        ResultConfiguration configuration = new ResultConfiguration("test")
+        ResultConfiguration configuration = new ResultConfiguration("test", CoreModel)
         configuration.collectors << collectorInformation1
         configuration.collectors << collectorInformation2
 
@@ -77,7 +77,7 @@ class CollectorFactoryTests {
         collectorInformation2.path = "Core:hierarchyLevel:hierarchyOutputComponent:outValue2"
         collectorInformation2.mode = CollectingModeFactory.getStrategy(SingleValueCollectingModeStrategy.IDENTIFIER)
 
-        ResultConfiguration configuration = new ResultConfiguration("test")
+        ResultConfiguration configuration = new ResultConfiguration("test", CoreModel)
         configuration.collectors << collectorInformation1
         configuration.collectors << collectorInformation2
 
@@ -97,7 +97,7 @@ class CollectorFactoryTests {
 
         CollectorFactory factory = new CollectorFactory(outputStrategy)
 
-        ResultConfiguration configuration = new ResultConfiguration("name")
+        ResultConfiguration configuration = new ResultConfiguration("name", CoreModel)
 
         List collectors = factory.createCollectors(configuration, testModel)
         assertNotNull collectors

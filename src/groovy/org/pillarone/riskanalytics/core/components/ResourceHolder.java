@@ -13,10 +13,6 @@ public class ResourceHolder<E extends IResource> implements Cloneable, Serializa
     private VersionNumber version;
     private Class resourceClass;
 
-    public ResourceHolder(Class resourceClass) {
-        this.resourceClass = resourceClass;
-    }
-
     public ResourceHolder(Class resourceClass, String name, VersionNumber version) {
         this.name = name;
         this.resourceClass = resourceClass;

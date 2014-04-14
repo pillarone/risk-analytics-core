@@ -267,8 +267,7 @@ class ArgumentParserIntegrationTests {
     void testResultConfigurationWithDifferentExisting() {
         new ResultConfigurationImportService().compareFilesAndWriteToDB(['Core'])
 
-        ResultConfiguration resultConfigurationToChange = new ResultConfiguration("CoreResultConfiguration")
-        resultConfigurationToChange.modelClass = CoreModel
+        ResultConfiguration resultConfigurationToChange = new ResultConfiguration("CoreResultConfiguration", CoreModel)
         resultConfigurationToChange.load()
         PacketCollector collector = resultConfigurationToChange.collectors[0]
         if(collector.mode.class == SingleValueCollectingModeStrategy) {

@@ -14,7 +14,7 @@ import org.pillarone.riskanalytics.core.util.GroovyUtils
 
 abstract class ParametrizedItem extends CommentableItem {
 
-    protected static Log LOG = LogFactory.getLog(ParametrizedItem)
+    private static final Log LOG = LogFactory.getLog(ParametrizedItem)
 
     private Set<IParametrizedItemListener> listeners = new HashSet<IParametrizedItemListener>()
 

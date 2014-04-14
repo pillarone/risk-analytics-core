@@ -58,8 +58,7 @@ public class SimulationConfiguration implements Serializable, Cloneable {
         simulation.parameterization.parameterHolders*.clearCachedValues()
 
 
-        preparedSimulation.template = new ResultConfiguration(simulation.template.name)
-        preparedSimulation.template.modelClass = simulation.template.modelClass
+        preparedSimulation.template = new ResultConfiguration(simulation.template.name, simulation.template.modelClass)
         preparedSimulation.template.versionNumber = simulation.template.versionNumber
         preparedSimulation.template.collectors = simulation.template.collectors
 

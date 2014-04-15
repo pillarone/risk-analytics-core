@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.simulation.engine
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.model.ModelHelper
 import org.pillarone.riskanalytics.core.output.*
+import org.pillarone.riskanalytics.core.output.batch.OutputStrategyFactory
 import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationBlock
 import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
@@ -24,16 +25,24 @@ import org.springframework.beans.factory.config.BeanDefinition
 public class SimulationConfiguration implements Serializable, Cloneable {
 
     Simulation simulation
-    ICollectorOutputStrategy outputStrategy
     MappingCache mappingCache
     List<SimulationBlock> simulationBlocks = []
     IPacketListener packetListener;
     Map<String, BeanDefinition> beans = [:]
+    ICollectorOutputStrategy outputStrategy
 
-    /**
-     * This creates a new Simulation instance based on the existing one, which only contains the necessary info for the
-     * simulation to make sure that this object can be serialized to the grid.
-     */
+    SimulationConfiguration(Simulation simulation, ICollectorOutputStrategy outputStrategy) {
+        this.simulation = simulation
+        this.outputStrategy = outputStrategy
+    }
+
+    SimulationConfiguration(Simulation simulation) {
+        this(simulation, OutputStrategyFactory.getInstance(simulation.strategy))
+    }
+/**
+ * This creates a new Simulation instance based on the existing one, which only contains the necessary info for the
+ * simulation to make sure that this object can be serialized to the grid.
+ */
     void prepareSimulationForGrid() {
         Simulation preparedSimulation = new Simulation(simulation.name)
         preparedSimulation.id = simulation.id

@@ -1,4 +1,5 @@
 package org.pillarone.riskanalytics.core.simulation.engine.grid
+
 import grails.util.Holders
 import models.core.CoreModel
 import org.gridgain.grid.GridNode
@@ -6,6 +7,7 @@ import org.gridgain.grid.kernal.GridRichNodeImpl
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.pillarone.riskanalytics.core.output.OutputStrategy
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
 import org.pillarone.riskanalytics.core.simulation.engine.grid.mapping.AbstractNodeMappingStrategy
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
@@ -38,7 +40,6 @@ class SimulationTaskTests {
         SimulationTask simulationTask = new TestSimulationTask(1)
 
         SimulationConfiguration configuration = createConfig(999)
-
 
         //tests will have to be adjusted for other values
         assertEquals 1000, SimulationTask.SIMULATION_BLOCK_SIZE
@@ -169,7 +170,6 @@ class SimulationTaskTests {
     }
 
     static SimulationConfiguration createConfig(int iterationCount) {
-        SimulationConfiguration configuration = new SimulationConfiguration()
         Simulation simulation = new Simulation("test")
         simulation.id = 1L
         simulation.modelClass = CoreModel
@@ -177,7 +177,8 @@ class SimulationTaskTests {
         simulation.parameterization = new Parameterization("test")
         simulation.template = new ResultConfiguration('heinz', CoreModel)
         simulation.periodCount = 1
-        configuration.simulation = simulation
+        simulation.strategy = OutputStrategy.NO_OUTPUT
+        SimulationConfiguration configuration = new SimulationConfiguration(simulation)
         assertNull simulation.start
         assertNull simulation.end
         return configuration

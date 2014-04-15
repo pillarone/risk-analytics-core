@@ -1,16 +1,15 @@
 package org.pillarone.riskanalytics.core.output
 
-import org.springframework.jdbc.datasource.DataSourceUtils
 import groovy.sql.Sql
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.BatchRun
 import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper
-import org.pillarone.riskanalytics.core.BatchRunSimulationRun
-
+import org.springframework.jdbc.datasource.DataSourceUtils
 
 class MysqlDeleteStrategy extends DeleteSimulationStrategy {
 
-    private static Log LOG = LogFactory.getLog(MysqlDeleteStrategy)
+    private static final Log LOG = LogFactory.getLog(MysqlDeleteStrategy)
 
     void deleteSimulation(SimulationRun simulationRun) {
         new File(GridHelper.getResultLocation(simulationRun.id)).deleteDir()
@@ -29,11 +28,14 @@ class MysqlDeleteStrategy extends DeleteSimulationStrategy {
             }
 
             sql.execute("DELETE FROM post_simulation_calculation where run_id=${simulationRun.id}")
-            BatchRunSimulationRun.findAllBySimulationRun(simulationRun)*.delete()
-            simulationRun.delete(flush: true)
+            BatchRun batchRun = simulationRun.batchRun
+            if (batchRun) {
+                batchRun.removeFromSimulationRuns(simulationRun)
+                batchRun.save(flush: true)
+            } else {
+                simulationRun.delete(flush: true)
+            }
             LOG.info "Simulation ${simulationRun.name} deleted in ${System.currentTimeMillis() - time}ms"
         }
     }
-
-
 }

@@ -1,23 +1,29 @@
 package org.pillarone.riskanalytics.core
-import org.joda.time.DateTime
-import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
+
+import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.util.DatabaseUtils
 
 class BatchRun {
     String name
     String comment
-    DateTime executionTime
     boolean executed = false
+    List<SimulationRun> simulationRuns = []
+
+    static hasMany = [simulationRuns: SimulationRun]
+
+    static fetchMode = [simulationRuns: 'eager']
 
     static constraints = {
         name unique: true
         comment nullable: true
-        executionTime nullable: true
     }
 
     static mapping = {
-        executionTime type: DateTimeMillisUserType
-        if (DatabaseUtils.isOracleDatabase()) {
+        simulationRuns indexColumn: [
+                name: "priority",
+                type: Integer
+        ]
+        if (DatabaseUtils.oracleDatabase) {
             comment(column: 'comment_value')
         }
     }

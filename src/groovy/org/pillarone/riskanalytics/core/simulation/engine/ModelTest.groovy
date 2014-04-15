@@ -15,12 +15,15 @@ import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.output.FileOutput
 import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
+import org.pillarone.riskanalytics.core.output.SimulationRun
+import org.pillarone.riskanalytics.core.output.batch.OutputStrategyFactory
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationBlock
 import org.pillarone.riskanalytics.core.simulation.item.*
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.util.MathUtils
 
 import static org.junit.Assert.*
+
 /**
  * An abstract class which provides functionality to run model tests.
  * This class does not belong to the test sources so that it can be used in plugins too.
@@ -86,60 +89,61 @@ abstract class ModelTest {
 
     @Before
     void setUp() {
-        MappingCache.instance.clear()
-        MathUtils.initRandomStreamBase(1234)
+        ParameterizationDAO.withNewSession { def session ->
+            MappingCache.instance.clear()
+            MathUtils.initRandomStreamBase(1234)
 
-        new ParameterizationImportService().compareFilesAndWriteToDB([getParameterFileName()])
-        new ResultConfigurationImportService().compareFilesAndWriteToDB([getResultConfigurationFileName()])
-        new ModelStructureImportService().compareFilesAndWriteToDB([getStructureFileName()])
+            new ParameterizationImportService().compareFilesAndWriteToDB([getParameterFileName()])
+            new ResultConfigurationImportService().compareFilesAndWriteToDB([getResultConfigurationFileName()])
+            new ModelStructureImportService().compareFilesAndWriteToDB([getStructureFileName()])
 
-        def parameter = ParameterizationDAO.findByName(getParameterDisplayName())
-        assertNotNull parameter
+            def parameter = ParameterizationDAO.findByName(getParameterDisplayName())
+            assertNotNull parameter
 
-        Parameterization parameterization = new Parameterization(parameter.name)
-        parameterization.modelClass = getModelClass()
-        parameterization.load()
+            Parameterization parameterization = new Parameterization(parameter.name)
+            parameterization.modelClass = getModelClass()
+            parameterization.load()
 
-        def resultConfig = ResultConfigurationDAO.findByName(getResultConfigurationDisplayName())
-        assertNotNull resultConfig
+            def resultConfig = ResultConfigurationDAO.findByName(getResultConfigurationDisplayName())
+            assertNotNull resultConfig
 
-        ResultConfiguration resultConfiguration = new ResultConfiguration(resultConfig.name, getModelClass())
-        resultConfiguration.load()
+            ResultConfiguration resultConfiguration = new ResultConfiguration(resultConfig.name, getModelClass())
+            resultConfiguration.load()
 
-        Class modelClass = getModelClass()
-        def modelInstance = modelClass.newInstance() as Model
+            Class modelClass = getModelClass()
+            def modelInstance = modelClass.newInstance() as Model
 
-        run = new Simulation(getResultFileName())
-        run.parameterization = parameterization
-        run.template = resultConfiguration
-        run.modelClass = modelClass
-        run.modelVersionNumber = new VersionNumber("1")
-        run.periodCount = getPeriodCount()
-        run.numberOfIterations = getIterationCount()
-        run.structure = ModelStructure.getStructureForModel(modelClass)
+            run = new Simulation(getResultFileName())
+            run.parameterization = parameterization
+            run.template = resultConfiguration
+            run.modelClass = modelClass
+            run.modelVersionNumber = new VersionNumber("1")
+            run.periodCount = getPeriodCount()
+            run.numberOfIterations = getIterationCount()
+            run.structure = ModelStructure.getStructureForModel(modelClass)
+            run.strategy = OutputStrategyFactory.getEnum(getOutputStrategy().class)
+            if (modelInstance.requiresStartDate()) {
+                run.beginOfFirstPeriod = new DateTime(2009, 1, 1, 0, 0, 0, 0)
+            }
 
-        if (modelInstance.requiresStartDate()) {
-            run.beginOfFirstPeriod = new DateTime(2009, 1, 1, 0, 0, 0, 0)
+            for (ParameterHolder parameterHolder in getRuntimeParameters()) {
+                run.addParameter(parameterHolder)
+            }
+
+            assertNotNull run.save()
+            refFileName = getPath() + getResultFileName() + "_ref.tsl"
+            newFileName = getPath() + getResultFileName() + ".tsl"
+            clean()
+            session.flush()
         }
-
-        for (ParameterHolder parameterHolder in getRuntimeParameters()) {
-            run.addParameter(parameterHolder)
-        }
-
-        assertNotNull run.save()
-        refFileName = getPath() + getResultFileName() + "_ref.tsl"
-        newFileName = getPath() + getResultFileName() + ".tsl"
-        clean()
     }
 
     @Test
     final void testModelRun() {
         runner = SimulationRunner.createRunner()
-        ICollectorOutputStrategy output = getOutputStrategy()
-        SimulationConfiguration configuration = new SimulationConfiguration(
-                simulation: run, outputStrategy: output,
-                simulationBlocks: [new SimulationBlock(0, getIterationCount(), 0)]
-        )
+        ICollectorOutputStrategy output = outputStrategy
+        SimulationConfiguration configuration = new SimulationConfiguration(run, output)
+        configuration.simulationBlocks = [new SimulationBlock(0, iterationCount, 0)]
         configuration.createMappingCache(run.template)
         runner.simulationConfiguration = configuration
 
@@ -154,13 +158,15 @@ abstract class ModelTest {
     }
 
     @After
-    void cleanUp() { //TODO: db changes made in @Before classes do not get rolled back by grails..
-        Parameterization parameterization = run.parameterization
-        ResultConfiguration template = run.template
-
-        run.delete()
-        parameterization.delete()
-        template.delete()
+    void cleanUp() {
+        SimulationRun.withNewSession { def session ->
+            Parameterization parameterization = run.parameterization
+            ResultConfiguration template = run.template
+            run.delete()
+            parameterization.delete()
+            template.delete()
+            session.flush()
+        }
     }
 
     protected ICollectorOutputStrategy getOutputStrategy() {

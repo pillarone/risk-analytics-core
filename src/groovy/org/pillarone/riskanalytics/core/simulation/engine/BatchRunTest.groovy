@@ -2,12 +2,9 @@ package org.pillarone.riskanalytics.core.simulation.engine
 
 import org.junit.Test
 import org.pillarone.riskanalytics.core.BatchRun
-import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.batch.BatchRunService
-import org.pillarone.riskanalytics.core.output.OutputStrategy
 
 import static org.junit.Assert.assertNotNull
-
 
 abstract class BatchRunTest extends ModelTest {
 
@@ -15,10 +12,10 @@ abstract class BatchRunTest extends ModelTest {
     final void testBatchRun() {
         BatchRunService service = BatchRunService.service
         BatchRun batchRun = null
-        BatchRun.withNewSession {  def session ->
-            batchRun = new BatchRun(name: "testBatchRun", executionTime: new DateTime(2100, 1, 1, 0, 0, 0, 0)).save(flush: true)
+        BatchRun.withNewSession { def session ->
+            batchRun = new BatchRun(name: "testBatchRun").save(flush: true)
             assertNotNull batchRun
-            service.createBatchRunSimulationRun(batchRun, run, OutputStrategy.FILE_OUTPUT)
+            service.createBatchRunSimulationRun(batchRun, run)
             session.flush()
         }
         service.runBatch(batchRun)

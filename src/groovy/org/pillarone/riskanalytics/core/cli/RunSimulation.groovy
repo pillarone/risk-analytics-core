@@ -65,13 +65,10 @@ public class RunSimulation {
 
     private
     static SimulationConfiguration createConfiguration(ArgumentParser parser, CommandLine commandLine) throws Exception {
-        SimulationConfiguration configuration = new SimulationConfiguration();
-        configuration.setOutputStrategy(parser.getOutputStrategy(commandLine));
         Simulation simulation = parser.createSimulation(commandLine);
-        simulation.getParameterization().load(true);
-        simulation.getTemplate().load(true);
-        configuration.setSimulation(simulation);
-        return configuration;
+        simulation.parameterization.load(true);
+        simulation.template.load(true);
+        return new SimulationConfiguration(simulation, parser.getOutputStrategy(commandLine));
     }
 
     private static void shutdown(IExternalDatabaseSupport databaseSupport) {

@@ -1,7 +1,9 @@
 package org.pillarone.riskanalytics.core.simulation.engine
+
 import models.core.CoreModel
 import org.junit.Test
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
+import org.pillarone.riskanalytics.core.output.OutputStrategy
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
@@ -11,12 +13,11 @@ import static org.junit.Assert.*
 
 class SimulationConfigurationTests {
 
-
     @Test
-    void prepareForGrid() {
+    void testPrepareForGrid() {
         FileImportService.importModelsIfNeeded(["Core"])
 
-        Simulation simulation = new Simulation("prepareForGrid")
+        Simulation simulation = new Simulation("testPrepareForGrid")
         simulation.modelClass = CoreModel
         simulation.parameterization = new Parameterization("CoreParameters", CoreModel)
         simulation.parameterization.load()
@@ -25,8 +26,8 @@ class SimulationConfigurationTests {
         simulation.template.load()
 
         simulation.keyFiguresToPreCalculate = [:]
-
-        SimulationConfiguration configuration = new SimulationConfiguration(simulation: simulation)
+        simulation.strategy = OutputStrategy.NO_OUTPUT
+        SimulationConfiguration configuration = new SimulationConfiguration(simulation)
         configuration.prepareSimulationForGrid()
 
         assertNotSame(simulation, configuration.simulation)
@@ -44,7 +45,5 @@ class SimulationConfigurationTests {
             assertNotNull(copiedHolder)
             assertNotSame(copiedHolder, holder)
         }
-
-
     }
 }

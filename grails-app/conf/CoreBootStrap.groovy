@@ -3,10 +3,12 @@ import grails.util.Environment
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.pillarone.riskanalytics.core.BatchRunSimulationRun
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
-import org.pillarone.riskanalytics.core.output.*
+import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
+import org.pillarone.riskanalytics.core.output.AggregatedWithSingleAvailableCollectingModeStrategy
+import org.pillarone.riskanalytics.core.output.CollectorMapping
+import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
 import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.EnumTagType
 import org.pillarone.riskanalytics.core.user.*
@@ -14,14 +16,12 @@ import org.springframework.transaction.TransactionStatus
 
 class CoreBootStrap {
 
-    private static Log LOG = LogFactory.getLog(CoreBootStrap)
+    private static final Log LOG = LogFactory.getLog(CoreBootStrap)
 
-    SpringSecurityService authenticateService
+    SpringSecurityService springSecurityService
     GrailsApplication grailsApplication
 
     def init = { servletContext ->
-
-        authenticateService = UserManagement.getSpringSecurityService()
 
         //All mappings must be persistent before a simulation is started
         CollectorMapping.withTransaction { status ->
@@ -56,7 +56,7 @@ class CoreBootStrap {
 
                 Person admin = new Person()
                 admin.username = "admin"
-                admin.password = authenticateService.encodePassword("admin")
+                admin.password = springSecurityService.encodePassword("admin")
                 admin.enabled = true
                 admin.settings = new UserSettings(language: "en")
                 admin.save()
@@ -64,7 +64,7 @@ class CoreBootStrap {
 
                 Person reviewer = new Person()
                 reviewer.username = "reviewer"
-                reviewer.password = authenticateService.encodePassword("reviewer")
+                reviewer.password = springSecurityService.encodePassword("reviewer")
                 reviewer.enabled = true
                 reviewer.settings = new UserSettings(language: "en")
                 reviewer.save()
@@ -72,7 +72,7 @@ class CoreBootStrap {
 
                 Person actuary = new Person()
                 actuary.username = "actuary"
-                actuary.password = authenticateService.encodePassword("actuary")
+                actuary.password = springSecurityService.encodePassword("actuary")
                 actuary.enabled = true
                 actuary.settings = new UserSettings(language: "en")
                 actuary.save()
@@ -80,7 +80,7 @@ class CoreBootStrap {
 
                 Person actuaryDE = new Person()
                 actuaryDE.username = "aktuar"
-                actuaryDE.password = authenticateService.encodePassword("aktuar")
+                actuaryDE.password = springSecurityService.encodePassword("aktuar")
                 actuaryDE.enabled = true
                 actuaryDE.settings = new UserSettings(language: "de")
                 actuaryDE.save()
@@ -88,7 +88,7 @@ class CoreBootStrap {
 
                 Person actuaryFR = new Person()
                 actuaryFR.username = "actuaire"
-                actuaryFR.password = authenticateService.encodePassword("actuaire")
+                actuaryFR.password = springSecurityService.encodePassword("actuaire")
                 actuaryFR.enabled = true
                 actuaryFR.settings = new UserSettings(language: "fr")
                 actuaryFR.save()
@@ -96,19 +96,7 @@ class CoreBootStrap {
 
             }
         }
-        //delete all unfinished simulations
-        SimulationRun.withTransaction { status ->
-            def unfinishedSimulations = SimulationRun.findAllByEndTime(null)
-            unfinishedSimulations.each { SimulationRun simulationRun ->
-                try {
-                    BatchRunSimulationRun batchRunSimulationRun = BatchRunSimulationRun.findBySimulationRun(simulationRun)
-                    if (!batchRunSimulationRun)
-                        simulationRun.delete()
-                } catch (Exception ex) {
-                    ex.printStackTrace()
-                }
-            }
-        }
+
         Tag.withTransaction { status ->
             if (!Tag.findByName(Tag.LOCKED_TAG)) {
                 new Tag(name: Tag.LOCKED_TAG, tagType: EnumTagType.PARAMETERIZATION).save()

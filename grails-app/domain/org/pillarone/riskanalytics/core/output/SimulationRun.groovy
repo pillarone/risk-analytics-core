@@ -2,12 +2,14 @@ package org.pillarone.riskanalytics.core.output
 
 import org.apache.commons.lang.builder.HashCodeBuilder
 import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.BatchRun
 import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.parameter.Parameter
 import org.pillarone.riskanalytics.core.parameter.SimulationTag
 import org.pillarone.riskanalytics.core.parameter.comment.ResultCommentDAO
 import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
+import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.util.DatabaseUtils
 
@@ -32,6 +34,8 @@ class SimulationRun {
     DateTime creationDate
     DateTime modificationDate
     Person creator
+    OutputStrategy strategy
+    SimulationState simulationState
 
     // more to come here
 
@@ -40,6 +44,8 @@ class SimulationRun {
     static transients = ['dataSource']
 
     static hasMany = [comments: ResultCommentDAO, runtimeParameters: Parameter, tags: SimulationTag]
+
+    static belongsTo = [batchRun: BatchRun]
 
     static constraints = {
         name unique: 'model'
@@ -55,6 +61,9 @@ class SimulationRun {
         parameterization nullable: true
         resultConfiguration nullable: true
         creator nullable: true
+        strategy nullable: true
+        simulationState nullable: true
+        batchRun nullable: true
     }
 
     static mapping = {
@@ -72,7 +81,7 @@ class SimulationRun {
     }
 
     static namedQueries = {
-        findSimulationForParameterization { name, modelClassName, version ->
+        findSimulationForParameterization { String name, String modelClassName, String version ->
             parameterization {
                 eq('name', name)
                 eq('modelClassName', modelClassName)

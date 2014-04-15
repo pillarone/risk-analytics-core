@@ -1,5 +1,4 @@
 package org.pillarone.riskanalytics.core.simulation.item
-
 import grails.util.Holders
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
@@ -12,6 +11,7 @@ import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 import org.pillarone.riskanalytics.core.output.DeleteSimulationStrategy
+import org.pillarone.riskanalytics.core.output.OutputStrategy
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.parameter.Parameter
@@ -19,6 +19,7 @@ import org.pillarone.riskanalytics.core.parameter.SimulationTag
 import org.pillarone.riskanalytics.core.parameter.comment.CommentDAO
 import org.pillarone.riskanalytics.core.parameter.comment.ResultCommentDAO
 import org.pillarone.riskanalytics.core.parameter.comment.Tag
+import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.FunctionComment
 
@@ -33,6 +34,9 @@ class Simulation extends ParametrizedItem {
 
     DateTime beginOfFirstPeriod
     int numberOfIterations
+    OutputStrategy strategy = OutputStrategy.NO_OUTPUT
+    SimulationState simulationState = SimulationState.NOT_RUNNING
+
     /**
      * The number of periods run in this simulation. Might be different than the number of periods in the parameterization.
      */
@@ -73,7 +77,7 @@ class Simulation extends ParametrizedItem {
         SimulationRun run = target as SimulationRun
         run.name = name
         run.comment = comment
-        run.model = getModelClass()?.name
+        run.model = modelClass?.name
         run.parameterization = ParameterizationDAO.find(parameterization.name, run.model, parameterization.versionNumber.toString())
         run.resultConfiguration = ResultConfigurationDAO.find(template.name, run.model, template.versionNumber.toString())
         if (run.resultConfiguration == null) { //PMO-2648
@@ -92,6 +96,8 @@ class Simulation extends ParametrizedItem {
         run.creator = creator
         run.modificationDate = modificationDate
         run.randomSeed = randomSeed
+        run.simulationState = simulationState
+        run.strategy = strategy
         saveComments(run)
         saveTags(run)
         saveParameters(runtimeParameters, run.runtimeParameters, run)
@@ -122,6 +128,12 @@ class Simulation extends ParametrizedItem {
         creator = run.creator
         modificationDate = run.modificationDate
         randomSeed = run.randomSeed
+        if (run.simulationState) {
+            simulationState = run.simulationState
+        }
+        if (run.strategy) {
+            strategy = run.strategy
+        }
         if (completeLoad) {
             loadComments(run)
             loadParameters(runtimeParameters, run.runtimeParameters)
@@ -131,14 +143,12 @@ class Simulation extends ParametrizedItem {
 
     @Override
     protected void addToDao(Parameter parameter, Object dao) {
-        dao = dao as SimulationRun
-        dao.addToRuntimeParameters(parameter)
+        (dao as SimulationRun).addToRuntimeParameters(parameter)
     }
 
     @Override
     protected void removeFromDao(Parameter parameter, Object dao) {
-        dao = dao as SimulationRun
-        dao.removeFromRuntimeParameters(parameter)
+        (dao as SimulationRun).removeFromRuntimeParameters(parameter)
     }
 
 
@@ -151,9 +161,9 @@ class Simulation extends ParametrizedItem {
     @CompileStatic
     public Object getParameter(String path) {
         for (int i = 0; i < runtimeParameters.size(); i++) {
-            ParameterHolder parameterHolder = runtimeParameters.get(i);
-            if (parameterHolder.getPath().equals(path)) {
-                return parameterHolder.getBusinessObject();
+            ParameterHolder parameterHolder = runtimeParameters[i];
+            if (parameterHolder.path.equals(path)) {
+                return parameterHolder.businessObject;
             }
         }
         throw new IllegalArgumentException("Failed to get runtime parameter for path '${path}'.");
@@ -170,7 +180,7 @@ class Simulation extends ParametrizedItem {
 
     protected void saveTags(SimulationRun run) {
         String tagDeltas = "" //PMO-2737
-        List tagsToRemove = []
+        List<SimulationTag> tagsToRemove = []
         for (SimulationTag tag in run.tags) {
             if (!tags.contains(tag.tag)) {
                 tagsToRemove << tag
@@ -189,7 +199,7 @@ class Simulation extends ParametrizedItem {
             }
         }
         if (tagDeltas.length() > 0) {
-            LOG.info("+/-TAGS on '${getNameAndVersion()}': $tagDeltas")
+            LOG.info("+/-TAGS on '${nameAndVersion}': $tagDeltas")
         }
     }
 
@@ -273,6 +283,4 @@ class Simulation extends ParametrizedItem {
             return false
         }
     }
-
-
 }

@@ -10,7 +10,7 @@ abstract class ConfigObjectBasedModellingItem extends ModellingItem {
     ConfigObject data
     String comment
 
-    public ConfigObjectBasedModellingItem(String name) {
+    ConfigObjectBasedModellingItem(String name) {
         super(name);
         versionNumber = new VersionNumber('1')
     }
@@ -18,7 +18,7 @@ abstract class ConfigObjectBasedModellingItem extends ModellingItem {
 
     abstract public IConfigObjectWriter getWriter()
 
-    public Class getModelClass() {
+    Class getModelClass() {
         Class modelClass = null
         if (data != null) {
             modelClass = data.containsKey("model") ? data.model : null
@@ -26,7 +26,7 @@ abstract class ConfigObjectBasedModellingItem extends ModellingItem {
         return modelClass
     }
 
-    public void setModelClass(Class newModelClass) {
+    void setModelClass(Class newModelClass) {
         if (data == null) {
             data = new ConfigObject()
         }
@@ -36,7 +36,7 @@ abstract class ConfigObjectBasedModellingItem extends ModellingItem {
     @CompileStatic
     private String checkAndTransformToStringData() {
         StringWriter stringWriter = new StringWriter()
-        getWriter().write(data, new BufferedWriter(stringWriter))
+        writer.write(data, new BufferedWriter(stringWriter))
         String stringData = stringWriter.toString()
 
         GroovyUtils.parseGroovyScript stringData, { }
@@ -45,7 +45,7 @@ abstract class ConfigObjectBasedModellingItem extends ModellingItem {
     }
 
     @CompileStatic
-    public void unload() {
+    void unload() {
         super.unload();
         data = null
     }
@@ -53,7 +53,7 @@ abstract class ConfigObjectBasedModellingItem extends ModellingItem {
     protected void mapToDao(def target) {
         target.name = name
         target.itemVersion = versionNumber.toString()
-        target.modelClassName = getModelClass()?.name
+        target.modelClassName = modelClass?.name
         target.comment = comment
 
         String actualStringData = checkAndTransformToStringData()
@@ -79,10 +79,6 @@ abstract class ConfigObjectBasedModellingItem extends ModellingItem {
         daoToBeDeleted.stringData.delete() // TODO (msh): error handling
     }
 
-    protected def loadFromDB() {
-        daoClass.findByNameAndItemVersion(name, versionNumber.toString())
-    }
-
     protected void mapFromDao(def source, boolean completeLoad) {
         if (source) {
             GroovyUtils.parseGroovyScript source.stringData.data, { ConfigObject config ->
@@ -92,5 +88,4 @@ abstract class ConfigObjectBasedModellingItem extends ModellingItem {
             FileImportService.spreadRanges(data)
         }
     }
-
 }

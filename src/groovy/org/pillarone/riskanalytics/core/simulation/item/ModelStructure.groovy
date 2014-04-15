@@ -57,7 +57,7 @@ public class ModelStructure extends ConfigObjectBasedModellingItem {
                     availableModelClasses << modelClass
                 }
             } catch (ClassNotFoundException e) {
-                LOG.error "Model ${it} is in db, but dont exist as classfile"
+                LOG.error "Model ${it} is in db, but dont exist as classfile", e
             }
         }
 
@@ -66,5 +66,9 @@ public class ModelStructure extends ConfigObjectBasedModellingItem {
         LOG.debug "Available model classes: $availableModelClasses"
 
         return availableModelClasses
+    }
+
+    protected def loadFromDB() {
+        ModelStructureDAO.findByNameAndItemVersion(name, versionNumber.toString())
     }
 }

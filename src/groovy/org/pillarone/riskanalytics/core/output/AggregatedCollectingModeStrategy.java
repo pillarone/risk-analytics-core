@@ -5,14 +5,13 @@ import org.pillarone.riskanalytics.core.output.aggregation.PacketAggregatorRegis
 import org.pillarone.riskanalytics.core.packets.Packet;
 import org.pillarone.riskanalytics.core.packets.PacketList;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class AggregatedCollectingModeStrategy extends AbstractCollectingModeStrategy {
 
-    static final String IDENTIFIER = "AGGREGATED";
+    public static final String IDENTIFIER = "AGGREGATED";
 
     private static final String RESOURCE_BUNDLE = "org.pillarone.riskanalytics.core.output.applicationResources";
     private String displayName;

@@ -1,4 +1,5 @@
 package org.pillarone.riskanalytics.core.simulation.item
+
 import grails.util.Holders
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
@@ -36,6 +37,7 @@ class Simulation extends ParametrizedItem {
     int numberOfIterations
     OutputStrategy strategy = OutputStrategy.NO_OUTPUT
     SimulationState simulationState = SimulationState.NOT_RUNNING
+    Long batchId
 
     /**
      * The number of periods run in this simulation. Might be different than the number of periods in the parameterization.
@@ -128,6 +130,7 @@ class Simulation extends ParametrizedItem {
         creator = run.creator
         modificationDate = run.modificationDate
         randomSeed = run.randomSeed
+        batchId = run.batchRun?.id
         if (run.simulationState) {
             simulationState = run.simulationState
         }

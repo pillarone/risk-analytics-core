@@ -85,7 +85,7 @@ class ModellingItemUpdaterTests {
     void testCopySimulation() {
         assert !ModellingItemUpdater.createOrUpdateModellingItem(null, new Simulation('name'))
         SimulationCacheItem source = new SimulationCacheItem(
-                100l, 'name', new ParameterizationCacheItem(1l, 'name', null, null,), new ResultConfigurationCacheItem(1l, 'name', EmptyModel, null), ImmutableList.copyOf([new Tag(name: 'tagName')]), CoreModel, new VersionNumber('7.0'), new DateTime(), new DateTime(), new DateTime(), new DateTime(), new Person(), 0
+                100l, 'name', new ParameterizationCacheItem(1l, 'name', null, null,), new ResultConfigurationCacheItem(1l, 'name', EmptyModel, null), ImmutableList.copyOf([new Tag(name: 'tagName')]), CoreModel, new VersionNumber('7.0'), new DateTime(), new DateTime(), new DateTime(), new DateTime(), new Person(), 0, null
         )
 
         Simulation result = ModellingItemUpdater.createOrUpdateModellingItem(source, null)

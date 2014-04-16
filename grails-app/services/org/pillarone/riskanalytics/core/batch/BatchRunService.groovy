@@ -6,6 +6,7 @@ import org.pillarone.riskanalytics.core.BatchRun
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationQueueService
+import org.pillarone.riskanalytics.core.simulation.item.Batch
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
 class BatchRunService {
@@ -19,35 +20,35 @@ class BatchRunService {
         return Holders.grailsApplication.mainContext.getBean(BatchRunService)
     }
 
-    void runBatch(BatchRun batchRun) {
+    void runBatch(Batch batch) {
         BatchRun.withTransaction {
-            BatchRun reload = BatchRun.get(batchRun.id)
-            offer(reload.simulationRuns)
-            reload.executed = true
-            reload.save(flush: true)
+            BatchRun batchRun = BatchRun.findByName(batch.name)
+            offer(batch.simulations)
+            batchRun.executed = true
+            batchRun.save(flush: true)
         }
     }
 
-    void runBatchRunSimulation(SimulationRun simulationRun) {
+    void runBatchRunSimulation(Simulation simulationRun) {
         offer(simulationRun)
     }
 
-    private boolean shouldRun(SimulationRun run) {
-        run.endTime == null && run.startTime == null
+    private boolean shouldRun(Simulation run) {
+        run.end == null && run.start == null
     }
 
-    private void offer(List<SimulationRun> simulationRuns) {
+    private void offer(List<Simulation> simulationRuns) {
         backgroundService.execute("execute bathcRunSimulationRuns $simulationRuns") {
-            List<SimulationConfiguration> configurations = simulationRuns.findAll { SimulationRun simulationRun -> shouldRun(simulationRun) }.collect {
+            List<SimulationConfiguration> configurations = simulationRuns.findAll { Simulation simulationRun -> shouldRun(simulationRun) }.collect {
                 configure(it)
             }
             configurations.each { start(it) }
         }
     }
 
-    private void offer(SimulationRun simulationRun) {
-        if (shouldRun(simulationRun)) {
-            start(configure(simulationRun))
+    private void offer(Simulation simulation) {
+        if (shouldRun(simulation)) {
+            start(configure(simulation))
         }
     }
 
@@ -55,9 +56,8 @@ class BatchRunService {
         simulationQueueService.offer(simulationConfiguration, 5)
     }
 
-    private SimulationConfiguration configure(SimulationRun simulationRun) {
-        def simulation = loadSimulation(simulationRun.name)
-        new SimulationConfiguration(simulation)
+    private SimulationConfiguration configure(Simulation simulation) {
+        new SimulationConfiguration(loadSimulation(simulation.name))
     }
 
     private static Simulation loadSimulation(String simulationName) {
@@ -79,35 +79,35 @@ class BatchRunService {
         }
     }
 
-    void deleteSimulationRun(BatchRun batchRun, SimulationRun simulationRun) {
+    void deleteSimulationRun(Batch batch, Simulation simulation) {
         BatchRun.withTransaction {
-            batchRun.attach()
+            BatchRun batchRun = BatchRun.lock(batch.id)
+            SimulationRun simulationRun = SimulationRun.lock(simulation.id)
             batchRun.removeFromSimulationRuns(simulationRun)
             batchRun.save(flush: true)
         }
     }
 
-    void changePriority(BatchRun batchRun, SimulationRun simulationRun, int step) {
+    void changePriority(Batch batch, Simulation simulation, int step) {
+        batch.load()
+        List<Simulation> simulationRuns = batch.simulations
+        def oldPriority = simulationRuns.indexOf(simulation)
+        if (oldPriority == -1) {
+            throw new IllegalStateException("SimulationRun $simulation does not belong to batch $batch")
+        }
+        int newPriority = oldPriority + step
+        if (newPriority < 0 || newPriority >= simulationRuns.size()) {
+            newPriority = oldPriority
+        }
         BatchRun.withTransaction {
-            BatchRun attachedBatchRun = BatchRun.get(batchRun.id)
-            List<SimulationRun> simulationRuns = attachedBatchRun.simulationRuns
-            def oldPriority = simulationRuns.indexOf(simulationRun)
-            if (oldPriority == -1) {
-                throw new IllegalStateException("SimulationRun $simulationRun does not belong to batch $attachedBatchRun")
-            }
-            int newPriority = oldPriority + step
-            if (newPriority < 0 || newPriority >= simulationRuns.size()) {
-                newPriority = oldPriority
-            }
-            Collections.swap(attachedBatchRun.simulationRuns, newPriority, oldPriority)
-            attachedBatchRun.save(flush: true)
+            BatchRun batchRun = BatchRun.get(batch.id)
+            Collections.swap(batchRun.simulationRuns, newPriority, oldPriority)
+            Collections.swap(batch.simulations, newPriority, oldPriority)
+            batchRun.save(flush: true)
         }
     }
 
-    boolean deleteBatchRun(BatchRun batchRun) {
-        BatchRun.withTransaction {
-            BatchRun.get(batchRun.id).delete()
-        }
-        return true
+    boolean deleteBatchRun(Batch batch) {
+        batch.delete()
     }
 }

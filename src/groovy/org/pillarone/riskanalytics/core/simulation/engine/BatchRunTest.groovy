@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.simulation.engine
 import org.junit.Test
 import org.pillarone.riskanalytics.core.BatchRun
 import org.pillarone.riskanalytics.core.batch.BatchRunService
+import org.pillarone.riskanalytics.core.simulation.item.Batch
 
 import static org.junit.Assert.assertNotNull
 
@@ -18,7 +19,8 @@ abstract class BatchRunTest extends ModelTest {
             service.createBatchRunSimulationRun(batchRun, run)
             session.flush()
         }
-        service.runBatch(batchRun)
+        Batch batch = new Batch(batchRun.name)
+        service.runBatch(batch)
         sleep(5000)
         int totalWait = 0
         while (!isBatchRunExecuted(batchRun)) {

@@ -25,7 +25,7 @@ class BatchRunInfoService {
     }
 
     @CompileStatic
-    SimulationState getSimulationState(SimulationRun simulationRun) {
+    SimulationState getSimulationState(Simulation simulationRun) {
         SimulationRun.get(simulationRun.id)?.simulationState
     }
 }

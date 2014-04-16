@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.modellingitem
 
 import com.google.common.collect.ImmutableList
+import org.pillarone.riskanalytics.core.BatchRun
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.ResourceDAO
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
@@ -70,7 +71,8 @@ class CacheItemMapper {
                             dao.creationDate,
                             dao.modificationDate,
                             dao.creator,
-                            dao.iterations
+                            dao.iterations,
+                            dao.batchRun?.id
                     )
         }
     }
@@ -94,6 +96,24 @@ class CacheItemMapper {
                             ImmutableList.copyOf(dao.tags*.tag ?: []),
                             dao.valid,
                             dao.status
+                    )
+        }
+    }
+
+    static BatchCacheItem getModellingItem(BatchRun dao, boolean forDeletion = false) {
+        checkForId(dao)
+        BatchRun.withNewSession {
+            forDeletion ? new BatchCacheItem(dao.id, null, null, null, null, dao.name, null, dao.executed, null) :
+                    new BatchCacheItem(
+                            dao.id,
+                            dao.creationDate,
+                            dao.modificationDate,
+                            dao.creator,
+                            dao.lastUpdater,
+                            dao.name,
+                            dao.comment,
+                            dao.executed,
+                            ImmutableList.copyOf(dao.simulationRuns.collect { SimulationRun run -> getModellingItem(run, true) }),
                     )
         }
     }

@@ -36,35 +36,35 @@ class AllFieldsFilterTests extends GroovyTestCase {
 
 
     void testSearchSimulations() {
-        SimulationCacheItem simulation = new SimulationCacheItem(1l, 'testName', null, null, null, null, null, null, null, null, null, null, 0)
+        SimulationCacheItem simulation = new SimulationCacheItem(1l, 'testName', null, null, null, null, null, null, null, null, null, null, 0, null)
         verifyOnlyNameSpecificOrGenericFiltersMatch('test', simulation)
 
         assert !new AllFieldsFilter(query: 'not found').accept(simulation)
         assert !new AllFieldsFilter(query: 'name:not found').accept(simulation)
 
 
-        simulation = new SimulationCacheItem(1l, 'some other name', null, null, ImmutableList.copyOf([new Tag(name: 'testName'), new Tag(name: 'secondTag')]), null, null, null, null, null, null, null, 0)
+        simulation = new SimulationCacheItem(1l, 'some other name', null, null, ImmutableList.copyOf([new Tag(name: 'testName'), new Tag(name: 'secondTag')]), null, null, null, null, null, null, null, 0, null)
         assert new AllFieldsFilter(query: 'testName').accept(simulation)        //should match tag
         assert !new AllFieldsFilter(query: 'name:testName').accept(simulation)   //name-specific; should not match tag
         assert new AllFieldsFilter(query: 'tag:testName').accept(simulation)    //should match tag
         assert !new AllFieldsFilter(query: 'tag:other').accept(simulation)       //tag-specific; should not match name
 
         ParameterizationCacheItem parameterization = new ParameterizationCacheItem(1l, null, 'PARAM_NAME', null, null, null, null, null, null, false, null, null)
-        simulation = new SimulationCacheItem(1l, 'some other name', parameterization, null, ImmutableList.copyOf([new Tag(name: 'testName'), new Tag(name: 'secondTag')]), null, null, null, null, null, null, null, 0)
+        simulation = new SimulationCacheItem(1l, 'some other name', parameterization, null, ImmutableList.copyOf([new Tag(name: 'testName'), new Tag(name: 'secondTag')]), null, null, null, null, null, null, null, 0, null)
         assert new AllFieldsFilter(query: 'PARAM_NAME').accept(simulation)     //should match on pn
         assert new AllFieldsFilter(query: 'name:param_').accept(simulation)    //should match on pn
 
         ResultConfigurationCacheItem resultConfiguration = new ResultConfigurationCacheItem(1l, 'TEMPLATE_NAME', null, null, null, null, null, null)
-        simulation = new SimulationCacheItem(1l, 'some other name', parameterization, resultConfiguration, ImmutableList.copyOf([new Tag(name: 'testName'), new Tag(name: 'secondTag')]), null, null, null, null, null, null, null, 0)
+        simulation = new SimulationCacheItem(1l, 'some other name', parameterization, resultConfiguration, ImmutableList.copyOf([new Tag(name: 'testName'), new Tag(name: 'secondTag')]), null, null, null, null, null, null, null, 0, null)
         assert new AllFieldsFilter(query: 'TEMPLATE_NAME').accept(simulation)  //should match tmpl name
         assert new AllFieldsFilter(query: 'name:template').accept(simulation)  //should match on tmpl
 
-        simulation = new SimulationCacheItem(1l, 'some other name', parameterization, resultConfiguration, ImmutableList.copyOf([new Tag(name: 'paramTestName')]), null, null, null, null, null, null, null, 0)
+        simulation = new SimulationCacheItem(1l, 'some other name', parameterization, resultConfiguration, ImmutableList.copyOf([new Tag(name: 'paramTestName')]), null, null, null, null, null, null, null, 0, null)
         assert new AllFieldsFilter(query: 'paramTestName').accept(simulation)  //should not match pn's tags
         assert new AllFieldsFilter(query: 'tag:paramtest').accept(simulation)  //should not match pn's tags
 
         parameterization = new ParameterizationCacheItem(1l, null, 'PARAM_NAME', null, null, null, null, null, null, false, null, 12345l)
-        simulation = new SimulationCacheItem(1l, 'some other name', parameterization, resultConfiguration, ImmutableList.copyOf([new Tag(name: 'paramTestName')]), null, null, null, null, null, null, null, 0)
+        simulation = new SimulationCacheItem(1l, 'some other name', parameterization, resultConfiguration, ImmutableList.copyOf([new Tag(name: 'paramTestName')]), null, null, null, null, null, null, null, 0, null)
         assert !new AllFieldsFilter(query: 't:12345').accept(simulation)        //should not match pn's tags
         assert new AllFieldsFilter(query: 'd:12345').accept(simulation)        //should match pn's deal id
         assert new AllFieldsFilter(query: '12345').accept(simulation)          //should match pn's deal id

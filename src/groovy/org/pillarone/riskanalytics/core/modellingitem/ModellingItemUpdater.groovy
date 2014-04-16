@@ -78,6 +78,26 @@ class ModellingItemUpdater {
         return target
     }
 
+    static Batch createOrUpdateModellingItem(BatchCacheItem source, Batch target) {
+        if (!source) {
+            return null
+        }
+        target = target ?: new Batch(source.name)
+        target.name = source.name
+        target.id = source.id
+        target.creationDate = source.creationDate
+        target.modificationDate = source.modificationDate
+        target.creator = source.creator
+        target.lastUpdater = source.lastUpdater
+        target.comment = source.comment
+        target.executed = source.executed
+        target.simulations = source.simulations.collect { SimulationCacheItem simulationCacheItem ->
+            Simulation targetSimulation = target.simulations.find { Simulation simulation -> simulation.id == simulationCacheItem.id }
+            createOrUpdateModellingItem(simulationCacheItem, targetSimulation)
+        }
+        return target
+    }
+
     static ModellingItem createOrUpdateModellingItem(CacheItem source, ModellingItem target) {
         if (!source) {
             return null

@@ -1,8 +1,10 @@
 package org.pillarone.riskanalytics.core.search
 
+import com.google.common.collect.ImmutableList
 import grails.util.Holders
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.BatchRun
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.ResourceDAO
 import org.pillarone.riskanalytics.core.modellingitem.*
@@ -78,6 +80,9 @@ class CacheItemSearchService {
                 cache.add(CacheItemMapper.getModellingItem(dao))
             }
             for (ResourceDAO dao in ResourceDAO.list()) {
+                cache.add(CacheItemMapper.getModellingItem(dao))
+            }
+            for (BatchRun dao in BatchRun.list()) {
                 cache.add(CacheItemMapper.getModellingItem(dao))
             }
         }
@@ -175,6 +180,27 @@ class CacheItemSearchService {
                 simulation.resultConfiguration = item
             }
         }
+    }
+
+    private synchronized void internalUpdateModellingItemInIndex(SimulationCacheItem item) {
+        if (item.batchId) {
+            cache.findAll {
+                (it instanceof BatchCacheItem) && it.id == item.batchId
+            }.each { BatchCacheItem batchCacheItem ->
+                if (batchCacheItem.simulations.indexOf(item) != -1) {
+                    internalUpdateModellingItemInIndex(batchCacheItem)
+                }
+            }
+        }
+    }
+
+    private synchronized void internalUpdateModellingItemInIndex(BatchCacheItem item) {
+        List<SimulationCacheItem> collect = item.simulations.collect { SimulationCacheItem simulationCacheItem ->
+            SimulationCacheItem existent = cache.find { it == simulationCacheItem } as SimulationCacheItem
+            existent ?: simulationCacheItem
+        }
+
+        item.simulations = ImmutableList.copyOf(collect)
     }
 
     public static CacheItemSearchService getInstance() {

@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core
 
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.output.SimulationRun
+import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.util.DatabaseUtils
 
@@ -34,6 +35,9 @@ class BatchRun {
                 name: "priority",
                 type: Integer
         ]
+        creationDate type: DateTimeMillisUserType
+        creator lazy: false
+        modificationDate type: DateTimeMillisUserType
         if (DatabaseUtils.oracleDatabase) {
             comment(column: 'comment_value')
         }

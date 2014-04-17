@@ -107,7 +107,7 @@ class BatchRunService {
         }
     }
 
-    boolean deleteBatchRun(Batch batch) {
+    boolean deleteBatch(Batch batch) {
         batch.delete()
     }
 }

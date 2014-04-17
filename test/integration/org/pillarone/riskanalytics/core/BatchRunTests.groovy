@@ -97,7 +97,7 @@ class BatchRunTests {
 
         Batch batch = new Batch(batchRun.name)
 
-        batchRunService.deleteBatchRun(batch)
+        batchRunService.deleteBatch(batch)
 
         bRun = BatchRun.findByName(batch.name)
         assertNull bRun

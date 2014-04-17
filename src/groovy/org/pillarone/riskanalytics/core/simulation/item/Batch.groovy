@@ -29,10 +29,12 @@ class Batch extends ModellingItem {
         batchRun.comment = comment
         batchRun.name = name
         batchRun.executed = executed
+        batchRun.creationDate = creationDate
+        batchRun.modificationDate = modificationDate
+        batchRun.lastUpdater = lastUpdater
+        batchRun.creator = creator
         batchRun.simulationRuns = simulations.collect {
-            SimulationRun run = SimulationRun.findByName(it.name)
-            //TODO run == null ?
-            run
+            SimulationRun.findByName(it.name)
         }
     }
 
@@ -42,6 +44,10 @@ class Batch extends ModellingItem {
         comment = batchRun.comment
         executed = batchRun.executed
         name = batchRun.name
+        creationDate = batchRun.creationDate
+        modificationDate = batchRun.modificationDate
+        lastUpdater = batchRun.lastUpdater
+        creator = batchRun.creator
         simulations = batchRun.simulationRuns.collect { SimulationRun run ->
             Simulation simulation = new Simulation(run.name)
             simulation.load()

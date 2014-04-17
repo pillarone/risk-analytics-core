@@ -248,7 +248,7 @@ abstract class ModellingItem implements Serializable {
     }
 
     @CompileStatic
-    List getSimulations() {
+    List<Simulation> getSimulations() {
         return []
     }
 

@@ -420,11 +420,13 @@ class Parameterization extends ParametrizedItem {
         return status == NONE || status == DATA_ENTRY
     }
 
-    List<SimulationRun> getSimulations() {
+    List<Simulation> getSimulations() {
         if (!loaded) {
             load()
         }
-        SimulationRun.findAllByParameterizationAndToBeDeleted(dao, false)
+        SimulationRun.findAllByParameterizationAndToBeDeleted(dao, false).collect {
+            new Simulation(it.name)
+        }
     }
 
     @Override

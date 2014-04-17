@@ -5,7 +5,6 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.SimulationProfileDAO
 import org.pillarone.riskanalytics.core.model.Model
-import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 import org.pillarone.riskanalytics.core.output.*
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 
@@ -170,14 +169,16 @@ class ResultConfiguration extends ModellingItem {
 
     @CompileStatic
     boolean isEditable() {
-        return !isUsedInSimulation()
+        return !usedInSimulation
     }
 
-    public List<SimulationRun> getSimulations() {
+    public List<Simulation> getSimulations() {
         if (!loaded) {
             load()
         }
-        return SimulationRun.findAllByResultConfigurationAndToBeDeleted(dao, false)
+        return SimulationRun.findAllByResultConfigurationAndToBeDeleted(dao, false).collect {
+            new Simulation(it.name)
+        }
     }
 
 

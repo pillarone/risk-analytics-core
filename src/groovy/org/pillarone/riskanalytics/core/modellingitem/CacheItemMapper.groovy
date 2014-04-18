@@ -113,7 +113,7 @@ class CacheItemMapper {
                             dao.name,
                             dao.comment,
                             dao.executed,
-                            ImmutableList.copyOf(dao.simulationRuns.collect { SimulationRun run -> getModellingItem(run, true) }),
+                            ImmutableList.copyOf(dao.simulationRuns.collect { SimulationRun run -> getModellingItem(run) }),
                     )
         }
     }

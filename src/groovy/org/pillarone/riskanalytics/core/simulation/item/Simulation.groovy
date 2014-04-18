@@ -271,17 +271,20 @@ class Simulation extends ParametrizedItem {
 
     @CompileStatic
     public int hashCode() {
+        if (!modelVersionNumber) {
+            LOG.error("simulation ${dump()} has no modelVersionNumber")
+        }
         HashCodeBuilder hashCodeBuilder = new HashCodeBuilder()
         hashCodeBuilder.append(name)
         hashCodeBuilder.append(modelClass)
-        hashCodeBuilder.append(modelVersionNumber.toString())
+        hashCodeBuilder.append(modelVersionNumber?.toString())
         return hashCodeBuilder.toHashCode()
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Simulation) {
-            return super.equals(obj) && obj.modelVersionNumber.equals(modelVersionNumber) //20140115 PMO-2681
+            return super.equals(obj) && obj.modelVersionNumber?.equals(modelVersionNumber) //20140115 PMO-2681
         } else {
             return false
         }

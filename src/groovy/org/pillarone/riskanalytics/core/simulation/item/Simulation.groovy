@@ -272,7 +272,7 @@ class Simulation extends ParametrizedItem {
     @CompileStatic
     public int hashCode() {
         if (!modelVersionNumber) {
-            LOG.error("simulation ${dump()} has no modelVersionNumber")
+            LOG.error("simulation ${this} has no modelVersionNumber")
         }
         HashCodeBuilder hashCodeBuilder = new HashCodeBuilder()
         hashCodeBuilder.append(name)

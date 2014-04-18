@@ -284,7 +284,7 @@ class Simulation extends ParametrizedItem {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Simulation) {
-            return super.equals(obj) && obj.modelVersionNumber?.equals(modelVersionNumber) //20140115 PMO-2681
+            return super.equals(obj) && obj.modelVersionNumber.equals(modelVersionNumber) //20140115 PMO-2681
         } else {
             return false
         }

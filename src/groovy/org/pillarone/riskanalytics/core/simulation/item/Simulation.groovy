@@ -82,9 +82,9 @@ class Simulation extends ParametrizedItem {
         run.model = modelClass?.name
         run.parameterization = ParameterizationDAO.find(parameterization.name, run.model, parameterization.versionNumber.toString())
         run.resultConfiguration = ResultConfigurationDAO.find(template.name, run.model, template.versionNumber.toString())
-        if (run.resultConfiguration == null) { //PMO-2648
-            LOG.warn("Missing result template! name:${template.name}, ver:${template.versionNumber.toString()}, model:${run.model} referenced by sim: ${run.name}")
-            LOG.warn("Nulls saved to sim's result config id are known to BREAK GUI startup (PMO-2648)")
+        //PMO-2648
+        if (!(run.resultConfiguration && run.parameterization)) {
+            LOG.warn("simulation $this does not have a resultConfiguration and a paramterization")
         }
         run.startTime = start
         run.endTime = end

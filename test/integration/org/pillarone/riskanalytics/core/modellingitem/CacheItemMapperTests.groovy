@@ -1,4 +1,5 @@
 package org.pillarone.riskanalytics.core.modellingitem
+
 import models.core.CoreModel
 import org.junit.Test
 import org.pillarone.riskanalytics.core.ModelDAO
@@ -8,17 +9,30 @@ class CacheItemMapperTests {
 
     @Test
     void testMapSimulations_ToBeDeleted() {
-        SimulationRun run
-        SimulationRun.withNewSession {
-            run = new SimulationRun()
+        SimulationRun run = SimulationRun.withNewSession {
+            SimulationRun run = new SimulationRun()
             run.name = 'name'
             run.model = CoreModel.class.name
-            run.toBeDeleted = true
             run.save(flush: true)
+            run
         }
-        SimulationCacheItem item = CacheItemMapper.getModellingItem(run)
+        run.toBeDeleted = true
+        SimulationCacheItem item = CacheItemMapper.getModellingItem(run, true)
         assert item.parameterization == null
         assert item.resultConfiguration == null
+    }
+
+    @Test(expected = IllegalStateException)
+    void testMapSimulations_ToBeDeleted_butNotForDeletion() {
+        SimulationRun run = SimulationRun.withNewSession {
+            SimulationRun run = new SimulationRun()
+            run.name = 'illegal'
+            run.model = CoreModel.class.name
+            run.save(flush: true)
+            run
+        }
+        run.toBeDeleted = true
+        CacheItemMapper.getModellingItem(run)
     }
 
     // PMO-2681

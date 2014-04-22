@@ -15,7 +15,11 @@ class CacheItemHibernateListener implements PostInsertEventListener, PostUpdateE
     }
 
     void onPostInsert(PostInsertEvent postInsertEvent) {
-        CacheItem item = CacheItemMapper.getModellingItem(postInsertEvent.entity)
+        def entity = postInsertEvent.entity
+        CacheItem item = CacheItemMapper.getModellingItem(entity)
+        if (isDeleted(entity)) {
+            throw new IllegalStateException("newly created entity $entity has flag 'toBeDeleted'")
+        }
         if (item != null) {
             for (CacheItemListener listener : listeners) {
                 listener.itemAdded(item)

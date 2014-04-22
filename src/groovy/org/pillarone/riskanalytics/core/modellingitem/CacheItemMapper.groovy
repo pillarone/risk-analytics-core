@@ -52,18 +52,24 @@ class CacheItemMapper {
 
     static SimulationCacheItem getModellingItem(SimulationRun detachedDao, boolean forDeletion = false) {
         checkForId(detachedDao)
+        if (detachedDao.toBeDeleted && !forDeletion) {
+            throw new IllegalStateException("SimulationRun ${detachedDao} is marked for deletion, but is asked to be mapped fully")
+        }
         //we have to reload the dao, because tags are fetched lazy. Otherwise we would get an LazyInitializationError
         SimulationRun.withNewSession {
             SimulationRun dao = SimulationRun.get(detachedDao.id) ?: detachedDao
+            if (!(dao.parameterization && dao.resultConfiguration)) {
+                log.warn("SimulationRun '$dao' does not have a parameterization and a result template.")
+            }
             def versionNumber = dao.usedModel?.itemVersion ? new VersionNumber(dao.usedModel.itemVersion) : null
             def modelClass = CacheItemMapper.classLoader.loadClass(dao.model)
             forDeletion ? new SimulationCacheItem(dao.id, dao.name, modelClass, versionNumber) :
                     new SimulationCacheItem(
                             dao.id,
                             dao.name,
-                            !dao.toBeDeleted ? getModellingItem(dao.parameterization) : null,
-                            !dao.toBeDeleted ? getModellingItem(dao.resultConfiguration) : null,
-                            !dao.toBeDeleted ? ImmutableList.copyOf(dao.tags*.tag ?: []) : null,
+                            getModellingItem(dao.parameterization),
+                            getModellingItem(dao.resultConfiguration),
+                            ImmutableList.copyOf(dao.tags*.tag ?: []),
                             modelClass,
                             versionNumber,
                             dao.endTime,

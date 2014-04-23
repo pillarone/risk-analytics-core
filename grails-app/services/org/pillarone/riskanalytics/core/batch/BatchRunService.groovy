@@ -13,6 +13,8 @@ class BatchRunService {
 
     SimulationQueueService simulationQueueService
 
+    private static final String SIM_STAMP_FORMAT = System.getProperty("BatchRunService.SIM_STAMP_FORMAT","yyyy-MM-dd HH:mm:ss ")
+
     void runBatch(Batch batch) {
         batch.load()
         if (!batch.executed) {
@@ -33,7 +35,7 @@ class BatchRunService {
         offer(simulationRun)
     }
 
-    private boolean shouldRun(Simulation run) {
+    private static boolean shouldRun(Simulation run) {
         run.end == null && run.start == null
     }
 
@@ -72,9 +74,9 @@ class BatchRunService {
         batch
     }
 
-    private Simulation createSimulation(Parameterization parameterization, SimulationProfile simulationProfile, Batch batch = null) {
+    private static Simulation createSimulation(Parameterization parameterization, SimulationProfile simulationProfile, Batch batch = null) {
         parameterization.load()
-        String name = parameterization.name + " " + new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date())
+        String name = "batch " + parameterization.name + " " + new SimpleDateFormat(SIM_STAMP_FORMAT).format(new Date())
         Simulation simulation = new Simulation(name)
         simulation.modelClass = parameterization.modelClass
         simulation.parameterization = parameterization

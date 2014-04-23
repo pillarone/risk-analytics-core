@@ -32,9 +32,12 @@ class WireCategory {
         assert sender in LinkedProperty, "${WireCategory.class.simpleName}: Only objects of class LinkedProperty can be wired but was: " + sender.dump()
 
         def source = ((LinkedProperty) sender).source
+        if(source == null){
+            throw new IllegalArgumentException("source should not be null")
+        }
         def sourcePropertyName = ((LinkedProperty) sender).name
         try {
-            PacketList sourceProperty = GroovyUtils.getProperties(source)[sourcePropertyName]
+            PacketList sourceProperty = GroovyUtils.getProperties(source)[sourcePropertyName] //2014-04-22 NPE occurred here during cancellation of sim
             PacketList targetProperty = GroovyUtils.getProperties(target)[targetPropertyName]
             if (!targetProperty.isCompatibleTo(sourceProperty)) {
                 throw new IllegalArgumentException("Wiring only allowed with same types for input and output $sender -> $target ($targetPropertyName)")

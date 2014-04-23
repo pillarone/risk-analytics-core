@@ -89,7 +89,7 @@ abstract public class ComposedComponent extends Component {
         try {
             wireComposedComponents(this);
         } catch (Throwable e) {
-            throw new WiringException("Failed to wire " + this + ": " + e.getMessage(), e);
+            throw new WiringException("Failed to wire " + this + " (" + e.getMessage()+")", e);
         }
     }
 

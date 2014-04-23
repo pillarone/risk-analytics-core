@@ -10,7 +10,6 @@ import org.pillarone.riskanalytics.core.output.DBOutput;
 import org.pillarone.riskanalytics.core.output.FileOutput;
 import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy;
 import org.pillarone.riskanalytics.core.output.NoOutput;
-import org.pillarone.riskanalytics.core.output.batch.OutputStrategyFactory;
 import org.pillarone.riskanalytics.core.parameterization.ParameterizationHelper;
 import org.pillarone.riskanalytics.core.simulation.item.*;
 
@@ -95,8 +94,6 @@ public class ArgumentParser {
         }
 
         final Simulation simulation = new Simulation(simulationName);
-        ICollectorOutputStrategy outputStrategy = getOutputStrategy(commandLine);
-        simulation.setStrategy(OutputStrategyFactory.getEnum(outputStrategy.getClass()));
         Parameterization parameterization = getParameterization(commandLine.getOptionValue(PARAMETERIZATION_OPTION), force);
         ResultConfiguration resultConfiguration = getResultConfiguration(commandLine.getOptionValue(RESULT_CONFIGURATION_OPTION), force);
         if (!parameterization.getModelClass().getName().equals(resultConfiguration.getModelClass().getName())) {

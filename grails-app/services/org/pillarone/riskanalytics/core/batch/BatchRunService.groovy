@@ -1,8 +1,6 @@
 package org.pillarone.riskanalytics.core.batch
-
 import org.pillarone.riskanalytics.core.BatchRun
 import org.pillarone.riskanalytics.core.SimulationProfileDAO
-import org.pillarone.riskanalytics.core.output.OutputStrategy
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationQueueService
@@ -83,7 +81,6 @@ class BatchRunService {
         String name = parameterization.name + " " + new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date())
         Simulation simulation = new Simulation(name)
         simulation.modelClass = parameterization.modelClass
-        simulation.strategy = OutputStrategy.BATCH_DB_OUTPUT
         simulation.parameterization = parameterization
         simulation.structure = ModelStructure.getStructureForModel(parameterization.modelClass)
         simulation.batch = batch

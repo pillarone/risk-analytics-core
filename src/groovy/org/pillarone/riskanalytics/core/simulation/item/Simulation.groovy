@@ -13,7 +13,6 @@ import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.model.registry.ModelRegistry
 import org.pillarone.riskanalytics.core.output.DeleteSimulationStrategy
-import org.pillarone.riskanalytics.core.output.OutputStrategy
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.parameter.Parameter
@@ -36,7 +35,6 @@ class Simulation extends ParametrizedItem {
 
     DateTime beginOfFirstPeriod
     int numberOfIterations
-    OutputStrategy strategy = OutputStrategy.NO_OUTPUT
     SimulationState simulationState = SimulationState.NOT_RUNNING
     Batch batch
 
@@ -106,7 +104,6 @@ class Simulation extends ParametrizedItem {
         run.modificationDate = modificationDate
         run.randomSeed = randomSeed
         run.simulationState = simulationState
-        run.strategy = strategy
         saveComments(run)
         saveTags(run)
         saveParameters(runtimeParameters, run.runtimeParameters, run)
@@ -142,9 +139,6 @@ class Simulation extends ParametrizedItem {
         }
         if (run.simulationState) {
             simulationState = run.simulationState
-        }
-        if (run.strategy) {
-            strategy = run.strategy
         }
         if (completeLoad) {
             loadComments(run)

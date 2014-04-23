@@ -26,7 +26,6 @@ class SimulationConfigurationTests {
         simulation.template.load()
 
         simulation.keyFiguresToPreCalculate = [:]
-        simulation.strategy = OutputStrategy.NO_OUTPUT
         SimulationConfiguration configuration = new SimulationConfiguration(simulation)
         configuration.prepareSimulationForGrid()
 

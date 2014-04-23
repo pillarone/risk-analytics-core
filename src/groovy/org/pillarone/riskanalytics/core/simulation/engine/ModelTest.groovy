@@ -123,7 +123,6 @@ abstract class ModelTest {
             run.periodCount = getPeriodCount()
             run.numberOfIterations = getIterationCount()
             run.structure = ModelStructure.getStructureForModel(modelClass)
-            run.strategy = OutputStrategyFactory.getEnum(getOutputStrategy().class)
             if (modelInstance.requiresStartDate()) {
                 run.beginOfFirstPeriod = new DateTime(2009, 1, 1, 0, 0, 0, 0)
             }

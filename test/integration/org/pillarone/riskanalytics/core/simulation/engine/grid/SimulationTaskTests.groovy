@@ -177,7 +177,6 @@ class SimulationTaskTests {
         simulation.parameterization = new Parameterization("test")
         simulation.template = new ResultConfiguration('heinz', CoreModel)
         simulation.periodCount = 1
-        simulation.strategy = OutputStrategy.NO_OUTPUT
         SimulationConfiguration configuration = new SimulationConfiguration(simulation)
         assertNull simulation.start
         assertNull simulation.end

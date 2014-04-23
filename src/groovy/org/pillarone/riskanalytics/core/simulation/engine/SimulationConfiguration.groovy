@@ -37,7 +37,7 @@ public class SimulationConfiguration implements Serializable, Cloneable {
     }
 
     SimulationConfiguration(Simulation simulation) {
-        this(simulation, OutputStrategyFactory.getInstance(simulation.strategy))
+        this(simulation, new DBOutput())
     }
 /**
  * This creates a new Simulation instance based on the existing one, which only contains the necessary info for the

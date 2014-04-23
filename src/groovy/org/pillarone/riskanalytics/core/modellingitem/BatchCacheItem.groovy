@@ -8,13 +8,15 @@ import org.pillarone.riskanalytics.core.user.Person
 class BatchCacheItem extends CacheItem {
     final String comment
     final boolean executed
-    ImmutableList<SimulationCacheItem> simulations
+    final String simulationProfileName
+    ImmutableList<ParameterizationCacheItem> parameterizations
 
-    BatchCacheItem(Long id, DateTime creationDate, DateTime modificationDate, Person creator, Person lastUpdater, String name, String comment, boolean executed, ImmutableList<SimulationCacheItem> simulations) {
+    BatchCacheItem(Long id, DateTime creationDate, DateTime modificationDate, Person creator, Person lastUpdater, String name, String comment, boolean executed, ImmutableList<ParameterizationCacheItem> parameterizations, String simulationProfileName) {
         super(id, creationDate, modificationDate, creator, lastUpdater, name, null)
         this.comment = comment
         this.executed = executed
-        this.simulations = simulations
+        this.parameterizations = parameterizations
+        this.simulationProfileName = simulationProfileName
     }
 
     @Override

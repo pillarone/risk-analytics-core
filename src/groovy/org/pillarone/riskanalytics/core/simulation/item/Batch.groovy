@@ -1,12 +1,15 @@
 package org.pillarone.riskanalytics.core.simulation.item
 
 import org.pillarone.riskanalytics.core.BatchRun
+import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.output.SimulationRun
 
 class Batch extends ModellingItem {
 
-    List<Simulation> simulations = []
+    List<Parameterization> parameterizations = []
     String comment
+    String simulationProfileName
+
     boolean executed = false
 
     Batch(String name) {
@@ -33,8 +36,9 @@ class Batch extends ModellingItem {
         batchRun.modificationDate = modificationDate
         batchRun.lastUpdater = lastUpdater
         batchRun.creator = creator
-        batchRun.simulationRuns = simulations.collect {
-            SimulationRun.findByName(it.name)
+        batchRun.simulationProfileName = simulationProfileName
+        batchRun.parameterizations = parameterizations.collect {
+            it.loadFromDB()
         }
     }
 
@@ -44,14 +48,17 @@ class Batch extends ModellingItem {
         comment = batchRun.comment
         executed = batchRun.executed
         name = batchRun.name
+        simulationProfileName = batchRun.simulationProfileName
         creationDate = batchRun.creationDate
         modificationDate = batchRun.modificationDate
         lastUpdater = batchRun.lastUpdater
         creator = batchRun.creator
-        simulations = batchRun.simulationRuns.collect { SimulationRun run ->
-            Simulation simulation = new Simulation(run.name)
-            simulation.load()
-            simulation
+        parameterizations = batchRun.parameterizations.collect { ParameterizationDAO run ->
+            Parameterization parameterization = new Parameterization(run.name)
+            parameterization.versionNumber = run.itemVersion ? new VersionNumber(run.itemVersion) : null
+            parameterization.modelClass = getClass().classLoader.loadClass(run.modelClassName)
+            parameterization.load()
+            parameterization
         }
     }
 
@@ -63,5 +70,21 @@ class Batch extends ModellingItem {
     @Override
     Class getModelClass() {
         null
+    }
+
+    @Override
+    List<Simulation> getSimulations() {
+        SimulationRun.withTransaction {
+            List<SimulationRun> simRuns = SimulationRun.createCriteria().list {
+                batchRun {
+                    eq('id', id)
+                }
+            }
+            simRuns.collect {
+                Simulation simulation = new Simulation(it.name)
+                simulation.load()
+                simulation
+            }
+        }
     }
 }

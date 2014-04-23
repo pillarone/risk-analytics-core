@@ -5,7 +5,6 @@ import javax.annotation.PreDestroy
 
 /**
  * holds runtime information about running, queued and finished simulations.
- * Will also replace BatchRunInfoService...
  */
 class SimulationRuntimeService {
     SimulationQueueService simulationQueueService

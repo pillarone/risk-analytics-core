@@ -1,21 +1,20 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
 import groovy.transform.CompileStatic
-import org.pillarone.riskanalytics.core.model.Model
-import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
-
-import java.util.concurrent.atomic.AtomicInteger
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.joda.time.DateTime
-import org.pillarone.riskanalytics.core.batch.BatchRunInfoService
 import org.pillarone.riskanalytics.core.components.Component
+import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.output.PacketCollector
 import org.pillarone.riskanalytics.core.simulation.SimulationState
-import org.pillarone.riskanalytics.core.simulation.item.Simulation
-import org.pillarone.riskanalytics.core.util.GroovyUtils
 import org.pillarone.riskanalytics.core.simulation.engine.actions.*
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
+import org.pillarone.riskanalytics.core.util.GroovyUtils
 import org.pillarone.riskanalytics.core.wiring.*
+
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * This is the main entity to run a simulation. To do this, create a runner object (SimulationRunner.createRunner()).
@@ -47,8 +46,6 @@ public class SimulationRunner {
     SimulationScope currentScope
 
     SimulationError error
-
-    BatchRunInfoService batchRunInfoService
 
     private int threadCount;
     private static AtomicInteger messageCount;

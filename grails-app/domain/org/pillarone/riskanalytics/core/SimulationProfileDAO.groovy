@@ -52,6 +52,9 @@ class SimulationProfileDAO {
         withModelClass { Class modelClass ->
             eq('modelClassName', modelClass?.name)
         }
+        withName { String name ->
+            eq('name', name)
+        }
         withCreator { Person creator ->
             if (creator) {
                 eq('creator', creator)

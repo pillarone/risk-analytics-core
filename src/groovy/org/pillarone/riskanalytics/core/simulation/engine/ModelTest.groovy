@@ -87,6 +87,8 @@ abstract class ModelTest {
 
     Simulation run
 
+    SimulationProfile simulationProfile
+
     @Before
     void setUp() {
         ParameterizationDAO.withNewSession { def session ->
@@ -136,6 +138,13 @@ abstract class ModelTest {
             clean()
             session.flush()
         }
+        simulationProfile = new SimulationProfile('testProfile', run.modelClass)
+        simulationProfile.numberOfIterations = run.numberOfIterations
+        simulationProfile.randomSeed = run.randomSeed
+        simulationProfile.runtimeParameters = run.runtimeParameters
+        simulationProfile.template = run.template
+        assert simulationProfile.save()
+
     }
 
     @Test
@@ -165,6 +174,7 @@ abstract class ModelTest {
             run.delete()
             parameterization.delete()
             template.delete()
+            simulationProfile.delete()
             session.flush()
         }
     }

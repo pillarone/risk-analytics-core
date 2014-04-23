@@ -1,7 +1,6 @@
 package org.pillarone.riskanalytics.core
 
 import org.joda.time.DateTime
-import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.persistence.DateTimeMillisUserType
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.util.DatabaseUtils
@@ -10,19 +9,21 @@ class BatchRun {
     String name
     String comment
     boolean executed = false
-    List<SimulationRun> simulationRuns = []
+    List<ParameterizationDAO> parameterizations = []
+    String simulationProfileName
 
     DateTime creationDate
     DateTime modificationDate
     Person creator
     Person lastUpdater
 
-    static hasMany = [simulationRuns: SimulationRun]
+    static hasMany = [parameterizations: ParameterizationDAO]
 
-    static fetchMode = [simulationRuns: 'eager']
+    static fetchMode = [parameterizations: 'eager']
 
     static constraints = {
         name unique: true
+        simulationProfileName nullable: true
         comment nullable: true
         creationDate nullable: true
         modificationDate nullable: true
@@ -31,10 +32,6 @@ class BatchRun {
     }
 
     static mapping = {
-        simulationRuns indexColumn: [
-                name: "priority",
-                type: Integer
-        ]
         creationDate type: DateTimeMillisUserType
         creator lazy: false
         modificationDate type: DateTimeMillisUserType

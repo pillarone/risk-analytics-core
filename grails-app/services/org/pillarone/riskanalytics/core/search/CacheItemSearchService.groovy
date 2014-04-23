@@ -161,46 +161,48 @@ class CacheItemSearchService {
     }
 
     private synchronized void internalUpdateModellingItemInIndex(ParameterizationCacheItem item) {
-        List<SimulationCacheItem> allSimulations = cache.findAll {
-            it instanceof SimulationCacheItem
-        } as List<SimulationCacheItem>
-        for (SimulationCacheItem simulation in allSimulations) {
-            if (simulation.parameterization.equals(item)) {
-                simulation.parameterization = item
-            }
+        cache.findAll {
+            it instanceof SimulationCacheItem && it.parameterization == item
+        }.each { SimulationCacheItem simulationCacheItem ->
+            simulationCacheItem.parameterization = item
+        }
+        cache.findAll {
+            (it instanceof BatchCacheItem) && it.parameterizations.contains(item)
+        }.each { BatchCacheItem batchCacheItem ->
+            internalUpdateModellingItemInIndex(batchCacheItem)
         }
     }
 
     private synchronized void internalUpdateModellingItemInIndex(ResultConfigurationCacheItem item) {
-        List<SimulationCacheItem> allSimulations = cache.findAll {
-            it instanceof SimulationCacheItem
-        } as List<SimulationCacheItem>
-        for (SimulationCacheItem simulation in allSimulations) {
-            if (simulation.resultConfiguration.equals(item)) {
-                simulation.resultConfiguration = item
-            }
+        cache.findAll {
+            it instanceof SimulationCacheItem && it.resultConfiguration == item
+        }.each { SimulationCacheItem simulationCacheItem ->
+            simulationCacheItem.resultConfiguration = item
         }
     }
 
     private synchronized void internalUpdateModellingItemInIndex(SimulationCacheItem item) {
-        if (item.batchId) {
-            cache.findAll {
-                (it instanceof BatchCacheItem) && it.id == item.batchId
-            }.each { BatchCacheItem batchCacheItem ->
-                if (batchCacheItem.simulations.indexOf(item) != -1) {
-                    internalUpdateModellingItemInIndex(batchCacheItem)
-                }
+        if (item.batch) {
+            int index = cache.indexOf(item.batch)
+            if (index != -1) {
+                item.batch = cache[index] as BatchCacheItem
             }
         }
     }
 
     private synchronized void internalUpdateModellingItemInIndex(BatchCacheItem item) {
-        List<SimulationCacheItem> collect = item.simulations.collect { SimulationCacheItem simulationCacheItem ->
-            SimulationCacheItem existent = cache.find { it == simulationCacheItem } as SimulationCacheItem
-            existent ?: simulationCacheItem
+        cache.findAll {
+            (it instanceof SimulationCacheItem) && it.batch && it.batch.id == item.id
+        }.each { SimulationCacheItem simulationCacheItem ->
+            simulationCacheItem.batch = item
         }
-
-        item.simulations = ImmutableList.copyOf(collect)
+        List<ParameterizationCacheItem> collect = item.parameterizations.collect { ParameterizationCacheItem parameterizationCacheItem ->
+            ParameterizationCacheItem existent = cache.find {
+                it == parameterizationCacheItem
+            } as ParameterizationCacheItem
+            existent ?: parameterizationCacheItem
+        }
+        item.parameterizations = ImmutableList.copyOf(collect)
     }
 
     public static CacheItemSearchService getInstance() {

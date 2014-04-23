@@ -78,7 +78,7 @@ class CacheItemMapper {
                             dao.modificationDate,
                             dao.creator,
                             dao.iterations,
-                            dao.batchRun?.id
+                            getModellingItem(dao.batchRun)
                     )
         }
     }
@@ -109,7 +109,7 @@ class CacheItemMapper {
     static BatchCacheItem getModellingItem(BatchRun dao, boolean forDeletion = false) {
         checkForId(dao)
         BatchRun.withNewSession {
-            forDeletion ? new BatchCacheItem(dao.id, null, null, null, null, dao.name, null, dao.executed, null) :
+            forDeletion ? new BatchCacheItem(dao.id, null, null, null, null, dao.name, null, dao.executed, null, null) :
                     new BatchCacheItem(
                             dao.id,
                             dao.creationDate,
@@ -119,7 +119,8 @@ class CacheItemMapper {
                             dao.name,
                             dao.comment,
                             dao.executed,
-                            ImmutableList.copyOf(dao.simulationRuns.collect { SimulationRun run -> getModellingItem(run) }),
+                            ImmutableList.copyOf(dao.parameterizations.collect { ParameterizationDAO run -> getModellingItem(run) }),
+                            dao.simulationProfileName
                     )
         }
     }

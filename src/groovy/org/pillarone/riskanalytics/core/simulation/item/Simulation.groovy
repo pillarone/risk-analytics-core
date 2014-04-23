@@ -7,6 +7,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.BatchRun
 import org.pillarone.riskanalytics.core.ModelDAO
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.model.Model
@@ -37,7 +38,7 @@ class Simulation extends ParametrizedItem {
     int numberOfIterations
     OutputStrategy strategy = OutputStrategy.NO_OUTPUT
     SimulationState simulationState = SimulationState.NOT_RUNNING
-    Long batchId
+    Batch batch
 
     /**
      * The number of periods run in this simulation. Might be different than the number of periods in the parameterization.
@@ -86,6 +87,12 @@ class Simulation extends ParametrizedItem {
         if (!(run.resultConfiguration && run.parameterization)) {
             LOG.warn("simulation $this does not have a resultConfiguration and a paramterization")
         }
+        if (batch) {
+            run.batchRun = BatchRun.findByName(batch.name)
+            if (!run.batchRun) {
+                throw new IllegalStateException("Failed to find batch with name ${batch.name}")
+            }
+        }
         run.startTime = start
         run.endTime = end
         run.iterations = numberOfIterations
@@ -130,7 +137,9 @@ class Simulation extends ParametrizedItem {
         creator = run.creator
         modificationDate = run.modificationDate
         randomSeed = run.randomSeed
-        batchId = run.batchRun?.id
+        if (run.batchRun) {
+            batch = new Batch(run.batchRun.name)
+        }
         if (run.simulationState) {
             simulationState = run.simulationState
         }

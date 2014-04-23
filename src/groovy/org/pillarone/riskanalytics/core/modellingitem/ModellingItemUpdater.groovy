@@ -47,6 +47,7 @@ class ModellingItemUpdater {
         target.id = source.id
         target.parameterization = createOrUpdateModellingItem(source.parameterization, target.parameterization)
         target.template = createOrUpdateModellingItem(source.resultConfiguration, target.template)
+        target.batch = createOrUpdateModellingItem(source.batch, target.batch)
         target.tags = source.tags
         target.modelClass = source.modelClass
         target.modelVersionNumber = source.modelVersionNumber?.clone()
@@ -91,9 +92,10 @@ class ModellingItemUpdater {
         target.lastUpdater = source.lastUpdater
         target.comment = source.comment
         target.executed = source.executed
-        target.simulations = source.simulations.collect { SimulationCacheItem simulationCacheItem ->
-            Simulation targetSimulation = target.simulations.find { Simulation simulation -> simulation.id == simulationCacheItem.id }
-            createOrUpdateModellingItem(simulationCacheItem, targetSimulation)
+        target.simulationProfileName = source.simulationProfileName
+        target.parameterizations = source.parameterizations.collect { ParameterizationCacheItem parameterizationCacheItem ->
+            Parameterization targetSimulation = target.parameterizations.find { Parameterization parameterization -> parameterization.id == parameterizationCacheItem.id }
+            createOrUpdateModellingItem(parameterizationCacheItem, targetSimulation)
         }
         return target
     }

@@ -4,7 +4,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.gridgain.grid.*;
 import org.joda.time.DateTime;
-import org.pillarone.riskanalytics.core.batch.BatchRunInfoService;
 import org.pillarone.riskanalytics.core.cli.ImportStructureInTransaction;
 import org.pillarone.riskanalytics.core.output.Calculator;
 import org.pillarone.riskanalytics.core.output.PathMapping;
@@ -253,7 +252,9 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
 
     protected void setSimulationState(SimulationState simulationState) {
         this.currentState = simulationState;
-        BatchRunInfoService.getService().batchSimulationStateChanged(getSimulation(), currentState);
+        Simulation simulation = getSimulation();
+        simulation.setSimulationState(currentState);
+        simulation.save();
     }
 
     public Simulation getSimulation() {

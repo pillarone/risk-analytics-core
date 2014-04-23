@@ -36,7 +36,7 @@ class SimulationRun {
     Person creator
     OutputStrategy strategy
     SimulationState simulationState
-
+    BatchRun batchRun
     // more to come here
 
     DataSource dataSource
@@ -44,8 +44,6 @@ class SimulationRun {
     static transients = ['dataSource']
 
     static hasMany = [comments: ResultCommentDAO, runtimeParameters: Parameter, tags: SimulationTag]
-
-    static belongsTo = [batchRun: BatchRun]
 
     static constraints = {
         name unique: 'model'

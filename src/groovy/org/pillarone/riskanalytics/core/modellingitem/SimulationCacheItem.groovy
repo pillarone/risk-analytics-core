@@ -19,9 +19,11 @@ class SimulationCacheItem extends CacheItem {
     final DateTime start
     final int numberOfIterations
     Long batchId
+    BatchCacheItem batch
+
 
     SimulationCacheItem(
-            Long id, String name, ParameterizationCacheItem parameterization, ResultConfigurationCacheItem resultConfiguration, ImmutableList<Tag> tags, Class modelClass, VersionNumber modelVersionNumber, DateTime end, DateTime start, DateTime creationDate, DateTime modificationDate, Person creator, int numberOfIterations, Long batchId
+            Long id, String name, ParameterizationCacheItem parameterization, ResultConfigurationCacheItem resultConfiguration, ImmutableList<Tag> tags, Class modelClass, VersionNumber modelVersionNumber, DateTime end, DateTime start, DateTime creationDate, DateTime modificationDate, Person creator, int numberOfIterations, BatchCacheItem batch
     ) {
         super(id, creationDate, modificationDate, creator, null, name, modelClass)
         this.parameterization = parameterization
@@ -31,7 +33,7 @@ class SimulationCacheItem extends CacheItem {
         this.end = end
         this.start = start
         this.numberOfIterations = numberOfIterations
-        this.batchId = batchId
+        this.batch = batch
     }
 
     SimulationCacheItem(Long id, String name, Class modelClass, VersionNumber modelVersionNumber) {

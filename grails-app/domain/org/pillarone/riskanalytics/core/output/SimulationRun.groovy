@@ -85,7 +85,11 @@ class SimulationRun {
                 eq('modelClassName', modelClassName)
                 eq('itemVersion', version)
             }
-
+        }
+        findByBatchRunId { Long id ->
+            batchRun {
+                eq('id', id)
+            }
         }
     }
 

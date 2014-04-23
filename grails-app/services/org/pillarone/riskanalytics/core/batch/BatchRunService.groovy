@@ -1,5 +1,5 @@
 package org.pillarone.riskanalytics.core.batch
-import org.pillarone.riskanalytics.core.BatchRun
+
 import org.pillarone.riskanalytics.core.SimulationProfileDAO
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
@@ -54,18 +54,14 @@ class BatchRunService {
         simulationQueueService.offer(simulationConfiguration, 5)
     }
 
-
-    void deleteSimulationRun(Batch batch, Simulation simulation) {
-        BatchRun.withTransaction {
-            BatchRun batchRun = BatchRun.lock(batch.id)
-            SimulationRun simulationRun = SimulationRun.lock(simulation.id)
-            batchRun.removeFromSimulationRuns(simulationRun)
-            batchRun.save(flush: true)
-        }
-    }
-
     boolean deleteBatch(Batch batch) {
-        batch.delete()
+        SimulationRun.withTransaction {
+            SimulationRun.findByBatchRunId(batch.id).list().each {
+                it.batchRun = null
+                it.save()
+            }
+            batch.delete()
+        }
     }
 
     Batch createBatch(List<Parameterization> parameterizations) {

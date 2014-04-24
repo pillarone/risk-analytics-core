@@ -9,8 +9,9 @@ import javax.annotation.PreDestroy
 class SimulationRuntimeService {
     SimulationQueueService simulationQueueService
     private final List<SimulationRuntimeInfo> finished = []
-    private final List<SimulationRuntimeInfo> queued = []
+    private final Map<UUID, SimulationRuntimeInfo> queuedMap = [:]
     private SimulationRuntimeInfo running
+    private QueueEntry runningEntry
     private final Object lock = new Object()
     private Timer timer
     private MyQueueListener queueListener
@@ -32,7 +33,7 @@ class SimulationRuntimeService {
 
     List<SimulationRuntimeInfo> getQueued() {
         synchronized (lock) {
-            List<SimulationRuntimeInfo> infos = new ArrayList<SimulationRuntimeInfo>(queued)
+            List<SimulationRuntimeInfo> infos = new ArrayList<SimulationRuntimeInfo>(queuedMap.values())
             if (running) {
                 infos.add(running)
             }
@@ -55,10 +56,12 @@ class SimulationRuntimeService {
             @Override
             public void run() {
                 if (running != null) {
-                    changed(running)
+                    if (running.apply(runningEntry)) {
+                        changed(running)
+                    }
                 }
             }
-        }, 2000, 2000);
+        }, 1000, 1000);
     }
 
     private class MyQueueListener implements ISimulationQueueListener {
@@ -68,11 +71,11 @@ class SimulationRuntimeService {
                 if (running) {
                     throw new IllegalStateException("starting called, but there is already a running simulation $running.id")
                 }
-                running = findByQueueId(entry.id)
+                running = queuedMap.remove(entry.id)
+                runningEntry = entry
                 if (!running) {
                     throw new IllegalStateException("no info found for id: ${entry.id}")
                 }
-                queued.remove(running)
                 starting(running)
                 startTimer()
             }
@@ -80,12 +83,10 @@ class SimulationRuntimeService {
 
         @Override
         void removed(UUID id) {
-            SimulationRuntimeInfo info = findByQueueId(id)
+            SimulationRuntimeInfo info = queuedMap.remove(id)
             if (!info) {
                 throw new IllegalStateException("no info found for id $id")
             }
-            info.simulationTask.cancel()
-            queued.remove(info)
             finished.add(info)
             removed(info)
         }
@@ -97,10 +98,12 @@ class SimulationRuntimeService {
                     throw new IllegalStateException("finished was called, but there is a different task running")
                 }
                 stopTimer()
-                queued.remove(running)
+                running.apply(runningEntry)
                 finished.add(running)
-                finished(running)
+                runningEntry = null
+                SimulationRuntimeInfo reference = running
                 running = null
+                finished(reference)
             }
         }
 
@@ -108,8 +111,7 @@ class SimulationRuntimeService {
         void offered(QueueEntry entry) {
             synchronized (lock) {
                 SimulationRuntimeInfo info = new SimulationRuntimeInfo(entry)
-                queued.add(info)
-                queued.sort()
+                queuedMap[entry.id] = info
                 offered(info)
             }
         }
@@ -117,10 +119,6 @@ class SimulationRuntimeService {
         private stopTimer() {
             timer?.cancel()
             timer = null
-        }
-
-        private SimulationRuntimeInfo findByQueueId(UUID id) {
-            queued.find { SimulationRuntimeInfo info -> info.id == id }
         }
     }
 }

@@ -87,7 +87,7 @@ class SimulationQueueService {
                 if (queueEntry) {
                     busy = true
                     notifyStarting(queueEntry)
-                    GridTaskFuture future = grid.execute(queueEntry.simulationTask, queueEntry.simulationConfiguration)
+                    GridTaskFuture future = grid.execute(queueEntry.simulationTask, queueEntry.simulationTask.simulationConfiguration)
                     future.listenAsync(taskListener)
                     currentTask = new CurrentTask(gridTaskFuture: future, entry: queueEntry)
                 }
@@ -116,7 +116,9 @@ class SimulationQueueService {
                 case SimulationState.RUNNING:
                 case SimulationState.SAVING_RESULTS:
                 case SimulationState.POST_SIMULATION_CALCULATIONS:
-                default: throw new IllegalStateException("task $entry has finished, but state was $simulationState")
+                default:
+                    log.warn("task $entry has finished, but state was $simulationState. This is likely to an internal gridgain error")
+                    notifyFinished(entry.id)
             }
         }
     }

@@ -1,83 +1,126 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
+import com.google.common.base.Preconditions
 import org.joda.time.DateTime
 import org.pillarone.riskanalytics.core.simulation.SimulationState
-import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationTask
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.user.Person
 
 class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo> {
-    private final QueueEntry queueEntry
+    private Simulation simulation
+    private Integer priority
+    private Date offeredAt
+    private UUID id
+    private Integer progress
+    private SimulationState simulationState
+    private DateTime estimatedSimulationEnd
+    private Person offeredBy
+    private List<Throwable> simulationErrors
 
-    SimulationRuntimeInfo(QueueEntry queueEntry) {
-        this.queueEntry = queueEntry
-        if (!queueEntry) {
-            throw new IllegalStateException('queueEntry must not be null')
-        }
+    SimulationRuntimeInfo(UUID id) {
+        this.id = Preconditions.checkNotNull(id)
+    }
+
+    SimulationRuntimeInfo(QueueEntry entry) {
+        this(entry.id)
+        apply(entry)
     }
 
     Simulation getSimulation() {
-        queueEntry.simulationConfiguration.simulation
-    }
-
-    SimulationTask getSimulationTask() {
-        queueEntry.simulationTask
+        simulation
     }
 
     Parameterization getParameterization() {
-        simulation.parameterization
+        simulation?.parameterization
     }
 
     ResultConfiguration getResultConfiguration() {
-        simulation.template
+        simulation?.template
     }
 
     Integer getIterations() {
-        simulation.numberOfIterations
+        simulation?.numberOfIterations
     }
 
     Integer getPriority() {
-        queueEntry.priority
+        priority
     }
 
     Date getConfiguredAt() {
-        queueEntry.offeredAt
+        offeredAt
     }
 
     UUID getId() {
-        queueEntry.id
+        id
     }
 
     Integer getProgress() {
-        queueEntry.simulationTask.progress
+        progress
     }
 
     SimulationState getSimulationState() {
-        queueEntry.simulationTask.simulationState
+        simulationState
     }
 
     DateTime getEstimatedSimulationEnd() {
-        simulationTask.estimatedSimulationEnd
+        estimatedSimulationEnd
     }
 
     Person getOfferedBy() {
-        queueEntry.offeredBy
+        offeredBy
     }
 
     List<Throwable> getSimulationErrors() {
-        simulationTask.simulationErrors
+        simulationErrors
+    }
+
+    boolean apply(QueueEntry entry) {
+        boolean changed = false
+        if (entry.id != id) {
+            throw new IllegalStateException("queueEntry id is different from our id")
+        }
+        if (simulation != entry.simulationTask.simulation) {
+            simulation = entry.simulationTask.simulation
+            changed = true
+        }
+        if (priority != entry.priority) {
+            priority = entry.priority
+            changed = true
+        }
+        if (offeredAt != entry.offeredAt) {
+            offeredAt = entry.offeredAt
+            changed = true
+        }
+        if (progress != entry.simulationTask.progress) {
+            progress = entry.simulationTask.progress
+            changed = true
+        }
+        if (simulationState != entry.simulationTask.simulationState) {
+            simulationState = entry.simulationTask.simulationState
+            changed = true
+        }
+        if (estimatedSimulationEnd != entry.simulationTask.estimatedSimulationEnd) {
+            estimatedSimulationEnd = entry.simulationTask.estimatedSimulationEnd
+            changed = true
+        }
+        if (offeredBy != entry.offeredBy) {
+            offeredBy = entry.offeredBy
+            changed = true
+        }
+        if (simulationErrors != entry.simulationTask.simulationErrors) {
+            simulationErrors = entry.simulationTask.simulationErrors
+            changed = true
+        }
+        changed
     }
 
     boolean equals(o) {
         if (this.is(o)) return true
         if (getClass() != o.class) return false
-
         SimulationRuntimeInfo that = (SimulationRuntimeInfo) o
-
         if (id != that.id) return false
-
         return true
     }
 
@@ -87,6 +130,9 @@ class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo> {
 
     @Override
     int compareTo(SimulationRuntimeInfo o) {
-        queueEntry.compareTo(o.queueEntry)
+        if (priority.equals(o.priority)) {
+            offeredAt.compareTo(o.offeredAt)
+        }
+        return priority.compareTo(o.priority)
     }
 }

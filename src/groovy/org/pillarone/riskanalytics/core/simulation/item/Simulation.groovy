@@ -36,7 +36,9 @@ class Simulation extends ParametrizedItem {
     DateTime beginOfFirstPeriod
     int numberOfIterations
     SimulationState simulationState = SimulationState.NOT_RUNNING
-    Batch batch
+
+    //As we do not need it on the nodes we make it transient.
+    transient Batch batch
 
     /**
      * The number of periods run in this simulation. Might be different than the number of periods in the parameterization.

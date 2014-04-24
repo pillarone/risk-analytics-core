@@ -8,14 +8,12 @@ class QueueEntry implements Comparable<QueueEntry> {
     final Date offeredAt
     int priority
     final SimulationTask simulationTask
-    final SimulationConfiguration simulationConfiguration
     final Person offeredBy
 
     QueueEntry(SimulationConfiguration simulationConfiguration, int priority, Person offeredBy) {
         this.simulationTask = new SimulationTask(simulationConfiguration: simulationConfiguration)
         this.offeredBy = offeredBy
         this.priority = priority
-        this.simulationConfiguration = simulationConfiguration
         id = UUID.randomUUID()
         offeredAt = new Date()
     }
@@ -24,7 +22,6 @@ class QueueEntry implements Comparable<QueueEntry> {
         this.id = id
         this.priority = 0
         this.simulationTask = null
-        this.simulationConfiguration = null
         this.offeredBy = null
         offeredAt = null
     }

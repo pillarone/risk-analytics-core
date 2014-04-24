@@ -114,4 +114,12 @@ class BatchRunService {
         }
         result
     }
+
+    List<String> getSimulationProfileNames() {
+        SimulationProfileDAO.createCriteria().list {
+            projections {
+                property('name')
+            }
+        }.unique()
+    }
 }

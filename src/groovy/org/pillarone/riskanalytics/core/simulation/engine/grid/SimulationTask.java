@@ -214,11 +214,11 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
                 simulation.delete();
                 return false;
             }
+            setSimulationState(SimulationState.FINISHED);
             simulation.setEnd(new DateTime());
             simulation.setNumberOfIterations(completedIterations);
             simulation.setPeriodCount(periodCount);
             simulation.save();
-            setSimulationState(SimulationState.FINISHED);
             LOG.info("Task completed in " + (System.currentTimeMillis() - time) + "ms");
             return true;
         } catch (Exception e) {
@@ -250,22 +250,29 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         return currentState;
     }
 
-    protected void setSimulationState(SimulationState simulationState) {
+    protected synchronized void setSimulationState(SimulationState simulationState) {
         this.currentState = simulationState;
-        Simulation simulation = getSimulation();
-        simulation.setSimulationState(currentState);
-        simulation.save();
+        getSimulation().setSimulationState(currentState);
+        try {
+            Thread.currentThread().sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public Simulation getSimulation() {
         return simulationConfiguration.getSimulation();
     }
 
-    public List<Throwable> getSimulationErrors() {
+    public SimulationConfiguration getSimulationConfiguration() {
+        return simulationConfiguration;
+    }
+
+    public synchronized List<Throwable> getSimulationErrors() {
         return simulationErrors;
     }
 
-    public void cancel() {
+    public synchronized void cancel() {
         cancelled = true;
         if (currentState == SimulationState.POST_SIMULATION_CALCULATIONS) {
             calculator.setStopped(true);
@@ -273,7 +280,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         setSimulationState(SimulationState.CANCELED);
     }
 
-    public int getProgress() {
+    public synchronized int getProgress() {
         if (!(currentState == SimulationState.POST_SIMULATION_CALCULATIONS)) {
             if (progress.isEmpty()) {
                 return 0;
@@ -288,7 +295,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         }
     }
 
-    public DateTime getEstimatedSimulationEnd() {
+    public synchronized DateTime getEstimatedSimulationEnd() {
         int progress = getProgress();
         if (progress > 0 && currentState == SimulationState.RUNNING) {
             long now = System.currentTimeMillis();

@@ -35,7 +35,7 @@ abstract class BatchRunTest extends ModelTest {
         assert batch.executed
         assert listener.offered.size() == 1
         QueueEntry entry = listener.offered.first()
-        assert entry.simulationConfiguration.simulation.parameterization == run.parameterization
+        assert entry.simulationTask.simulation.parameterization == run.parameterization
         //wait to finish simulation
         listener.waitUntilFinished()
     }

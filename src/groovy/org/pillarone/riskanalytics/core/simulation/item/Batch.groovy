@@ -2,7 +2,6 @@ package org.pillarone.riskanalytics.core.simulation.item
 
 import org.pillarone.riskanalytics.core.BatchRun
 import org.pillarone.riskanalytics.core.ParameterizationDAO
-import org.pillarone.riskanalytics.core.output.SimulationRun
 
 class Batch extends ModellingItem {
 
@@ -70,21 +69,5 @@ class Batch extends ModellingItem {
     @Override
     Class getModelClass() {
         null
-    }
-
-    @Override
-    List<Simulation> getSimulations() {
-        SimulationRun.withTransaction {
-            List<SimulationRun> simRuns = SimulationRun.createCriteria().list {
-                batchRun {
-                    eq('id', id)
-                }
-            }
-            simRuns.collect {
-                Simulation simulation = new Simulation(it.name)
-                simulation.load()
-                simulation
-            }
-        }
     }
 }

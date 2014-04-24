@@ -1,9 +1,7 @@
 package org.pillarone.riskanalytics.core.simulation.engine
-
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.model.ModelHelper
 import org.pillarone.riskanalytics.core.output.*
-import org.pillarone.riskanalytics.core.output.batch.OutputStrategyFactory
 import org.pillarone.riskanalytics.core.parameterization.ParameterApplicator
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationBlock
 import org.pillarone.riskanalytics.core.simulation.item.ModelStructure
@@ -14,7 +12,6 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolde
 import org.pillarone.riskanalytics.core.util.PeriodLabelsUtil
 import org.pillarone.riskanalytics.core.wiring.IPacketListener
 import org.springframework.beans.factory.config.BeanDefinition
-
 /**
  * The SimulationConfiguration is a descriptor for a runnable simulation. All runtime aspects e.g. numberOfIterations,
  * numberOfPeriods, the parameterization, etc are stored in the simulationRun. They have to be persistent.
@@ -73,6 +70,8 @@ public class SimulationConfiguration implements Serializable, Cloneable {
 
         preparedSimulation.structure = ModelStructure.getStructureForModel(simulation.modelClass)
         preparedSimulation.modelVersionNumber = simulation.modelVersionNumber
+        preparedSimulation.simulationState = simulation.simulationState
+        preparedSimulation.batch = simulation.batch
 
         this.simulation = preparedSimulation
     }

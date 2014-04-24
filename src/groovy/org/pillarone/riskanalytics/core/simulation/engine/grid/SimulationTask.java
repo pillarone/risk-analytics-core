@@ -253,11 +253,6 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
     protected synchronized void setSimulationState(SimulationState simulationState) {
         this.currentState = simulationState;
         getSimulation().setSimulationState(currentState);
-        try {
-            Thread.currentThread().sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     public Simulation getSimulation() {

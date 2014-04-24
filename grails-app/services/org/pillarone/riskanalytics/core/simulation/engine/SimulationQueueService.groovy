@@ -117,7 +117,9 @@ class SimulationQueueService {
                 case SimulationState.SAVING_RESULTS:
                 case SimulationState.POST_SIMULATION_CALCULATIONS:
                 default:
-                    log.warn("task $entry has finished, but state was $simulationState. This is likely to an internal gridgain error")
+                    log.error("task $entry has finished, but state was $simulationState. This is likely to an internal gridgain error")
+                    entry.simulationTask.simulationErrors.add(new Throwable("internal gridgain error"))
+                    entry.simulationTask.simulationState = SimulationState.ERROR
                     notifyFinished(entry.id)
             }
         }

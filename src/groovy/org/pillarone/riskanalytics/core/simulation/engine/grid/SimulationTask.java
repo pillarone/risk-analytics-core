@@ -250,7 +250,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         return currentState;
     }
 
-    protected synchronized void setSimulationState(SimulationState simulationState) {
+    public synchronized void setSimulationState(SimulationState simulationState) {
         this.currentState = simulationState;
         getSimulation().setSimulationState(currentState);
     }

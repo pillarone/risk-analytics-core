@@ -86,8 +86,13 @@ class SimulationRun {
                 eq('itemVersion', version)
             }
         }
-        findByBatchRunId { Long id ->
+        withBatchRunId { Long id ->
             batchRun {
+                eq('id', id)
+            }
+        }
+        withParamId { Long id ->
+            parameterization {
                 eq('id', id)
             }
         }

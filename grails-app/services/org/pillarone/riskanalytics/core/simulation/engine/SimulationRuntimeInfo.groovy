@@ -81,10 +81,8 @@ class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo> {
         if (entry.id != id) {
             throw new IllegalStateException("queueEntry id is different from our id")
         }
-        if (simulation != entry.simulationTask.simulation) {
-            simulation = entry.simulationTask.simulation
-            changed = true
-        }
+        simulation = entry.simulationTask.simulation
+
         if (priority != entry.priority) {
             priority = entry.priority
             changed = true

@@ -13,7 +13,8 @@ class BatchRunService {
 
     SimulationQueueService simulationQueueService
 
-    private static final String SIM_STAMP_FORMAT = System.getProperty("BatchRunService.SIM_STAMP_FORMAT","yyyy-MM-dd HH:mm:ss ")
+    private static
+    final String SIM_STAMP_FORMAT = System.getProperty("BatchRunService.SIM_STAMP_FORMAT", "yyyy-MM-dd HH:mm:ss ")
 
     void runBatch(Batch batch) {
         batch.load()
@@ -58,7 +59,7 @@ class BatchRunService {
 
     boolean deleteBatch(Batch batch) {
         SimulationRun.withTransaction {
-            SimulationRun.findByBatchRunId(batch.id).list().each {
+            SimulationRun.withBatchRunId(batch.id).list().each {
                 it.batchRun = null
                 it.save()
             }
@@ -74,7 +75,8 @@ class BatchRunService {
         batch
     }
 
-    private static Simulation createSimulation(Parameterization parameterization, SimulationProfile simulationProfile, Batch batch = null) {
+    private
+    static Simulation createSimulation(Parameterization parameterization, SimulationProfile simulationProfile, Batch batch = null) {
         parameterization.load()
         String name = "batch " + parameterization.name + " " + new SimpleDateFormat(SIM_STAMP_FORMAT).format(new Date())
         Simulation simulation = new Simulation(name)
@@ -121,5 +123,15 @@ class BatchRunService {
                 property('name')
             }
         }.unique()
+    }
+
+    Simulation findSimulation(Batch batch, Parameterization parameterization) {
+        SimulationRun run = SimulationRun.withBatchRunId(batch?.id).withParamId(parameterization?.id).get()
+        if (run) {
+            Simulation simulation = new Simulation(run.name)
+            simulation.load()
+            return simulation
+        }
+        return null
     }
 }

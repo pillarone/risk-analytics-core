@@ -257,6 +257,12 @@ abstract class ModellingItem implements Serializable {
     }
 
     @Override
+    // PMO-2710 Bug preventing renaming Batches
+    // I think the problem was that ModellingItem’s equals() was not distinguishing between different kinds of ModellingItems,
+    // so a batch with an id 1 could match a P14n with id 1, thus returning the wrong GUI node to rename.
+    // Not too happy with the way the whole tree is recursively walked when trying to simply rename an item you have already right-clicked on.
+    // It’s just dumb and there’s about 3000 items to walk when you’re renaming a Batch.
+    //
     boolean equals(Object obj) {
         if (obj instanceof ModellingItem) {
 

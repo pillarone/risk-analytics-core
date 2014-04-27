@@ -90,7 +90,7 @@ class BatchRunService {
 
         simulation.numberOfIterations = simulationProfile.numberOfIterations
         simulation.periodCount = parameterization.periodCount
-        if (simulation.randomSeed != null) {
+        if (simulationProfile.randomSeed != null) {
             simulation.randomSeed = simulationProfile.randomSeed
         } else {
             long millis = System.currentTimeMillis()

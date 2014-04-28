@@ -18,6 +18,7 @@ class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo> {
     private DateTime estimatedSimulationEnd
     private Person offeredBy
     private List<Throwable> simulationErrors
+    private long offeredNanoTime
 
     SimulationRuntimeInfo(UUID id) {
         this.id = Preconditions.checkNotNull(id)
@@ -82,6 +83,7 @@ class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo> {
             throw new IllegalStateException("queueEntry id is different from our id")
         }
         simulation = entry.simulationTask.simulation
+        offeredNanoTime = entry.offeredNanoTime
 
         if (priority != entry.priority) {
             priority = entry.priority
@@ -129,7 +131,7 @@ class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo> {
     @Override
     int compareTo(SimulationRuntimeInfo o) {
         if (priority.equals(o.priority)) {
-            offeredAt.compareTo(o.offeredAt)
+            return offeredNanoTime.compareTo(o.offeredNanoTime)
         }
         return priority.compareTo(o.priority)
     }

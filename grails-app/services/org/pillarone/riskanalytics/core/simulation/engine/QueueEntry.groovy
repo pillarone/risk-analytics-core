@@ -9,6 +9,7 @@ class QueueEntry implements Comparable<QueueEntry> {
     int priority
     final SimulationTask simulationTask
     final Person offeredBy
+    final long offeredNanoTime
 
     QueueEntry(SimulationConfiguration simulationConfiguration, int priority, Person offeredBy) {
         this.simulationTask = new SimulationTask(simulationConfiguration: simulationConfiguration)
@@ -16,6 +17,7 @@ class QueueEntry implements Comparable<QueueEntry> {
         this.priority = priority
         id = UUID.randomUUID()
         offeredAt = new Date()
+        offeredNanoTime = System.nanoTime()
     }
 
     QueueEntry(UUID id) {
@@ -24,11 +26,12 @@ class QueueEntry implements Comparable<QueueEntry> {
         this.simulationTask = null
         this.offeredBy = null
         offeredAt = null
+        offeredNanoTime = System.nanoTime()
     }
 
     int compareTo(QueueEntry o) {
         if (priority.equals(o.priority)) {
-            offeredAt.compareTo(o.offeredAt)
+            return offeredNanoTime.compareTo(o.offeredNanoTime)
         }
         return priority.compareTo(o.priority)
     }

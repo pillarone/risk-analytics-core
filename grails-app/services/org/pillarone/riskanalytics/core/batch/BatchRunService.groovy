@@ -68,7 +68,7 @@ class BatchRunService {
     }
 
     Batch createBatch(List<Parameterization> parameterizations) {
-        def batch = new Batch(new SimpleDateFormat(BATCH_SIMNAME_STAMP_FORMAT).format(new Date()))
+        Batch batch = new Batch(new SimpleDateFormat(BATCH_SIMNAME_STAMP_FORMAT).format(new Date()))
         batch.parameterizations = parameterizations
         batch.executed = false
         batch.save()
@@ -88,7 +88,7 @@ class BatchRunService {
         //TODO decide if we need it and should add it to simulation profiles
         //simulation.beginOfFirstPeriod = beginOfFirstPeriod
 
-        simulation.numberOfIterations = simulationProfile.numberOfIterations
+        simulation.numberOfIterations = simulationProfile.numberOfIterations ?: 0
         simulation.periodCount = parameterization.periodCount
         if (simulationProfile.randomSeed != null) {
             simulation.randomSeed = simulationProfile.randomSeed

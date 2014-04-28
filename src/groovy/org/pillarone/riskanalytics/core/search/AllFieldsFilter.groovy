@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.search
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.modellingitem.BatchCacheItem
 import org.pillarone.riskanalytics.core.modellingitem.CacheItem
 import org.pillarone.riskanalytics.core.modellingitem.ParameterizationCacheItem
 import org.pillarone.riskanalytics.core.modellingitem.ResourceCacheItem
@@ -76,6 +77,12 @@ class AllFieldsFilter implements ISearchFilter {
     private static
     final boolean matchSimulationResultsOnDealId = System.getProperty("matchSimulationResultsOnDealId", "true").equalsIgnoreCase("true");
 
+    // It can be counterproductive to filter batches.  You search for p14ns to put into a batch but the batch name
+    // is not likely to match the same filter exactly, so you can't see the batch once it's created. So by default
+    // we don't filter batches.  Matthias may come up with a friendly toggle in the GUI; meanwhile I need to test..
+    private static final boolean filterBatchesInGUI = System.getProperty("filterBatchesInGUI", "false").equalsIgnoreCase("true");
+
+
     static final String AND_SEPARATOR = " AND "
     static final String OR_SEPARATOR = " OR "
     String query = ""
@@ -131,6 +138,11 @@ class AllFieldsFilter implements ISearchFilter {
                         //
                         matchSimulationResultsOnDealId && FilterHelp.matchDealId(sim.parameterization, matchTerms)
                 )
+    }
+
+    // This override forces all Batch nodes to be visible in tree
+    private static boolean internalAccept(BatchCacheItem b, String[] matchTerms) {
+        return !filterBatchesInGUI;
     }
 
     //matchTerms.any { isStateAcceptor(it) && StringUtils.containsIgnoreCase(p14n.status?.toString(), getText(it)) } ||

@@ -425,7 +425,9 @@ class Parameterization extends ParametrizedItem {
             load()
         }
         SimulationRun.findAllByParameterizationAndToBeDeleted(dao, false).collect {
-            new Simulation(it.name)
+            Simulation simulation = new Simulation(it.name)
+            simulation.load(false)
+            simulation
         }
     }
 

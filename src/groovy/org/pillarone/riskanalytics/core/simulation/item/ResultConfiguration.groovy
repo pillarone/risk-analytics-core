@@ -177,7 +177,9 @@ class ResultConfiguration extends ModellingItem {
             load()
         }
         return SimulationRun.findAllByResultConfigurationAndToBeDeleted(dao, false).collect {
-            new Simulation(it.name)
+            Simulation simulation = new Simulation(it.name)
+            simulation.load(false)
+            simulation
         }
     }
 

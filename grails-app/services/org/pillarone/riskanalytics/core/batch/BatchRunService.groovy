@@ -71,7 +71,6 @@ class BatchRunService {
         Batch batch = new Batch(new SimpleDateFormat(BATCH_SIMNAME_STAMP_FORMAT).format(new Date()))
         batch.parameterizations = parameterizations
         batch.executed = false
-        batch.save()
         batch
     }
 

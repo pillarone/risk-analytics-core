@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.simulation.item
 
 import org.pillarone.riskanalytics.core.BatchRun
 import org.pillarone.riskanalytics.core.ParameterizationDAO
+import org.pillarone.riskanalytics.core.SimulationProfileDAO
 
 class Batch extends ModellingItem {
 
@@ -58,6 +59,16 @@ class Batch extends ModellingItem {
             parameterization.modelClass = getClass().classLoader.loadClass(run.modelClassName)
             parameterization.load()
             parameterization
+        }
+    }
+
+    boolean isValidToRun() {
+        if (executed) {
+            return false
+        }
+        List<String> modelNames = parameterizations.modelClass.name.unique()
+        return modelNames.every {
+            SimulationProfileDAO.countByNameAndModelClassName(simulationProfileName, it) > 0
         }
     }
 

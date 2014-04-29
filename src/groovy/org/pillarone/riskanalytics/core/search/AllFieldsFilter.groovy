@@ -14,34 +14,37 @@ import org.pillarone.riskanalytics.core.modellingitem.SimulationCacheItem
   Originally :-
 
   AllFieldsFilter supported one or more _alternative_ search terms separated by OR.
-  Matching was attempted in following ways:
+  Matching occurred in these ways:
    - term found in item name
-   - term exactly matches item's creator
+   - term exactly matched item's creator
    - term found in any of item's tags (for taggable items - Simulations, Parameterizations and Resources)
-   - Parameterizations: additionally, term found in status, or exact match to Pn's deal (numeric) id
-   - Simulation items: additionally, term found in name of its Pn or Result Template
+   - Parameterizations: additionally, term found in status, or exact match to its numeric deal id
+   - Simulation: additionally, term found in name of its Pn or Result Template
 
    and yielded all items matching on any of the above tests on any of the OR terms.
 
    New :-
 
-   + Filter terms can now be restricted in their scope
+   + Filter terms can restrict their effect to the Name, State, Tags, Deal Id, and Owner fields.
    + Filtering can successively narrow a search via AND clauses
    + Negative filtering allows to exclude specific values via ! prefix
-   + Match allowed on partial username (its hard to remember exact usernames)
-   + Allow finding simulation results for given (exact) deal id, in addition to finding P4ns
+   + Match allowed on partial username (it can be hard to remember exact usernames)
+   + Allow finding simulation results, in addition to finding P4ns, for given (exact) deal id
 
    This has been extended as described below.
-   The implementation is not particularly 'object oriented' and would probably fit into some kind of visitor
-   pattern implementation if some bright spark can see how to do that without doubling the size of the code.
+
+   Note: The implementation is not very 'object oriented' and might fit nicely into some kind of visitor
+   pattern implementation if some bright spark can see how to do that without doubling the size of the
+   code (or doubling the filtering time :-P ) (or both :P :P)
    -----------------------------------------
 
-   + ALLOW RESTRICTED FILTER/SEARCH TERM SCOPE
+   + FILTER ON SPECIFIC FIELDS
 
-        Terms can be restricted to apply to a specific item attribute by prefixing with one of:
-            DEALID:|NAME:|OWNER:|STATE:|TAG:
+        Terms can focused on a specific field by prefixing with one of (case not sensitive):
+            DEALID:, NAME:, OWNER:, STATE:, or TAG:
+        (Shorter forms D:, N:, O:, S:, and T: are allowed too.)
 
-        This is a refinement that decays to current behaviour if keywords are not used.
+        This refinement decays to the old behaviour if keywords are not used.
 
         If term begins with "<keyword>:" and <keyword> is relevant to the item type being matched, use it as now.
         (Ditto if term doesn't begin with "<keyword>:")
@@ -51,24 +54,35 @@ import org.pillarone.riskanalytics.core.modellingitem.SimulationCacheItem
             yielded items with the word 'review' in the name or with status 'in review'.
 
         Now, the search text: "status:review"
-            will only yield items with the status.  Pns with 'review' in the name but status 'in production' will not match.
+            will only yield items with status 'in review';
+            items with 'review' in the *name* but in status 'data entry' will not match.
 
 
    + ALLOW AND-ing MULTIPLE FILTERS
 
         After  i) is implemented, this is easy to layer on top of existing design.
 
-        Currently the filter 'review OR production' makes sense for names or status values.
-        But 'review AND production' does not make sense for status values (an item has only one status).
-        But the filter 'name:review AND name:production' would make sense and help refine the search.
+        Formerly the filter 'review OR production' made sense (matching on names or status values),
+        whereas filter 'review AND production' could not make sense for status values (an item has only one status).
+        Now, the filter 'name:review AND name:production' makes sense and helps refine the search.
 
         The implementation is somewhat simplistic but useful as long as the query doesn't get too clever:
-        The query is split into successive filters at AND boundaries.
-        Each filter is then split into alternative search terms at OR boundaries.
-        Each filter's terms are applied to the results of the prior filter, narrowing the search.
+        The query is initially split into successive restriction filters at AND boundaries.
+        Each restriction is then split into alternative search terms at OR boundaries.
+        Each filter's terms are applied to the results of the prior filter, successively shrinking the matching tree.
 
    + ALLOW NEGATIVE FILTERS TO EXCLUDE ITEMS
+
         Eg The filter 'tag:Q4 2013 AND !tag:Allianz Re' would be useful for listing all the non AZRE models in the Q4 quarter run.
+
+   + ALLOW EXACT MATCH IN ADDITION TO CONTAINMENT MATCH
+
+        Using the = operator instead of the : allows specifying an *exact* match.
+
+        So whereas the filter : 't:50K'
+        would match tags :  '50K' and '14Q1v11_50K',
+        the filter : 't=50K'
+        would only match the tag '50K'.
 */
 
 class AllFieldsFilter implements ISearchFilter {
@@ -110,7 +124,13 @@ class AllFieldsFilter implements ISearchFilter {
 
     @Override
     boolean accept(CacheItem item) {
-        return item != null && matchTerms.every { passesRestriction(item, it) }
+        if( item == null ){
+            false
+        }
+        if( matchTerms.empty ){
+            true
+        }
+        return matchTerms.every { passesRestriction(item, it) }
     }
 
     static boolean passesRestriction(CacheItem item, String[] matchTerms) {
@@ -121,6 +141,7 @@ class AllFieldsFilter implements ISearchFilter {
     }
 
     private static boolean internalAccept(CacheItem item, String[] searchStrings) {
+        LOG.warn("CacheItem IGNORED by AllFieldsFilter: ${item.nameAndVersion} ")
         return false
     }
 
@@ -140,7 +161,9 @@ class AllFieldsFilter implements ISearchFilter {
                 )
     }
 
-    // This override forces all Batch nodes to be visible in tree
+    // This override renders Batches immune to filtering (so they always appear).
+    // Set -DfilterBatchesInGUI=true to remove this immunity.
+    //
     private static boolean internalAccept(BatchCacheItem b, String[] matchTerms) {
         return !filterBatchesInGUI;
     }
@@ -158,7 +181,7 @@ class AllFieldsFilter implements ISearchFilter {
     }
 
     //------------------------------------------------------------------------------------------------------------------
-    // Santa's not so little helper..
+    // Santa's not-so-little helper..
     //
     static class FilterHelp {
 
@@ -170,6 +193,12 @@ class AllFieldsFilter implements ISearchFilter {
         static final String ownerPrefix = "OWNER:"
         static final String statePrefix = "STATE:"
         static final String tagPrefix = "TAG:"
+
+        static final String dealIdPrefixEq = "DEALID="
+        static final String namePrefixEq = "NAME="
+        static final String ownerPrefixEq = "OWNER="
+        static final String statePrefixEq = "STATE="
+        static final String tagPrefixEq = "TAG="
         static final String nonePrefix = "";
 
         //Shorter versions of the above for more concise filter expressions
@@ -179,16 +208,33 @@ class AllFieldsFilter implements ISearchFilter {
         static final String stateShort = "S:"
         static final String tagShort = "T:"
 
+        static final String dealIdShortEq = "D="
+        static final String nameShortEq = "N="
+        static final String ownerShortEq = "O="
+        static final String stateShortEq = "S="
+        static final String tagShortEq = "T="
+
+        // TODO Should enforce excluding these special characters from item fields (name, tags, status etc)
+        //
         static final String FILTER_NEGATION = "!"
         static final String COLON = ":"
-//      static final boolean canNamesHaveColons = System.getProperty("AllFieldsFilter.canNamesHaveColons","false").toBoolean();
+        static final String EQUALS = "="
 
-        //In expected most-frequently-used-first order:
-        static final String[] columnFilterPrefixes = [tagPrefix, tagShort,
+        //In expected *most-frequently-used-first* order (need for speed):
+        //
+        static final String[] columnFilterPrefixes = [
+                tagPrefix, tagShort,
                 namePrefix, nameShort,
                 statePrefix, stateShort,
                 ownerPrefix, ownerShort,
-                dealIdPrefix, dealIdShort];
+                dealIdPrefix, dealIdShort,
+
+                tagPrefixEq, tagShortEq,
+                namePrefixEq, nameShortEq,
+                statePrefixEq, stateShortEq,
+                ownerPrefixEq, ownerShortEq,
+                dealIdPrefixEq, dealIdShortEq
+        ];
 
         // Search terms without a column prefix apply to all columns
         private static boolean isGeneralSearchTerm(String term) {
@@ -199,20 +245,26 @@ class AllFieldsFilter implements ISearchFilter {
         //(Copes with extra spaces after ! or before :)
         private static String getColumnFilterPrefix(String term) {
             int colonIndex = term.indexOf(COLON);
-            if (colonIndex == -1) {
+            int equalsIndex = term.indexOf(EQUALS);
+            if (colonIndex == -1 && equalsIndex == -1) { // not a column-specific term
+                return nonePrefix;
+            }
+            if (colonIndex != -1 && equalsIndex != -1) { // ambiguous - treat as generic search term
                 return nonePrefix;
             }
 
             int bangIndex = term.indexOf(FILTER_NEGATION);
 
-            //Give up if : precedes ! - it's a weirdo, treat as a general search term
-            if (colonIndex < bangIndex) {
-                LOG.warn("getColumnFilterPrefix(term: ${term}): Bang after colon - treat as generic filter.")
+            //Give up if : or = precedes ! - it's a weirdo, treat as a general search term
+            if (colonIndex < bangIndex || equalsIndex < bangIndex ) {
+                LOG.warn("getColumnFilterPrefix(term: ${term}): Bang after ':' or '=' - treat as generic filter.")
                 return nonePrefix;
             }
 
-            //Column filter prefix sits between any bang and the colon
-            String prefix = term.substring(bangIndex + 1, colonIndex).trim() + COLON;
+            //Column prefix sits between any bang and the colon/equals
+            String prefix = (colonIndex  != -1) ? term.substring(bangIndex + 1, colonIndex).trim() + COLON
+                          : (equalsIndex != -1) ? term.substring(bangIndex + 1, colonIndex).trim() + EQUALS
+                          : ""
 
             return columnFilterPrefixes.find { prefix.equalsIgnoreCase(it) } ?: nonePrefix;
 
@@ -220,74 +272,162 @@ class AllFieldsFilter implements ISearchFilter {
 //            return nonePrefix;
         }
 
-        //Acceptor terms either have no prefix or prefix matches the column in question
+        //Acceptor terms either have no prefix or prefix matches the column in question and ends in ':'
         //
         private static boolean isDealIdAcceptor(String term) {
             if (term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(EQUALS)) return false
             return [nonePrefix, dealIdShort, dealIdPrefix].any { it == prefix }
         }
 
         private static boolean isNameAcceptor(String term) {
             if (term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(EQUALS)) return false
             return [nonePrefix, nameShort, namePrefix].any { it == prefix }
         }
 
         private static boolean isOwnerAcceptor(String term) {
             if (term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(EQUALS)) return false
             return [nonePrefix, ownerShort, ownerPrefix].any { it == prefix }
         }
 
         private static boolean isStateAcceptor(String term) {
             if (term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(EQUALS)) return false
             return [nonePrefix, stateShort, statePrefix].any { it == prefix }
         }
 
         private static boolean isTagAcceptor(String term) {
             if (term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(EQUALS)) return false
             return [nonePrefix, tagShort, tagPrefix].any { it == prefix }
         }
-        // Rejector terms begin with ! and must match the column in question
+
+        //Column-equals-operator terms have prefix matches the column in question and end in '='
+        //
+        private static boolean isDealIdEqualsOp(String term) {
+            if (term.startsWith(FILTER_NEGATION) ) return false;
+            String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(COLON)) return false
+            return [/*nonePrefix,*/ dealIdShort, dealIdPrefix].any { it == prefix }
+        }
+
+        private static boolean isNameEqualsOp(String term) {
+            if (term.startsWith(FILTER_NEGATION)) return false;
+            String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(COLON)) return false
+            return [nonePrefix, nameShort, namePrefix].any { it == prefix }
+        }
+
+        private static boolean isOwnerEqualsOp(String term) {
+            if (term.startsWith(FILTER_NEGATION)) return false;
+            String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(COLON)) return false
+            return [nonePrefix, ownerShort, ownerPrefix].any { it == prefix }
+        }
+
+        private static boolean isStateEqualsOp(String term) {
+            if (term.startsWith(FILTER_NEGATION)) return false;
+            String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(COLON)) return false
+            return [nonePrefix, stateShort, statePrefix].any { it == prefix }
+        }
+
+        private static boolean isTagEqualsOp(String term) {
+            if (term.startsWith(FILTER_NEGATION)) return false;
+            String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(COLON)) return false
+            return [nonePrefix, tagShort, tagPrefix].any { it == prefix }
+        }
+
+
+        // Rejector terms begin with "!", match the column in question, and end in ':'
         //
         private static boolean isDealIdRejector(String term) {
             if (!term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(EQUALS)) return false
             return [dealIdShort, dealIdPrefix].any { it == prefix }
         }
 
         private static boolean isNameRejector(String term) {
             if (!term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(EQUALS)) return false
             return [nameShort, namePrefix].any { it == prefix }
         }
 
         private static boolean isOwnerRejector(String term) {
             if (!term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(EQUALS)) return false
             return [ownerShort, ownerPrefix].any { it == prefix }
         }
 
         private static boolean isStateRejector(String term) {
             if (!term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(EQUALS)) return false
             return [stateShort, statePrefix].any { it == prefix }
         }
 
         private static boolean isTagRejector(String term) {
             if (!term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(EQUALS)) return false
+            return [tagShort, tagPrefix].any { it == prefix }
+        }
+
+        // Column-not-equals terms begin with "!", match the column in question, and end in '='
+        //
+        private static boolean isDealIdNotEqualsOp(String term) {
+            if (!term.startsWith(FILTER_NEGATION)) return false;
+            String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(COLON)) return false
+            return [dealIdShort, dealIdPrefix].any { it == prefix }
+        }
+
+        private static boolean isNameNotEqualsOp(String term) {
+            if (!term.startsWith(FILTER_NEGATION)) return false;
+            String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(COLON)) return false
+            return [nameShort, namePrefix].any { it == prefix }
+        }
+
+        private static boolean isOwnerNotEqualsOp(String term) {
+            if (!term.startsWith(FILTER_NEGATION)) return false;
+            String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(COLON)) return false
+            return [ownerShort, ownerPrefix].any { it == prefix }
+        }
+
+        private static boolean isStateNotEqualsOp(String term) {
+            if (!term.startsWith(FILTER_NEGATION)) return false;
+            String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(COLON)) return false
+            return [stateShort, statePrefix].any { it == prefix }
+        }
+
+        private static boolean isTagNotEqualsOp(String term) {
+            if (!term.startsWith(FILTER_NEGATION)) return false;
+            String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(COLON)) return false
             return [tagShort, tagPrefix].any { it == prefix }
         }
 
 
         private static boolean matchName(CacheItem item, String[] matchTerms) {
             return matchTerms.any {
-                isNameAcceptor(it) ? StringUtils.containsIgnoreCase(item.nameAndVersion, getText(it))
-                        : isNameRejector(it) ? !StringUtils.containsIgnoreCase(item.nameAndVersion, getText(it))
+                          isNameAcceptor(it)    ?  StringUtils.containsIgnoreCase(item.nameAndVersion, getText(it))
+                        : isNameRejector(it)    ? !StringUtils.containsIgnoreCase(item.nameAndVersion, getText(it))
+                        : isNameEqualsOp(it)    ?  StringUtils.equalsIgnoreCase(item.nameAndVersion, getText(it))
+                        : isNameNotEqualsOp(it) ? !StringUtils.equalsIgnoreCase(item.nameAndVersion, getText(it))
                         : false
             };
         }
@@ -322,12 +462,26 @@ class AllFieldsFilter implements ISearchFilter {
                 if (isTagAcceptor(it)) {
                     //e.g. term 'tag:Q4 2013' will match any sim or pn tagged 'Q4 2013' (but also eg 'Q4 2013 ReRun')
                     item.tags*.name.any { String tag -> StringUtils.containsIgnoreCase(tag, getText(it)) }
-                } else {
+                }
+                else
+                if (isTagRejector(it)){
                     //e.g. term '!tag:Q4 2013' will match any sim or pn tagged 'H2 2013' (but not 'Q4 2013 ReRun')
-                    isTagRejector(it) ? !item.tags*.name.any { String tag -> StringUtils.containsIgnoreCase(tag, getText(it)) }
+                     !item.tags*.name.any { String tag -> StringUtils.containsIgnoreCase(tag, getText(it)) }
 
-                            //e.g. term 'status:Q4 2013' would fail to match a sim tagged Q4 2013 (and status 'in review' etc)
-                            : false
+                }
+                else
+                if (isTagEqualsOp(it)) {
+                    //e.g. term 'tag=Q4 2013' will match any sim or pn tagged 'Q4 2013' (but not eg 'Q4 2013 ReRun')
+                    item.tags*.name.any { String tag -> StringUtils.equalsIgnoreCase(tag, getText(it)) }
+                }
+                else
+                if (isTagNotEqualsOp(it)) {
+                    //e.g. term '!tag = Q4 2013' will match any sim or pn tagged 'Q1 2015' (but also eg 'Q4 2013 ReRun')
+                    !item.tags*.name.any { String tag -> StringUtils.equalsIgnoreCase(tag, getText(it)) }
+                }
+                else{
+                    //e.g. term 'status:Q4 2013' would fail to match a sim tagged Q4 2013 (and status 'in review' etc)
+                    false
                 }
             }
         }

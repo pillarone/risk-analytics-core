@@ -51,6 +51,8 @@ public class SimulationScope {
 
     private volatile SimulationState simulationState = SimulationState.NOT_RUNNING
 
+    ResultDataSource resultDataSource
+
     SimulationScope() {
         idGenerator = new CountingIdGenerator()
     }

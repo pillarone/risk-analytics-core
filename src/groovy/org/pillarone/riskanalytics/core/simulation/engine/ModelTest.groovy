@@ -151,6 +151,8 @@ abstract class ModelTest {
         runner = SimulationRunner.createRunner()
         ICollectorOutputStrategy output = outputStrategy
         SimulationConfiguration configuration = new SimulationConfiguration(run, output)
+        configuration.resultDataSource = new ResultDataSource()
+        prepareDataSource(configuration.resultDataSource)
         configuration.simulationBlocks = [new SimulationBlock(0, iterationCount, 0)]
         configuration.createMappingCache(run.template)
         runner.simulationConfiguration = configuration
@@ -163,6 +165,10 @@ abstract class ModelTest {
             compareResults()
         }
         postSimulationEvaluation()
+    }
+
+    protected void prepareDataSource(ResultDataSource dataSource) {
+
     }
 
     @After

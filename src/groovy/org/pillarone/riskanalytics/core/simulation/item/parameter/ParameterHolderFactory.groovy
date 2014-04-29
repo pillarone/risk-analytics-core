@@ -60,6 +60,10 @@ class ParameterHolderFactory {
         return new MultiDimensionalParameterHolder(path, periodIndex, value.clone())
     }
 
+    public static ParameterHolder getHolder(String path, int periodIndex, DataSourceDefinition value) {
+        return new DataSourceParameterHolder(path, periodIndex, value)
+    }
+
     public static ParameterHolder getHolder(String path, int periodIndex, def value) {
         throw new IllegalArgumentException("Unknown parameter type ${value?.class?.name}")
     }
@@ -86,6 +90,8 @@ class ParameterHolderFactory {
                 return createDateHolder(parameter)
             case ResourceParameter:
                 return createResourceHolder(parameter)
+            case DataSourceParameter:
+                return createDataSourceHolder(parameter)
             default:
                 throw new RuntimeException("Unknown paramter type: ${parameter.class}")
         }
@@ -130,6 +136,10 @@ class ParameterHolderFactory {
 
     private static ParameterHolder createMultiDimensionalParameterHolder(Parameter parameter) {
         return new MultiDimensionalParameterHolder(parameter)
+    }
+
+    private static ParameterHolder createDataSourceHolder(Parameter parameter) {
+        return new DataSourceParameterHolder(parameter)
     }
 
     /**

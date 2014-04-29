@@ -5,11 +5,13 @@ import org.apache.commons.logging.LogFactory;
 import org.gridgain.grid.*;
 import org.joda.time.DateTime;
 import org.pillarone.riskanalytics.core.cli.ImportStructureInTransaction;
+import org.pillarone.riskanalytics.core.components.DataSourceDefinition;
 import org.pillarone.riskanalytics.core.output.Calculator;
 import org.pillarone.riskanalytics.core.output.PathMapping;
 import org.pillarone.riskanalytics.core.output.aggregation.PacketAggregatorRegistry;
 import org.pillarone.riskanalytics.core.parameterization.ParameterizationHelper;
 import org.pillarone.riskanalytics.core.simulation.SimulationState;
+import org.pillarone.riskanalytics.core.simulation.engine.ResultDataSource;
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.mapping.AbstractNodeMappingStrategy;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.mapping.INodeMappingStrategy;
@@ -76,6 +78,11 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
             simulationConfiguration.prepareSimulationForGrid();
             simulationConfiguration.setBeans(SpringBeanDefinitionRegistry.getRequiredBeanDefinitions());
             simulationConfiguration.getSimulation().setStart(start);
+
+            List<DataSourceDefinition> dataSourceDefinitions = ParameterizationHelper.collectDataSourceDefinitions(simulationConfiguration.getSimulation().getParameterization().getParameters());
+            ResultDataSource dataSource = new ResultDataSource();
+            dataSource.load(dataSourceDefinitions);
+            simulationConfiguration.setResultDataSource(dataSource);
 
             resultTransferListener = new ResultTransferListener(this);
 

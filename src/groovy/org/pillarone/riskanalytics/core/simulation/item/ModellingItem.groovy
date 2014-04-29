@@ -256,34 +256,27 @@ abstract class ModellingItem implements Serializable {
         name
     }
 
-    @Override
-    // PMO-2710 Bug preventing renaming Batches
-    // I think the problem was that ModellingItem’s equals() was not distinguishing between different kinds of ModellingItems,
-    // so a batch with an id 1 could match a P14n with id 1, thus returning the wrong GUI node to rename.
-    // Not too happy with the way the whole tree is recursively walked when trying to simply rename an item you have already right-clicked on.
-    // It’s just dumb and there’s about 3000 items to walk when you’re renaming a Batch.
-    //
-    boolean equals(Object obj) {
-        if (obj instanceof ModellingItem) {
+    boolean equals(o) {
+        if (this.is(o)) return true
+        if (getClass() != o.class) return false
 
-            if (id != null && obj.id != null) {
-                // Hack to allow Batches to be renamed at ART.
-                // Avoid eg a Batch with id 1 being treated as equal to a P14n or Simulation with id 1
-                //
-                // (Might be correct to simply replace check for ModellingItem above, with a check for Class equality
-                // and then can drop this hack.)
-                String thisName = this.getClass().getCanonicalName();
-                String rhsName = obj.getClass().getCanonicalName();
-                if( !thisName.equals(rhsName) ){
-                    return false;
-                }
+        ModellingItem that = (ModellingItem) o
 
-                return obj.id.equals(id)
-            } else {
-                return obj.name.equals(name) && obj.modelClass.equals(modelClass)
-            }
+        if (id != null && that.id != null) {
+            return that.id.equals(id)
+        } else {
+            return that.name.equals(name) && that.modelClass.equals(modelClass)
         }
-        return false
+    }
+
+    int hashCode() {
+        if (id) {
+            return id.hashCode()
+        }
+        int result
+        result = (name != null ? name.hashCode() : 0)
+        result = 31 * result + (modelClass != null ? modelClass.hashCode() : 0)
+        return result
     }
 
     @Override

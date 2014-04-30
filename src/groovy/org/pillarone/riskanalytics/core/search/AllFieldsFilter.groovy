@@ -340,35 +340,35 @@ class AllFieldsFilter implements ISearchFilter {
             if (term.startsWith(FILTER_NEGATION) ) return false;
             String prefix = getColumnFilterPrefix(term)
             if (prefix.endsWith(COLON)) return false
-            return [/*nonePrefix,*/ dealIdShort, dealIdPrefix].any { it == prefix }
+            return [/*nonePrefix,*/ dealIdShortEq, dealIdPrefixEq].any { it == prefix }
         }
 
         private static boolean isNameEqualsOp(String term) {
             if (term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
             if (prefix.endsWith(COLON)) return false
-            return [/*nonePrefix,*/ nameShort, namePrefix].any { it == prefix }
+            return [/*nonePrefix,*/ nameShortEq, namePrefixEq].any { it == prefix }
         }
 
         private static boolean isOwnerEqualsOp(String term) {
             if (term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
             if (prefix.endsWith(COLON)) return false
-            return [/*nonePrefix,*/ ownerShort, ownerPrefix].any { it == prefix }
+            return [/*nonePrefix,*/ ownerShortEq, ownerPrefixEq].any { it == prefix }
         }
 
         private static boolean isStateEqualsOp(String term) {
             if (term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
             if (prefix.endsWith(COLON)) return false
-            return [/*nonePrefix,*/ stateShort, statePrefix].any { it == prefix }
+            return [/*nonePrefix,*/ stateShortEq, statePrefixEq].any { it == prefix }
         }
 
         private static boolean isTagEqualsOp(String term) {
             if (term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
             if (prefix.endsWith(COLON)) return false
-            return [/*nonePrefix,*/ tagShort, tagPrefix].any { it == prefix }
+            return [/*nonePrefix,*/ tagShortEq, tagPrefixEq].any { it == prefix }
         }
 
         private static boolean isSeedEqualsOp(String term) {
@@ -377,8 +377,6 @@ class AllFieldsFilter implements ISearchFilter {
             if (prefix.endsWith(COLON)) return false
             return seedPrefixEq == prefix
         }
-
-
 
         // Rejector terms begin with "!", match the column in question, and end in ':'
         //
@@ -423,35 +421,35 @@ class AllFieldsFilter implements ISearchFilter {
             if (!term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
             if (prefix.endsWith(COLON)) return false
-            return [dealIdShort, dealIdPrefix].any { it == prefix }
+            return [dealIdShortEq, dealIdPrefixEq].any { it == prefix }
         }
 
         private static boolean isNameNotEqualsOp(String term) {
             if (!term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
             if (prefix.endsWith(COLON)) return false
-            return [nameShort, namePrefix].any { it == prefix }
+            return [nameShortEq, namePrefixEq].any { it == prefix }
         }
 
         private static boolean isOwnerNotEqualsOp(String term) {
             if (!term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
             if (prefix.endsWith(COLON)) return false
-            return [ownerShort, ownerPrefix].any { it == prefix }
+            return [ownerShortEq, ownerPrefixEq].any { it == prefix }
         }
 
         private static boolean isStateNotEqualsOp(String term) {
             if (!term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
             if (prefix.endsWith(COLON)) return false
-            return [stateShort, statePrefix].any { it == prefix }
+            return [stateShortEq, statePrefixEq].any { it == prefix }
         }
 
         private static boolean isTagNotEqualsOp(String term) {
             if (!term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
             if (prefix.endsWith(COLON)) return false
-            return [tagShort, tagPrefix].any { it == prefix }
+            return [tagShortEq, tagPrefixEq].any { it == prefix }
         }
 
 

@@ -3,6 +3,7 @@ package org.pillarone.riskanalytics.core.simulation.item
 import org.pillarone.riskanalytics.core.BatchRun
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.SimulationProfileDAO
+import org.pillarone.riskanalytics.core.output.SimulationRun
 
 class Batch extends ModellingItem {
 
@@ -70,6 +71,16 @@ class Batch extends ModellingItem {
         return modelNames.every {
             SimulationProfileDAO.countByNameAndModelClassName(simulationProfileName, it) > 0
         }
+    }
+
+    @Override
+    protected Object deleteDaoImpl(Object dao) {
+        BatchRun batchRun = dao as BatchRun
+        SimulationRun.withBatchRunId(batchRun.id).list().each {
+            it.batchRun = null
+            it.save()
+        }
+        super.deleteDaoImpl(batchRun)
     }
 
     @Override

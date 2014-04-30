@@ -85,7 +85,18 @@ class ModellingItemUpdaterTests {
     void testCopySimulation() {
         assert !ModellingItemUpdater.createOrUpdateModellingItem(null, new Simulation('name'))
         SimulationCacheItem source = new SimulationCacheItem(
-                100l, 'name', new ParameterizationCacheItem(1l, 'name', null, null,), new ResultConfigurationCacheItem(1l, 'name', EmptyModel, null), ImmutableList.copyOf([new Tag(name: 'tagName')]), CoreModel, new VersionNumber('7.0'), new DateTime(), new DateTime(), new DateTime(), new DateTime(), new Person(), 0, null
+                100l,
+                'name',
+                new ParameterizationCacheItem(1l, 'name', null, null,),
+                new ResultConfigurationCacheItem(1l, 'name', EmptyModel, null),
+                ImmutableList.copyOf([new Tag(name: 'tagName')]),
+                CoreModel,
+                new VersionNumber('7.0'),
+                new DateTime(), new DateTime(), new DateTime(), new DateTime(),
+                new Person(),
+                0,
+                null,
+                0                                                                   // randomSeed
         )
 
         Simulation result = ModellingItemUpdater.createOrUpdateModellingItem(source, null)
@@ -103,6 +114,7 @@ class ModellingItemUpdaterTests {
         assert source.modificationDate == result.modificationDate
         assert source.creator == result.creator
         assert source.numberOfIterations == result.numberOfIterations
+        assert source.randomSeed == result.randomSeed
 
         Simulation toUpdate = new Simulation('toUpdate')
         result = ModellingItemUpdater.createOrUpdateModellingItem(source, toUpdate)
@@ -121,7 +133,7 @@ class ModellingItemUpdaterTests {
         assert source.modificationDate == result.modificationDate
         assert source.creator == result.creator
         assert source.numberOfIterations == result.numberOfIterations
-
+        assert source.randomSeed == result.randomSeed
     }
 
     @Test

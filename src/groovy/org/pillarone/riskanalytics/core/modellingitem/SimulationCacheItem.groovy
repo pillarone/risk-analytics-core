@@ -20,10 +20,22 @@ class SimulationCacheItem extends CacheItem {
     final int numberOfIterations
     Long batchId
     BatchCacheItem batch
+    final int randomSeed
 
 
     SimulationCacheItem(
-            Long id, String name, ParameterizationCacheItem parameterization, ResultConfigurationCacheItem resultConfiguration, ImmutableList<Tag> tags, Class modelClass, VersionNumber modelVersionNumber, DateTime end, DateTime start, DateTime creationDate, DateTime modificationDate, Person creator, int numberOfIterations, BatchCacheItem batch
+            Long id,
+            String name,
+            ParameterizationCacheItem parameterization,
+            ResultConfigurationCacheItem resultConfiguration,
+            ImmutableList<Tag> tags,
+            Class modelClass,
+            VersionNumber modelVersionNumber,
+            DateTime end, DateTime start, DateTime creationDate, DateTime modificationDate,
+            Person creator,
+            int numberOfIterations,
+            BatchCacheItem batch,
+            int randomSeed = -1
     ) {
         super(id, creationDate, modificationDate, creator, null, name, modelClass)
         this.parameterization = parameterization
@@ -34,8 +46,11 @@ class SimulationCacheItem extends CacheItem {
         this.start = start
         this.numberOfIterations = numberOfIterations
         this.batch = batch
+        this.randomSeed = randomSeed
     }
 
+    // Don't like the look of this - partially constructed objects
+    //
     SimulationCacheItem(Long id, String name, Class modelClass, VersionNumber modelVersionNumber) {
         this(id, name, null, null, null, modelClass, modelVersionNumber, null, null, null, null, null, -1, null)
     }

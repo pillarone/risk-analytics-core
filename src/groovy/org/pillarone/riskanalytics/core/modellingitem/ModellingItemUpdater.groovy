@@ -57,6 +57,7 @@ class ModellingItemUpdater {
         target.modificationDate = source.modificationDate
         target.creator = source.creator
         target.numberOfIterations = source.numberOfIterations
+        target.randomSeed = source.randomSeed
         return target
     }
 

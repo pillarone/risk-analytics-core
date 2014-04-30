@@ -135,9 +135,11 @@ class AllFieldsFilter implements ISearchFilter {
 
     static boolean passesRestriction(CacheItem item, String[] matchTerms) {
 
-        return FilterHelp.matchName(item, matchTerms) ||
-                FilterHelp.matchOwner(item, matchTerms) ||
-                internalAccept(item, matchTerms)
+        // Name and owner fields found on every item type
+        //
+        return FilterHelp.matchName(item, matchTerms)  ||
+               FilterHelp.matchOwner(item, matchTerms) ||
+               internalAccept(item, matchTerms)
     }
 
     private static boolean internalAccept(CacheItem item, String[] searchStrings) {
@@ -145,20 +147,28 @@ class AllFieldsFilter implements ISearchFilter {
         return false
     }
 
-    //  Useful to match results on dealid off the pn though, for quarter runs.
+    //  Didn't match simulation on name via general name match attempt, so
+    //  try match sim's tags or p14n or result config
+    //  --NEW--
+    //  or random seed (helpful for version migration comparison reports in new releases).
+    //
     private static boolean internalAccept(SimulationCacheItem sim, String[] matchTerms) {
         return FilterHelp.matchTags(sim, matchTerms) ||
                 matchTerms.any {
                     FilterHelp.isNameAcceptor(it) &&
-                            (StringUtils.containsIgnoreCase(sim.parameterization?.name, FilterHelp.getText(it)) ||
-                                    StringUtils.containsIgnoreCase(sim.resultConfiguration?.name, FilterHelp.getText(it))
+                            (
+                              StringUtils.containsIgnoreCase(sim.parameterization?.name, FilterHelp.getText(it)) ||
+                              StringUtils.containsIgnoreCase(sim.resultConfiguration?.name, FilterHelp.getText(it))
                             )
                 } ||
                 (
                         //Can disable this to check performance impact..
                         //
                         matchSimulationResultsOnDealId && FilterHelp.matchDealId(sim.parameterization, matchTerms)
-                )
+                ) ||
+                matchTerms.any {
+                    FilterHelp.isSeedEqualsOp(it) && StringUtils.equals(""+sim.randomSeed, FilterHelp.getText(it))
+                }
     }
 
     // This override renders Batches immune to filtering (so they always appear).
@@ -213,6 +223,9 @@ class AllFieldsFilter implements ISearchFilter {
         static final String ownerShortEq = "O="
         static final String stateShortEq = "S="
         static final String tagShortEq = "T="
+        //Special match operators
+        static final String seedPrefix   = "SEED"   //randomSeed used in a sim
+        static final String seedPrefixEq = "SEED="
 
         // TODO Should enforce excluding these special characters from item fields (name, tags, status etc)
         //
@@ -233,7 +246,10 @@ class AllFieldsFilter implements ISearchFilter {
                 namePrefixEq, nameShortEq,
                 statePrefixEq, stateShortEq,
                 ownerPrefixEq, ownerShortEq,
-                dealIdPrefixEq, dealIdShortEq
+                dealIdPrefixEq, dealIdShortEq,
+
+                seedPrefixEq,
+                seedPrefix   //not used yet, added for consistency
         ];
 
         // Search terms without a column prefix apply to all columns
@@ -311,6 +327,13 @@ class AllFieldsFilter implements ISearchFilter {
             return [nonePrefix, tagShort, tagPrefix].any { it == prefix }
         }
 
+        private static boolean isSeedAcceptor(String term) {
+            if (term.startsWith(FILTER_NEGATION)) return false;
+            String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(EQUALS)) return false
+            return seedPrefix == prefix
+        }
+
         //Column-equals-operator terms have prefix matches the column in question and end in '='
         //
         private static boolean isDealIdEqualsOp(String term) {
@@ -347,6 +370,14 @@ class AllFieldsFilter implements ISearchFilter {
             if (prefix.endsWith(COLON)) return false
             return [/*nonePrefix,*/ tagShort, tagPrefix].any { it == prefix }
         }
+
+        private static boolean isSeedEqualsOp(String term) {
+            if (term.startsWith(FILTER_NEGATION)) return false;
+            String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(COLON)) return false
+            return seedPrefixEq == prefix
+        }
+
 
 
         // Rejector terms begin with "!", match the column in question, and end in ':'

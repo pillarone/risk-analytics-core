@@ -78,7 +78,8 @@ class CacheItemMapper {
                             dao.modificationDate,
                             dao.creator,
                             dao.iterations,
-                            getModellingItem(dao.batchRun)
+                            getModellingItem(dao.batchRun),
+                            dao.randomSeed
                     )
         }
     }

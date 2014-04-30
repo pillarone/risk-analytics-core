@@ -2,10 +2,12 @@ package org.pillarone.riskanalytics.core.parameterization
 
 import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.components.Component
+import org.pillarone.riskanalytics.core.components.DataSourceDefinition
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
 import org.pillarone.riskanalytics.core.model.Model
 import org.pillarone.riskanalytics.core.parameter.comment.Tag
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
+import org.pillarone.riskanalytics.core.simulation.item.parameter.DataSourceParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolderFactory
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.Comment
@@ -211,6 +213,16 @@ public class ParameterizationHelper {
 
             } else if (parameter instanceof ParameterObjectParameterHolder) {
                 result.addAll(collectUsedResources(parameter.classifierParameters.values().toList()))
+            }
+        }
+        return result;
+    }
+
+    static List<DataSourceDefinition> collectDataSourceDefinitions(List<ParameterHolder> parameters) {
+        List<DataSourceDefinition> result = new ArrayList<DataSourceDefinition>();
+        for (ParameterHolder parameter : parameters) {
+            if (parameter instanceof DataSourceParameterHolder) {
+                result << parameter.definition
             }
         }
         return result;

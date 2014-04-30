@@ -27,6 +27,8 @@ public class SimulationConfiguration implements Serializable, Cloneable {
     IPacketListener packetListener;
     Map<String, BeanDefinition> beans = [:]
     ICollectorOutputStrategy outputStrategy
+    ResultDataSource resultDataSource
+
 
     SimulationConfiguration(Simulation simulation, ICollectorOutputStrategy outputStrategy) {
         this.simulation = simulation

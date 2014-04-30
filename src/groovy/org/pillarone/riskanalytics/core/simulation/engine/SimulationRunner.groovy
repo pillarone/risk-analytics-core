@@ -219,6 +219,7 @@ public class SimulationRunner {
         currentScope.outputStrategy = configuration.outputStrategy
         currentScope.iterationScope.numberOfPeriods = simulation.periodCount
         currentScope.simulationBlocks = configuration.simulationBlocks
+        currentScope.resultDataSource = configuration.resultDataSource
 
         simulationAction.iterationAction.periodAction.model = currentScope.model
 

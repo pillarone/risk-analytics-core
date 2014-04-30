@@ -255,15 +255,20 @@ abstract class ResultAccessor {
 
     @CompileStatic
     static double[] getValues(SimulationRun simulationRun, int periodIndex, String pathName, String collectorName, String fieldName) {
-        File iterationFile = new File(GridHelper.getResultPathLocation(simulationRun.id, getPathId(pathName), getFieldId(fieldName), getCollectorId(collectorName), periodIndex))
+        IterationFileAccessor ifa = createFileAccessor(simulationRun, pathName, fieldName, collectorName, periodIndex)
         HashMap<Integer, Double> tmpValues = new HashMap<Integer, Double>(simulationRun.iterations);
-        IterationFileAccessor ifa = new IterationFileAccessor(iterationFile);
         double[] values = new double[simulationRun.iterations]
         int current = 0
         while (ifa.fetchNext()) {
             values[current++] = ifa.getValue()
         }
         return fillWithZeroes(simulationRun, values);
+    }
+
+    @CompileStatic
+    public static IterationFileAccessor createFileAccessor(SimulationRun simulationRun, String pathName, String fieldName, String collectorName, int periodIndex) {
+        File iterationFile = new File(GridHelper.getResultPathLocation(simulationRun.id, getPathId(pathName), getFieldId(fieldName), getCollectorId(collectorName), periodIndex))
+        return new IterationFileAccessor(iterationFile)
     }
 
     @CompileStatic

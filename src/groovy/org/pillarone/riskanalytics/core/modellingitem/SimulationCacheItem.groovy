@@ -31,11 +31,14 @@ class SimulationCacheItem extends CacheItem {
             ImmutableList<Tag> tags,
             Class modelClass,
             VersionNumber modelVersionNumber,
-            DateTime end, DateTime start, DateTime creationDate, DateTime modificationDate,
+            DateTime end,
+            DateTime start,
+            DateTime creationDate,
+            DateTime modificationDate,
             Person creator,
             int numberOfIterations,
             BatchCacheItem batch,
-            int randomSeed = -1
+            int randomSeed
     ) {
         super(id, creationDate, modificationDate, creator, null, name, modelClass)
         this.parameterization = parameterization
@@ -52,7 +55,7 @@ class SimulationCacheItem extends CacheItem {
     // Don't like the look of this - partially constructed objects
     //
     SimulationCacheItem(Long id, String name, Class modelClass, VersionNumber modelVersionNumber) {
-        this(id, name, null, null, null, modelClass, modelVersionNumber, null, null, null, null, null, -1, null)
+        this(id, name, null, null, null, modelClass, modelVersionNumber, null, null, null, null, null, -1, null, -1)
     }
 
     @Override

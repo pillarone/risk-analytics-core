@@ -127,7 +127,7 @@ class AllFieldsFilter implements ISearchFilter {
         if( item == null ){
             false
         }
-        if( matchTerms.empty ){
+        if( matchTerms == null || matchTerms.empty ){
             true
         }
         return matchTerms.every { passesRestriction(item, it) }

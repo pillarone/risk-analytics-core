@@ -16,7 +16,6 @@ import org.pillarone.riskanalytics.core.output.FileOutput
 import org.pillarone.riskanalytics.core.output.ICollectorOutputStrategy
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.output.SimulationRun
-import org.pillarone.riskanalytics.core.output.batch.OutputStrategyFactory
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationBlock
 import org.pillarone.riskanalytics.core.simulation.item.*
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
@@ -151,7 +150,7 @@ abstract class ModelTest {
         runner = SimulationRunner.createRunner()
         ICollectorOutputStrategy output = outputStrategy
         SimulationConfiguration configuration = new SimulationConfiguration(run, output)
-        configuration.resultDataSource = new ResultDataSource()
+        configuration.resultDataSource = new ResultData()
         prepareDataSource(configuration.resultDataSource)
         configuration.simulationBlocks = [new SimulationBlock(0, iterationCount, 0)]
         configuration.createMappingCache(run.template)
@@ -167,7 +166,7 @@ abstract class ModelTest {
         postSimulationEvaluation()
     }
 
-    protected void prepareDataSource(ResultDataSource dataSource) {
+    protected void prepareDataSource(ResultData dataSource) {
 
     }
 

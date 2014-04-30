@@ -10,7 +10,7 @@ import org.pillarone.riskanalytics.core.fileimport.FileImportService
 import org.pillarone.riskanalytics.core.output.*
 import org.pillarone.riskanalytics.core.parameterization.ParameterizationHelper
 import org.pillarone.riskanalytics.core.simulation.engine.ModelTest
-import org.pillarone.riskanalytics.core.simulation.engine.ResultDataSource
+import org.pillarone.riskanalytics.core.simulation.engine.ResultData
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultDescriptor
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultTransferObject
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultWriter
@@ -68,7 +68,7 @@ class DependingCoreModelTests extends ModelTest {
     }
 
     @Override
-    protected void prepareDataSource(ResultDataSource dataSource) {
+    protected void prepareDataSource(ResultData dataSource) {
         dataSource.load(ParameterizationHelper.collectDataSourceDefinitions(run.parameterization.parameterHolders))
     }
 

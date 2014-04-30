@@ -11,7 +11,7 @@ import org.pillarone.riskanalytics.core.output.PathMapping;
 import org.pillarone.riskanalytics.core.output.aggregation.PacketAggregatorRegistry;
 import org.pillarone.riskanalytics.core.parameterization.ParameterizationHelper;
 import org.pillarone.riskanalytics.core.simulation.SimulationState;
-import org.pillarone.riskanalytics.core.simulation.engine.ResultDataSource;
+import org.pillarone.riskanalytics.core.simulation.engine.ResultData;
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.mapping.AbstractNodeMappingStrategy;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.mapping.INodeMappingStrategy;
@@ -80,7 +80,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
             simulationConfiguration.getSimulation().setStart(start);
 
             List<DataSourceDefinition> dataSourceDefinitions = ParameterizationHelper.collectDataSourceDefinitions(simulationConfiguration.getSimulation().getParameterization().getParameters());
-            ResultDataSource dataSource = new ResultDataSource();
+            ResultData dataSource = new ResultData();
             dataSource.load(dataSourceDefinitions);
             simulationConfiguration.setResultDataSource(dataSource);
 

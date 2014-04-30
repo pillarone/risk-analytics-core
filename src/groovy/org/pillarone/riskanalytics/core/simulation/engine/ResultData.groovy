@@ -11,7 +11,7 @@ import org.pillarone.riskanalytics.core.packets.ExternalPacket
 import org.pillarone.riskanalytics.core.packets.SingleExternalPacket
 import org.pillarone.riskanalytics.core.simulation.item.SimulationProfile
 
-class ResultDataSource {
+class ResultData {
 
     private Map<DataSourceDefinition, List<ExternalPacket>> cache = [:]
 

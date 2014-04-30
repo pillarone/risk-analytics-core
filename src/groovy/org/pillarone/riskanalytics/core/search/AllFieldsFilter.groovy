@@ -263,8 +263,10 @@ class AllFieldsFilter implements ISearchFilter {
 
             //Column prefix sits between any bang and the colon/equals
             String prefix = (colonIndex  != -1) ? term.substring(bangIndex + 1, colonIndex).trim() + COLON
-                          : (equalsIndex != -1) ? term.substring(bangIndex + 1, colonIndex).trim() + EQUALS
+                          : (equalsIndex != -1) ? term.substring(bangIndex + 1, equalsIndex).trim() + EQUALS
                           : ""
+
+            if(prefix.empty) return nonePrefix // slightly faster in most frequent case where no prefix used
 
             return columnFilterPrefixes.find { prefix.equalsIgnoreCase(it) } ?: nonePrefix;
 
@@ -322,28 +324,28 @@ class AllFieldsFilter implements ISearchFilter {
             if (term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
             if (prefix.endsWith(COLON)) return false
-            return [nonePrefix, nameShort, namePrefix].any { it == prefix }
+            return [/*nonePrefix,*/ nameShort, namePrefix].any { it == prefix }
         }
 
         private static boolean isOwnerEqualsOp(String term) {
             if (term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
             if (prefix.endsWith(COLON)) return false
-            return [nonePrefix, ownerShort, ownerPrefix].any { it == prefix }
+            return [/*nonePrefix,*/ ownerShort, ownerPrefix].any { it == prefix }
         }
 
         private static boolean isStateEqualsOp(String term) {
             if (term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
             if (prefix.endsWith(COLON)) return false
-            return [nonePrefix, stateShort, statePrefix].any { it == prefix }
+            return [/*nonePrefix,*/ stateShort, statePrefix].any { it == prefix }
         }
 
         private static boolean isTagEqualsOp(String term) {
             if (term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
             if (prefix.endsWith(COLON)) return false
-            return [nonePrefix, tagShort, tagPrefix].any { it == prefix }
+            return [/*nonePrefix,*/ tagShort, tagPrefix].any { it == prefix }
         }
 
 
@@ -488,7 +490,7 @@ class AllFieldsFilter implements ISearchFilter {
 
         // Drop any column prefix to return unadorned text user wanted to filter with
         private static String getText(String specificSearchTerm) {
-            String raw = specificSearchTerm.replaceFirst("(?i)^[!]? *[a-z]+ *:", ""); //case insensitive regex-replace
+            String raw = specificSearchTerm.replaceFirst("(?i)^[!]? *[a-z]+ *[:=]", ""); //case insensitive regex-replace
             LOG.debug("getTargetText(${specificSearchTerm}-->${raw})")
 
             return raw.trim()

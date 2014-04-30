@@ -10,9 +10,9 @@ import org.pillarone.riskanalytics.core.parameterization.IParameterObjectClassif
 class ExampleParameterType extends AbstractParameterObjectClassifier implements Serializable {
 
     public static final ExampleParameterType TYPE_ONE = new ExampleParameterType(
-            "type one", "TYPE_ONE", ["parm1": 1d])
+            "type one", "TYPE_ONE", ["classifier1": 1d])
     public static final ExampleParameterType TYPE_TWO = new ExampleParameterType(
-            "type two", "TYPE_TWO", ["parm1": 1d, "parm2": 2d])
+            "type two", "TYPE_TWO", ["classifier1": 1d, "classifier2": 2d])
 
     public static final all = [ TYPE_ONE, TYPE_TWO ]
 
@@ -45,7 +45,7 @@ class ExampleParameterType extends AbstractParameterObjectClassifier implements 
     }
 
     static IExampleParameterStrategy getDefault() {
-        return ExampleParameterType.getStrategy(ExampleParameterType.TYPE_ONE, ['parm1': 0d])
+        return ExampleParameterType.getStrategy(ExampleParameterType.TYPE_ONE, ['classifier1': 0d])
     }
 
     public String getConstructionString(Map parameters) {
@@ -62,9 +62,9 @@ class ExampleParameterType extends AbstractParameterObjectClassifier implements 
     static IExampleParameterStrategy getStrategy(ExampleParameterType type, Map parameters) {
         switch (type) {
             case ExampleParameterType.TYPE_ONE:
-                return new ExampleParameterTypeOne(parm1 : parameters['parm1'])
+                return new ExampleParameterTypeOne(classifier1 : parameters['classifier1'])
             case ExampleParameterType.TYPE_TWO:
-                return new ExampleParameterTypeTwo(parm1 : parameters['parm1'], parm2 : parameters['parm2'])
+                return new ExampleParameterTypeTwo(classifier1 : parameters['classifier1'], classifier2 : parameters['classifier2'])
         }
     }
 }

@@ -8,13 +8,13 @@ import org.pillarone.riskanalytics.core.parameterization.IParameterObjectClassif
  */
 class ExampleParameterTypeOne extends AbstractParameterObject implements IExampleParameterStrategy {
 
-    private double parm1
+    private double classifier1
 
     IParameterObjectClassifier getType() {
         ExampleParameterType.TYPE_ONE
     }
 
     Map getParameters() {
-        ['parm1' : parm1]
+        ['classifier1' : classifier1]
     }
 }

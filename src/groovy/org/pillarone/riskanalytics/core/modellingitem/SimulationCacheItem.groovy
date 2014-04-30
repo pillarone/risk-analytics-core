@@ -20,7 +20,7 @@ class SimulationCacheItem extends CacheItem {
     final int numberOfIterations
     Long batchId
     BatchCacheItem batch
-    final int randomSeed
+    final Integer randomSeed
 
 
     SimulationCacheItem(

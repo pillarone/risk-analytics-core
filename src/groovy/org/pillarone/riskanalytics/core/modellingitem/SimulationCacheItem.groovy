@@ -38,7 +38,7 @@ class SimulationCacheItem extends CacheItem {
             Person creator,
             int numberOfIterations,
             BatchCacheItem batch,
-            int randomSeed
+            Integer randomSeed       //Somehow a null is coming in here during a test
     ) {
         super(id, creationDate, modificationDate, creator, null, name, modelClass)
         this.parameterization = parameterization

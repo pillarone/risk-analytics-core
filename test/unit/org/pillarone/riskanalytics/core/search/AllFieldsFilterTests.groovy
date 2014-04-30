@@ -66,12 +66,16 @@ class AllFieldsFilterTests extends GroovyTestCase {
         parameterization = new ParameterizationCacheItem(1l, null, 'PARAM_NAME', null, null, null, null, null, null, false, null, 12345l)
         simulation = new SimulationCacheItem(1l, 'some other name', parameterization, resultConfiguration, ImmutableList.copyOf([new Tag(name: 'paramTestName')]), null, null, null, null, null, null, null, 0, null,54321)
         assert !new AllFieldsFilter(query: 't:12345').accept(simulation)        //should not match pn's tags
-        assert new AllFieldsFilter(query: 'd:12345').accept(simulation)        //should match pn's deal id
-        assert new AllFieldsFilter(query: '12345').accept(simulation)          //should match pn's deal id
+        assert  new AllFieldsFilter(query: 'd:12345').accept(simulation)        //should match pn's deal id
+        assert  new AllFieldsFilter(query: '12345').accept(simulation)          //should match pn's deal id
         assert !new AllFieldsFilter(query: 'd:2345').accept(simulation)         //but not on partial deal id
         assert !new AllFieldsFilter(query: '2345').accept(simulation)           //but not on partial deal id
-        assert new AllFieldsFilter(query: 'seed=54321').accept(simulation)      //should match exact randomSeed value
-        assert !new AllFieldsFilter(query: 'seed:4321').accept(simulation)      //but not on partial value
+        assert  new AllFieldsFilter(query: 'seed=54321').accept(simulation)     //should match exact randomSeed value
+        assert !new AllFieldsFilter(query: 'seed=4321').accept(simulation)      //but not match wrong value
+        assert  new AllFieldsFilter(query: '!seed=4321').accept(simulation)     //should reject wrong value
+        assert  new AllFieldsFilter(query: 'seed:4321').accept(simulation)      //match on contained substring
+        assert !new AllFieldsFilter(query: '!seed:4321').accept(simulation)     //should fail to reject contained substring
+        assert !new AllFieldsFilter(query: 'seed:1234').accept(simulation)      //should fail to match foreign substring
     }
 
     void testSearchResources() {

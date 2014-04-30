@@ -167,7 +167,10 @@ class AllFieldsFilter implements ISearchFilter {
                         matchSimulationResultsOnDealId && FilterHelp.matchDealId(sim.parameterization, matchTerms)
                 ) ||
                 matchTerms.any {
-                    FilterHelp.isSeedEqualsOp(it) && StringUtils.equals(""+sim.randomSeed, FilterHelp.getText(it))
+                    (FilterHelp.isSeedEqualsOp(it)    &&  StringUtils.equals(""+sim.randomSeed, FilterHelp.getText(it))) ||
+                    (FilterHelp.isSeedNotEqualsOp(it) && !StringUtils.equals(""+sim.randomSeed, FilterHelp.getText(it))) ||
+                    (FilterHelp.isSeedAcceptor(it)    &&  StringUtils.contains(""+sim.randomSeed, FilterHelp.getText(it))) ||
+                    (FilterHelp.isSeedRejector(it)    &&  !StringUtils.contains(""+sim.randomSeed, FilterHelp.getText(it)))
                 }
     }
 
@@ -224,7 +227,7 @@ class AllFieldsFilter implements ISearchFilter {
         static final String stateShortEq = "S="
         static final String tagShortEq = "T="
         //Special match operators
-        static final String seedPrefix   = "SEED"   //randomSeed used in a sim
+        static final String seedPrefix   = "SEED:"   //randomSeed used in a sim
         static final String seedPrefixEq = "SEED="
 
         // TODO Should enforce excluding these special characters from item fields (name, tags, status etc)
@@ -271,16 +274,16 @@ class AllFieldsFilter implements ISearchFilter {
 
             int bangIndex = term.indexOf(FILTER_NEGATION);
 
-            //Give up if : or = precedes ! - it's a weirdo, treat as a general search term
-            if (colonIndex < bangIndex || equalsIndex < bangIndex ) {
-                LOG.warn("getColumnFilterPrefix(term: ${term}): Bang after ':' or '=' - treat as generic filter.")
+            if (   (colonIndex  != -1 &&  colonIndex  < bangIndex)      // : found and precedes !
+                || (equalsIndex != -1 &&  equalsIndex < bangIndex) ) {  // = found and precedes !
+                LOG.warn("getColumnFilterPrefix(term: ${term}): ':' or '=' precedes '!' - it's a weirdo, treat as a general search term.")
                 return nonePrefix;
             }
 
-            //Column prefix sits between any bang and the colon/equals
-            String prefix = (colonIndex  != -1) ? term.substring(bangIndex + 1, colonIndex).trim() + COLON
-                          : (equalsIndex != -1) ? term.substring(bangIndex + 1, equalsIndex).trim() + EQUALS
-                          : ""
+            //Column prefix sits between any bang and the colon or equals (only one of which is present)
+            //
+            String prefix = (colonIndex  != -1) ? term.substring(bangIndex + 1, colonIndex).trim()  + COLON
+                                                : term.substring(bangIndex + 1, equalsIndex).trim() + EQUALS
 
             if(prefix.empty) return nonePrefix // slightly faster in most frequent case where no prefix used
 
@@ -415,6 +418,12 @@ class AllFieldsFilter implements ISearchFilter {
             return [tagShort, tagPrefix].any { it == prefix }
         }
 
+        private static boolean isSeedRejector(String term) {
+            if (!term.startsWith(FILTER_NEGATION)) return false;
+            String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(EQUALS)) return false
+            return seedPrefix == prefix
+        }
         // Column-not-equals terms begin with "!", match the column in question, and end in '='
         //
         private static boolean isDealIdNotEqualsOp(String term) {
@@ -450,6 +459,13 @@ class AllFieldsFilter implements ISearchFilter {
             String prefix = getColumnFilterPrefix(term)
             if (prefix.endsWith(COLON)) return false
             return [tagShortEq, tagPrefixEq].any { it == prefix }
+        }
+
+        private static boolean isSeedNotEqualsOp(String term) {
+            if (!term.startsWith(FILTER_NEGATION)) return false;
+            String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(COLON)) return false
+            return seedPrefixEq == prefix
         }
 
 

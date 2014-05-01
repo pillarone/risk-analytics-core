@@ -21,38 +21,51 @@ class AllFieldsFilterTests extends GroovyTestCase {
     }
 
 
+    // Added exact match tests for name/tag
+    //
     void testSearchParameterizations() {
         ParameterizationCacheItem parameterization = new ParameterizationCacheItem(1l, null, 'testName', null, null, null, null, null, null, false, null, null)
         verifyOnlyNameSpecificOrGenericFiltersMatch('test', parameterization)
 
         assert !new AllFieldsFilter(query: 'not found').accept(parameterization)
-        parameterization = new ParameterizationCacheItem(1l, null, 'some other name', null, null, null, null, null, ImmutableList.copyOf([new Tag(name: 'testName'), new Tag(name: 'secondTag')]), false, null, null)
-        assert new AllFieldsFilter(query: 'testName').accept(parameterization)
-        assert new AllFieldsFilter(query: 'tag:testName').accept(parameterization)
-        assert new AllFieldsFilter(query: 'tag:unknown OR name:other').accept(parameterization)
-        assert !new AllFieldsFilter(query: 'tag:unknown AND name:other').accept(parameterization)
-        assert !new AllFieldsFilter(query: 'unknown AND other').accept(parameterization)
+        ParameterizationCacheItem otherP14n = new ParameterizationCacheItem(1l, null, 'some other name', null, null, null, null, null, ImmutableList.copyOf([new Tag(name: 'testName'), new Tag(name: 'secondTag')]), false, null, null)
+        assert new AllFieldsFilter(query: 'testName').accept(otherP14n)
+        assert new AllFieldsFilter(query: 'tag:testName').accept(otherP14n)
+        assert new AllFieldsFilter(query: 'tag:unknown OR name:other').accept(otherP14n)
+        assert !new AllFieldsFilter(query: 'tag:unknown AND name:other').accept(otherP14n)
+        assert !new AllFieldsFilter(query: 'unknown AND other').accept(otherP14n)
     }
 
 
     void testSearchSimulations() {
-        SimulationCacheItem simulation = new SimulationCacheItem(1l, 'testName', null, null, null, null, null, null, null, null, null, null, 0, null, 0)
+        SimulationCacheItem simulation = new SimulationCacheItem(1l, 'testName', null, null, null, null, null, null, null, null, null, null, 0, null, 12345)
         verifyOnlyNameSpecificOrGenericFiltersMatch('test', simulation)
 
         assert !new AllFieldsFilter(query: 'not found').accept(simulation)
         assert !new AllFieldsFilter(query: 'name:not found').accept(simulation)
 
 
-        simulation = new SimulationCacheItem(1l, 'some other name', null, null, ImmutableList.copyOf([new Tag(name: 'testName'), new Tag(name: 'secondTag')]), null, null, null, null, null, null, null, 0, null, 0)
-        assert new AllFieldsFilter(query: 'testName').accept(simulation)        //should match tag
-        assert !new AllFieldsFilter(query: 'name:testName').accept(simulation)   //name-specific; should not match tag
-        assert new AllFieldsFilter(query: 'tag:testName').accept(simulation)    //should match tag
+        simulation = new SimulationCacheItem(1l, 'some other name', null, null, ImmutableList.copyOf([new Tag(name: 'testName'), new Tag(name: 'secondTag')]), null, null, null, null, null, null, null, 0, null, 12345)
+        assert  new AllFieldsFilter(query: 'testName').accept(simulation)        //should match tag
+        assert !new AllFieldsFilter(query: 'n:testName').accept(simulation)      //name-specific; should not match tag
+        assert  new AllFieldsFilter(query: 'tag:testName').accept(simulation)    //should match tag
+        assert  new AllFieldsFilter(query: 't:testName').accept(simulation)      //should match tag
         assert !new AllFieldsFilter(query: 'tag:other').accept(simulation)       //tag-specific; should not match name
+
+        assert  new AllFieldsFilter(query: 'seed:345').accept(simulation)        //partial match seed
+        assert !new AllFieldsFilter(query: '!seed:345').accept(simulation)       //fail to reject good snippet of seed
+        assert !new AllFieldsFilter(query: 'seed:543').accept(simulation)        //partial match fails on bad seed snippet
+        assert  new AllFieldsFilter(query: '!seed:543').accept(simulation)       //successfully reject foreign substring on seed
+        assert !new AllFieldsFilter(query: 'seed=345').accept(simulation)        //exact match fails on wrong seed
+        assert  new AllFieldsFilter(query: '!seed=345').accept(simulation)       //successfully reject wrong seed
+        assert !new AllFieldsFilter(query: '!seed=12345').accept(simulation)     //fail to reject good seed
+        assert  new AllFieldsFilter(query: 'seed=12345').accept(simulation)      //successfully match correct seed
 
         ParameterizationCacheItem parameterization = new ParameterizationCacheItem(1l, null, 'PARAM_NAME', null, null, null, null, null, null, false, null, null)
         simulation = new SimulationCacheItem(1l, 'some other name', parameterization, null, ImmutableList.copyOf([new Tag(name: 'testName'), new Tag(name: 'secondTag')]), null, null, null, null, null, null, null, 0, null, 0)
         assert new AllFieldsFilter(query: 'PARAM_NAME').accept(simulation)     //should match on pn
-        assert new AllFieldsFilter(query: 'name:param_').accept(simulation)    //should match on pn
+        assert new AllFieldsFilter(query: 'PARAM_NAME').accept(simulation)     //should match on pn
+        assert new AllFieldsFilter(query: 'name:param_').accept(simulation)    //case insensitive!
 
         ResultConfigurationCacheItem resultConfiguration = new ResultConfigurationCacheItem(1l, 'TEMPLATE_NAME', null, null, null, null, null, null)
         simulation = new SimulationCacheItem(1l, 'some other name', parameterization, resultConfiguration, ImmutableList.copyOf([new Tag(name: 'testName'), new Tag(name: 'secondTag')]), null, null, null, null, null, null, null, 0, null, 0)
@@ -110,26 +123,41 @@ class AllFieldsFilterTests extends GroovyTestCase {
         assert new AllFieldsFilter(query: 'name:first OR name:v2').accept(resource1)
 
     }
-    // Supply sim, pn or resource with given name-fragment
-    // Checks that only a generic filters or a name-specific one will match fragment via the name
+    // Supply sim, pn or resource with given name-fragment (and no other fields matching the fragment)
+    // Checks that only a generic filter or a name-specific one will match fragment via the name
+    //
     private static void verifyOnlyNameSpecificOrGenericFiltersMatch(String nameFragment, def modellingItem) {
 
         //Checks are pointless unless item name contains supplied name fragment
+        //
         assert StringUtils.containsIgnoreCase(modellingItem.name, nameFragment)
 
         //Generic filter should match by name
-        assert (new AllFieldsFilter(query: nameFragment)).accept(modellingItem)
+        //
+        assert  (new AllFieldsFilter(query: nameFragment)).accept(modellingItem)
         //Name-specific filter should match by name
-        assert (new AllFieldsFilter(query: 'name:' + nameFragment)).accept(modellingItem)
-        assert (new AllFieldsFilter(query: 'n:' + nameFragment)).accept(modellingItem)
+        //
+        assert  (new AllFieldsFilter(query: 'name:' + nameFragment)).accept(modellingItem)
+        assert  (new AllFieldsFilter(query: 'n:' + nameFragment)).accept(modellingItem)
+        assert !(new AllFieldsFilter(query: '!n:' + nameFragment)).accept(modellingItem)
+
         //Other-column-specific filters should not match by name
+        //
         assert !(new AllFieldsFilter(query: 'dealid:' + nameFragment)).accept(modellingItem)
         assert !(new AllFieldsFilter(query: 'd:' + nameFragment)).accept(modellingItem)
+
         assert !(new AllFieldsFilter(query: 'owner:' + nameFragment)).accept(modellingItem)
         assert !(new AllFieldsFilter(query: 'o:' + nameFragment)).accept(modellingItem)
+        assert  (new AllFieldsFilter(query: '!o:' + nameFragment)).accept(modellingItem)   // all items have owner field
+
         assert !(new AllFieldsFilter(query: 'state:' + nameFragment)).accept(modellingItem)
         assert !(new AllFieldsFilter(query: 's:' + nameFragment)).accept(modellingItem)
+
         assert !(new AllFieldsFilter(query: 'tag:' + nameFragment)).accept(modellingItem)
         assert !(new AllFieldsFilter(query: 't:' + nameFragment)).accept(modellingItem)
+        assert  (new AllFieldsFilter(query: '!t:' + nameFragment)).accept(modellingItem)
+
+        assert !(new AllFieldsFilter(query: 'seed:' + nameFragment)).accept(modellingItem)
+        assert !(new AllFieldsFilter(query: 'seed=' + nameFragment)).accept(modellingItem)
     }
 }

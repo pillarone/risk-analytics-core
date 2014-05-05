@@ -11,6 +11,7 @@ class DependingCoreModel extends CoreModel {
     @Override
     void initComponents() {
         dependingComponent = new DependingComponent()
+        addStartComponent(dependingComponent)
         super.initComponents()
     }
 }

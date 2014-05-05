@@ -80,9 +80,4 @@ class DependingCoreModelTests extends ModelTest {
         ]
     }
 
-    void postSimulationEvaluation() {
-        DependingCoreModel model = runner.currentScope.model
-        assertEquals(2, model.dependingComponent.outData.size())
-        assertTrue(model.dependingComponent.outData.every { it instanceof AggregatedExternalPacket })
-    }
 }

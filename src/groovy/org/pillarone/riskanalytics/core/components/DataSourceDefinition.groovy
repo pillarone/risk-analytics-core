@@ -43,9 +43,9 @@ class DataSourceDefinition {
 
     @Override
     int hashCode() {
-        return new HashCodeBuilder().append(parameterization.nameAndVersion).append(parameterization.modelClass)
-                .append(path).append(fields.toArray())
-                .append(periods.toArray()).append(collectorName).toHashCode()
+        return new HashCodeBuilder().append(parameterization?.nameAndVersion).append(parameterization?.modelClass)
+                .append(path).append(fields?.toArray())
+                .append(periods?.toArray()).append(collectorName).toHashCode()
     }
 
     @Override

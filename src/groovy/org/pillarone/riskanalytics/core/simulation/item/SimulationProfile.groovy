@@ -73,6 +73,7 @@ class SimulationProfile extends ParametrizedItem {
         ResultConfiguration resultConfiguration = new ResultConfiguration(simulationSettingsDAO.template.name, modelClass)
         resultConfiguration.versionNumber = new VersionNumber(simulationSettingsDAO.template.itemVersion)
         template = resultConfiguration
+        template.load()
         numberOfIterations = simulationSettingsDAO.numberOfIterations
         creationDate = simulationSettingsDAO.creationDate
         creator = simulationSettingsDAO.creator

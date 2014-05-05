@@ -133,6 +133,7 @@ class SimulationProfileTests {
     void testLoadFromDb() {
         SimulationProfileDAO persistent = createValidDao('name', createValidTemplate(), CoreModel)
         mockDomain(SimulationProfileDAO, [persistent])
+        mockDomain(ResultConfigurationDAO)
         def toLoad = new SimulationProfile('name', CoreModel)
         assert toLoad.loadFromDB().id == persistent.id
         toLoad.load()

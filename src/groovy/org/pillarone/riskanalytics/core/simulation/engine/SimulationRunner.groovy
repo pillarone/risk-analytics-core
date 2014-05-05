@@ -219,7 +219,10 @@ public class SimulationRunner {
         currentScope.outputStrategy = configuration.outputStrategy
         currentScope.iterationScope.numberOfPeriods = simulation.periodCount
         currentScope.simulationBlocks = configuration.simulationBlocks
-        currentScope.resultDataSource = configuration.resultDataSource
+
+        //using the de-serialized map does not work
+        currentScope.resultDataSource = new ResultData()
+        currentScope.resultDataSource.cache.putAll(configuration.resultDataSource.cache)
 
         simulationAction.iterationAction.periodAction.model = currentScope.model
 

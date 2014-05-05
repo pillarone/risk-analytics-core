@@ -20,7 +20,7 @@ class ResultData {
 
     private static final Log LOG = LogFactory.getLog(ResultData)
 
-    private Map<DataSourceDefinition, List<ExternalPacket>> cache = [:]
+    Map<DataSourceDefinition, List<ExternalPacket>> cache = new HashMap()
 
     void load(List<DataSourceDefinition> definitions) {
         for(DataSourceDefinition definition in definitions) {

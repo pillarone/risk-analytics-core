@@ -170,7 +170,13 @@ class AllFieldsFilter implements ISearchFilter {
                     (FilterHelp.isSeedEqualsOp(it)    &&  StringUtils.equals(""+sim.randomSeed, FilterHelp.getText(it))) ||
                     (FilterHelp.isSeedNotEqualsOp(it) && !StringUtils.equals(""+sim.randomSeed, FilterHelp.getText(it))) ||
                     (FilterHelp.isSeedAcceptor(it)    &&  StringUtils.contains(""+sim.randomSeed, FilterHelp.getText(it))) ||
-                    (FilterHelp.isSeedRejector(it)    &&  !StringUtils.contains(""+sim.randomSeed, FilterHelp.getText(it)))
+                    (FilterHelp.isSeedRejector(it)    && !StringUtils.contains(""+sim.randomSeed, FilterHelp.getText(it)))
+                } ||
+                matchTerms.any {
+                    (FilterHelp.isIterationsEqualsOp(it)    &&  StringUtils.equals(""+sim.numberOfIterations, FilterHelp.getText(it))) ||
+                    (FilterHelp.isIterationsNotEqualsOp(it) && !StringUtils.equals(""+sim.numberOfIterations, FilterHelp.getText(it))) ||
+                    (FilterHelp.isIterationsAcceptor(it)    &&  StringUtils.contains(""+sim.numberOfIterations, FilterHelp.getText(it))) ||
+                    (FilterHelp.isIterationsRejector(it)    && !StringUtils.contains(""+sim.numberOfIterations, FilterHelp.getText(it)))
                 }
     }
 
@@ -226,9 +232,13 @@ class AllFieldsFilter implements ISearchFilter {
         static final String ownerShortEq = "O="
         static final String stateShortEq = "S="
         static final String tagShortEq = "T="
-        //Special match operators
+
+        //Special match operators - useful for admin work
+        //
         static final String seedPrefix   = "SEED:"   //randomSeed used in a sim
         static final String seedPrefixEq = "SEED="
+        static final String iterationsPrefix   = "ITS:"   //numberOfIterations used in a sim
+        static final String iterationsPrefixEq = "ITS="
 
         // TODO Should enforce excluding these special characters from item fields (name, tags, status etc)
         //
@@ -252,7 +262,9 @@ class AllFieldsFilter implements ISearchFilter {
                 dealIdPrefixEq, dealIdShortEq,
 
                 seedPrefixEq,
-                seedPrefix   //not used yet, added for consistency
+                seedPrefix,
+                iterationsPrefixEq,
+                iterationsPrefix,
         ];
 
         // Search terms without a column prefix apply to all columns
@@ -337,6 +349,13 @@ class AllFieldsFilter implements ISearchFilter {
             return seedPrefix == prefix
         }
 
+        private static boolean isIterationsAcceptor(String term) {
+            if (term.startsWith(FILTER_NEGATION)) return false;
+            String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(EQUALS)) return false
+            return iterationsPrefix == prefix
+        }
+
         //Column-equals-operator terms have prefix matches the column in question and end in '='
         //
         private static boolean isDealIdEqualsOp(String term) {
@@ -381,6 +400,14 @@ class AllFieldsFilter implements ISearchFilter {
             return seedPrefixEq == prefix
         }
 
+        private static boolean isIterationsEqualsOp(String term) {
+            if (term.startsWith(FILTER_NEGATION)) return false;
+            String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(COLON)) return false
+            return iterationsPrefixEq == prefix
+        }
+
+
         // Rejector terms begin with "!", match the column in question, and end in ':'
         //
         private static boolean isDealIdRejector(String term) {
@@ -424,6 +451,14 @@ class AllFieldsFilter implements ISearchFilter {
             if (prefix.endsWith(EQUALS)) return false
             return seedPrefix == prefix
         }
+
+        private static boolean isIterationsRejector(String term) {
+            if (!term.startsWith(FILTER_NEGATION)) return false;
+            String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(EQUALS)) return false
+            return iterationsPrefix == prefix
+        }
+
         // Column-not-equals terms begin with "!", match the column in question, and end in '='
         //
         private static boolean isDealIdNotEqualsOp(String term) {
@@ -466,6 +501,13 @@ class AllFieldsFilter implements ISearchFilter {
             String prefix = getColumnFilterPrefix(term)
             if (prefix.endsWith(COLON)) return false
             return seedPrefixEq == prefix
+        }
+
+        private static boolean isIterationsNotEqualsOp(String term) {
+            if (!term.startsWith(FILTER_NEGATION)) return false;
+            String prefix = getColumnFilterPrefix(term)
+            if (prefix.endsWith(COLON)) return false
+            return iterationsPrefixEq == prefix
         }
 
 

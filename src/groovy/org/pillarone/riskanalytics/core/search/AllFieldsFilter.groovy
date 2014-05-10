@@ -142,8 +142,10 @@ class AllFieldsFilter implements ISearchFilter {
                internalAccept(item, matchTerms)
     }
 
+    // These items must already have failed to match on name / owner if we get here.
+    //
     private static boolean internalAccept(CacheItem item, String[] searchStrings) {
-        LOG.warn("CacheItem IGNORED by AllFieldsFilter: ${item.nameAndVersion} ")
+        LOG.debug("CacheItem IGNORED by AllFieldsFilter: ${item.nameAndVersion} ")
         return false
     }
 
@@ -235,10 +237,12 @@ class AllFieldsFilter implements ISearchFilter {
 
         //Special match operators - useful for admin work
         //
-        static final String seedPrefix   = "SEED:"   //randomSeed used in a sim
-        static final String seedPrefixEq = "SEED="
-        static final String iterationsPrefix   = "ITS:"   //numberOfIterations used in a sim
-        static final String iterationsPrefixEq = "ITS="
+        static final String seedPrefix          = "SEED:"   //randomSeed used in a sim
+        static final String seedPrefixEq        = "SEED="
+        static final String iterationsPrefix    = "ITERATIONS:"   //numberOfIterations used in a sim
+        static final String iterationsShort     = "ITS:"
+        static final String iterationsPrefixEq  = "ITERATIONS="
+        static final String iterationsShortEq   = "ITS="
 
         // TODO Should enforce excluding these special characters from item fields (name, tags, status etc)
         //
@@ -263,7 +267,9 @@ class AllFieldsFilter implements ISearchFilter {
 
                 seedPrefixEq,
                 seedPrefix,
+                iterationsShortEq,
                 iterationsPrefixEq,
+                iterationsShort,
                 iterationsPrefix,
         ];
 
@@ -299,215 +305,162 @@ class AllFieldsFilter implements ISearchFilter {
 
             if(prefix.empty) return nonePrefix // slightly faster in most frequent case where no prefix used
 
-            return columnFilterPrefixes.find { prefix.equalsIgnoreCase(it) } ?: nonePrefix;
+            String found = columnFilterPrefixes.find { prefix.equalsIgnoreCase(it) };
 
-//            LOG.warn("getColumnFilterPrefix(term: ${term})-> ignoring unknown prefix: ${prefix}")
-//            return nonePrefix;
+            if(found == null ){
+                LOG.warn("getColumnFilterPrefix(term: ${term})-> ignoring unknown prefix: ${prefix}")
+                return nonePrefix;
+            }
+            return found;
         }
 
         //Acceptor terms either have no prefix or prefix matches the column in question and ends in ':'
         //
-        private static boolean isDealIdAcceptor(String term) {
+        private static boolean isAcceptor(String term, final ArrayList<String> values) {
             if (term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
             if (prefix.endsWith(EQUALS)) return false
-            return [nonePrefix, dealIdShort, dealIdPrefix].any { it == prefix }
+            return values.any { it == prefix }
+        }
+
+        private static boolean isDealIdAcceptor(String term) {
+            isAcceptor( term, [nonePrefix, dealIdShort, dealIdPrefix] )
         }
 
         private static boolean isNameAcceptor(String term) {
-            if (term.startsWith(FILTER_NEGATION)) return false;
-            String prefix = getColumnFilterPrefix(term)
-            if (prefix.endsWith(EQUALS)) return false
-            return [nonePrefix, nameShort, namePrefix].any { it == prefix }
+            isAcceptor( term, [nonePrefix, nameShort, namePrefix] )
         }
 
         private static boolean isOwnerAcceptor(String term) {
-            if (term.startsWith(FILTER_NEGATION)) return false;
-            String prefix = getColumnFilterPrefix(term)
-            if (prefix.endsWith(EQUALS)) return false
-            return [nonePrefix, ownerShort, ownerPrefix].any { it == prefix }
+            isAcceptor( term, [nonePrefix, ownerShort, ownerPrefix] )
         }
 
         private static boolean isStateAcceptor(String term) {
-            if (term.startsWith(FILTER_NEGATION)) return false;
-            String prefix = getColumnFilterPrefix(term)
-            if (prefix.endsWith(EQUALS)) return false
-            return [nonePrefix, stateShort, statePrefix].any { it == prefix }
+            isAcceptor( term, [nonePrefix, stateShort, statePrefix] )
         }
 
         private static boolean isTagAcceptor(String term) {
-            if (term.startsWith(FILTER_NEGATION)) return false;
-            String prefix = getColumnFilterPrefix(term)
-            if (prefix.endsWith(EQUALS)) return false
-            return [nonePrefix, tagShort, tagPrefix].any { it == prefix }
+            isAcceptor( term, [nonePrefix, tagShort, tagPrefix] )
         }
 
         private static boolean isSeedAcceptor(String term) {
-            if (term.startsWith(FILTER_NEGATION)) return false;
-            String prefix = getColumnFilterPrefix(term)
-            if (prefix.endsWith(EQUALS)) return false
-            return seedPrefix == prefix
+            isAcceptor( term, [seedPrefix] )
         }
 
         private static boolean isIterationsAcceptor(String term) {
-            if (term.startsWith(FILTER_NEGATION)) return false;
-            String prefix = getColumnFilterPrefix(term)
-            if (prefix.endsWith(EQUALS)) return false
-            return iterationsPrefix == prefix
+            isAcceptor( term, [iterationsShort, iterationsPrefix] )
         }
 
         //Column-equals-operator terms have prefix matches the column in question and end in '='
         //
-        private static boolean isDealIdEqualsOp(String term) {
+        private static boolean isEqualsOp(String term, final ArrayList<String> values) {
             if (term.startsWith(FILTER_NEGATION) ) return false;
             String prefix = getColumnFilterPrefix(term)
             if (prefix.endsWith(COLON)) return false
-            return [/*nonePrefix,*/ dealIdShortEq, dealIdPrefixEq].any { it == prefix }
+            return values.any { it == prefix }
+        }
+
+        private static boolean isDealIdEqualsOp(String term) {
+            isEqualsOp( term, [dealIdShortEq, dealIdPrefixEq] )
         }
 
         private static boolean isNameEqualsOp(String term) {
-            if (term.startsWith(FILTER_NEGATION)) return false;
-            String prefix = getColumnFilterPrefix(term)
-            if (prefix.endsWith(COLON)) return false
-            return [/*nonePrefix,*/ nameShortEq, namePrefixEq].any { it == prefix }
+            isEqualsOp( term, [nameShortEq, namePrefixEq] )
         }
 
         private static boolean isOwnerEqualsOp(String term) {
-            if (term.startsWith(FILTER_NEGATION)) return false;
-            String prefix = getColumnFilterPrefix(term)
-            if (prefix.endsWith(COLON)) return false
-            return [/*nonePrefix,*/ ownerShortEq, ownerPrefixEq].any { it == prefix }
+            isEqualsOp( term, [ownerShortEq, ownerPrefixEq] )
         }
 
         private static boolean isStateEqualsOp(String term) {
-            if (term.startsWith(FILTER_NEGATION)) return false;
-            String prefix = getColumnFilterPrefix(term)
-            if (prefix.endsWith(COLON)) return false
-            return [/*nonePrefix,*/ stateShortEq, statePrefixEq].any { it == prefix }
+            isEqualsOp( term, [stateShortEq, statePrefixEq] )
         }
 
         private static boolean isTagEqualsOp(String term) {
-            if (term.startsWith(FILTER_NEGATION)) return false;
-            String prefix = getColumnFilterPrefix(term)
-            if (prefix.endsWith(COLON)) return false
-            return [/*nonePrefix,*/ tagShortEq, tagPrefixEq].any { it == prefix }
+            isEqualsOp( term, [tagShortEq, tagPrefixEq] )
         }
 
         private static boolean isSeedEqualsOp(String term) {
-            if (term.startsWith(FILTER_NEGATION)) return false;
-            String prefix = getColumnFilterPrefix(term)
-            if (prefix.endsWith(COLON)) return false
-            return seedPrefixEq == prefix
+            isEqualsOp( term, [seedPrefixEq] )
         }
 
         private static boolean isIterationsEqualsOp(String term) {
-            if (term.startsWith(FILTER_NEGATION)) return false;
-            String prefix = getColumnFilterPrefix(term)
-            if (prefix.endsWith(COLON)) return false
-            return iterationsPrefixEq == prefix
+            isEqualsOp( term, [iterationsShortEq, iterationsPrefixEq] )
         }
 
 
         // Rejector terms begin with "!", match the column in question, and end in ':'
         //
-        private static boolean isDealIdRejector(String term) {
+        private static boolean isRejector(String term, final ArrayList<String> values) {
             if (!term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
             if (prefix.endsWith(EQUALS)) return false
-            return [dealIdShort, dealIdPrefix].any { it == prefix }
+            return values.any { it == prefix }
+        }
+
+        private static boolean isDealIdRejector(String term) {
+            isRejector( term, [dealIdShort, dealIdPrefix] )
         }
 
         private static boolean isNameRejector(String term) {
-            if (!term.startsWith(FILTER_NEGATION)) return false;
-            String prefix = getColumnFilterPrefix(term)
-            if (prefix.endsWith(EQUALS)) return false
-            return [nameShort, namePrefix].any { it == prefix }
+            isRejector( term, [nameShort, namePrefix] )
         }
 
         private static boolean isOwnerRejector(String term) {
-            if (!term.startsWith(FILTER_NEGATION)) return false;
-            String prefix = getColumnFilterPrefix(term)
-            if (prefix.endsWith(EQUALS)) return false
-            return [ownerShort, ownerPrefix].any { it == prefix }
+            isRejector( term, [ownerShort, ownerPrefix] )
         }
 
         private static boolean isStateRejector(String term) {
-            if (!term.startsWith(FILTER_NEGATION)) return false;
-            String prefix = getColumnFilterPrefix(term)
-            if (prefix.endsWith(EQUALS)) return false
-            return [stateShort, statePrefix].any { it == prefix }
+            isRejector( term, [stateShort, statePrefix] )
         }
 
         private static boolean isTagRejector(String term) {
-            if (!term.startsWith(FILTER_NEGATION)) return false;
-            String prefix = getColumnFilterPrefix(term)
-            if (prefix.endsWith(EQUALS)) return false
-            return [tagShort, tagPrefix].any { it == prefix }
+            isRejector( term, [tagShort, tagPrefix] )
         }
 
         private static boolean isSeedRejector(String term) {
-            if (!term.startsWith(FILTER_NEGATION)) return false;
-            String prefix = getColumnFilterPrefix(term)
-            if (prefix.endsWith(EQUALS)) return false
-            return seedPrefix == prefix
+            isRejector( term, [seedPrefix] )
         }
 
         private static boolean isIterationsRejector(String term) {
-            if (!term.startsWith(FILTER_NEGATION)) return false;
-            String prefix = getColumnFilterPrefix(term)
-            if (prefix.endsWith(EQUALS)) return false
-            return iterationsPrefix == prefix
+            isRejector( term, [iterationsShort, iterationsPrefix] )
         }
 
         // Column-not-equals terms begin with "!", match the column in question, and end in '='
         //
-        private static boolean isDealIdNotEqualsOp(String term) {
+        private static boolean isNotEqualsOp(String term, final ArrayList<String> values) {
             if (!term.startsWith(FILTER_NEGATION)) return false;
             String prefix = getColumnFilterPrefix(term)
             if (prefix.endsWith(COLON)) return false
-            return [dealIdShortEq, dealIdPrefixEq].any { it == prefix }
+            return values.any { it == prefix }
+        }
+
+        private static boolean isDealIdNotEqualsOp(String term) {
+            isNotEqualsOp( term, [dealIdShortEq, dealIdPrefixEq] )
         }
 
         private static boolean isNameNotEqualsOp(String term) {
-            if (!term.startsWith(FILTER_NEGATION)) return false;
-            String prefix = getColumnFilterPrefix(term)
-            if (prefix.endsWith(COLON)) return false
-            return [nameShortEq, namePrefixEq].any { it == prefix }
+            isNotEqualsOp( term, [nameShortEq, namePrefixEq] )
         }
 
         private static boolean isOwnerNotEqualsOp(String term) {
-            if (!term.startsWith(FILTER_NEGATION)) return false;
-            String prefix = getColumnFilterPrefix(term)
-            if (prefix.endsWith(COLON)) return false
-            return [ownerShortEq, ownerPrefixEq].any { it == prefix }
+            isNotEqualsOp( term, [ownerShortEq, ownerPrefixEq] )
         }
 
         private static boolean isStateNotEqualsOp(String term) {
-            if (!term.startsWith(FILTER_NEGATION)) return false;
-            String prefix = getColumnFilterPrefix(term)
-            if (prefix.endsWith(COLON)) return false
-            return [stateShortEq, statePrefixEq].any { it == prefix }
+            isNotEqualsOp( term, [stateShortEq, statePrefixEq] )
         }
 
         private static boolean isTagNotEqualsOp(String term) {
-            if (!term.startsWith(FILTER_NEGATION)) return false;
-            String prefix = getColumnFilterPrefix(term)
-            if (prefix.endsWith(COLON)) return false
-            return [tagShortEq, tagPrefixEq].any { it == prefix }
+            isNotEqualsOp( term, [tagShortEq, tagPrefixEq] )
         }
 
         private static boolean isSeedNotEqualsOp(String term) {
-            if (!term.startsWith(FILTER_NEGATION)) return false;
-            String prefix = getColumnFilterPrefix(term)
-            if (prefix.endsWith(COLON)) return false
-            return seedPrefixEq == prefix
+            isNotEqualsOp( term, [seedPrefixEq] )
         }
 
         private static boolean isIterationsNotEqualsOp(String term) {
-            if (!term.startsWith(FILTER_NEGATION)) return false;
-            String prefix = getColumnFilterPrefix(term)
-            if (prefix.endsWith(COLON)) return false
-            return iterationsPrefixEq == prefix
+            isNotEqualsOp( term, [iterationsShortEq, iterationsPrefixEq] )
         }
 
 
@@ -576,9 +529,15 @@ class AllFieldsFilter implements ISearchFilter {
         }
 
         // Drop any column prefix to return unadorned text user wanted to filter with
+        // (?i)     = case insensitive
+        // ^        = start of string
+        // [!]? *   = optional bang followed by optional spaces
+        // [a-z]+ * = alphabetic word followed by optional spaces
+        // [:=]     = colon or equals
+        //
         private static String getText(String specificSearchTerm) {
             String raw = specificSearchTerm.replaceFirst("(?i)^[!]? *[a-z]+ *[:=]", ""); //case insensitive regex-replace
-            LOG.debug("getTargetText(${specificSearchTerm}-->${raw})")
+            LOG.debug("getText(${specificSearchTerm}-->${raw})")
 
             return raw.trim()
         }

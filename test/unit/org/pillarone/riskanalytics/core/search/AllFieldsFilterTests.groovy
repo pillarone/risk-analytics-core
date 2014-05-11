@@ -18,6 +18,9 @@ class AllFieldsFilterTests extends GroovyTestCase {
         // Must not find 'user' in name of resource, nor 'testName' in username
         assert !new AllFieldsFilter(query: 'name:user').accept(resource)
         assert !new AllFieldsFilter(query: 'owner:testName').accept(resource)
+        // Must not find 'user' in name of resource, nor 'testName' in username
+        assert !new AllFieldsFilter(query: 'seed:123').accept(resource)
+        assert !new AllFieldsFilter(query: 'its:123').accept(resource)
     }
 
 
@@ -76,6 +79,8 @@ class AllFieldsFilterTests extends GroovyTestCase {
         assert new AllFieldsFilter(query: 'paramTestName').accept(simulation)  //should not match pn's tags
         assert new AllFieldsFilter(query: 'tag:paramtest').accept(simulation)  //should not match pn's tags
 
+        // Filter on seed
+        //
         parameterization = new ParameterizationCacheItem(1l, null, 'PARAM_NAME', null, null, null, null, null, null, false, null, 12345l)
         simulation = new SimulationCacheItem(1l, 'some other name', parameterization, resultConfiguration, ImmutableList.copyOf([new Tag(name: 'paramTestName')]), null, null, null, null, null, null, null, 0, null,54321)
         assert !new AllFieldsFilter(query: 't:12345').accept(simulation)        //should not match pn's tags
@@ -89,6 +94,19 @@ class AllFieldsFilterTests extends GroovyTestCase {
         assert  new AllFieldsFilter(query: 'seed:4321').accept(simulation)      //match on contained substring
         assert !new AllFieldsFilter(query: '!seed:4321').accept(simulation)     //should fail to reject contained substring
         assert !new AllFieldsFilter(query: 'seed:1234').accept(simulation)      //should fail to match foreign substring
+
+        // Filter on iterations
+        //
+        parameterization = new ParameterizationCacheItem(1l, null, 'PARAM_NAME', null, null, null, null, null, null, false, null, 12345l)
+        simulation = new SimulationCacheItem(1l, 'some other name', parameterization, resultConfiguration, ImmutableList.copyOf([new Tag(name: 'paramTestName')]), null, null, null, null, null, null, null, 5000, null,54321)
+        assert  new AllFieldsFilter(query: 'its=5000').accept(simulation)       //should match exact iterations
+        assert  new AllFieldsFilter(query: 'iterations=5000').accept(simulation)//should match exact iterations
+        assert !new AllFieldsFilter(query: 'its=5').accept(simulation)          //but not match wrong iterations
+        assert  new AllFieldsFilter(query: 'its:5').accept(simulation)          //should match partially
+        assert  new AllFieldsFilter(query: 'iterations:5').accept(simulation)   //ditto
+        assert  new AllFieldsFilter(query: '!its=4321').accept(simulation)      //should reject wrong value
+        assert !new AllFieldsFilter(query: '!its:50').accept(simulation)        //should fail to reject contained substring
+        assert !new AllFieldsFilter(query: 'its:1234').accept(simulation)      //should fail to match foreign substring
     }
 
     void testSearchResources() {

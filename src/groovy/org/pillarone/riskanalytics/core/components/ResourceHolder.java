@@ -13,7 +13,7 @@ public class ResourceHolder<E extends IResource> implements Cloneable, Serializa
     private VersionNumber version;
     private Class resourceClass;
 
-    public ResourceHolder(Class resourceClass) {
+    public ResourceHolder(Class resourceClass) {  // This constructor is somehow needed during Model Migrations.
         this.resourceClass = resourceClass;
     }
 

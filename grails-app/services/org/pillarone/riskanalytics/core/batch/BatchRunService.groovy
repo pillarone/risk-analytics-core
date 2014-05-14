@@ -121,6 +121,7 @@ class BatchRunService {
             projections {
                 property('name')
             }
+            order('name')
         }.unique()
     }
 

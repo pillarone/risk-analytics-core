@@ -49,6 +49,7 @@ class SimulationQueueService {
         preConditionCheck(configuration)
         synchronized (lock) {
             QueueEntry queueEntry = new QueueEntry(configuration, priority, currentUser)
+            configuration.username = currentUser?.username
             queue.offer(queueEntry)
             notifyOffered(queueEntry)
             new SimulationHandler(queueEntry.simulationTask, queueEntry.id)

@@ -5,6 +5,7 @@ import org.junit.After
 import org.pillarone.riskanalytics.core.dataaccess.ResultAccessor
 import org.pillarone.riskanalytics.core.packets.AggregatedExternalPacket
 import org.pillarone.riskanalytics.core.packets.SingleExternalPacket
+import org.pillarone.riskanalytics.core.simulation.item.parameter.IntegerParameterHolder
 
 import static org.junit.Assert.*
 import org.junit.Before
@@ -53,6 +54,8 @@ class ResultDataTests {
         simulation.numberOfIterations = 3
         simulation.periodCount = 1
         simulation.randomSeed = 1
+
+        simulation.addParameter(new IntegerParameterHolder("x:y", 0, 1))
 
         simulation.save()
 
@@ -112,7 +115,7 @@ class ResultDataTests {
 
         DataSourceDefinition definition = new DataSourceDefinition("CoreParameters", "1", CoreModel, path.pathName, [field1.fieldName, field2.fieldName],[0], aggregated.collectorName)
 
-        resultData.load([definition])
+        resultData.load([definition], simulation)
 
         List<ExternalPacket> values = resultData.getValuesForDefinition(definition)
         assertEquals(3, values.size())
@@ -148,7 +151,7 @@ class ResultDataTests {
 
         DataSourceDefinition definition = new DataSourceDefinition("CoreParameters", "1", CoreModel, path.pathName, [field1.fieldName, field2.fieldName],[0], single.collectorName)
 
-        resultData.load([definition])
+        resultData.load([definition], simulation)
 
         List<ExternalPacket> values = resultData.getValuesForDefinition(definition)
         assertEquals(3, values.size())

@@ -15,7 +15,9 @@ import org.pillarone.riskanalytics.core.packets.AggregatedExternalPacket
 import org.pillarone.riskanalytics.core.packets.ExternalPacket
 import org.pillarone.riskanalytics.core.packets.SingleExternalPacket
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
+import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 
 class ResultData {
 
@@ -23,13 +25,39 @@ class ResultData {
 
     Map<DataSourceDefinition, List<ExternalPacket>> cache = new HashMap()
 
-    void load(List<DataSourceDefinition> definitions) {
+    void load(List<DataSourceDefinition> definitions, Simulation simulation) {
         for(DataSourceDefinition definition in definitions) {
 
             List<ExternalPacket> list = []
 
             definition.parameterization.load(false)
-            SimulationRun run = SimulationRun.findByParameterization(definition.parameterization.dao) //TODO: compare runtime params
+            List<SimulationRun> candidates = SimulationRun.findAllWhere(
+                    parameterization: definition.parameterization.dao,
+                    iterations: simulation.numberOfIterations,
+                    randomSeed: simulation.randomSeed,
+                    resultConfiguration: simulation.template.dao
+            )
+
+            SimulationRun run = null
+
+            for(SimulationRun simulationRun in candidates) {
+                Simulation candidate = new Simulation(simulationRun.name)
+                candidate.modelClass = simulation.modelClass
+                candidate.load()
+
+                boolean valid = true
+                for(ParameterHolder holder in simulation.runtimeParameters) {
+                    if(!(holder.businessObject == candidate.runtimeParameters.find { it.path == holder.path}?.businessObject)) {
+                        valid = false
+                    }
+                }
+
+                if(valid) {
+                    run = simulationRun
+                    break
+                }
+
+            }
             if(run == null) {
                 throw new IllegalArgumentException("No matching result found!")
             }

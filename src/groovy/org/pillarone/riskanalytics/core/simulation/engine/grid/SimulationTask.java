@@ -82,7 +82,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
 
             List<DataSourceDefinition> dataSourceDefinitions = ParameterizationHelper.collectDataSourceDefinitions(simulationConfiguration.getSimulation().getParameterization().getParameters());
             ResultData dataSource = new ResultData();
-            dataSource.load(dataSourceDefinitions);
+            dataSource.load(dataSourceDefinitions, simulationConfiguration.getSimulation());
             simulationConfiguration.setResultDataSource(dataSource);
 
             resultTransferListener = new ResultTransferListener(this);

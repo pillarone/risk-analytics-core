@@ -22,6 +22,8 @@ import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolde
 
 class DependingCoreModelTests extends ModelTest {
 
+    Simulation baseSimulation
+
     @Before
     void init() {
         FileImportService.importModelsIfNeeded(['Core'])
@@ -31,25 +33,25 @@ class DependingCoreModelTests extends ModelTest {
         ResultConfiguration template = new ResultConfiguration("CoreResultConfiguration", CoreModel)
         template.load()
 
-        Simulation simulation = new Simulation("Result")
-        simulation.parameterization = parameterization
-        simulation.template = template
-        simulation.beginOfFirstPeriod = new DateTime()
-        simulation.start = new DateTime().minusMinutes(10)
-        simulation.end = new DateTime()
-        simulation.periodCount = 1
-        simulation.numberOfIterations = 1
-        simulation.modelClass = CoreModel
-        simulation.save()
+        baseSimulation = new Simulation("Result")
+        baseSimulation.parameterization = parameterization
+        baseSimulation.template = template
+        baseSimulation.beginOfFirstPeriod = new DateTime()
+        baseSimulation.start = new DateTime().minusMinutes(10)
+        baseSimulation.end = new DateTime()
+        baseSimulation.periodCount = 1
+        baseSimulation.numberOfIterations = 1
+        baseSimulation.modelClass = CoreModel
+        baseSimulation.save()
 
         PathMapping path = PathMapping.findOrSaveByPathName("outPath")
         FieldMapping field = FieldMapping.findOrSaveByFieldName("x")
         FieldMapping field2 = FieldMapping.findOrSaveByFieldName("y")
         CollectorMapping collector = CollectorMapping.findOrSaveByCollectorName(AggregatedCollectingModeStrategy.IDENTIFIER)
 
-        ResultWriter writer = new ResultWriter(simulation.id)
-        writeResult(new SingleValueResult(simulationRun: simulation.simulationRun, period: 0, iteration: 1, path: path, field: field, collector: collector, valueIndex: 1, value: 100), writer)
-        writeResult(new SingleValueResult(simulationRun: simulation.simulationRun, period: 0, iteration: 1, path: path, field: field2, collector: collector, valueIndex: 1, value: 200), writer)
+        ResultWriter writer = new ResultWriter(baseSimulation.id)
+        writeResult(new SingleValueResult(simulationRun: baseSimulation.simulationRun, period: 0, iteration: 1, path: path, field: field, collector: collector, valueIndex: 1, value: 100), writer)
+        writeResult(new SingleValueResult(simulationRun: baseSimulation.simulationRun, period: 0, iteration: 1, path: path, field: field2, collector: collector, valueIndex: 1, value: 200), writer)
     }
 
     private void writeResult(SingleValueResult result, ResultWriter resultWriter) {
@@ -69,7 +71,7 @@ class DependingCoreModelTests extends ModelTest {
 
     @Override
     protected void prepareDataSource(ResultData dataSource) {
-        dataSource.load(ParameterizationHelper.collectDataSourceDefinitions(run.parameterization.parameterHolders))
+        dataSource.load(ParameterizationHelper.collectDataSourceDefinitions(run.parameterization.parameterHolders), baseSimulation)
     }
 
     @Override

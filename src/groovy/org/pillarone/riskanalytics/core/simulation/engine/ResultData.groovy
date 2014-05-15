@@ -1,6 +1,8 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
 import groovy.transform.CompileStatic
+import org.apache.commons.lang.builder.EqualsBuilder
+import org.apache.commons.lang.builder.HashCodeBuilder
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.components.DataSourceDefinition
@@ -13,7 +15,6 @@ import org.pillarone.riskanalytics.core.packets.AggregatedExternalPacket
 import org.pillarone.riskanalytics.core.packets.ExternalPacket
 import org.pillarone.riskanalytics.core.packets.SingleExternalPacket
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
-import org.pillarone.riskanalytics.core.simulation.item.SimulationProfile
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 
 class ResultData {
@@ -33,22 +34,44 @@ class ResultData {
                 throw new IllegalArgumentException("No matching result found!")
             }
 
-            for(String field in definition.fields) {
-                for(int period in definition.periods) {
+            for(int period in definition.periods) {
+
+                Map<IterationPathPair, ExternalPacket> packets = [:]
+
+                for(String field in definition.fields) {
                     try {
                         long time = System.currentTimeMillis()
                         IterationFileAccessor ifa = ResultAccessor.createFileAccessor(run, definition.path, field, definition.collectorName, period)
                         while(ifa.fetchNext()) {
                             if (definition.collectorName == AggregatedCollectingModeStrategy.IDENTIFIER) {
-                                list << new AggregatedExternalPacket(
-                                        basedOn: definition, field: field, iteration: ifa.iteration, period: period,
-                                        value: ifa.value
-                                )
+
+                                IterationPathPair pair = new IterationPathPair(ifa.iteration, definition.path)
+                                AggregatedExternalPacket packet = packets.get(pair)
+
+                                if(packet == null) {
+                                    packet = new AggregatedExternalPacket(basedOn: definition, iteration: ifa.iteration, period: period)
+                                    packet.addValue(field, ifa.value)
+
+                                    packets.put(pair, packet)
+                                    list << packet
+                                } else {
+                                    packet.addValue(field, ifa.value)
+                                }
+
+
                             } else if(definition.collectorName == SingleValueCollectingModeStrategy.IDENTIFIER) {
-                                list << new SingleExternalPacket(
-                                        basedOn: definition, field: field, iteration: ifa.iteration, period: period,
-                                        values: ifa.singleValues
-                                )
+                                IterationPathPair pair = new IterationPathPair(ifa.iteration, definition.path)
+                                SingleExternalPacket packet = packets.get(pair)
+
+                                if(packet == null) {
+                                    packet = new SingleExternalPacket(basedOn: definition, iteration: ifa.iteration, period: period)
+                                    packet.addValue(field, ifa.singleValues)
+
+                                    packets.put(pair, packet)
+                                    list << packet
+                                } else {
+                                    packet.addValue(field, ifa.singleValues)
+                                }
                             } else {
                                 throw new IllegalStateException("Unsupported collector for external data: ${definition.collectorName}")
                             }
@@ -75,5 +98,31 @@ class ResultData {
     @CompileStatic
     List<ExternalPacket> getValuesForDefinition(DataSourceDefinition definition) {
         return cache[definition]
+    }
+
+    @CompileStatic
+    private static class IterationPathPair {
+
+        int iteration
+        String path
+
+        IterationPathPair(int iteration, String path) {
+            this.iteration = iteration
+            this.path = path
+        }
+
+        @Override
+        int hashCode() {
+            return new HashCodeBuilder().append(iteration).append(path).toHashCode()
+        }
+
+        @Override
+        boolean equals(Object obj) {
+            if(obj instanceof IterationPathPair) {
+                return new EqualsBuilder().append(iteration, obj.iteration).append(path, obj.path).equals
+            }
+
+            return false
+        }
     }
 }

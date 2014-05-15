@@ -8,7 +8,6 @@ abstract class ExternalPacket extends Packet {
 
     DataSourceDefinition basedOn
 
-    String field
     int iteration
     int period
 }

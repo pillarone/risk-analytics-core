@@ -5,5 +5,14 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class AggregatedExternalPacket extends ExternalPacket {
 
-    double value
+    private Map<String, Double> values = [:]
+
+    void addValue(String field, double value) {
+        values.put(field, value)
+    }
+
+    double getValue(String field) {
+        return values[field]
+    }
+
 }

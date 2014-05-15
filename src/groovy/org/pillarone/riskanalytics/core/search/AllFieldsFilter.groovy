@@ -308,7 +308,7 @@ class AllFieldsFilter implements ISearchFilter {
             String found = columnFilterPrefixes.find { prefix.equalsIgnoreCase(it) };
 
             if(found == null ){
-                LOG.warn("getColumnFilterPrefix(term: ${term})-> ignoring unknown prefix: ${prefix}")
+//                LOG.warn("getColumnFilterPrefix(term: ${term})-> ignoring unknown prefix: ${prefix}") //False warnings from search terms containing : e.g. timestamps
                 return nonePrefix;
             }
             return found;

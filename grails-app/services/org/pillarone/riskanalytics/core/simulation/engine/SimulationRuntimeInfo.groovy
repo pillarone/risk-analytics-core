@@ -80,8 +80,8 @@ class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo> {
         if (start) {
             DateTime end = simulation.end ?: estimatedSimulationEnd
             if (end) {
-                Period period = new Period(start, end, PeriodType.minutes());
-                return "${period.minutes} min"
+                Period period = new Period(start, end, PeriodType.seconds());
+                return "${period.seconds} sec"
             }
         }
         return 'n/a'

@@ -1,9 +1,5 @@
-import org.codehaus.groovy.grails.io.support.UrlResource
-import org.codehaus.groovy.grails.plugins.BasicGrailsPluginInfo
-import org.codehaus.groovy.grails.plugins.GrailsPluginInfo
-
 //Use a custom plugins dir, because different branches use different plugin versions
-grails.project.plugins.dir = "../local-plugins/RiskAnalyticsCore-master"
+grails.project.plugins.dir = "../local-plugins/RiskAnalyticsCore-1.9.x"
 
 grails.project.dependency.resolver = "maven"
 

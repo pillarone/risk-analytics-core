@@ -11,7 +11,7 @@ class AggregatedExternalPacket extends ExternalPacket {
         values.put(field, value)
     }
 
-    double getValue(String field) {
+    Double getValue(String field) {
         return values[field]
     }
 

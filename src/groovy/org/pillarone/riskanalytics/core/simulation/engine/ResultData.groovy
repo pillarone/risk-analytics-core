@@ -35,7 +35,6 @@ class ResultData {
                     parameterization: definition.parameterization.dao,
                     iterations: simulation.numberOfIterations,
                     randomSeed: simulation.randomSeed,
-                    resultConfiguration: simulation.template.dao
             )
 
             SimulationRun run = null

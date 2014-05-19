@@ -2,6 +2,8 @@ package org.pillarone.riskanalytics.core.simulation.engine
 
 import com.google.common.base.Preconditions
 import org.joda.time.DateTime
+import org.joda.time.Period
+import org.joda.time.PeriodType
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
@@ -71,6 +73,18 @@ class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo> {
 
     Person getOfferedBy() {
         offeredBy
+    }
+
+    String getEstimatedTime() {
+        DateTime start = simulation?.start
+        if (start) {
+            DateTime end = simulation.end ?: estimatedSimulationEnd
+            if (end) {
+                Period period = new Period(start, end, PeriodType.minutes());
+                return "${period.minutes} min"
+            }
+        }
+        return 'n/a'
     }
 
     List<Throwable> getSimulationErrors() {

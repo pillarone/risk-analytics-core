@@ -38,7 +38,6 @@ grails.project.dependency.resolution = {
     }
 
     dependencies {
-        compile 'com.google.guava:guava:10.0.1'
         runtime 'net.sf.jasperreports:jasperreports:4.0.1', {
             excludes "xml-apis", "commons-collections", "jdtcore"
         }

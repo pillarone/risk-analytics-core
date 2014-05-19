@@ -28,8 +28,6 @@ public class SimulationConfiguration implements Serializable, Cloneable {
     Map<String, BeanDefinition> beans = [:]
     ICollectorOutputStrategy outputStrategy
     ResultData resultDataSource
-    //the user who offered this task to the queue.
-    String username
 
 
     SimulationConfiguration(Simulation simulation, ICollectorOutputStrategy outputStrategy) {

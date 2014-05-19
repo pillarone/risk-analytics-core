@@ -92,13 +92,4 @@ class Batch extends ModellingItem {
     Class getModelClass() {
         null
     }
-
-    @Override
-    List<Simulation> getSimulations() {
-        SimulationRun.withBatchRunId(id).list().collect {
-            Simulation simulation = new Simulation(it.name)
-            simulation.load()
-            simulation
-        }
-    }
 }

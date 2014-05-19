@@ -19,7 +19,7 @@ public abstract class ReportUtils {
         final ModellingItem[] modellingItem = new ModellingItem[1];
         reportData.accept(new IReportDataVisitor() {
             public void visitModellingItemReportData(ModellingItemReportData modellingItemReportData) {
-                modellingItem[0] = modellingItemReportData.getItem();
+                modellingItem[0] = (ModellingItem) modellingItemReportData.getItem();
             }
 
             public void visitReportDataCollection(ReportDataCollection reportDataCollection) {
@@ -57,7 +57,7 @@ public abstract class ReportUtils {
         final List<ModellingItem> modellingItems = new ArrayList<ModellingItem>();
         reportData.accept(new IReportDataVisitor() {
             public void visitModellingItemReportData(ModellingItemReportData modellingItemReportData) {
-                modellingItems.add(modellingItemReportData.getItem());
+                modellingItems.add((ModellingItem) modellingItemReportData.getItem());
             }
 
             public void visitReportDataCollection(ReportDataCollection reportDataCollection) {

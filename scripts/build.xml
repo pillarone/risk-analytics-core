@@ -7,7 +7,7 @@
     <property file="application.properties"/>
 
     <property name="build.prod.dir" value="${user.home}/.grails/${app.grails.version}/projects/${app.name}"/>
-    <property name="plugin.dir" value="${basedir}/../local-plugins/${app.name}-master"/>
+    <property name="plugin.dir" value="${basedir}/../local-plugins/${app.name}-1.9.x"/>
     <property name="classes.prod.dir" value="${build.prod.dir}/classes"/>
     <property name="plugin.classes.prod.dir" value="${build.prod.dir}/plugin-classes"/>
     <property name="dist.dir" value="dist"/>

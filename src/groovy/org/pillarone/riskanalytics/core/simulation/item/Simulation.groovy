@@ -232,6 +232,7 @@ class Simulation extends ParametrizedItem {
     protected Object deleteDaoImpl(simulation) {
         assert simulation instanceof SimulationRun
         DeleteSimulationStrategy.instance.deleteSimulation(simulation)
+        parameterization?.addRemoveLockTag()
         return true
     }
 

@@ -10,3 +10,5 @@ exportParam.groovy
 .idea/*
 *.iml
 out/*
+*.zip
+plugin.xml

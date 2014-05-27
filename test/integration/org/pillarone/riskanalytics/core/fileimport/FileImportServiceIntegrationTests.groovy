@@ -19,6 +19,7 @@ class FileImportServiceIntegrationTests  {
     @Before
     void setUp() {
         ModelRegistry.instance.clear()
+        ModelStructureDAO.list()*.delete()
     }
 
     @After

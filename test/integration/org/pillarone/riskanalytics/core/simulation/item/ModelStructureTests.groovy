@@ -11,6 +11,10 @@ class ModelStructureTests {
 
     @Test
     void testFindAllModelClasses() {
+        ModelStructureDAO.withNewSession { def session ->
+            ModelStructureDAO.list()*.delete()
+            session.flush()
+        }
         ModelStructureDAO exampleCompanyStructure = new ModelStructureDAO()
         exampleCompanyStructure.name = "ExampleCompany"
         exampleCompanyStructure.modelClassName = "ExampleCompanyModel"
@@ -32,7 +36,7 @@ class ModelStructureTests {
         List modelClasses = ModelStructure.findAllModelClasses()
 
         assertEquals "not all model classes rerieved", modeClassNamesFromDB.size(), modelClasses.size()
-        modelClasses.each {Class modelClass ->
+        modelClasses.each { Class modelClass ->
             assertTrue "modelClass not in DB: ${modelClass.name}", modeClassNamesFromDB.contains(modelClass.name)
             modeClassNamesFromDB.remove(modelClass.name)
         }

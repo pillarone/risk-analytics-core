@@ -19,6 +19,7 @@ class FileImportServiceIntegrationTests  {
     @Before
     void setUp() {
         ModelRegistry.instance.clear()
+        ModelStructureDAO.list()*.delete()
     }
 
     @After
@@ -106,6 +107,10 @@ class FileImportServiceIntegrationTests  {
 
         assertTrue ParameterizationDAO.count() > 0
 
-        assertEquals ModelStructureDAO.count() as int, ModelRegistry.instance.allModelClasses.size()
+
+        List<ModelStructureDAO> structures = ModelStructureDAO.list()
+        Set<Class> classes = ModelRegistry.instance.allModelClasses
+
+        assertEquals("Strcutures: (${structures*.name.join(", ")}) / Classes: ${classes*.simpleName.join(", ")}", structures.size(), classes.size())
     }
 }

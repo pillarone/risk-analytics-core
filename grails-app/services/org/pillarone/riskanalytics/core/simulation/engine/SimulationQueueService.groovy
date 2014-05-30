@@ -78,6 +78,18 @@ class SimulationQueueService {
         }
     }
 
+    // PMO-2797 - need ability to check if item (to open) is used in any queued sim, including currently running one
+    //
+    List<QueueEntry> getQueueEntriesIncludingCurrentTask() {
+        synchronized (lock) {
+            List<QueueEntry> allEntries = queue.toArray().toList() as List<QueueEntry>
+            if( currentTask ){
+                allEntries.add(0,currentTask.entry) // PMO-2797 want current task checked first (in case: almost done)
+            }
+            allEntries
+        }
+    }
+
     private void poll() {
         synchronized (lock) {
             if (!busy) {

@@ -58,7 +58,7 @@ class Batch extends ModellingItem {
             Parameterization parameterization = new Parameterization(run.name)
             parameterization.versionNumber = run.itemVersion ? new VersionNumber(run.itemVersion) : null
             parameterization.modelClass = getClass().classLoader.loadClass(run.modelClassName)
-            parameterization.load()
+            parameterization.load(false)  //Don't fully load all p14ns as massively impacts speed of opening a batch
             parameterization
         }
     }

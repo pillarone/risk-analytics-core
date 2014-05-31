@@ -58,7 +58,7 @@ class Batch extends ModellingItem {
             Parameterization parameterization = new Parameterization(run.name)
             parameterization.versionNumber = run.itemVersion ? new VersionNumber(run.itemVersion) : null
             parameterization.modelClass = getClass().classLoader.loadClass(run.modelClassName)
-            parameterization.load(false)  //Don't fully load all p14ns as massively impacts speed of opening a batch
+            parameterization.load(false)  //PMO-2802 Don't fully load p14ns - speed up opening a batch dramatically
             parameterization
         }
     }
@@ -97,7 +97,7 @@ class Batch extends ModellingItem {
     List<Simulation> getSimulations() {
         SimulationRun.withBatchRunId(id).list().collect {
             Simulation simulation = new Simulation(it.name)
-            simulation.load()
+            simulation.load(false) //PMO-2802 Don't fully load sims too
             simulation
         }
     }

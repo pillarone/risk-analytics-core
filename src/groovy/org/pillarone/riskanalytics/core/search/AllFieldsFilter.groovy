@@ -124,10 +124,10 @@ class AllFieldsFilter implements ISearchFilter {
 
     @Override
     boolean accept(CacheItem item) {
-        if( item == null ){
+        if( !item ){
             false
         }
-        if( matchTerms == null || matchTerms.empty ){
+        if( (!matchTerms)  || matchTerms.empty ){
             true
         }
         return matchTerms.every { passesRestriction(item, it) }
@@ -294,7 +294,7 @@ class AllFieldsFilter implements ISearchFilter {
 
             if (   (colonIndex  != -1 &&  colonIndex  < bangIndex)      // : found and precedes !
                 || (equalsIndex != -1 &&  equalsIndex < bangIndex) ) {  // = found and precedes !
-                LOG.warn("getColumnFilterPrefix(term: ${term}): ':' or '=' precedes '!' - it's a weirdo, treat as a general search term.")
+                LOG.debug("getColumnFilterPrefix(term: ${term}): ':' or '=' precedes '!' - it's a weirdo, treat as a general search term.")
                 return nonePrefix;
             }
 
@@ -307,8 +307,8 @@ class AllFieldsFilter implements ISearchFilter {
 
             String found = columnFilterPrefixes.find { prefix.equalsIgnoreCase(it) };
 
-            if(found == null ){
-                LOG.warn("getColumnFilterPrefix(term: ${term})-> ignoring unknown prefix: ${prefix}")
+            if( !found ){
+                LOG.debug("getColumnFilterPrefix(term: ${term})-> ignoring unknown prefix: ${prefix}")
                 return nonePrefix;
             }
             return found;
@@ -490,6 +490,8 @@ class AllFieldsFilter implements ISearchFilter {
             };
         }
 
+        // TODO - allow matching on deal name OR id in this method; rename to matchOnDeal ?
+        //
         private static boolean matchDealId(ParameterizationCacheItem p14n, String[] matchTerms) {
             return matchTerms.any {
                 isDealIdAcceptor(it) ? StringUtils.equalsIgnoreCase(p14n?.dealId?.toString(), getText(it))

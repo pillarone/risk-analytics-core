@@ -101,6 +101,8 @@ private void buildJar() {
     ant.jar(destfile: "${jarTarget}/${grailsAppName}.jar", basedir: stagingDir, manifest: manifestTarget, excludes: excludes)
 
     classPath.add("${grailsAppName}.jar")
+    println(classPath)
+    println(classPath.size())
     for (String main in mains) {
         ant.manifest(file: manifestTarget) {
             attribute(name: "Main-Class", value: main)
@@ -113,7 +115,7 @@ private void buildJar() {
         }
         ant.jar(destfile: "${jarTarget}/${main}.jar", basedir: stagingDir, manifest: manifestTarget, includes: "${main.replace(".", "/")}.class")
     }
-    ant.delete(file: manifestTarget)
+//    ant.delete(file: manifestTarget)
 }
 
 //Copies all classes & resources to a directory
@@ -151,7 +153,7 @@ private List getRelativeClassPaths(String externalLibsTarget) {
     new File(externalLibsTarget).eachFileRecurse { File file ->
         classPath << "lib/${file.name}"
     }
-    return classPath
+    return classPath.sort()
 }
 
 setDefaultTarget('jarMain')

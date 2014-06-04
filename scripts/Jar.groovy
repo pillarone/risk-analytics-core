@@ -140,8 +140,9 @@ private void copyLibraries(String target) {
     //files in plugin/lib directories are not included in runtime dependencies below..
     def pluginPath = pluginsDirPath as String
     List excluded = []
-    if (argsMap.excludeJars) {
-       excluded = argsMap.excludeJars.split(',')
+    String excludeJars = argsMap.excludeJars
+    if (excludeJars) {
+       excluded = excludeJars.split(',')
     }
     GrailsPluginUtils.getPluginLibDirectories(pluginPath).each { Resource resource ->
         File file = resource.file

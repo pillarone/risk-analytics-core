@@ -139,7 +139,10 @@ private void copyLibraries(String target) {
     ant.mkdir(dir: externalLibsTarget)
     //files in plugin/lib directories are not included in runtime dependencies below..
     def pluginPath = pluginsDirPath as String
-    List excluded = argsMap.excludeJars?.split(',') ?:[]
+    List excluded = []
+    if (argsMap.excludeJars) {
+       excluded = argsMap.excludeJars.split(',')
+    }
     GrailsPluginUtils.getPluginLibDirectories(pluginPath).each { Resource resource ->
         File file = resource.file
         if (file.exists()) {

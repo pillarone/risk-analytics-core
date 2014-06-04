@@ -1,3 +1,5 @@
+import org.codehaus.groovy.grails.io.support.Resource
+import org.codehaus.groovy.grails.plugins.GrailsPluginUtils
 import org.codehaus.groovy.grails.project.packaging.GrailsProjectWarCreator
 
 includeTargets << grailsScript("_GrailsWar")
@@ -54,7 +56,6 @@ Options:
     warCreator.stagingDir = new File(stagingDir)
     warCreator.createDescriptor()
 
-
     //Project ready to run in stagingDir, optionally create a jar or cmd file to run the application
     if (argsMap.buildJar) {
         buildJar()
@@ -101,8 +102,6 @@ private void buildJar() {
     ant.jar(destfile: "${jarTarget}/${grailsAppName}.jar", basedir: stagingDir, manifest: manifestTarget, excludes: excludes)
 
     classPath.add("${grailsAppName}.jar")
-    println(classPath)
-    println(classPath.size())
     for (String main in mains) {
         ant.manifest(file: manifestTarget) {
             attribute(name: "Main-Class", value: main)
@@ -115,7 +114,7 @@ private void buildJar() {
         }
         ant.jar(destfile: "${jarTarget}/${main}.jar", basedir: stagingDir, manifest: manifestTarget, includes: "${main.replace(".", "/")}.class")
     }
-//    ant.delete(file: manifestTarget)
+    ant.delete(file: manifestTarget)
 }
 
 //Copies all classes & resources to a directory
@@ -139,10 +138,23 @@ private void copyLibraries(String target) {
     def externalLibsTarget = "${target}/lib"
     ant.mkdir(dir: externalLibsTarget)
     //files in plugin/lib directories are not included in runtime dependencies below..
-    ant.copy(todir: externalLibsTarget, flatten: true) {
-        fileset(dir: pluginsDirPath, includes: '**/lib/*.jar')
+    def pluginPath = pluginsDirPath as String
+    List excluded = argsMap.excludeJars?.split(',') ?:[]
+    GrailsPluginUtils.getPluginLibDirectories(pluginPath).each { Resource resource ->
+        File file = resource.file
+        if (file.exists()) {
+            file.eachFileRecurse {File jar ->
+                if (excluded.contains(jar.name)) {
+                    println("excluded: ${jar.name}")
+                    return
+                }
+                ant.copy(toDir:externalLibsTarget, flatten:true) {
+                       fileset(file:jar)
+                }
+            }
+        }
     }
-    for(File lib in grailsSettings.runtimeDependencies) {
+    for (File lib in grailsSettings.runtimeDependencies) {
         ant.copy(todir: externalLibsTarget, flatten: true, file: lib.absolutePath)
     }
 }
@@ -153,7 +165,9 @@ private List getRelativeClassPaths(String externalLibsTarget) {
     new File(externalLibsTarget).eachFileRecurse { File file ->
         classPath << "lib/${file.name}"
     }
-    return classPath.sort()
+    //the order is important. Somewhere there is a conflict. In this order it works for now, but could well be it brakes in future.
+    //TODO: spend more time to remove all remaining class path conflicts.
+    return classPath.sort().reverse()
 }
 
 setDefaultTarget('jarMain')

@@ -21,9 +21,9 @@ import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
 
 class RiskAnalyticsCoreGrailsPlugin {
     // the plugin version
-    def version = "1.9.x-SNAPSHOT"
+    def version = "1.9.0"
     // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "2.2.1 > *"
+    def grailsVersion = "2.3.2 > *"
     // the other plugins this plugin depends on
     def dependsOn = [
             "backgroundThread": "1.3",

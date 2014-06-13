@@ -296,6 +296,6 @@ public class GroovyUtils {
 
     public static String getExportFileName(SimulationRun simulationRun) {
         String fileName = (simulationRun.name + simulationRun.startTime.toString() + ".csv").replaceAll(":", "-")
-        return FileConstants.CSV_EXPORT_DIRECTORY + "/" + fileName
+        return FileConstants.CSV_EXPORT_DIRECTORY + File.separator + fileName
     }
 }

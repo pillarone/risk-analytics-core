@@ -43,29 +43,40 @@ abstract class ResultAccessor {
     }
 
     static String exportCsv(SimulationRun simulationRun) {
-        String fileName = GroovyUtils.getExportFileName(simulationRun)
-        File file = new File(fileName)
-        if (file.exists()) {
-            file.delete()
+        final CollectorMapping singleCollector = CollectorMapping.findByCollectorName(SingleValueCollectingModeStrategy.IDENTIFIER)
+        if (singleCollector == null) {
+            throw new IllegalStateException("collector_mapping named SINGLE not found")
         }
-        StringBuilder fileContent = new StringBuilder()
-        List<ResultPathDescriptor> paths = getDistinctPaths(simulationRun)
+        String fileName = GroovyUtils.getExportFileName(simulationRun)  // csv file at client (not sim results folder on disk)
+        File csvFile = new File(fileName)
+        if (csvFile.exists()) {
+            LOG.info("DELETING ${fileName} (already exists)")
+            csvFile.delete()
+        }
+
+        List<ResultPathDescriptor> paths = getDistinctPaths(simulationRun) // gets timed but not significant
         DateTimeFormatter formatter = DateTimeFormat.forPattern(Parameterization.PERIOD_DATE_FORMAT)
+
+        long t = System.currentTimeMillis()
 
         for (ResultPathDescriptor descriptor in paths) {
             if (descriptor.collector.collectorName == AggregatedWithSingleAvailableCollectingModeStrategy.IDENTIFIER) { //get distinct path ignores single collectors
-                descriptor.collector = CollectorMapping.findByCollectorName(SingleValueCollectingModeStrategy.IDENTIFIER) //but we only want single values in CSV if they are available
+                descriptor.collector = singleCollector //but we only want single values in CSV if they are available
             }
             IterationFileAccessor ifa = new IterationFileAccessor(new File(GridHelper.getResultPathLocation(simulationRun.id, descriptor.path.id, descriptor.field.id, descriptor.collector.id, descriptor.period)));
             while (ifa.fetchNext()) {
                 for (DateTimeValuePair pair in ifa.getSingleValues()) {
-                    file.append([ifa.iteration, descriptor.period, descriptor.path.pathName, descriptor.field.fieldName, pair.aDouble, descriptor.collector.collectorName, formatter.print(new DateTime(pair.dateTime))].join(",") + "\n")
+                    csvFile.append([ifa.iteration, descriptor.period, descriptor.path.pathName, descriptor.field.fieldName, pair.aDouble, descriptor.collector.collectorName, formatter.print(new DateTime(pair.dateTime))].join(",") + "\n")
                 }
             }
         }
+        LOG.info("Timed ${System.currentTimeMillis() - t} ms: wrote ${paths.size()} paths to '${fileName}' (sim: ${simulationRun.name})");
         return fileName
     }
 
+    // Result paths for SINGLE collector strategy are excluded
+    // Why - too many ?
+    //
     static List<ResultPathDescriptor> getDistinctPaths(SimulationRun run) {
         CollectorMapping singleCollector = CollectorMapping.findByCollectorName(SingleValueCollectingModeStrategy.IDENTIFIER)
         if (singleCollector == null) {
@@ -73,20 +84,26 @@ abstract class ResultAccessor {
         }
 
         List<ResultPathDescriptor> result = []
-        File file = new File(GridHelper.getResultLocation(run.id))
-        Map<String,PathMapping> pathMappings = new HashMap<String,PathMapping>()
-        Map<String,FieldMapping> fieldMappings = new HashMap<String,FieldMapping>()
-        Map<Long,CollectorMapping> collectorMappings = new HashMap<Long,CollectorMapping>()
-        for (File f in file.listFiles()) {
-            String[] ids = f.name.split("_")
-            Long collectorId = Long.parseLong(ids[3])
-            if (collectorId != singleCollector.id) {
-                result.add(new ResultPathDescriptor(
-                        getPathmapping(pathMappings,ids[0]),
-                        getFieldMapping(fieldMappings,ids[2]),
-                        getCollectorMapping(collectorMappings,collectorId),
-                        Integer.parseInt(ids[1])))
+        File resultDir = new File(GridHelper.getResultLocation(run.id))
+        if( resultDir.exists() ){
+            Map<String,PathMapping> pathMappings = new HashMap<String,PathMapping>()
+            Map<String,FieldMapping> fieldMappings = new HashMap<String,FieldMapping>()
+            Map<Long,CollectorMapping> collectorMappings = new HashMap<Long,CollectorMapping>()
+            for (File f in resultDir.listFiles()) {
+                String[] ids = f.name.split("_")
+                Long collectorId = Long.parseLong(ids[3])
+                if (collectorId != singleCollector.id) {
+                    result.add(new ResultPathDescriptor(
+                            getPathmapping(pathMappings,ids[0]),
+                            getFieldMapping(fieldMappings,ids[2]),
+                            getCollectorMapping(collectorMappings,collectorId),
+                            Integer.parseInt(ids[1])))
+                }
             }
+        } else {
+            String err = "Missing dir: '${resultDir.absolutePath}' for sim: '${run.name}' (if test system: probly OK)"  //PMO-2814
+            LOG.warn(err)
+            throw new IllegalStateException(err)
         }
 
         return result

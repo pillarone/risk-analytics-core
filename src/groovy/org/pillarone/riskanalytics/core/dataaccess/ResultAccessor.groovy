@@ -47,31 +47,49 @@ abstract class ResultAccessor {
         if (singleCollector == null) {
             throw new IllegalStateException("collector_mapping named SINGLE not found")
         }
-        String fileName = GroovyUtils.getExportFileName(simulationRun)  // csv file at client (not sim results folder on disk)
+        String fileName = GroovyUtils.getExportFileName(simulationRun)  // csv file on server under ...\.pillarone\RiskAnalyhtics\csvExport\.
         File csvFile = new File(fileName)
         if (csvFile.exists()) {
             LOG.info("DELETING ${fileName} (already exists)")
             csvFile.delete()
         }
 
-        List<ResultPathDescriptor> paths = getDistinctPaths(simulationRun) // gets timed but not significant
-        DateTimeFormatter formatter = DateTimeFormat.forPattern(Parameterization.PERIOD_DATE_FORMAT)
+        try {
+            OutputStream csvOutputStream = null;
+            try {
+                csvOutputStream = new DataOutputStream( new BufferedOutputStream(new FileOutputStream(csvFile)) );
+                List<ResultPathDescriptor> paths = getDistinctPaths(simulationRun) // gets timed but not significant
+                DateTimeFormatter formatter = DateTimeFormat.forPattern(Parameterization.PERIOD_DATE_FORMAT)
 
-        long t = System.currentTimeMillis()
-
-        for (ResultPathDescriptor descriptor in paths) {
-            if (descriptor.collector.collectorName == AggregatedWithSingleAvailableCollectingModeStrategy.IDENTIFIER) { //get distinct path ignores single collectors
-                descriptor.collector = singleCollector //but we only want single values in CSV if they are available
+//                long t = System.currentTimeMillis()
+                // Bottleneck - takes 16secs for 5 iterations (=> 4.5hrs for 5K iters ?)
+                // File was being opened/closed for each line of csv output.
+                //
+                for (ResultPathDescriptor descriptor in paths) {
+                    if (descriptor.collector.collectorName == AggregatedWithSingleAvailableCollectingModeStrategy.IDENTIFIER) { //get distinct path ignores single collectors
+                        descriptor.collector = singleCollector //but we only want single values in CSV if they are available
+                    }
+                    IterationFileAccessor ifa = new IterationFileAccessor(new File(GridHelper.getResultPathLocation(simulationRun.id, descriptor.path.id, descriptor.field.id, descriptor.collector.id, descriptor.period)));
+                    while (ifa.fetchNext()) {
+                        for (DateTimeValuePair pair in ifa.getSingleValues()) {
+                            csvOutputStream.writeChars([ifa.iteration, descriptor.period, descriptor.path.pathName, descriptor.field.fieldName, pair.aDouble, descriptor.collector.collectorName, formatter.print(new DateTime(pair.dateTime))].join(",") + "\n")
+                        }
+                    }
+                    ifa.close()
+                }
+//                LOG.debug("Timed ${System.currentTimeMillis() - t} ms: wrote ${paths.size()} paths to '${fileName}' (sim: ${simulationRun.name})");
+                return fileName
             }
-            IterationFileAccessor ifa = new IterationFileAccessor(new File(GridHelper.getResultPathLocation(simulationRun.id, descriptor.path.id, descriptor.field.id, descriptor.collector.id, descriptor.period)));
-            while (ifa.fetchNext()) {
-                for (DateTimeValuePair pair in ifa.getSingleValues()) {
-                    csvFile.append([ifa.iteration, descriptor.period, descriptor.path.pathName, descriptor.field.fieldName, pair.aDouble, descriptor.collector.collectorName, formatter.print(new DateTime(pair.dateTime))].join(",") + "\n")
+            finally {
+                if(csvOutputStream != null){
+                    csvOutputStream.close();
                 }
             }
         }
-        LOG.info("Timed ${System.currentTimeMillis() - t} ms: wrote ${paths.size()} paths to '${fileName}' (sim: ${simulationRun.name})");
-        return fileName
+        catch(Exception ex){
+            LOG.warn(ex);
+            throw new IllegalStateException(ex)
+        }
     }
 
     // Result paths for SINGLE collector strategy are excluded

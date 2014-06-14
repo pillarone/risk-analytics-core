@@ -40,10 +40,13 @@ public class ExportResultAccessor {
 
         for (int i = 0; i < run.getPeriodCount(); i++) {
             File f = new File(GridHelper.getResultPathLocation(ResultAccessor.getRunIDFromSimulation(run) , pathId, fieldId, collectorId, i));
-            IterationFileAccessor ifa;
+            IterationFileAccessor ifa = null;
             try {
                 ifa = new IterationFileAccessor(f);
             } catch (Exception e) {
+                if( ifa != null ){
+                    ifa.close();
+                }
                 throw new RiskAnalyticsResultAccessException("Failed to find file : " + f.toString(), e);
             }
             try {
@@ -62,6 +65,10 @@ public class ExportResultAccessor {
                 }
             } catch (Exception e) {
                 throw new RiskAnalyticsResultAccessException("Failed to get iteration : " + ifa.getIteration(), e);
+            } finally {
+                if( ifa != null ){
+                    ifa.close();
+                }
             }
         }
         return result;

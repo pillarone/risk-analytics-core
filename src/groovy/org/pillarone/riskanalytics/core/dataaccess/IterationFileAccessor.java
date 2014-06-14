@@ -1,43 +1,73 @@
 package org.pillarone.riskanalytics.core.dataaccess;
 
-import org.joda.time.DateTime;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.pillarone.riskanalytics.core.simulation.engine.grid.GridHelper;
 
 import java.io.*;
 import java.util.*;
 
 public class IterationFileAccessor {
+    private static Log LOG = LogFactory.getLog( IterationFileAccessor.class );
     protected DataInputStream dis;
     protected int iteration;
     protected List<DateTimeValuePair> value;
 
+    // TODO try this approach from Bruce Eckel:
+    // http://www.java2s.com/Code/Java/File-Input-Output/Mappinganentirefileintomemoryforreading.htm
+    //
     public IterationFileAccessor(File f) throws Exception {
         if (f.exists()) {
-            FileInputStream fis = new FileInputStream(f);
-            BufferedInputStream bs = new BufferedInputStream(fis);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            FileInputStream fis = null;
+            BufferedInputStream bs = null;
+            try{
+                fis = new FileInputStream(f);
+                bs = new BufferedInputStream(fis);
+                ByteArrayOutputStream bos = new ByteArrayOutputStream(); // Doesn't need to be closed after use
 
-            byte[] b = new byte[8048];
-            int len;
-            int count = 0;
-            while ((len = bs.read(b)) != -1) {
-                bos.write(b, 0, len);
-                count++;
-            }
-            if (count == 0) {
-                Thread.sleep(2000);
+                byte[] b = new byte[8048];
+                int len = -1;
+                int count = 0;
+                long t = System.currentTimeMillis();
                 while ((len = bs.read(b)) != -1) {
                     bos.write(b, 0, len);
                     count++;
                 }
-            }
-            bs.close();
-            fis.close();
-            ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+                if (count == 0) {
+                    Thread.sleep(2000);
+                    while ((len = bs.read(b)) != -1) {
+                        bos.write(b, 0, len);
+                        count++;
+                    }
+                }
+                ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
 
-            dis = new DataInputStream(bis);
+                dis = new DataInputStream(bis);
+                LOG.info("Timed " + (System.currentTimeMillis() - t) + "ms: Reading IFA: " + f.getAbsolutePath() );
+            }
+            finally{ // joy of java lacking destructors
+                if(bs != null){
+                    bs.close();
+                }
+                if(fis != null){
+                    fis.close();
+                }
+            }
+
+        } else {
+            throw new IllegalStateException("File not found: " + f.getAbsolutePath());
         }
 
+    }
+
+    public void close(){
+        if(dis != null){
+            try{
+                dis.close();
+            } catch( IOException e){
+                LOG.error( "IOException trying to close dis: ", e );
+            }
+        }
     }
 
     public boolean fetchNext() throws Exception {

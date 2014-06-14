@@ -50,8 +50,8 @@ class ResultService implements IResultService {
 
         SimulationRun run = SimulationRun.get(simulationId)
         try {
-            String periodLabels = run.parameterization.periodLabels
-            String[] labels = periodLabels.split(";")
+
+            String[] labels = run.parameterization.periodLabels.split(";")
             SimpleDateFormat dateFormat = new SimpleDateFormat(Parameterization.PERIOD_DATE_FORMAT)
             for (String label in labels) {
                 periodDates << dateFormat.parse(label)
@@ -65,8 +65,8 @@ class ResultService implements IResultService {
             String path = fullPath.substring(0, fullPath.lastIndexOf(":"))
             String field = fullPath.substring(fullPath.lastIndexOf(":") + 1)
             List<SingleValueResultPOJO> results = ExportResultAccessor.getSingleValueResultsForExport(
-                    SingleValueCollectingModeStrategy.IDENTIFIER, path, field, run)
-
+                    SingleValueCollectingModeStrategy.IDENTIFIER, path, field, run
+            )
             for (int periodIndex = 0; periodIndex < run.periodCount; periodIndex++) {
                 ResultInfo info = new ResultInfo(path: fullPath, periodIndex: periodIndex)
                 if (periodIndex < periodDates.size()) {

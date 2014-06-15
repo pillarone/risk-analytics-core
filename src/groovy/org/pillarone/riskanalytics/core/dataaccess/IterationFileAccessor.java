@@ -13,7 +13,7 @@ public class IterationFileAccessor {
     protected int iteration;
     protected List<DateTimeValuePair> value;
 
-    // TODO try this approach from Bruce Eckel:
+    // TODO If this becomes perf bottleneck try this approach from Bruce Eckel:
     // http://www.java2s.com/Code/Java/File-Input-Output/Mappinganentirefileintomemoryforreading.htm
     //
     public IterationFileAccessor(File f) throws Exception {
@@ -28,7 +28,7 @@ public class IterationFileAccessor {
                 byte[] b = new byte[8048];
                 int len = -1;
                 int count = 0;
-                long t = System.currentTimeMillis();
+//                long t = System.currentTimeMillis();
                 while ((len = bs.read(b)) != -1) {
                     bos.write(b, 0, len);
                     count++;
@@ -43,7 +43,7 @@ public class IterationFileAccessor {
                 ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
 
                 dis = new DataInputStream(bis);
-                LOG.info("Timed " + (System.currentTimeMillis() - t) + "ms: Reading IFA: " + f.getAbsolutePath() );
+//                LOG.debug("Timed " + (System.currentTimeMillis() - t) + "ms: Reading IFA: " + f.getAbsolutePath() );
             }
             finally{ // joy of java lacking destructors
                 if(bs != null){
@@ -55,7 +55,7 @@ public class IterationFileAccessor {
             }
 
         }
-//        else {  Some dumb test depends on this not throwing
+//        else {  Some dumb test in ResultServiceTests.groovy depends on this not throwing
 //            throw new IllegalStateException("File not found: " + f.getAbsolutePath());
 //        }
 

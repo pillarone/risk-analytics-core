@@ -239,7 +239,7 @@ class ResultServiceTests {
 
         String regExcombinedPath = path1RegExName + ":" + field.fieldName
         List<ResultInfo> resultsWithRegEx = resultService.getResults(simulation.id, [regExcombinedPath])
-        assertEquals 3, resultsWithRegEx.size()
+        assertEquals 3, resultsWithRegEx.size() // TODO fix why this breaks if IFA.groovy ctor throws when file not found
 
         String combinedName1 = path1.pathName + ":" + field.fieldName
         String combinedName2 = path2.pathName + ":" + field.fieldName

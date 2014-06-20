@@ -42,7 +42,7 @@ abstract class ResultAccessor {
         return result
     }
 
-    static String exportCsv(SimulationRun simulationRun) {
+    static String exportCsv(SimulationRun simulationRun, Long maxLines = null, Long maxBytes = null ) {
         final CollectorMapping singleCollector = CollectorMapping.findByCollectorName(SingleValueCollectingModeStrategy.IDENTIFIER)
         if (singleCollector == null) {
             throw new IllegalStateException("collector_mapping named SINGLE not found")
@@ -54,6 +54,8 @@ abstract class ResultAccessor {
             csvFile.delete()
         }
 
+        int  linesWrote = 0;
+        long bytesWrote = 0;
         try {
             OutputStream csvOutputStream = null;
             try {
@@ -61,8 +63,7 @@ abstract class ResultAccessor {
                 List<ResultPathDescriptor> paths = getDistinctPaths(simulationRun) // gets timed but not significant
                 DateTimeFormatter formatter = DateTimeFormat.forPattern(Parameterization.PERIOD_DATE_FORMAT)
 
-//                long t = System.currentTimeMillis()
-                // Bottleneck - takes 16secs for 5 iterations (=> 4.5hrs for 5K iters ?)
+                // Bottleneck took 16secs for 5 iterations (=> 4.5hrs for 5K iters ?)
                 // File was being opened/closed for each line of csv output.
                 //
                 for (ResultPathDescriptor descriptor in paths) {
@@ -72,12 +73,19 @@ abstract class ResultAccessor {
                     IterationFileAccessor ifa = new IterationFileAccessor(new File(GridHelper.getResultPathLocation(simulationRun.id, descriptor.path.id, descriptor.field.id, descriptor.collector.id, descriptor.period)));
                     while (ifa.fetchNext()) {
                         for (DateTimeValuePair pair in ifa.getSingleValues()) {
-                            csvOutputStream.writeChars([ifa.iteration, descriptor.period, descriptor.path.pathName, descriptor.field.fieldName, pair.aDouble, descriptor.collector.collectorName, formatter.print(new DateTime(pair.dateTime))].join(",") + "\n")
+                            if( maxLines != null && ++linesWrote >= maxLines ){
+                                throw new IllegalStateException("CSV exceeds allowed number of lines ($maxLines)")
+                            }
+                            if( maxBytes != null && bytesWrote >= maxBytes){
+                                throw new IllegalStateException("CSV exceeds allowed file size ($maxBytes)")
+                            }
+                            String line = [ifa.iteration, descriptor.period, descriptor.path.pathName, descriptor.field.fieldName, pair.aDouble, descriptor.collector.collectorName, formatter.print(new DateTime(pair.dateTime))].join(",") + "\n"
+                            csvOutputStream.writeChars(line)
+                            bytesWrote += line.length()
                         }
                     }
                     ifa.close()
                 }
-//                LOG.debug("Timed ${System.currentTimeMillis() - t} ms: wrote ${paths.size()} paths to '${fileName}' (sim: ${simulationRun.name})");
                 return fileName
             }
             finally {
@@ -88,7 +96,7 @@ abstract class ResultAccessor {
         }
         catch(Exception ex){
             LOG.warn(ex);
-            throw new IllegalStateException(ex)
+            throw ex
         }
     }
 

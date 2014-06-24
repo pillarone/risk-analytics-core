@@ -1,10 +1,6 @@
 package models.dependingCore
-
 import models.core.CoreModel
 import org.joda.time.DateTime
-import org.pillarone.riskanalytics.core.packets.AggregatedExternalPacket
-
-import static org.junit.Assert.*
 import org.junit.Before
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
 import org.pillarone.riskanalytics.core.output.*
@@ -71,7 +67,7 @@ class DependingCoreModelTests extends ModelTest {
 
     @Override
     protected void prepareDataSource(ResultData dataSource) {
-        dataSource.load(ParameterizationHelper.collectDataSourceDefinitions(run.parameterization.parameterHolders), baseSimulation)
+        dataSource.load(ParameterizationHelper.collectDataSourceDefinitions(run.parameterization.allParameterHolders), baseSimulation)
     }
 
     @Override

@@ -332,7 +332,7 @@ class ParameterizationTests {
         parameterization.addParameter(newHolder)
 
         assertTrue parameterization.getParameters("path").size() > 0
-        newHolder.removed = true
+        parameterization.removeParameter(newHolder)
         assertFalse parameterization.getParameters("path").size() > 0
     }
 
@@ -601,7 +601,7 @@ class ParameterizationTests {
         def paramHolderSecond = new StringParameterHolder("path", 1, "INVALID")
         parameterization.addParameter(paramHolderFirst)
         parameterization.addParameter(paramHolderSecond)
-        ParameterHolder holder = parameterization.getParameterHoldersForFirstPeriod('path')
+        ParameterHolder holder = parameterization.getArbitraryParameterHolder('path')
         assertEquals(paramHolderFirst, holder)
     }
 
@@ -612,10 +612,10 @@ class ParameterizationTests {
         parameters << ParameterHolderFactory.getHolder("path", 2, ExampleParameterObjectClassifier.TYPE1.getParameterObject(["p1": 0, "p2": 0]))
         Parameterization parametrization = new Parameterization("")
         parameters.each { parametrization.addParameter(it) }
-        assert parametrization.getParameterHoldersForFirstPeriod("path:a").periodIndex == 0
-        assert parametrization.getParameterHoldersForFirstPeriod("path:b").periodIndex == 0
-        assert parametrization.getParameterHoldersForFirstPeriod("path:p1").periodIndex == 2
-        assert parametrization.getParameterHoldersForFirstPeriod("path:p2").periodIndex == 2
+        assert parametrization.getArbitraryParameterHolder("path:a").periodIndex == 0
+        assert parametrization.getArbitraryParameterHolder("path:b").periodIndex == 0
+        assert parametrization.getArbitraryParameterHolder("path:p1").periodIndex == 2
+        assert parametrization.getArbitraryParameterHolder("path:p2").periodIndex == 2
 
     }
 
@@ -626,7 +626,7 @@ class ParameterizationTests {
         def paramHolderSecond = new StringParameterHolder("path", 1, "INVALID")
         parameterization.addParameter(paramHolderFirst)
         parameterization.addParameter(paramHolderSecond)
-        ParameterHolder holder = parameterization.getParameterHoldersForFirstPeriod('notFound')
+        ParameterHolder holder = parameterization.getArbitraryParameterHolder('notFound')
     }
 
     private def createDao(Class modelClass, String daoName) {

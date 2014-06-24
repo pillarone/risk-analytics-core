@@ -5,11 +5,11 @@ import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
-import org.pillarone.riskanalytics.core.output.AggregatedCollectingModeStrategy
-import org.pillarone.riskanalytics.core.output.AggregatedWithSingleAvailableCollectingModeStrategy
-import org.pillarone.riskanalytics.core.output.CollectorMapping
-import org.pillarone.riskanalytics.core.output.SingleValueCollectingModeStrategy
+import org.pillarone.riskanalytics.core.output.*
+import org.pillarone.riskanalytics.core.output.aggregation.PacketAggregatorRegistry
 import org.pillarone.riskanalytics.core.parameter.comment.Tag
+import org.pillarone.riskanalytics.core.parameterization.validation.ValidatorRegistry
+import org.pillarone.riskanalytics.core.report.ReportRegistry
 import org.pillarone.riskanalytics.core.simulation.item.parameter.comment.EnumTagType
 import org.pillarone.riskanalytics.core.user.*
 import org.springframework.transaction.TransactionStatus
@@ -23,6 +23,7 @@ class CoreBootStrap {
 
     def init = { servletContext ->
 
+        registerStuff()
         //All mappings must be persistent before a simulation is started
         CollectorMapping.withTransaction { status ->
             CollectorMapping mapping = new CollectorMapping(collectorName: SingleValueCollectingModeStrategy.IDENTIFIER)
@@ -118,6 +119,14 @@ class CoreBootStrap {
         ParameterizationDAO.withTransaction { TransactionStatus status ->
             FileImportService.importModelsIfNeeded(models)
         }
+    }
+
+    void registerStuff() {
+        //in all registries there is done some work in a static block. Do it here once, to not slow down something at runtime (see PMO-2819)
+        CollectingModeFactory.availableStrategies
+        PacketAggregatorRegistry.allAggregators
+        ValidatorRegistry.validators
+        ReportRegistry.allReportModels
     }
 
     def destroy = {

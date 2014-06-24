@@ -6,6 +6,7 @@ import org.pillarone.riskanalytics.core.dataaccess.ResultAccessor
 import org.pillarone.riskanalytics.core.packets.AggregatedExternalPacket
 import org.pillarone.riskanalytics.core.packets.SingleExternalPacket
 import org.pillarone.riskanalytics.core.simulation.item.parameter.IntegerParameterHolder
+import org.pillarone.riskanalytics.core.test.TestUtils
 
 import static org.junit.Assert.*
 import org.junit.Before
@@ -75,14 +76,7 @@ class ResultDataTests {
     }
 
     private void writeResult(ResultWriter resultWriter, SingleValueResult result) {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        DataOutputStream dos = new DataOutputStream(bos);
-        dos.writeInt(result.iteration);
-        dos.writeInt(1);
-        dos.writeDouble(result.value);
-        dos.writeDouble(0);
-
-        resultWriter.writeResult(new ResultTransferObject(new ResultDescriptor(result.field.id, result.path.id, result.collector.id, result.period), null, bos.toByteArray(), 0));
+        TestUtils.writeResult(resultWriter, result)
     }
 
     private void writeResult(ResultWriter resultWriter, List<SingleValueResult> result) {
@@ -90,9 +84,10 @@ class ResultDataTests {
         DataOutputStream dos = new DataOutputStream(bos);
         dos.writeInt(result[0].iteration);
         dos.writeInt(result.size());
-        result.each {
+        result.eachWithIndex { it, index ->
             dos.writeDouble(it.value);
             dos.writeDouble(0);
+            dos.writeUTF("${result[0].iteration}|${index}")
         }
 
         resultWriter.writeResult(new ResultTransferObject(new ResultDescriptor(result[0].field.id, result[0].path.id, result[0].collector.id, result[0].period), null, bos.toByteArray(), 0));
@@ -159,15 +154,18 @@ class ResultDataTests {
         SingleExternalPacket value = values.find { it.iteration == 1 }
         assertEquals(100, value.getValues(field1.fieldName)[0].aDouble, 0)
         assertEquals(1000, value.getValues(field2.fieldName)[0].aDouble, 0)
+//        assertEquals("1|0", value.getValues(field2.fieldName)[0].packetId)
 
         value = values.find { it.iteration == 2 }
         assertEquals(200, value.getValues(field1.fieldName)[0].aDouble, 0)
         assertEquals(300, value.getValues(field1.fieldName)[1].aDouble, 0)
+        assertEquals("2|0", value.getValues(field1.fieldName)[0].packetId)
         assertEquals(2000, value.getValues(field2.fieldName)[0].aDouble, 0)
 
         value = values.find { it.iteration == 3 }
         assertEquals(300, value.getValues(field1.fieldName)[0].aDouble, 0)
         assertEquals(3000, value.getValues(field2.fieldName)[0].aDouble, 0)
+//        assertEquals("3|0", value.getValues(field2.fieldName)[0].packetId)
 
     }
 }

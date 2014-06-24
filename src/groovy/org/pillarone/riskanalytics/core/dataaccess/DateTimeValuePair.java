@@ -9,10 +9,12 @@ public class DateTimeValuePair {
 
     final long dateTime;
     final double aDouble;
+    final String packetId;
 
-    public DateTimeValuePair(long dateTime, double aDouble) {
+    public DateTimeValuePair(long dateTime, double aDouble, String packetId) {
         this.dateTime = dateTime;
         this.aDouble = aDouble;
+        this.packetId = packetId;
     }
 
     public long getDateTime() {
@@ -21,5 +23,9 @@ public class DateTimeValuePair {
 
     public double getaDouble() {
         return aDouble;
+    }
+
+    public String getPacketId() {
+        return packetId;
     }
 }

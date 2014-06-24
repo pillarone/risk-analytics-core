@@ -13,6 +13,7 @@ import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultDesc
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultTransferObject
 import org.pillarone.riskanalytics.core.simulation.engine.grid.output.ResultWriter
 import org.pillarone.riskanalytics.core.dataaccess.ResultAccessor
+import org.pillarone.riskanalytics.core.test.TestUtils
 
 import static org.junit.Assert.*
 
@@ -94,13 +95,7 @@ class CalculatorTests {
     }
 
     private void writeResult(SingleValueResult result) {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        DataOutputStream dos = new DataOutputStream(bos);
-        dos.writeInt(result.iteration);
-        dos.writeInt(1);
-        dos.writeDouble(result.value);
-        dos.writeLong(0);
-        resultWriter.writeResult(new ResultTransferObject(new ResultDescriptor(result.field.id, result.path.id, result.collector.id, result.period), null, bos.toByteArray(), 0));
+        TestUtils.writeResult(resultWriter, result)
     }
 
 }

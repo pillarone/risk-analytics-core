@@ -25,6 +25,8 @@ public class Packet implements Cloneable, Comparable {
 
     private DateTime date;
 
+    private String packetId;
+
     public Packet() {
     }
 
@@ -33,6 +35,15 @@ public class Packet implements Cloneable, Comparable {
         this.setSender(original.sender);
         this.setSenderChannelName(original.senderChannelName);
         this.id=id;
+        this.packetId = original.packetId;
+    }
+
+    public String getPacketId() {
+        return packetId;
+    }
+
+    public void setPacketId(String packetId) {
+        this.packetId = packetId;
     }
 
     @Override

@@ -16,7 +16,7 @@ import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationBlock
 import org.pillarone.riskanalytics.core.simulation.engine.id.IIdGenerator
-import org.pillarone.riskanalytics.core.simulation.engine.id.CountingIdGenerator
+import org.pillarone.riskanalytics.core.simulation.engine.id.IdGenerator
 import org.pillarone.riskanalytics.core.output.FileOutput
 
 /**
@@ -54,7 +54,7 @@ public class SimulationScope {
     ResultData resultDataSource
 
     SimulationScope() {
-        idGenerator = new CountingIdGenerator()
+        idGenerator = new IdGenerator(this)
     }
 
     public void setSimulation(Simulation simulation) {

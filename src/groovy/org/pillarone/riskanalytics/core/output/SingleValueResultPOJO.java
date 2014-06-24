@@ -19,6 +19,7 @@ public class SingleValueResultPOJO {
     private int valueIndex;
     private double value;
     private DateTime date;
+    private String packetId = "";
 
     @Override
     public String toString() {
@@ -105,5 +106,13 @@ public class SingleValueResultPOJO {
 
     public void setDate(DateTime date) {
         this.date = date;
+    }
+
+    public String getPacketId() {
+        return packetId;
+    }
+
+    public void setPacketId(String packetId) {
+        this.packetId = packetId;
     }
 }

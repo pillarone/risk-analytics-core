@@ -28,7 +28,7 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
      */
     protected List<SingleValueResultPOJO> createSingleValueResults(Packet packet, Map<String, Number> valueMap, int valueIndex, boolean crashSimOnError) {
         PeriodScope periodScope = packetCollector.getSimulationScope().getIterationScope().getPeriodScope();
-        return createSingleValueResults(valueMap, valueIndex, getPeriod(packet, periodScope), getDate(packet, periodScope), crashSimOnError);
+        return createSingleValueResults(valueMap, packet.getPacketId(), valueIndex, getPeriod(packet, periodScope), getDate(packet, periodScope), crashSimOnError);
     }
 
     /**
@@ -68,7 +68,7 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
      * The key of the value map is the field name.
      * If a value is infinite or NaN a log statement is created and the packet ignored.
      */
-    private List<SingleValueResultPOJO> createSingleValueResults(Map<String, Number> valueMap, int valueIndex, int period, DateTime date, boolean crashSimOnError) {
+    private List<SingleValueResultPOJO> createSingleValueResults(Map<String, Number> valueMap, String packetId, int valueIndex, int period, DateTime date, boolean crashSimOnError) {
         List<SingleValueResultPOJO> results = new ArrayList(valueMap.size());
         int iteration = packetCollector.getSimulationScope().getIterationScope().getCurrentIteration();
         PathMapping path = packetCollector.getSimulationScope().getMappingCache().lookupPath(packetCollector.getPath());
@@ -85,6 +85,7 @@ abstract public class AbstractCollectingModeStrategy implements ICollectingModeS
             result.setValueIndex(valueIndex);
             result.setValue(value);
             result.setDate(date);
+            result.setPacketId(packetId);
             results.add(result);
         }
         return results;

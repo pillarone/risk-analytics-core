@@ -59,7 +59,7 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
                 values = new ArrayList<IterationValue>();
                 singleResults.put(descriptor, values);
             }
-            values.add(new IterationValue(result.value, result.date != null ? result.date.millis : 0));
+            values.add(new IterationValue(result.value, result.date != null ? result.date.millis : 0L, result.packetId));
             resultCount++;
         }
 
@@ -76,6 +76,7 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
             for (IterationValue i: values) {
                 dos.writeDouble(i.value);
                 dos.writeLong(i.tstamp);
+                dos.writeUTF(i.packetId);
             }
 
         }
@@ -114,11 +115,14 @@ class GridOutputStrategy implements ICollectorOutputStrategy, Serializable {
 }
 
 class IterationValue {
-    public double value;
-    public long tstamp;
+    double value;
+    long tstamp;
 
-    public IterationValue(double value, long tstamp) {
+    String packetId
+
+    public IterationValue(double value, long tstamp, String packetId) {
         this.value = value;
         this.tstamp = tstamp;
+        this.packetId = packetId
     }
 }

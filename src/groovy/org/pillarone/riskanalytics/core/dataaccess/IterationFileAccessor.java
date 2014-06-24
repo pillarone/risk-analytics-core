@@ -79,7 +79,8 @@ public class IterationFileAccessor {
             for (int i = 0; i < len; i++) {
                 final double doubleValue = dis.readDouble();
                 final long dateTimeLong = dis.readLong();
-                DateTimeValuePair dateTimeValuePair = new DateTimeValuePair( dateTimeLong , doubleValue);
+                final String packetId = dis.readUTF();
+                DateTimeValuePair dateTimeValuePair = new DateTimeValuePair( dateTimeLong , doubleValue, packetId);
                 value.add(dateTimeValuePair);
             }
             return true;

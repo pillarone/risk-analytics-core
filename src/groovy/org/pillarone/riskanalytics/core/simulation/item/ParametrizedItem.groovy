@@ -72,7 +72,7 @@ abstract class ParametrizedItem extends CommentableItem {
     void removeComponent(String path) {
         Model model = (Model) modelClass.newInstance()
         String pathWithoutModel = ComponentUtils.removeModelFromPath(path, model)
-        for (ParameterHolder holder in notDeletedParameterHolders.findAll { ParameterHolder it -> it.path.startsWith(pathWithoutModel) }) {
+        for (ParameterHolder holder in allParameterHolders.findAll { ParameterHolder it -> !it.removed && it.path.startsWith(pathWithoutModel) }) {
             removeParameter(holder)
         }
         for (Comment comment in comments.findAll { Comment it -> it.path.startsWith(path) && !it.deleted }) {
@@ -207,7 +207,7 @@ abstract class ParametrizedItem extends CommentableItem {
         boolean isNested = nestedIndex > -1
         if (isNested) {
             String subPath = path.substring(0, nestedIndex)
-            List<ParameterHolder> findAll = notDeletedParameterHolders.findAll { ParameterHolder it -> it.path == subPath && it.periodIndex == periodIndex }
+            List<ParameterHolder> findAll = allParameterHolders.findAll { ParameterHolder it -> !it.removed && it.path == subPath && it.periodIndex == periodIndex }
             if (findAll.size() == 0) {
                 throw new ParameterNotFoundException("Parameter $path does not exist for period $periodIndex (base path $subPath not found)")
             }
@@ -215,22 +215,22 @@ abstract class ParametrizedItem extends CommentableItem {
                 //On Windoze I get this compile error, go figure:
                 //Fatal error during compilation org.apache.tools.ant.BuildException: BUG! exception in phase 'class generation' in source unit 'C:\dev\risk-analytics-core\src\groovy\org\pillarone\riskanalytics\core\simulation\item\ParametrizedItem.groovy' Trying to access private constant field [org.pillarone.riskanalytics.core.simulation.item.ModellingItem#LOG] from inner class
                 //findAll.each { LOG.warn( it.toString()) }
-                for(ParameterHolder it : findAll){
-                    LOG.warn( it.toString()) //So try it the old fashioned way
+                for (ParameterHolder it : findAll) {
+                    LOG.warn(it.toString()) //So try it the old fashioned way
                 }
                 throw new IllegalStateException("Found ${findAll.size()} 'not removed' parameters: PeriodIndex=$periodIndex, path=$path (subPath=$subPath)")
             }
             ParameterHolder parameterHolder = findAll.first()
             return getNestedParameterHolder(parameterHolder, path.substring(nestedIndex + 1).split(":"), periodIndex)
         } else {
-            List<ParameterHolder> findAll = notDeletedParameterHolders.findAll { ParameterHolder it -> it.path == path && it.periodIndex == periodIndex }
+            List<ParameterHolder> findAll = allParameterHolders.findAll { ParameterHolder it -> !it.removed && it.path == path && it.periodIndex == periodIndex }
             if (findAll.size() == 0) {
                 throw new ParameterNotFoundException("Parameter $path does not exist")
             }
             if (findAll.size() > 1) {
                 LOG.warn("List of ${findAll.size()} parameters for path: $path and periodIndex: $periodIndex: ");
-                for(ParameterHolder it : findAll){
-                    LOG.warn( it.toString()) //Again.. old fashioned way
+                for (ParameterHolder it : findAll) {
+                    LOG.warn(it.toString()) //Again.. old fashioned way
                 }
                 throw new IllegalStateException("Found ${findAll.size()} 'not removed' parameters: PeriodIndex=$periodIndex, path=$path")
             }
@@ -244,7 +244,7 @@ abstract class ParametrizedItem extends CommentableItem {
         boolean isNested = nestedIndex > -1
         if (isNested) {
             String subPath = path.substring(0, nestedIndex)
-            List<ParameterHolder> parameterHolders = notDeletedParameterHolders.findAll { ParameterHolder it -> it.path == subPath }
+            List<ParameterHolder> parameterHolders = allParameterHolders.findAll { ParameterHolder it -> !it.removed && it.path == subPath }
             if (parameterHolders.empty == 0) {
                 throw new ParameterNotFoundException("Parameter $path does not exist (base path $subPath not found)")
             }
@@ -257,7 +257,7 @@ abstract class ParametrizedItem extends CommentableItem {
             }
             return result
         } else {
-            Collection<ParameterHolder> parameterHolder = notDeletedParameterHolders.findAll { ParameterHolder it -> it.path == path }
+            Collection<ParameterHolder> parameterHolder = allParameterHolders.findAll { ParameterHolder it -> !it.removed && it.path == path }
             if (parameterHolder.empty) {
                 throw new ParameterNotFoundException("Parameter $path does not exist")
             }
@@ -265,25 +265,26 @@ abstract class ParametrizedItem extends CommentableItem {
         }
     }
 
-    ParameterHolder getParameterHoldersForFirstPeriod(String path) {
+    ParameterHolder getArbitraryParameterHolder(String path) {
         int nestedIndex = path.indexOf(":", path.indexOf(":parm") + 1)
         def isNested = nestedIndex > -1
-        String basePath = isNested ? path.substring(0, nestedIndex) : path
-        Integer minimalPeriodIndex = notDeletedParameterHolders.findAll { ParameterHolder it ->
-            boolean fits = it.path == basePath
-            //check if holder has correct classifiers
-            if (isNested) {
-                fits &= hasParameterAtPath(path, it.periodIndex)
+        if (isNested) {
+            String basePath = path.substring(0, nestedIndex)
+            ParameterHolder firstFound = allParameterHolders.find { ParameterHolder it ->
+                !it.removed && it.path == basePath && hasParameterAtPath(path, it.periodIndex)
             }
-            fits
-
-        }.periodIndex.min()
-        if (minimalPeriodIndex == null) {
-            throw new ParameterNotFoundException("No parameter found for path $path")
+            if (firstFound == null) {
+                throw new ParameterNotFoundException("No parameter found for path $path")
+            }
+            return getNestedParameterHolder(firstFound, path.substring(nestedIndex + 1).split(':'), firstFound.periodIndex)
+        } else {
+            ParameterHolder parameterHolder = allParameterHolders.find { ParameterHolder it -> !it.removed && it.path == path }
+            if (!parameterHolder) {
+                throw new ParameterNotFoundException("Parameter $path does not exist")
+            }
+            return parameterHolder
         }
-        getParameterHolder(path, minimalPeriodIndex)
     }
-
 
     boolean hasParameterAtPath(String path) { //TODO improve?
         try {

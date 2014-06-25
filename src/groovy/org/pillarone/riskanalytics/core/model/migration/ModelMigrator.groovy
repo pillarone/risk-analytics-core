@@ -82,7 +82,8 @@ public class ModelMigrator {
                     }
 
                     parameterization.load()
-                    parameterization.parameterHolders*.removed = true
+
+                    parameterization.allParameterHolders.each {parameterization.removeParameter(it)}
                     newParameters.each { parameterization.addParameter(it) }
                     parameterization.modelVersionNumber = migration.to
                     parameterization.save()

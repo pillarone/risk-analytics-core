@@ -67,7 +67,7 @@ class DependingCoreModelTests extends ModelTest {
 
     @Override
     protected void prepareDataSource(ResultData dataSource) {
-        dataSource.load(ParameterizationHelper.collectDataSourceDefinitions(run.parameterization.parameterHolders), baseSimulation)
+        dataSource.load(ParameterizationHelper.collectDataSourceDefinitions(run.parameterization.allParameterHolders), baseSimulation)
     }
 
     @Override

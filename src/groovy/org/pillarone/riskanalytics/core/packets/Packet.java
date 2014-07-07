@@ -25,7 +25,7 @@ public class Packet implements Cloneable, Comparable {
 
     private DateTime date;
 
-    private String packetId;
+    private String packetId = "";
 
     public Packet() {
     }

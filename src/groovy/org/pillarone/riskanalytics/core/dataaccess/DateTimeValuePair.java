@@ -1,7 +1,5 @@
 package org.pillarone.riskanalytics.core.dataaccess;
 
-import org.joda.time.DateTime;
-
 /**
  * author simon.parten @ art-allianz . com
  */
@@ -27,5 +25,14 @@ public class DateTimeValuePair {
 
     public String getPacketId() {
         return packetId;
+    }
+
+    @Override
+    public String toString() {
+        return "DateTimeValuePair{" +
+            "dateTime=" + dateTime +
+            ", aDouble=" + aDouble +
+            ", packetId='" + packetId + '\'' +
+            '}';
     }
 }

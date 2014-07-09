@@ -1,8 +1,8 @@
 package org.pillarone.riskanalytics.core.simulation.engine.grid;
 
-import grails.plugin.springsecurity.SpringSecurityUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.MDC;
 import org.gridgain.grid.*;
 import org.joda.time.DateTime;
 import org.pillarone.riskanalytics.core.cli.ImportStructureInTransaction;
@@ -57,7 +57,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
             throws GridException {
         try {
             this.simulationConfiguration = simulationConfiguration;
-            logInOwnerOfSimulation();
+            initMDCForLogging();
             INodeMappingStrategy strategy = AbstractNodeMappingStrategy.getStrategy();
             List<GridNode> nodes = new ArrayList<GridNode>(strategy.filterNodes(subgrid));
             if (nodes.isEmpty()) {
@@ -159,17 +159,18 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         }
     }
 
-    private void logInOwnerOfSimulation() {
+    private void initMDCForLogging() {
         String username = simulationConfiguration.getUsername();
         if (username != null) {
-            SpringSecurityUtils.reauthenticate(username, null);
+            MDC.put("username", username);
         }
+        MDC.put("simulation", simulationConfiguration.getSimulation().getParameterization().getNameAndVersion());
     }
 
     @SuppressWarnings({"ThrowableInstanceNeverThrown"})
     public Object reduce(List<GridJobResult> gridJobResults) {
         try {
-            logInOwnerOfSimulation();
+            initMDCForLogging();
             int totalMessageCount = 0;
             int periodCount = 1;
             int completedIterations = 0;

@@ -64,7 +64,8 @@ class ResultData {
             for(int period in definition.periods) {
 
                 Map<IterationPathPair, ExternalPacket> packets = [:]
-
+                definition.fields << "startDateForPatterns"
+                definition.fields << "occurrenceDate"
                 for(String field in definition.fields) {
                     try {
                         long time = System.currentTimeMillis()

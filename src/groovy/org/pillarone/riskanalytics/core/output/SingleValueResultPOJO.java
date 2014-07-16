@@ -24,7 +24,8 @@ public class SingleValueResultPOJO {
     @Override
     public String toString() {
         StringBuffer buffer = new StringBuffer();
-        buffer.append("Period: ");
+        buffer.append(packetId);
+        buffer.append(", period: ");
         buffer.append(period);
         buffer.append("> ");
         buffer.append(value);

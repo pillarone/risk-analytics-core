@@ -29,6 +29,10 @@ class ModelHelper {
     private static final String CEDED_RESERVE_RISK_BASE = 'cededReserveRiskBase'
     private static final String CEDED_PREMIUM_RISK_BASE = 'cededPremiumRiskBase'
     private static final String CEDED_PREMIUM_AND_RESERVE_RISK_BASE = "cededPremiumAndReserveRiskBase";
+
+    private static final String OCCURRENCE_DATE = "occurrenceDate";
+    private static final String START_DATE_FOR_PATTERNS = "startDateForPatterns";
+
     private static final String PERILS = "claimsGenerators"
     private static final String RESERVES = "reservesGenerators"
     private static final String CONTRACTS = "reinsuranceContracts"
@@ -69,6 +73,8 @@ class ModelHelper {
             results.add(CEDED_PREMIUM_RISK_BASE)
             results.add(CEDED_PREMIUM_AND_RESERVE_RISK_BASE)
         }
+        results.add(START_DATE_FOR_PATTERNS)
+        results.add(OCCURRENCE_DATE)
         return results
     }
 

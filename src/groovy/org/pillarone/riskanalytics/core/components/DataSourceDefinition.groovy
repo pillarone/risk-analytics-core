@@ -9,8 +9,8 @@ class DataSourceDefinition {
 
     Parameterization parameterization
     String path
-    List<String> fields = []
-    List<Integer> periods = []
+    Set<String> fields = []
+    Set<Integer> periods = []
     String collectorName
 
     DataSourceDefinition() {

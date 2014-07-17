@@ -1,10 +1,8 @@
 package org.pillarone.riskanalytics.core.simulation.engine
-
 import org.gridgain.grid.Grid
 import org.gridgain.grid.GridTaskFuture
 import org.gridgain.grid.typedef.CI1
 import org.pillarone.riskanalytics.core.simulation.SimulationState
-import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationHandler
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.user.UserManagement
 
@@ -45,14 +43,13 @@ class SimulationQueueService {
         taskListener = null
     }
 
-    SimulationHandler offer(SimulationConfiguration configuration, int priority = 10) {
+    void offer(SimulationConfiguration configuration, int priority = 10) {
         preConditionCheck(configuration)
         synchronized (lock) {
             QueueEntry queueEntry = new QueueEntry(configuration, priority, currentUser)
             configuration.username = currentUser?.username
             queue.offer(queueEntry)
             notifyOffered(queueEntry)
-            new SimulationHandler(queueEntry.simulationTask, queueEntry.id)
         }
     }
 
@@ -83,8 +80,8 @@ class SimulationQueueService {
     List<QueueEntry> getQueueEntriesIncludingCurrentTask() {
         synchronized (lock) {
             List<QueueEntry> allEntries = queue.toArray().toList() as List<QueueEntry>
-            if( currentTask ){
-                allEntries.add(0,currentTask.entry) // PMO-2797 want current task checked first (in case: almost done)
+            if (currentTask) {
+                allEntries.add(0, currentTask.entry) // PMO-2797 want current task checked first (in case: almost done)
             }
             allEntries
         }

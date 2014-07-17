@@ -143,7 +143,7 @@ class StatusChangeService {
         }
 
         def newId = newItem.save()
-        newItem.load()
+//        newItem.load() not needed after a save
         return newItem
     }
 

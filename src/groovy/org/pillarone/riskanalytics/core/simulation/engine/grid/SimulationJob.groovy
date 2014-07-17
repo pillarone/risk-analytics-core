@@ -2,6 +2,7 @@ package org.pillarone.riskanalytics.core.simulation.engine.grid
 
 import grails.util.Holders
 import groovy.transform.CompileStatic
+import org.apache.log4j.MDC
 import org.codehaus.groovy.grails.commons.DefaultGrailsApplication
 import org.gridgain.grid.GridJobAdapterEx
 import org.joda.time.DateTimeZone
@@ -39,6 +40,7 @@ class SimulationJob extends GridJobAdapterEx {
         Date start = new Date()
 
         try {
+            initMDCForLogging()
             initSpringContext()
 /** Setting the default time zone to UTC avoids problems in multi user context with different time zones
  *  and switches off daylight saving capabilities and possible related problems.                */
@@ -103,5 +105,13 @@ class SimulationJob extends GridJobAdapterEx {
             grailsApplication.mainContext = ctx
             Holders.grailsApplication = grailsApplication
         }
+    }
+
+    private void initMDCForLogging() {
+        String username = simulationConfiguration.username
+        if (username != null) {
+            MDC.put("username", username)
+        }
+        MDC.put('simulation', simulationConfiguration.simulation.parameterization.nameAndVersion)
     }
 }

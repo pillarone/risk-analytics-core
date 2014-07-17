@@ -31,6 +31,6 @@ class ModelHelperTests {
         assertEquals 6, paths.size()
         assertTrue paths.any { it.contains("hierarchyLevel") }
 
-        assertEquals 0, ModelHelper.getAllPossibleFields(coreModel, false).size()
+        assertEquals 0, ModelHelper.getAllPossibleFields(coreModel, false, false).size()
     }
 }

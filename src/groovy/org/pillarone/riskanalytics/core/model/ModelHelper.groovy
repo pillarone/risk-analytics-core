@@ -52,7 +52,7 @@ class ModelHelper {
      * @param model A model with all parameters injected
      * @return All possible fields
      */
-    public static Set<String> getAllPossibleFields(Model model, boolean includePremiumReserveRisk) {
+    public static Set<String> getAllPossibleFields(Model model, boolean includePremiumReserveRisk, boolean mapExtraDateFields) {
         Set<String> results = []
         model.properties.each { String key, value ->
             if (value instanceof Component) {
@@ -73,8 +73,10 @@ class ModelHelper {
             results.add(CEDED_PREMIUM_RISK_BASE)
             results.add(CEDED_PREMIUM_AND_RESERVE_RISK_BASE)
         }
-        results.add(START_DATE_FOR_PATTERNS)
-        results.add(OCCURRENCE_DATE)
+        if (mapExtraDateFields) {
+            results.add(START_DATE_FOR_PATTERNS)
+            results.add(OCCURRENCE_DATE)
+        }
         return results
     }
 

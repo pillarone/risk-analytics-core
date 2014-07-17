@@ -7,6 +7,7 @@ import org.pillarone.riskanalytics.core.parameter.DataSourceParameter
 
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotNull
+import static org.junit.Assert.assertTrue
 
 
 class DataSourceDefinitionParameterHolderTests {
@@ -40,8 +41,8 @@ class DataSourceDefinitionParameterHolderTests {
         assertEquals("target", newParameter.parameterizationName)
         assertEquals("2", newParameter.parameterizationVersion)
         assertEquals(CoreModel.name, newParameter.modelClassName)
-        assertEquals("a|b", newParameter.fields)
-        assertEquals("0|1", newParameter.periods)
+        assertTrue("fields", newParameter.fields.contains('a') && newParameter.fields.contains('b') && newParameter.fields.contains('|'))
+        assertTrue("periods", newParameter.periods.contains('0') && newParameter.periods.contains('1') && newParameter.periods.contains('|'))
         assertEquals("collector", newParameter.collectorName)
     }
 

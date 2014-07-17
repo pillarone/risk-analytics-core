@@ -114,8 +114,9 @@ public class SimulationConfiguration implements Serializable, Cloneable {
             paths.addAll(inceptionPeriodPaths)
             Set<String> typeDrillDownPaths = getPotentialTypeDrillDowns(drillDownCollectors)
             paths.addAll(typeDrillDownPaths)
-
-            Set fields = ModelHelper.getAllPossibleFields(model, !inceptionPeriodPaths.empty)
+            // todo: cleaner, generic concept required, collectors need to be able to register additional fields (similar functionality in ResultData required)
+            boolean mapExtraDateFields = resultConfiguration.collectors.mode.identifier.contains("QUEUED_SIMULATION_PAID_ULTIMATE")
+            Set fields = ModelHelper.getAllPossibleFields(model, !inceptionPeriodPaths.empty, mapExtraDateFields)
             MappingCache cache = MappingCache.instance
 
             for (String path in paths) {

@@ -1,6 +1,7 @@
 package org.pillarone.riskanalytics.core.parameterization
 
 import org.joda.time.DateTime
+import org.pillarone.riskanalytics.core.components.DataSourceDefinition
 import org.pillarone.riskanalytics.core.util.IConfigObjectWriter
 import org.pillarone.riskanalytics.core.components.ResourceHolder
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
@@ -111,6 +112,26 @@ class ParameterWriter implements IConfigObjectWriter {
         } else {
             out << "new ${ResourceHolder.name}(${value.resourceClass.name})"
         }
+    }
+
+    private void appendValue(BufferedWriter out, DataSourceDefinition value) {
+        out << "new ${DataSourceDefinition.name}("
+        out << "'${value.parameterization.name}', "
+        out << "'${value.parameterization.versionNumber}', "
+        out << "${value.parameterization.modelClass.name}, "
+        out << "'${value.path}', "
+        out << "["
+        for(String field in value.fields) {
+            out << "'${field}', "
+        }
+        out << "], "
+        out << "["
+        for(Integer period in value.periods) {
+            out << "${period}, "
+        }
+        out << "], "
+        out << "'${value.collectorName}'"
+        out << ")"
     }
 
     private void appendValue(BufferedWriter out, Object value) {

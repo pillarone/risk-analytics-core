@@ -29,6 +29,12 @@ class DataSourceDefinition {
     @Override
     boolean equals(Object obj) {
         if (obj instanceof DataSourceDefinition) {
+
+            //TODO: gridgain serialization requires this...
+            if(path == null) {
+                return super.equals(obj)
+            }
+
             return new EqualsBuilder()
                     .append(parameterization.nameAndVersion, obj.parameterization.nameAndVersion)
                     .append(parameterization.modelClass, obj.parameterization.modelClass)
@@ -43,9 +49,15 @@ class DataSourceDefinition {
 
     @Override
     int hashCode() {
-        return new HashCodeBuilder().append(parameterization?.nameAndVersion).append(parameterization?.modelClass)
-                .append(path).append(fields?.toArray())
-                .append(periods?.toArray()).append(collectorName).toHashCode()
+
+        //TODO: gridgain serialization requires this...
+        if(path == null) {
+            return super.hashCode()
+        }
+
+        return new HashCodeBuilder().append(parameterization.nameAndVersion).append(parameterization.modelClass)
+                .append(path).append(fields.toArray())
+                .append(periods.toArray()).append(collectorName).toHashCode()
     }
 
     @Override

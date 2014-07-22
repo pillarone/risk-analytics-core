@@ -59,4 +59,17 @@ class DataSourceParameterHolder extends ParameterHolder {
     Parameter createEmptyParameter() {
         return new DataSourceParameter(path: path, periodIndex: periodIndex)
     }
+
+    @Override
+    Object clone() {
+        DataSourceParameterHolder clone = super.clone()
+
+        Parameterization sourceParametrization = definition.parameterization
+        clone.definition = new DataSourceDefinition(
+                sourceParametrization.name, sourceParametrization.versionNumber.toString(), sourceParametrization.modelClass,
+                definition.path, new ArrayList<String>(definition.fields), new ArrayList<Integer>(definition.periods),
+                definition.collectorName
+        )
+        return clone
+    }
 }

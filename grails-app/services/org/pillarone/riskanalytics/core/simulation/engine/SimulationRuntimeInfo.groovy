@@ -1,6 +1,8 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
 import com.google.common.base.Preconditions
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 import org.joda.time.DateTime
 import org.joda.time.Period
 import org.joda.time.PeriodType
@@ -11,6 +13,9 @@ import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.user.Person
 
 class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo> {
+
+    private static final Log LOG = LogFactory.getLog(SimulationRuntimeInfo)
+
     private Simulation simulation
     private Integer priority
     private Date offeredAt
@@ -108,6 +113,7 @@ class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo> {
             changed = true
         }
         if (progress != entry.simulationTask.progress) {
+            LOG.debug("progress changed from $progress to ${entry.simulationTask.progress}")
             progress = entry.simulationTask.progress
             changed = true
         }

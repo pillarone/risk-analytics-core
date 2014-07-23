@@ -57,6 +57,7 @@ class SimulationRuntimeService {
             public void run() {
                 if (running != null) {
                     if (running.apply(runningEntry)) {
+                        log.debug("applying $runningEntry to $running")
                         changed(running)
                     }
                 }

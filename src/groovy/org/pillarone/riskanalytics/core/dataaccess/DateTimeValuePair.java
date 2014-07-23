@@ -2,10 +2,12 @@ package org.pillarone.riskanalytics.core.dataaccess;
 
 import org.joda.time.DateTime;
 
+import java.io.Serializable;
+
 /**
  * author simon.parten @ art-allianz . com
  */
-public class DateTimeValuePair {
+public class DateTimeValuePair implements Serializable {
 
     final long dateTime;
     final double aDouble;

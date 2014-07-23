@@ -19,7 +19,7 @@ import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 
-class ResultData {
+class ResultData implements Serializable {
 
     private static final Log LOG = LogFactory.getLog(ResultData)
 

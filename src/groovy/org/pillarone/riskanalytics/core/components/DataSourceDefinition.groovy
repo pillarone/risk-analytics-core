@@ -5,7 +5,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
 
-class DataSourceDefinition {
+class DataSourceDefinition implements Serializable{
 
     Parameterization parameterization
     String path

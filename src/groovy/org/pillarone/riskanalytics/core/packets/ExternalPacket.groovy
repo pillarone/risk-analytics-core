@@ -4,7 +4,7 @@ import groovy.transform.CompileStatic
 import org.pillarone.riskanalytics.core.components.DataSourceDefinition
 
 @CompileStatic
-abstract class ExternalPacket extends Packet {
+abstract class ExternalPacket extends Packet implements Serializable {
 
     DataSourceDefinition basedOn
 

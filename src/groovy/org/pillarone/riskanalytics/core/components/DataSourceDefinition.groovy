@@ -36,11 +36,11 @@ class DataSourceDefinition implements Serializable{
             }
 
             return new EqualsBuilder()
-                    .append(parameterization.nameAndVersion, obj.parameterization.nameAndVersion)
-                    .append(parameterization.modelClass, obj.parameterization.modelClass)
-                    .append(path, obj.path)
-                    .append(fields.toArray(), obj.fields.toArray())
-                    .append(periods.toArray(), obj.periods.toArray())
+                    .append(parameterization?.nameAndVersion, obj.parameterization?.nameAndVersion)
+                    .append(parameterization?.modelClass, obj.parameterization?.modelClass)
+                    .append(path, obj?.path)
+                    .append(fields?.toArray(), obj.fields?.toArray())
+                    .append(periods?.toArray(), obj.periods?.toArray())
                     .append(collectorName, obj.collectorName).equals
         }
 

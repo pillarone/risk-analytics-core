@@ -151,6 +151,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
             simulationConfiguration.getSimulation().save();
             return jobsToNodes;
         } catch (Exception e) {
+            getSimulation().delete();
             simulationErrors.add(e);
             if (!cancelled) {
                 setSimulationState(SimulationState.ERROR);
@@ -241,6 +242,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
             LOG.info("Task completed in " + (System.currentTimeMillis() - time) + "ms");
             return true;
         } catch (Exception e) {
+            getSimulation().delete();
             simulationErrors.add(e);
             if (!cancelled) {
                 setSimulationState(SimulationState.ERROR);

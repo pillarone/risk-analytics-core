@@ -255,6 +255,8 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
 
     public synchronized void onMessage(Object serializable) {
         ResultTransferObject result = (ResultTransferObject) serializable;
+        LOG.debug("got result from resultTransferListener: " + result.getProgress() + "Will now write result ....");
+        long before = System.currentTimeMillis();
         if (!jobIds.contains(result.getJobIdentifier())) {
             return;
         }
@@ -264,7 +266,8 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         PathMapping pm = simulationConfiguration.getMappingCache().lookupPath(rd.getPath());
         rd.setPathId(pm.pathID());
         resultWriter.writeResult(result);
-        LOG.debug("got result from resultTransferListener: " + result.getProgress());
+        long diff = System.currentTimeMillis() - before;
+        LOG.debug("wrote result in " + diff + " ms");
         progress.put(result.getJobIdentifier(), result.getProgress());
         notify();
     }

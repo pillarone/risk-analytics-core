@@ -209,6 +209,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
                         Thread.currentThread().interrupt();
                         break;
                     }
+                    LOG.debug("got new message. messageCount: " + messageCount.get() + "/totalMessageCount: " + totalMessageCount);
                     if (System.currentTimeMillis() - timeout > MESSAGE_TIMEOUT) {
                         error = true;
                         simulationErrors.add(new TimeoutException("Not all messages received - timeout reached"));
@@ -263,6 +264,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         PathMapping pm = simulationConfiguration.getMappingCache().lookupPath(rd.getPath());
         rd.setPathId(pm.pathID());
         resultWriter.writeResult(result);
+        LOG.debug("got result from resultTransferListener: " + result.getProgress());
         progress.put(result.getJobIdentifier(), result.getProgress());
         notify();
     }

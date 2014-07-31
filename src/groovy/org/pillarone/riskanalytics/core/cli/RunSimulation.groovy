@@ -10,8 +10,6 @@ import org.pillarone.riskanalytics.core.initialization.StandaloneConfigLoader
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationRunner
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
-import org.quartz.SchedulerException
-import org.quartz.impl.StdSchedulerFactory
 import org.springframework.context.support.AbstractApplicationContext
 
 public class RunSimulation {
@@ -74,11 +72,7 @@ public class RunSimulation {
     private static void shutdown(IExternalDatabaseSupport databaseSupport) {
         AbstractApplicationContext applicationContext = (AbstractApplicationContext) Holders.getGrailsApplication().getMainContext();
         applicationContext.close();
-        try {
-            StdSchedulerFactory.getDefaultScheduler().shutdown();
-        } catch (SchedulerException e) {
-            LOG.warn("Error shutting down quartz scheduler", e);
-        }
+
         if (databaseSupport != null) {
             databaseSupport.stopDatabase();
         }

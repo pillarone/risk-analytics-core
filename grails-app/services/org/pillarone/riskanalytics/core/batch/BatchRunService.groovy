@@ -1,17 +1,18 @@
 package org.pillarone.riskanalytics.core.batch
 
-import org.pillarone.riskanalytics.core.SimulationProfileDAO
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationQueueService
 import org.pillarone.riskanalytics.core.simulation.item.*
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
+import org.pillarone.riskanalytics.core.simulationprofile.SimulationProfileService
 
 import java.text.SimpleDateFormat
 
 class BatchRunService {
 
     SimulationQueueService simulationQueueService
+    SimulationProfileService simulationProfileService
 
     private static
     final String BATCH_SIMNAME_STAMP_FORMAT = System.getProperty("BatchRunService.BATCH_SIMNAME_STAMP_FORMAT", "yyyyMMdd HH:mm:ss z")
@@ -26,7 +27,7 @@ class BatchRunService {
     }
 
     private List<Simulation> createSimulations(Batch batch) {
-        Map<Class, SimulationProfile> byModelClass = getSimulationProfilesGroupedByModelClass(batch.simulationProfileName)
+        Map<Class, SimulationProfile> byModelClass = simulationProfileService.getSimulationProfilesGroupedByModelClass(batch.simulationProfileName)
         batch.parameterizations.collect {
             createSimulation(it, byModelClass[it.modelClass], batch)
         }
@@ -102,27 +103,6 @@ class BatchRunService {
         }
         simulation.save()
         return simulation
-    }
-
-    Map<Class, SimulationProfile> getSimulationProfilesGroupedByModelClass(String simulationProfileName) {
-        Map<Class, SimulationProfile> result = [:]
-        SimulationProfileDAO.findAllByName(simulationProfileName).collect {
-            SimulationProfile simulationProfile = new SimulationProfile(it.name, getClass().classLoader.loadClass(it.modelClassName))
-            simulationProfile.load()
-            simulationProfile
-        }.each {
-            result[it.modelClass] = it
-        }
-        result
-    }
-
-    List<String> getSimulationProfileNames() {
-        SimulationProfileDAO.createCriteria().list {
-            projections {
-                property('name')
-            }
-            order('name')
-        }.unique()
     }
 
     Simulation findSimulation(Batch batch, Parameterization parameterization) {

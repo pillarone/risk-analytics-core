@@ -7,6 +7,7 @@ import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.BatchRun
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.ResourceDAO
+import org.pillarone.riskanalytics.core.SimulationProfileDAO
 import org.pillarone.riskanalytics.core.modellingitem.*
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.output.SimulationRun
@@ -83,6 +84,9 @@ class CacheItemSearchService {
                 cache.add(CacheItemMapper.getModellingItem(dao))
             }
             for (BatchRun dao in BatchRun.list()) {
+                cache.add(CacheItemMapper.getModellingItem(dao))
+            }
+            for (SimulationProfileDAO dao in SimulationProfileDAO.list()) {
                 cache.add(CacheItemMapper.getModellingItem(dao))
             }
         }

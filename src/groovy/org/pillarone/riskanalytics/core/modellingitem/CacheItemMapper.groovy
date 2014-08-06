@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList
 import org.pillarone.riskanalytics.core.BatchRun
 import org.pillarone.riskanalytics.core.ParameterizationDAO
 import org.pillarone.riskanalytics.core.ResourceDAO
+import org.pillarone.riskanalytics.core.SimulationProfileDAO
 import org.pillarone.riskanalytics.core.output.ResultConfigurationDAO
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.item.VersionNumber
@@ -82,6 +83,25 @@ class CacheItemMapper {
                             dao.randomSeed
                     )
         }
+    }
+
+    static SimulationProfileCacheItem getModellingItem(SimulationProfileDAO dao, boolean forDeletion = false) {
+        checkForId(dao)
+        def modelClass = CacheItemMapper.classLoader.loadClass(dao.modelClassName)
+        forDeletion ? new SimulationProfileCacheItem(dao.id, dao.name, modelClass) :
+                new SimulationProfileCacheItem(
+                        dao.id,
+                        dao.creationDate,
+                        dao.modificationDate,
+                        dao.creator,
+                        dao.lastUpdater,
+                        dao.name,
+                        modelClass,
+                        dao.randomSeed,
+                        dao.numberOfIterations,
+                        dao.forPublic,
+                        getModellingItem(dao.template)
+                )
     }
 
     static ResourceCacheItem getModellingItem(ResourceDAO detachedDao, boolean forDeletion = false) {

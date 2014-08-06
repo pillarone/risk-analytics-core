@@ -22,7 +22,7 @@ class SimulationQueueService {
     private Timer pollingTimer
 
     @Delegate
-    private SimulationQueueNotifyingSupport support = new SimulationQueueNotifyingSupport()
+    private QueueNotifyingSupport support = new QueueNotifyingSupport()
 
     @PostConstruct
     private void initialize() {

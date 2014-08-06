@@ -49,7 +49,7 @@ abstract class BatchRunTest extends ModelTest {
     }
 
 
-    static class MyListener implements ISimulationQueueListener {
+    static class MyListener implements QueueListener<QueueEntry> {
         CountDownLatch latch = new CountDownLatch(1)
 
         List<QueueEntry> offered = []

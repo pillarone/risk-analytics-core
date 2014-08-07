@@ -52,7 +52,9 @@ Persistence & Simulation engine.
     }
 
     def doWithSpring = {
-        uploadStrategy(LogOnlyUploadStrategy)
+        uploadStrategy(LogOnlyUploadStrategy) {
+            backgroundService = ref('backgroundService')
+        }
         ConfigObject config = application.config
 
         traceLogManager(TraceLogManager)

@@ -1,49 +1,53 @@
 package org.pillarone.riskanalytics.core.upload
 
+import java.util.concurrent.CopyOnWriteArraySet
+
 class BasicUploadFuture implements IUploadFuture {
 
-    private IUploadTaskListener taskListener
     private UploadResult uploadResult
     private volatile boolean canceled = false
+    private final Set<IUploadTaskListener> taskListeners = new CopyOnWriteArraySet<IUploadTaskListener>()
 
 
     @Override
     void cancel() {
         canceled = true
         uploadResult = new UploadResult(uploadState: UploadState.CANCELED)
-        notifyUploadListener()
+        notifyUploadListeners()
     }
 
     void failed(List<String> errors) {
         uploadResult = new UploadResult(uploadState: UploadState.ERROR, errors: errors)
-        notifyUploadListener()
+        notifyUploadListeners()
     }
 
     void done() {
         uploadResult = new UploadResult(uploadState: UploadState.DONE)
-        notifyUploadListener()
+        notifyUploadListeners()
     }
 
-    private notifyUploadListener() {
-        taskListener.apply(this)
+    private notifyUploadListeners() {
+        synchronized (taskListeners) {
+            taskListeners.each { it.apply(this) }
+        }
     }
 
     boolean getCanceled() {
-        return canceled
+        canceled
     }
 
     @Override
     UploadResult getUploadResult() {
-        return uploadResult
+        uploadResult
     }
 
     @Override
     void stopListenAsync(IUploadTaskListener uploadTaskListener) {
-        taskListener = null
+        taskListeners.remove(uploadTaskListener)
     }
 
     @Override
     void listenAsync(IUploadTaskListener uploadTaskListener) {
-        taskListener = uploadTaskListener
+        taskListeners.add(uploadTaskListener)
     }
 }

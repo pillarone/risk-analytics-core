@@ -1,5 +1,8 @@
 package org.pillarone.riskanalytics.core.queue
 
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
+
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 
@@ -7,6 +10,9 @@ import javax.annotation.PreDestroy
  * holds runtime information about running, queued and finished simulations.
  */
 abstract class AbstractRuntimeService<Q extends IQueueEntry, T extends IRuntimeInfo<Q>> {
+
+    private static final Log LOG = LogFactory.getLog(AbstractQueueService)
+
     protected final List<T> finished = []
     protected final Map<UUID, T> queuedMap = [:]
     protected T running
@@ -66,7 +72,7 @@ abstract class AbstractRuntimeService<Q extends IQueueEntry, T extends IRuntimeI
             public void run() {
                 if (running != null) {
                     if (running.apply(runningEntry)) {
-                        AbstractRuntimeService.log.debug("applying $runningEntry to $running")
+                        LOG.debug("applying $runningEntry to $running")
                         changed(running)
                     }
                 }

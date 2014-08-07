@@ -14,7 +14,6 @@ import org.pillarone.riskanalytics.core.remoting.IResultService
 import org.pillarone.riskanalytics.core.remoting.ITransactionService
 import org.pillarone.riskanalytics.core.remoting.impl.ResultService
 import org.pillarone.riskanalytics.core.simulation.engine.MappingCache
-import org.pillarone.riskanalytics.core.upload.IUploadStrategy
 import org.pillarone.riskanalytics.core.upload.LogOnlyUploadStrategy
 import org.pillarone.riskanalytics.core.util.GrailsConfigValidator
 import org.springframework.remoting.rmi.RmiProxyFactoryBean

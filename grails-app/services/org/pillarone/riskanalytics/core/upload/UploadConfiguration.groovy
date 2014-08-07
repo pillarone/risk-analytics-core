@@ -4,9 +4,17 @@ import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
 class UploadConfiguration {
 
-    UploadConfiguration(Simulation simulation) {
+    final String username
+    final String destination
+    final boolean allowOverwrite
+    final Simulation simulation
+
+    UploadConfiguration(Simulation simulation, boolean allowOverwrite, String destination, String username) {
         this.simulation = simulation
+        this.allowOverwrite = allowOverwrite
+        this.destination = destination
+        this.username = username
     }
 
-    final Simulation simulation
+
 }

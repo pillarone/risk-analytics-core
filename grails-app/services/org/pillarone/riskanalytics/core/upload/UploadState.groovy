@@ -1,5 +1,5 @@
 package org.pillarone.riskanalytics.core.upload
 
 enum UploadState {
-    PENDING, UPLOADING, ERROR;
+    PENDING, UPLOADING, CANCELED, ERROR, DONE;
 }

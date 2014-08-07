@@ -7,25 +7,25 @@ import org.apache.commons.logging.LogFactory
 import java.util.concurrent.CopyOnWriteArraySet
 
 @CompileStatic
-class SimulationQueueNotifyingSupport {
-    private static final Log LOG = LogFactory.getLog(SimulationQueueNotifyingSupport)
-    private final Set<ISimulationQueueListener> listeners = new CopyOnWriteArraySet<ISimulationQueueListener>()
+class QueueNotifyingSupport<T> {
+    private static final Log LOG = LogFactory.getLog(QueueNotifyingSupport)
+    private final Set<QueueListener> listeners = new CopyOnWriteArraySet<QueueListener>()
 
-    void addSimulationQueueListener(ISimulationQueueListener listener) {
+    void addSimulationQueueListener(QueueListener listener) {
         synchronized (listeners) {
             listeners.add(listener)
         }
     }
 
-    void removeSimulationQueueListener(ISimulationQueueListener listener) {
+    void removeSimulationQueueListener(QueueListener listener) {
         synchronized (listeners) {
             listeners.remove(listener)
         }
     }
 
-    void notifyStarting(QueueEntry queueEntry) {
+    void notifyStarting(T queueEntry) {
         synchronized (listeners) {
-            listeners.each { ISimulationQueueListener listener ->
+            listeners.each { QueueListener listener ->
                 doExceptionSave {
                     listener.starting(queueEntry)
                 }
@@ -35,7 +35,7 @@ class SimulationQueueNotifyingSupport {
 
     void notifyRemoved(UUID id) {
         synchronized (listeners) {
-            listeners.each { ISimulationQueueListener listener ->
+            listeners.each { QueueListener listener ->
                 doExceptionSave {
                     listener.removed(id)
                 }
@@ -45,7 +45,7 @@ class SimulationQueueNotifyingSupport {
 
     void notifyFinished(UUID id) {
         synchronized (listeners) {
-            listeners.each { ISimulationQueueListener listener ->
+            listeners.each { QueueListener listener ->
                 doExceptionSave {
                     listener.finished(id)
                 }
@@ -53,9 +53,9 @@ class SimulationQueueNotifyingSupport {
         }
     }
 
-    void notifyOffered(QueueEntry queueEntry) {
+    void notifyOffered(T queueEntry) {
         synchronized (listeners) {
-            listeners.each { ISimulationQueueListener listener ->
+            listeners.each { QueueListener listener ->
                 doExceptionSave {
                     listener.offered(queueEntry)
                 }

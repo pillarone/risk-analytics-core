@@ -65,7 +65,7 @@ class SimulationRuntimeService {
         }, 1000, 1000);
     }
 
-    private class MyQueueListener implements ISimulationQueueListener {
+    private class MyQueueListener implements QueueListener<QueueEntry> {
         @Override
         void starting(QueueEntry entry) {
             synchronized (lock) {
@@ -77,7 +77,7 @@ class SimulationRuntimeService {
                 if (!running) {
                     throw new IllegalStateException("no info found for id: ${entry.id}")
                 }
-                starting(running)
+                support.starting(running)
                 startTimer()
             }
         }
@@ -113,7 +113,7 @@ class SimulationRuntimeService {
             synchronized (lock) {
                 SimulationRuntimeInfo info = new SimulationRuntimeInfo(entry)
                 queuedMap[entry.id] = info
-                offered(info)
+                support.offered(info)
             }
         }
 

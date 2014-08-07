@@ -14,6 +14,7 @@ import org.pillarone.riskanalytics.core.remoting.IResultService
 import org.pillarone.riskanalytics.core.remoting.ITransactionService
 import org.pillarone.riskanalytics.core.remoting.impl.ResultService
 import org.pillarone.riskanalytics.core.simulation.engine.MappingCache
+import org.pillarone.riskanalytics.core.upload.LogOnlyUploadStrategy
 import org.pillarone.riskanalytics.core.util.GrailsConfigValidator
 import org.springframework.remoting.rmi.RmiProxyFactoryBean
 import org.springframework.remoting.rmi.RmiServiceExporter
@@ -26,9 +27,9 @@ class RiskAnalyticsCoreGrailsPlugin {
     def grailsVersion = "2.3.2 > *"
     // the other plugins this plugin depends on
     def dependsOn = [
-            "backgroundThread": "1.3",
+            "backgroundThread"  : "1.3",
             "springSecurityCore": "2.0-RC2",
-            "release": "3.0.1"
+            "release"           : "3.0.1"
     ]
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
@@ -51,6 +52,9 @@ Persistence & Simulation engine.
     }
 
     def doWithSpring = {
+        uploadStrategy(LogOnlyUploadStrategy) {
+            backgroundService = ref('backgroundService')
+        }
         ConfigObject config = application.config
 
         traceLogManager(TraceLogManager)
@@ -117,8 +121,8 @@ Persistence & Simulation engine.
 
         hibernateEventListeners(HibernateEventListeners) {
             listenerMap = ['post-commit-insert': cacheItemListener,
-                    'post-commit-update': cacheItemListener,
-                    'post-commit-delete': cacheItemListener]
+                           'post-commit-update': cacheItemListener,
+                           'post-commit-delete': cacheItemListener]
         }
 
         mappingCache(MappingCache) {}
@@ -135,15 +139,15 @@ Persistence & Simulation engine.
 
         //Checks at startup if certain config options required for the core are set and sets defaults otherwise
         def standardCalculatorOutput = [
-                'stdev': true,
+                'stdev'     : true,
                 'percentile': [0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0],
-                'var': [99, 99.5],
-                'tvar': [99, 99.5],
-                'pdf': 200
+                'var'       : [99, 99.5],
+                'tvar'      : [99, 99.5],
+                'pdf'       : 200
         ]
 
         GrailsConfigValidator.validateConfig(application.config, [
-                "resultBulkInsert": GenericResultBulkInsert,
+                "resultBulkInsert"     : GenericResultBulkInsert,
                 "calculationBulkInsert": GenericCalculationBulkInsert,
                 "keyFiguresToCalculate": standardCalculatorOutput
         ])

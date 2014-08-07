@@ -1,13 +1,13 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
-interface ISimulationQueueListener {
+interface QueueListener<T> {
 
-    void starting(QueueEntry entry)
+    void starting(T entry)
 
     void finished(UUID id)
 
     void removed(UUID id)
 
-    void offered(QueueEntry entry)
+    void offered(T entry)
 
 }

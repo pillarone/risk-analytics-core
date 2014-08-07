@@ -1,30 +1,30 @@
-package org.pillarone.riskanalytics.core.upload
+package org.pillarone.riskanalytics.core.queue
 
-class QueueEntry {
+class AbstractQueueEntry<R extends IResult> implements IQueueEntry<R> {
     final UUID id
     final Date offeredAt
     int priority
     final long offeredNanoTime
-    final UploadConfiguration uploadConfiguration
-    UploadResult uploadResult
+    final IConfiguration configuration
+    R result
 
-    QueueEntry(UploadConfiguration uploadConfiguration, int priority) {
-        this.uploadConfiguration = uploadConfiguration
+    AbstractQueueEntry(IConfiguration configuration, int priority) {
+        this.configuration = configuration
         this.priority = priority
         id = UUID.randomUUID()
         offeredAt = new Date()
         offeredNanoTime = System.nanoTime()
     }
 
-    QueueEntry(UUID id) {
+    AbstractQueueEntry(UUID id) {
         this.id = id
         this.priority = 0
         offeredAt = null
         offeredNanoTime = System.nanoTime()
-        uploadConfiguration = null
+        configuration = null
     }
 
-    int compareTo(QueueEntry o) {
+    int compareTo(IQueueEntry o) {
         if (priority.equals(o.priority)) {
             return offeredNanoTime.compareTo(o.offeredNanoTime)
         }
@@ -35,7 +35,7 @@ class QueueEntry {
         if (this.is(o)) return true
         if (getClass() != o.class) return false
 
-        QueueEntry that = (QueueEntry) o
+        AbstractQueueEntry that = (AbstractQueueEntry) o
 
         if (id != that.id) return false
 

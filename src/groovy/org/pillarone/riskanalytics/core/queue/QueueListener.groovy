@@ -1,6 +1,6 @@
-package org.pillarone.riskanalytics.core.simulation.engine
+package org.pillarone.riskanalytics.core.queue
 
-interface QueueListener<T> {
+interface QueueListener<T extends IQueueEntry> {
 
     void starting(T entry)
 

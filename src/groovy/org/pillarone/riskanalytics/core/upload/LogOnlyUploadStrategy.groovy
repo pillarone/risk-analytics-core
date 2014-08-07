@@ -3,15 +3,16 @@ package org.pillarone.riskanalytics.core.upload
 import models.core.CoreModel
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import org.pillarone.riskanalytics.core.queue.IQueueTaskFuture
 
 class LogOnlyUploadStrategy implements IUploadStrategy {
-    private final static Log LOG = LogFactory.getLog(BasicUploadFuture)
+    private final static Log LOG = LogFactory.getLog(BasicQueueTaskFuture)
 
     def backgroundService
 
     @Override
-    IUploadFuture upload(UploadConfiguration configuration, int priority) {
-        BasicUploadFuture future = new BasicUploadFuture()
+    IQueueTaskFuture upload(UploadConfiguration configuration, int priority) {
+        BasicQueueTaskFuture future = new BasicQueueTaskFuture()
         backgroundService.execute('upload') {
             LOG.debug("start upload simulation: ${configuration.simulation}")
             Thread.sleep(1000)

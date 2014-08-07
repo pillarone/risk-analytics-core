@@ -6,13 +6,14 @@ import org.apache.commons.logging.LogFactory
 import org.joda.time.DateTime
 import org.joda.time.Period
 import org.joda.time.PeriodType
+import org.pillarone.riskanalytics.core.queue.IRuntimeInfo
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.user.Person
 
-class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo> {
+class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo>, IRuntimeInfo<QueueEntry> {
 
     private static final Log LOG = LogFactory.getLog(SimulationRuntimeInfo)
 

@@ -1,12 +1,15 @@
 package org.pillarone.riskanalytics.core.upload
 
+import org.pillarone.riskanalytics.core.queue.IQueueTaskFuture
+import org.pillarone.riskanalytics.core.queue.IQueueTaskListener
+
 import java.util.concurrent.CopyOnWriteArraySet
 
-class BasicUploadFuture implements IUploadFuture {
+class BasicQueueTaskFuture implements IQueueTaskFuture {
 
     private UploadResult uploadResult
     private volatile boolean canceled = false
-    private final Set<IUploadTaskListener> taskListeners = new CopyOnWriteArraySet<IUploadTaskListener>()
+    private final Set<IQueueTaskListener> taskListeners = new CopyOnWriteArraySet<IQueueTaskListener>()
 
 
     @Override
@@ -37,17 +40,17 @@ class BasicUploadFuture implements IUploadFuture {
     }
 
     @Override
-    UploadResult getUploadResult() {
+    UploadResult getResult() {
         uploadResult
     }
 
     @Override
-    void stopListenAsync(IUploadTaskListener uploadTaskListener) {
+    void stopListenAsync(IQueueTaskListener uploadTaskListener) {
         taskListeners.remove(uploadTaskListener)
     }
 
     @Override
-    void listenAsync(IUploadTaskListener uploadTaskListener) {
+    void listenAsync(IQueueTaskListener uploadTaskListener) {
         taskListeners.add(uploadTaskListener)
     }
 }

@@ -5,6 +5,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.pillarone.riskanalytics.core.batch.BatchRunService
+import org.pillarone.riskanalytics.core.queue.QueueListener
 import org.pillarone.riskanalytics.core.simulation.item.Batch
 
 import java.util.concurrent.CountDownLatch
@@ -16,12 +17,12 @@ abstract class BatchRunTest extends ModelTest {
     @Before
     void addListener() {
         listener = new MyListener()
-        simulationQueueService.addSimulationQueueListener(listener)
+        simulationQueueService.addQueueListener(listener)
     }
 
     @After
     void removeListener() {
-        simulationQueueService.removeSimulationQueueListener(listener)
+        simulationQueueService.removeQueueListener(listener)
         listener = null
     }
 

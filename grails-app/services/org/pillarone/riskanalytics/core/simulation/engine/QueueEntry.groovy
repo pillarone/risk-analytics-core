@@ -1,15 +1,17 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
+import org.pillarone.riskanalytics.core.queue.IQueueEntry
 import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationTask
 import org.pillarone.riskanalytics.core.user.Person
 
-class QueueEntry implements Comparable<QueueEntry> {
+class QueueEntry implements IQueueEntry<SimulationResult> {
     final UUID id
     final Date offeredAt
     int priority
     final SimulationTask simulationTask
     final Person offeredBy
     final long offeredNanoTime
+    SimulationResult result
 
     QueueEntry(SimulationConfiguration simulationConfiguration, int priority, Person offeredBy) {
         this.simulationTask = new SimulationTask(simulationConfiguration: simulationConfiguration)
@@ -29,7 +31,7 @@ class QueueEntry implements Comparable<QueueEntry> {
         offeredNanoTime = System.nanoTime()
     }
 
-    int compareTo(QueueEntry o) {
+    int compareTo(IQueueEntry o) {
         if (priority.equals(o.priority)) {
             return offeredNanoTime.compareTo(o.offeredNanoTime)
         }
@@ -55,4 +57,6 @@ class QueueEntry implements Comparable<QueueEntry> {
     String toString() {
         id
     }
+
+
 }

@@ -1,7 +1,9 @@
 package org.pillarone.riskanalytics.core.simulation.engine
+
 import org.gridgain.grid.Grid
 import org.gridgain.grid.GridTaskFuture
 import org.gridgain.grid.typedef.CI1
+import org.pillarone.riskanalytics.core.queue.IQueueService
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.user.Person
 import org.pillarone.riskanalytics.core.user.UserManagement
@@ -11,7 +13,7 @@ import javax.annotation.PreDestroy
 
 import static com.google.common.base.Preconditions.checkNotNull
 
-class SimulationQueueService {
+class SimulationQueueService implements IQueueService<QueueEntry> {
     Grid grid
 
     private final PriorityQueue<QueueEntry> queue = new PriorityQueue<QueueEntry>()

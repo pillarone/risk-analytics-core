@@ -7,25 +7,29 @@ import java.util.concurrent.CopyOnWriteArraySet
 
 class BasicQueueTaskFuture implements IQueueTaskFuture {
 
-    private UploadResult uploadResult
+    private final UploadQueueTaskContext context
     private volatile boolean canceled = false
     private final Set<IQueueTaskListener> taskListeners = new CopyOnWriteArraySet<IQueueTaskListener>()
 
+    BasicQueueTaskFuture(UploadQueueTaskContext context) {
+        this.context = context
+    }
 
     @Override
     void cancel() {
         canceled = true
-        uploadResult = new UploadResult(uploadState: UploadState.CANCELED)
+        context.uploadState = UploadState.CANCELED
         notifyUploadListeners()
     }
 
     void failed(List<String> errors) {
-        uploadResult = new UploadResult(uploadState: UploadState.ERROR, errors: errors)
+        context.uploadState = UploadState.ERROR
+        context.errors.addAll(errors)
         notifyUploadListeners()
     }
 
     void done() {
-        uploadResult = new UploadResult(uploadState: UploadState.DONE)
+        context.uploadState = UploadState.DONE
         notifyUploadListeners()
     }
 
@@ -37,11 +41,6 @@ class BasicQueueTaskFuture implements IQueueTaskFuture {
 
     boolean getCanceled() {
         canceled
-    }
-
-    @Override
-    UploadResult getResult() {
-        uploadResult
     }
 
     @Override

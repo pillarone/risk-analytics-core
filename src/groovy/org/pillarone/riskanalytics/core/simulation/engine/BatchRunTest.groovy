@@ -35,8 +35,8 @@ abstract class BatchRunTest extends ModelTest {
         batchRunService.runBatch(batch)
         assert batch.executed
         assert listener.offered.size() == 1
-        QueueEntry entry = listener.offered.first()
-        assert entry.simulationTask.simulation.parameterization == run.parameterization
+        SimulationQueueEntry entry = listener.offered.first()
+        assert entry.context.simulationTask.simulation.parameterization == run.parameterization
         //wait to finish simulation
         listener.waitUntilFinished()
     }
@@ -50,17 +50,17 @@ abstract class BatchRunTest extends ModelTest {
     }
 
 
-    static class MyListener implements QueueListener<QueueEntry> {
+    static class MyListener implements QueueListener<SimulationQueueEntry> {
         CountDownLatch latch = new CountDownLatch(1)
 
-        List<QueueEntry> offered = []
+        List<SimulationQueueEntry> offered = []
 
         void waitUntilFinished() {
             latch.await()
         }
 
         @Override
-        void starting(QueueEntry entry) {}
+        void starting(SimulationQueueEntry entry) {}
 
         @Override
         void finished(UUID id) {
@@ -71,7 +71,7 @@ abstract class BatchRunTest extends ModelTest {
         void removed(UUID id) {}
 
         @Override
-        void offered(QueueEntry entry) {
+        void offered(SimulationQueueEntry entry) {
             offered << entry
         }
     }

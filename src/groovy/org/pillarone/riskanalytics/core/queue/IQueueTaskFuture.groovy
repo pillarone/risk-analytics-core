@@ -7,6 +7,4 @@ interface IQueueTaskFuture {
 
     void cancel()
 
-    IResult getResult()
-
 }

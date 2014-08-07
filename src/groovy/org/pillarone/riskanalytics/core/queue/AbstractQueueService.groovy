@@ -1,12 +1,11 @@
 package org.pillarone.riskanalytics.core.queue
 
 import com.google.common.base.Preconditions
-import org.pillarone.riskanalytics.core.simulation.engine.QueueNotifyingSupport
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 
-abstract class AbstractQueueService<C extends IConfiguration, Q extends IQueueEntry> implements IQueueService<Q> {
+abstract class AbstractQueueService<C, K extends IQueueTaskContext<C>, Q extends IQueueEntry<K>> implements IQueueService<Q> {
 
     protected final PriorityQueue<Q> queue = new PriorityQueue<Q>()
     protected final Object lock = new Object()
@@ -92,7 +91,7 @@ abstract class AbstractQueueService<C extends IConfiguration, Q extends IQueueEn
                 if (queueEntry) {
                     busy = true
                     notifyStarting(queueEntry)
-                    IQueueTaskFuture future = doWork(queueEntry.configuration, queueEntry.priority)
+                    IQueueTaskFuture future = doWork(queueEntry.context, queueEntry.priority)
                     future.listenAsync(taskListener)
                     currentTask = new CurrentTask<Q>(future: future, entry: queueEntry)
                 }
@@ -100,7 +99,7 @@ abstract class AbstractQueueService<C extends IConfiguration, Q extends IQueueEn
         }
     }
 
-    abstract IQueueTaskFuture doWork(C configuration, int priority)
+    abstract IQueueTaskFuture doWork(K context, int priority)
 
     private void queueTaskFinished(IQueueTaskFuture future) {
         synchronized (lock) {
@@ -111,14 +110,12 @@ abstract class AbstractQueueService<C extends IConfiguration, Q extends IQueueEn
             Q entry = currentTask.entry
             currentTask = null
             future.stopListenAsync(taskListener)
-            IResult result = future.result
-            if (!result) {
-                throw new IllegalStateException("queue task finished without result")
-            }
-            entry.result = result
+            handleContext(entry.context)
             notifyFinished(entry.id)
         }
     }
+
+    abstract void handleContext(K context)
 
     private static class CurrentTask<Q extends IQueueEntry> {
         IQueueTaskFuture future

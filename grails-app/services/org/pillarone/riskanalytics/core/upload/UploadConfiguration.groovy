@@ -1,9 +1,8 @@
 package org.pillarone.riskanalytics.core.upload
 
-import org.pillarone.riskanalytics.core.queue.IConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
-class UploadConfiguration implements IConfiguration {
+class UploadConfiguration {
 
     final String username
     final String destination

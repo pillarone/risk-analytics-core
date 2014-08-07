@@ -1,19 +1,19 @@
 package org.pillarone.riskanalytics.core.queue
 
-class AbstractQueueEntry<R extends IResult> implements IQueueEntry<R> {
+class AbstractQueueEntry<C extends IQueueTaskContext> implements IQueueEntry<C> {
     final UUID id
     final Date offeredAt
     int priority
     final long offeredNanoTime
-    final IConfiguration configuration
-    R result
+    final C context
 
-    AbstractQueueEntry(IConfiguration configuration, int priority) {
-        this.configuration = configuration
+
+    AbstractQueueEntry(C context, int priority) {
         this.priority = priority
         id = UUID.randomUUID()
         offeredAt = new Date()
         offeredNanoTime = System.nanoTime()
+        this.context = context
     }
 
     AbstractQueueEntry(UUID id) {
@@ -21,7 +21,7 @@ class AbstractQueueEntry<R extends IResult> implements IQueueEntry<R> {
         this.priority = 0
         offeredAt = null
         offeredNanoTime = System.nanoTime()
-        configuration = null
+        context = null
     }
 
     int compareTo(IQueueEntry o) {

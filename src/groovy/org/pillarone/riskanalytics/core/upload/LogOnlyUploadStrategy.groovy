@@ -11,17 +11,17 @@ class LogOnlyUploadStrategy implements IUploadStrategy {
     def backgroundService
 
     @Override
-    IQueueTaskFuture upload(UploadConfiguration configuration, int priority) {
-        BasicQueueTaskFuture future = new BasicQueueTaskFuture()
+    IQueueTaskFuture upload(UploadQueueTaskContext context, int priority) {
+        BasicQueueTaskFuture future = new BasicQueueTaskFuture(context)
         backgroundService.execute('upload') {
-            LOG.debug("start upload simulation: ${configuration.simulation}")
+            LOG.debug("start upload simulation: ${context.configuration.simulation}")
             Thread.sleep(1000)
             if (future.canceled) {
                 LOG.debug("task was canceled -> exit")
                 return
             }
-            LOG.debug("finished uploading simulation: ${configuration.simulation}")
-            if (configuration.simulation.modelClass == CoreModel) {
+            LOG.debug("finished uploading simulation: ${context.configuration.simulation}")
+            if (context.configuration.simulation.modelClass == CoreModel) {
                 future.failed(['upload not possible with core model'])
             } else {
                 future.done()

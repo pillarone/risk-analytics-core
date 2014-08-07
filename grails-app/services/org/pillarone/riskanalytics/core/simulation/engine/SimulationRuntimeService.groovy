@@ -4,7 +4,7 @@ import org.pillarone.riskanalytics.core.queue.AbstractRuntimeService
 import org.pillarone.riskanalytics.core.queue.IQueueService
 import org.pillarone.riskanalytics.core.queue.IRuntimeInfoListener
 
-class SimulationRuntimeService extends AbstractRuntimeService<QueueEntry, SimulationRuntimeInfo> {
+class SimulationRuntimeService extends AbstractRuntimeService<SimulationQueueEntry, SimulationRuntimeInfo> {
     SimulationQueueService simulationQueueService
 
     private final IRuntimeInfoListener addOrRemoveLockedTagListener = new AddOrRemoveLockedTagListener()
@@ -21,12 +21,12 @@ class SimulationRuntimeService extends AbstractRuntimeService<QueueEntry, Simula
     }
 
     @Override
-    IQueueService<QueueEntry> getQueueService() {
+    IQueueService<SimulationQueueEntry> getQueueService() {
         return simulationQueueService
     }
 
     @Override
-    SimulationRuntimeInfo createRuntimeInfo(QueueEntry queueEntry) {
+    SimulationRuntimeInfo createRuntimeInfo(SimulationQueueEntry queueEntry) {
         return new SimulationRuntimeInfo(queueEntry)
     }
 }

@@ -4,5 +4,5 @@ import org.pillarone.riskanalytics.core.queue.IQueueTaskFuture
 
 interface IUploadStrategy {
 
-    IQueueTaskFuture upload(UploadConfiguration configuration, int priority)
+    IQueueTaskFuture upload(UploadQueueTaskContext configuration, int priority)
 }

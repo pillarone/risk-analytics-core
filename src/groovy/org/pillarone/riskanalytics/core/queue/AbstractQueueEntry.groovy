@@ -1,35 +1,30 @@
-package org.pillarone.riskanalytics.core.simulation.engine
+package org.pillarone.riskanalytics.core.queue
 
-import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationTask
-import org.pillarone.riskanalytics.core.user.Person
-
-class QueueEntry implements Comparable<QueueEntry> {
+class AbstractQueueEntry<C extends IQueueTaskContext> implements IQueueEntry<C> {
     final UUID id
     final Date offeredAt
     int priority
-    final SimulationTask simulationTask
-    final Person offeredBy
     final long offeredNanoTime
+    final C context
 
-    QueueEntry(SimulationConfiguration simulationConfiguration, int priority, Person offeredBy) {
-        this.simulationTask = new SimulationTask(simulationConfiguration: simulationConfiguration)
-        this.offeredBy = offeredBy
+
+    AbstractQueueEntry(C context, int priority) {
         this.priority = priority
         id = UUID.randomUUID()
         offeredAt = new Date()
         offeredNanoTime = System.nanoTime()
+        this.context = context
     }
 
-    QueueEntry(UUID id) {
+    AbstractQueueEntry(UUID id) {
         this.id = id
         this.priority = 0
-        this.simulationTask = null
-        this.offeredBy = null
         offeredAt = null
         offeredNanoTime = System.nanoTime()
+        context = null
     }
 
-    int compareTo(QueueEntry o) {
+    int compareTo(IQueueEntry o) {
         if (priority.equals(o.priority)) {
             return offeredNanoTime.compareTo(o.offeredNanoTime)
         }
@@ -40,7 +35,7 @@ class QueueEntry implements Comparable<QueueEntry> {
         if (this.is(o)) return true
         if (getClass() != o.class) return false
 
-        QueueEntry that = (QueueEntry) o
+        AbstractQueueEntry that = (AbstractQueueEntry) o
 
         if (id != that.id) return false
 
@@ -49,10 +44,5 @@ class QueueEntry implements Comparable<QueueEntry> {
 
     int hashCode() {
         return id.hashCode()
-    }
-
-    @Override
-    String toString() {
-        id
     }
 }

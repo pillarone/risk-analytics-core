@@ -1,6 +1,8 @@
 package org.pillarone.riskanalytics.core.simulation.engine
 
-class SimulationRuntimeInfoAdapter implements ISimulationRuntimeInfoListener {
+import org.pillarone.riskanalytics.core.queue.IRuntimeInfoListener
+
+class SimulationRuntimeInfoAdapter implements IRuntimeInfoListener<SimulationRuntimeInfo> {
     @Override
     void starting(SimulationRuntimeInfo info) {}
 

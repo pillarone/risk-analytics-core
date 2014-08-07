@@ -6,13 +6,14 @@ import org.apache.commons.logging.LogFactory
 import org.joda.time.DateTime
 import org.joda.time.Period
 import org.joda.time.PeriodType
+import org.pillarone.riskanalytics.core.queue.IRuntimeInfo
 import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import org.pillarone.riskanalytics.core.user.Person
 
-class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo> {
+class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo>, IRuntimeInfo<SimulationQueueEntry> {
 
     private static final Log LOG = LogFactory.getLog(SimulationRuntimeInfo)
 
@@ -31,7 +32,7 @@ class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo> {
         this.id = Preconditions.checkNotNull(id)
     }
 
-    SimulationRuntimeInfo(QueueEntry entry) {
+    SimulationRuntimeInfo(SimulationQueueEntry entry) {
         this(entry.id)
         apply(entry)
     }
@@ -96,12 +97,12 @@ class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo> {
         simulationErrors
     }
 
-    boolean apply(QueueEntry entry) {
+    boolean apply(SimulationQueueEntry entry) {
         boolean changed = false
         if (entry.id != id) {
             throw new IllegalStateException("queueEntry id is different from our id")
         }
-        simulation = entry.simulationTask.simulation
+        simulation = entry.context.simulationTask.simulation
         offeredNanoTime = entry.offeredNanoTime
 
         if (priority != entry.priority) {
@@ -112,25 +113,25 @@ class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo> {
             offeredAt = entry.offeredAt
             changed = true
         }
-        if (progress != entry.simulationTask.progress) {
-            LOG.debug("progress changed from $progress to ${entry.simulationTask.progress}")
-            progress = entry.simulationTask.progress
+        if (progress != entry.context.simulationTask.progress) {
+            LOG.debug("progress changed from $progress to ${entry.context.simulationTask.progress}")
+            progress = entry.context.simulationTask.progress
             changed = true
         }
-        if (simulationState != entry.simulationTask.simulationState) {
-            simulationState = entry.simulationTask.simulationState
+        if (simulationState != entry.context.simulationTask.simulationState) {
+            simulationState = entry.context.simulationTask.simulationState
             changed = true
         }
-        if (estimatedSimulationEnd != entry.simulationTask.estimatedSimulationEnd) {
-            estimatedSimulationEnd = entry.simulationTask.estimatedSimulationEnd
+        if (estimatedSimulationEnd != entry.context.simulationTask.estimatedSimulationEnd) {
+            estimatedSimulationEnd = entry.context.simulationTask.estimatedSimulationEnd
             changed = true
         }
         if (offeredBy != entry.offeredBy) {
             offeredBy = entry.offeredBy
             changed = true
         }
-        if (simulationErrors != entry.simulationTask.simulationErrors) {
-            simulationErrors = entry.simulationTask.simulationErrors
+        if (simulationErrors != entry.context.simulationTask.simulationErrors) {
+            simulationErrors = entry.context.simulationTask.simulationErrors
             changed = true
         }
         changed

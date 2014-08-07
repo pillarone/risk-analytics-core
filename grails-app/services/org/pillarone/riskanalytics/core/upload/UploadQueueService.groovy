@@ -1,10 +1,13 @@
 package org.pillarone.riskanalytics.core.upload
 
+import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.engine.QueueNotifyingSupport
+import org.pillarone.riskanalytics.core.simulation.item.Simulation
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 
+import static com.google.common.base.Preconditions.checkArgument
 import static com.google.common.base.Preconditions.checkNotNull
 
 class UploadQueueService {
@@ -127,7 +130,14 @@ class UploadQueueService {
     }
 
     private static void preConditionCheck(UploadConfiguration configuration) {
-        //TODO for now everything is ok
+        checkNotNull(configuration)
+        Simulation simulation = configuration.simulation
+        checkNotNull(simulation)
+        checkNotNull(simulation.id)
+        checkNotNull(simulation.start)
+        checkNotNull(simulation.end)
+        checkNotNull(simulation.template)
+        checkArgument(simulation.simulationState == SimulationState.FINISHED)
     }
 }
 

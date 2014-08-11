@@ -9,6 +9,9 @@ import static org.pillarone.riskanalytics.core.upload.UploadValidationError.REAS
 
 class UploadValidationService {
 
+    // Note: Sim should never be null, but profile might
+    // Eg user forgot to set up profile in one model class.
+    //
     List<UploadValidationError> validate(Simulation simulation, SimulationProfile simulationProfile) {
         Preconditions.checkNotNull(simulation)
         List<UploadValidationError> errors = []

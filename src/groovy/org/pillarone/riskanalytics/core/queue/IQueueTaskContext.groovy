@@ -1,7 +1,13 @@
 package org.pillarone.riskanalytics.core.queue
+import org.joda.time.DateTime
 
-interface IQueueTaskContext<C> {
+interface IQueueTaskContext<K> {
 
-    C getConfiguration()
+    K getConfiguration()
 
+    DateTime getEstimatedEnd()
+
+    int getProgress()
+
+    String getUsername()
 }

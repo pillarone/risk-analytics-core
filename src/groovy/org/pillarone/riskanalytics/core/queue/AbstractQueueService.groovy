@@ -5,7 +5,7 @@ import com.google.common.base.Preconditions
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 
-abstract class AbstractQueueService<C, K extends IQueueTaskContext<C>, Q extends IQueueEntry<K>> implements IQueueService<Q> {
+abstract class AbstractQueueService<K, Q extends IQueueEntry<K>> implements IQueueService<Q> {
 
     protected final PriorityQueue<Q> queue = new PriorityQueue<Q>()
     protected final Object lock = new Object()
@@ -15,7 +15,17 @@ abstract class AbstractQueueService<C, K extends IQueueTaskContext<C>, Q extends
     protected Timer pollingTimer
 
     @Delegate
-    private QueueNotifyingSupport support = new QueueNotifyingSupport<Q>()
+    private QueueNotifyingSupport<Q> support = new QueueNotifyingSupport<Q>()
+
+    @Override
+    void removeQueueListener(QueueListener<Q> queueListener) {
+        support.removeQueueListener(queueListener)
+    }
+
+    @Override
+    void addQueueListener(QueueListener<Q> queueListener) {
+        support.addQueueListener(queueListener)
+    }
 
     @PostConstruct
     private void initialize() {
@@ -36,21 +46,21 @@ abstract class AbstractQueueService<C, K extends IQueueTaskContext<C>, Q extends
         taskListener = null
     }
 
-    void offer(C configuration, int priority = 5) {
+    void offer(K configuration, int priority = 5) {
         preConditionCheck(configuration)
         synchronized (lock) {
             Q queueEntry = createQueueEntry(configuration, priority)
             queue.offer(queueEntry)
-            notifyOffered(queueEntry)
+            support.notifyOffered(queueEntry)
         }
 
     }
 
-    abstract Q createQueueEntry(C configuration, int priority)
+    abstract Q createQueueEntry(K configuration, int priority)
 
     abstract Q createQueueEntry(UUID id)
 
-    abstract void preConditionCheck(C configuration)
+    abstract void preConditionCheck(K configuration)
 
     void cancel(UUID uuid) {
         Preconditions.checkNotNull(uuid)
@@ -60,7 +70,7 @@ abstract class AbstractQueueService<C, K extends IQueueTaskContext<C>, Q extends
                 return
             }
             if (queue.remove(createQueueEntry(uuid))) {
-                notifyRemoved(uuid)
+                support.notifyRemoved(uuid)
             }
         }
     }
@@ -90,8 +100,8 @@ abstract class AbstractQueueService<C, K extends IQueueTaskContext<C>, Q extends
                 Q queueEntry = queue.poll()
                 if (queueEntry) {
                     busy = true
-                    notifyStarting(queueEntry)
-                    IQueueTaskFuture future = doWork(queueEntry.context, queueEntry.priority)
+                    support.notifyStarting(queueEntry)
+                    IQueueTaskFuture future = doWork(queueEntry, queueEntry.priority)
                     future.listenAsync(taskListener)
                     currentTask = new CurrentTask<Q>(future: future, entry: queueEntry)
                 }
@@ -99,7 +109,7 @@ abstract class AbstractQueueService<C, K extends IQueueTaskContext<C>, Q extends
         }
     }
 
-    abstract IQueueTaskFuture doWork(K context, int priority)
+    abstract IQueueTaskFuture doWork(Q entry, int priority)
 
     private void queueTaskFinished(IQueueTaskFuture future) {
         synchronized (lock) {
@@ -110,12 +120,12 @@ abstract class AbstractQueueService<C, K extends IQueueTaskContext<C>, Q extends
             Q entry = currentTask.entry
             currentTask = null
             future.stopListenAsync(taskListener)
-            handleContext(entry.context)
-            notifyFinished(entry.id)
+            handleEntry(entry)
+            support.notifyFinished(entry.id)
         }
     }
 
-    abstract void handleContext(K context)
+    abstract void handleEntry(Q entry)
 
     private static class CurrentTask<Q extends IQueueEntry> {
         IQueueTaskFuture future

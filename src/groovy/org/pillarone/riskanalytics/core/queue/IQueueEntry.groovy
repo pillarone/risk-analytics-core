@@ -1,6 +1,6 @@
 package org.pillarone.riskanalytics.core.queue
 
-interface IQueueEntry<R extends IQueueTaskContext> extends Comparable<IQueueEntry> {
+interface IQueueEntry<K> extends Comparable<IQueueEntry<K>> {
 
     UUID getId()
 
@@ -8,5 +8,5 @@ interface IQueueEntry<R extends IQueueTaskContext> extends Comparable<IQueueEntr
 
     long getOfferedNanoTime()
 
-    R getContext()
+    IQueueTaskContext<K> getContext()
 }

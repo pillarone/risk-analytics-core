@@ -5,16 +5,14 @@ import org.gridgain.grid.GridTaskFuture
 import org.pillarone.riskanalytics.core.queue.AbstractQueueService
 import org.pillarone.riskanalytics.core.queue.IQueueTaskFuture
 import org.pillarone.riskanalytics.core.simulation.SimulationState
-import org.pillarone.riskanalytics.core.user.Person
-import org.pillarone.riskanalytics.core.user.UserManagement
 
-class SimulationQueueService extends AbstractQueueService<SimulationConfiguration, SimulationQueueTaskContext, SimulationQueueEntry> {
+class SimulationQueueService extends AbstractQueueService<SimulationConfiguration, SimulationQueueEntry> {
 
     Grid grid
 
     @Override
     SimulationQueueEntry createQueueEntry(SimulationConfiguration configuration, int priority) {
-        new SimulationQueueEntry(configuration, priority, currentUser)
+        new SimulationQueueEntry(configuration, priority)
     }
 
     @Override
@@ -32,13 +30,15 @@ class SimulationQueueService extends AbstractQueueService<SimulationConfiguratio
     }
 
     @Override
-    IQueueTaskFuture doWork(SimulationQueueTaskContext context, int priority) {
+    IQueueTaskFuture doWork(SimulationQueueEntry entry, int priority) {
+        SimulationQueueTaskContext context = entry.context
         GridTaskFuture future = grid.execute(context.simulationTask, context.simulationTask.simulationConfiguration)
         new SimulationQueueTaskFuture(future, context)
     }
 
     @Override
-    void handleContext(SimulationQueueTaskContext context) {
+    void handleEntry(SimulationQueueEntry entry) {
+        SimulationQueueTaskContext context = entry.context
         SimulationState simulationState = context.simulationTask.simulationState
         switch (simulationState) {
             case SimulationState.FINISHED:
@@ -55,9 +55,5 @@ class SimulationQueueService extends AbstractQueueService<SimulationConfiguratio
                 context.simulationTask.simulationErrors.add(new Throwable("internal gridgain error"))
                 context.simulationTask.simulationState = SimulationState.ERROR
         }
-    }
-
-    private static Person getCurrentUser() {
-        UserManagement.currentUser
     }
 }

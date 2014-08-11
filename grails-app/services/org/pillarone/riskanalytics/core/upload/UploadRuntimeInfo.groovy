@@ -134,10 +134,6 @@ class UploadRuntimeInfo implements Comparable<UploadRuntimeInfo>, IRuntimeInfo<U
         uploadState
     }
 
-    Person getOfferedBy() {
-        offeredBy
-    }
-
     DateTime getStart() {
         start
     }

@@ -9,7 +9,15 @@ class SimulationProfileService {
 
     String getActiveProfileName() {
         //TODO discuss how to determine. For now take the first one
-        SimulationProfileDAO.list([max: 1])?.first()?.name
+        List<String> names = SimulationProfileDAO.createCriteria().list {
+            eq('forPublic', true)
+            order('id', 'desc')
+            maxResults(1)
+            projections {
+                property('name')
+            }
+        }
+        names ? names.first() : null
     }
 
     Map<Class, SimulationProfile> getSimulationProfilesGroupedByModelClass(String simulationProfileName) {

@@ -8,5 +8,6 @@ package org.pillarone.riskanalytics.core.remoting
  * To change this template use File | Settings | File Templates.
  */
 class UploadException extends Exception {
+    private static final long serialVersionUID = 5193157398754375801L;
     List<String> errors = []
 }

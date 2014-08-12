@@ -5,9 +5,10 @@ import org.pillarone.riskanalytics.core.queue.IQueueTaskContext
 
 class UploadQueueTaskContext implements IQueueTaskContext<UploadConfiguration> {
     final UploadConfiguration configuration
-    List<String> errors = []
-    UploadState uploadState = UploadState.PENDING
-    int progress = 0
+    private List<String> errors = []
+    private UploadState uploadState = UploadState.PENDING
+    volatile int progress = 0
+    private final Object lock = new Object()
 
     UploadQueueTaskContext(UploadConfiguration configuration) {
         this.configuration = configuration
@@ -26,5 +27,27 @@ class UploadQueueTaskContext implements IQueueTaskContext<UploadConfiguration> {
     @Override
     String getUsername() {
         configuration.username
+    }
+
+    void setUploadState(UploadState state) {
+        synchronized (lock) {
+            uploadState = state
+        }
+    }
+
+    UploadState getUploadState() {
+        return uploadState
+    }
+
+    void addError(String error) {
+        synchronized (lock) {
+            errors.add(error)
+        }
+    }
+
+    List<String> getErrors() {
+        synchronized (lock) {
+            return new ArrayList<String>(errors)
+        }
     }
 }

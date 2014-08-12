@@ -1,35 +1,49 @@
 package org.pillarone.riskanalytics.core.upload
 
+import grails.util.Holders
 import org.pillarone.riskanalytics.core.queue.IQueueTaskFuture
 import org.pillarone.riskanalytics.core.queue.IQueueTaskListener
+import org.pillarone.riskanalytics.core.remoting.IUploadService
+import org.pillarone.riskanalytics.core.upload.UploadQueueTaskContext
+import org.pillarone.riskanalytics.core.upload.UploadState
 
 import java.util.concurrent.CopyOnWriteArraySet
 
-class BasicUploadTaskFuture implements IQueueTaskFuture {
+class UploadTaskFuture implements IQueueTaskFuture {
 
     private final UploadQueueTaskContext context
     private volatile boolean canceled = false
     private final Set<IQueueTaskListener> taskListeners = new CopyOnWriteArraySet<IQueueTaskListener>()
+    private UUID uploadInfoId
 
-    BasicUploadTaskFuture(UploadQueueTaskContext context) {
+    UploadTaskFuture(UploadQueueTaskContext context, UUID uploadInfoId) {
+        this.uploadInfoId = uploadInfoId
         this.context = context
     }
 
     @Override
     void cancel() {
         canceled = true
+        uploadService.cancelUpload(uploadInfoId)
         context.uploadState = UploadState.CANCELED
         notifyUploadListeners()
     }
 
     void failed(List<String> errors) {
+        if (canceled) {
+            return
+        }
         context.uploadState = UploadState.ERROR
         errors.each { context.addError(it) }
         notifyUploadListeners()
     }
 
     void done() {
+        if (canceled) {
+            return
+        }
         context.uploadState = UploadState.DONE
+        context.progress = 100
         notifyUploadListeners()
     }
 
@@ -39,8 +53,8 @@ class BasicUploadTaskFuture implements IQueueTaskFuture {
         }
     }
 
-    boolean getCanceled() {
-        canceled
+    static IUploadService getUploadService() {
+        Holders.grailsApplication.mainContext.getBean('uploadService', IUploadService)
     }
 
     @Override

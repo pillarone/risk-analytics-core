@@ -1,13 +1,10 @@
-package org.pillarone.riskanalytics.core.upload.artisan
+package org.pillarone.riskanalytics.core.upload
 
 import groovy.util.logging.Log
 import org.pillarone.riskanalytics.core.queue.IQueueTaskFuture
 import org.pillarone.riskanalytics.core.remoting.IUploadService
 import org.pillarone.riskanalytics.core.remoting.UploadInfo
 import org.pillarone.riskanalytics.core.remoting.UploadException
-import org.pillarone.riskanalytics.core.upload.IUploadStrategy
-import org.pillarone.riskanalytics.core.upload.UploadConfiguration
-import org.pillarone.riskanalytics.core.upload.UploadQueueTaskContext
 
 import java.util.logging.Level
 
@@ -29,8 +26,9 @@ class DefaultUploadStrategy implements IUploadStrategy {
         UploadInfo uploadInfo = createUploadInfo(context.configuration)
         UploadTaskFuture future = new UploadTaskFuture(context, uploadInfo.uuid)
         backgroundService.execute("upload $uploadInfo") {
-            //this call has to block
+            context.uploadState = UploadState.UPLOADING
             try {
+                //this call has to block
                 uploadService.startUpload(uploadInfo)
                 future.done()
             } catch (UploadException uploadException) {

@@ -12,14 +12,38 @@ public class UploadInfo implements Serializable {
 
     private static final long serialVersionUID = -2368426722415786382L;
     private UUID uuid;
+    private long simulationId;
+    private String quarter;
+    private boolean allowOverwrite;
+    private String destination;
 
-    public UploadInfo(UUID uuid) {
+    public UploadInfo(UUID uuid, long simulationId, String quarter, boolean allowOverwrite, String destination) {
+        this.simulationId = simulationId;
+        this.quarter = quarter;
+        this.allowOverwrite = allowOverwrite;
+        this.destination = destination;
         Preconditions.checkNotNull(uuid);
         this.uuid = uuid;
     }
 
     public UUID getUuid() {
         return uuid;
+    }
+
+    public long getSimulationId() {
+        return simulationId;
+    }
+
+    public String getQuarter() {
+        return quarter;
+    }
+
+    public boolean isAllowOverwrite() {
+        return allowOverwrite;
+    }
+
+    public String getDestination() {
+        return destination;
     }
 
     @Override

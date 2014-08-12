@@ -3,14 +3,15 @@ package org.pillarone.riskanalytics.core.upload.artisan
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.pillarone.riskanalytics.core.remoting.IUploadService
-import org.pillarone.riskanalytics.core.remoting.impl.UploadException
+import org.pillarone.riskanalytics.core.remoting.UploadInfo
+import org.pillarone.riskanalytics.core.remoting.UploadException
 
 class DefaultUploadService implements IUploadService {
     private static final Log LOG = LogFactory.getLog(DefaultUploadService)
 
     @Override
-    void startUpload(UUID uuid, long simulationId, String quarter, boolean allowOverwrite, String destination) throws UploadException {
-        LOG.info("started upload for $uuid, $simulationId, $quarter, $allowOverwrite, $destination")
+    void startUpload(UploadInfo uploadInfo) throws UploadException {
+        LOG.info("started upload for $uploadInfo")
         sleep(5000)
     }
 

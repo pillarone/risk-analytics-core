@@ -1,6 +1,6 @@
 package org.pillarone.riskanalytics.core.remoting;
 
-import org.pillarone.riskanalytics.core.remoting.impl.UploadException;
+import org.pillarone.riskanalytics.core.remoting.UploadException;
 
 import java.util.UUID;
 
@@ -18,12 +18,10 @@ public interface IUploadService {
 
     /**
      * Upload sim and throw remote exception if problem occurs; returns handle that can be used for cancellation attempt.
+     * @param uploadInfo
      */
-    void startUpload(UUID uuid, long simulationId,
-                     String quarter,
-                     boolean allowOverwrite,
-                     String destination // 'destination' field in gui pfo nr  etc
-    ) throws UploadException;
+    void startUpload(// 'destination' field in gui pfo nr  etc
+                     UploadInfo uploadInfo) throws UploadException;
 
     void cancelUpload(UUID uploadInfoId);
 

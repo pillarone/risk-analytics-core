@@ -1,4 +1,4 @@
-package org.pillarone.riskanalytics.core.remoting.impl
+package org.pillarone.riskanalytics.core.remoting
 
 /**
  * Created with IntelliJ IDEA.

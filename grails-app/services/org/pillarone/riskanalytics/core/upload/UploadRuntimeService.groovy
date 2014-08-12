@@ -14,7 +14,7 @@ class UploadRuntimeService extends AbstractRuntimeService<UploadQueueEntry, Uplo
 
     @Override
     UploadRuntimeInfo createRuntimeInfo(UploadQueueEntry queueEntry) {
-        return new UploadRuntimeInfo()
+        return new UploadRuntimeInfo(queueEntry)
     }
 
     @Override

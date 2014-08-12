@@ -1,5 +1,4 @@
 package org.pillarone.riskanalytics.core.simulation.engine
-
 import com.google.common.base.Preconditions
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
@@ -11,7 +10,6 @@ import org.pillarone.riskanalytics.core.simulation.SimulationState
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
-import org.pillarone.riskanalytics.core.user.Person
 
 class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo>, IRuntimeInfo<SimulationQueueEntry> {
 
@@ -24,7 +22,7 @@ class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo>, IRunti
     private Integer progress
     private SimulationState simulationState
     private DateTime estimatedSimulationEnd
-    private Person offeredBy
+    private String username
     private List<Throwable> simulationErrors
     private long offeredNanoTime
 
@@ -35,6 +33,11 @@ class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo>, IRunti
     SimulationRuntimeInfo(SimulationQueueEntry entry) {
         this(entry.id)
         apply(entry)
+    }
+
+    @Override
+    String getUsername() {
+        username
     }
 
     Simulation getSimulation() {
@@ -73,12 +76,9 @@ class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo>, IRunti
         simulationState
     }
 
-    DateTime getEstimatedSimulationEnd() {
+    @Override
+    DateTime getEstimatedEnd() {
         estimatedSimulationEnd
-    }
-
-    Person getOfferedBy() {
-        offeredBy
     }
 
     String getEstimatedTime() {
@@ -126,8 +126,8 @@ class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo>, IRunti
             estimatedSimulationEnd = entry.context.simulationTask.estimatedSimulationEnd
             changed = true
         }
-        if (offeredBy != entry.offeredBy) {
-            offeredBy = entry.offeredBy
+        if (username != entry.context.username) {
+            username = entry.context.username
             changed = true
         }
         if (simulationErrors != entry.context.simulationTask.simulationErrors) {

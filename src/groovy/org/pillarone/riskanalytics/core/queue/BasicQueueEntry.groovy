@@ -1,30 +1,33 @@
 package org.pillarone.riskanalytics.core.queue
 
-class AbstractQueueEntry<C extends IQueueTaskContext> implements IQueueEntry<C> {
+class BasicQueueEntry<K> implements IQueueEntry<K> {
     final UUID id
     final Date offeredAt
     int priority
     final long offeredNanoTime
-    final C context
+    private final IQueueTaskContext<K> context
 
-
-    AbstractQueueEntry(C context, int priority) {
+    BasicQueueEntry(IQueueTaskContext<K> context, int priority) {
         this.priority = priority
+        this.context = context
         id = UUID.randomUUID()
         offeredAt = new Date()
         offeredNanoTime = System.nanoTime()
-        this.context = context
     }
 
-    AbstractQueueEntry(UUID id) {
+    BasicQueueEntry(UUID id) {
+        this.context = null
         this.id = id
         this.priority = 0
         offeredAt = null
         offeredNanoTime = System.nanoTime()
-        context = null
     }
 
-    int compareTo(IQueueEntry o) {
+    IQueueTaskContext<K> getContext() {
+        return context
+    }
+
+    int compareTo(IQueueEntry<K> o) {
         if (priority.equals(o.priority)) {
             return offeredNanoTime.compareTo(o.offeredNanoTime)
         }
@@ -35,7 +38,7 @@ class AbstractQueueEntry<C extends IQueueTaskContext> implements IQueueEntry<C> 
         if (this.is(o)) return true
         if (getClass() != o.class) return false
 
-        AbstractQueueEntry that = (AbstractQueueEntry) o
+        BasicQueueEntry that = (BasicQueueEntry) o
 
         if (id != that.id) return false
 

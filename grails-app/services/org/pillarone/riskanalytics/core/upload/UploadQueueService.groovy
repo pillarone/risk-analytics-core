@@ -1,4 +1,5 @@
 package org.pillarone.riskanalytics.core.upload
+
 import org.pillarone.riskanalytics.core.queue.AbstractQueueService
 import org.pillarone.riskanalytics.core.queue.IQueueTaskFuture
 import org.pillarone.riskanalytics.core.simulation.SimulationState
@@ -7,7 +8,7 @@ import org.pillarone.riskanalytics.core.simulation.item.Simulation
 import static com.google.common.base.Preconditions.checkArgument
 import static com.google.common.base.Preconditions.checkNotNull
 
-class UploadQueueService extends AbstractQueueService<UploadConfiguration, UploadQueueTaskContext, UploadQueueEntry> {
+class UploadQueueService extends AbstractQueueService<UploadConfiguration, UploadQueueEntry> {
 
     IUploadStrategy uploadStrategy
 
@@ -22,22 +23,21 @@ class UploadQueueService extends AbstractQueueService<UploadConfiguration, Uploa
     }
 
     @Override
-    IQueueTaskFuture doWork(UploadQueueTaskContext context, int priority) {
-        uploadStrategy.upload(context, priority)
+    IQueueTaskFuture doWork(UploadQueueEntry entry, int priority) {
+        uploadStrategy.upload(entry.context, priority)
     }
 
     @Override
-    void handleContext(UploadQueueTaskContext context) {
-        if (!context) {
+    void handleEntry(UploadQueueEntry entry) {
+        if (!entry.context) {
             throw new IllegalStateException("queue task finished without result")
         }
     }
 
     @Override
     void preConditionCheck(UploadConfiguration configuration) {
-        UploadConfiguration uploadConfiguration = configuration as UploadConfiguration
-        checkNotNull(uploadConfiguration)
-        Simulation simulation = uploadConfiguration.simulation
+        checkNotNull(configuration)
+        Simulation simulation = configuration.simulation
         checkNotNull(simulation)
         checkNotNull(simulation.id)
         checkNotNull(simulation.start)

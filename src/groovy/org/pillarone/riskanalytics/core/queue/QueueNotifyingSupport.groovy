@@ -1,29 +1,27 @@
 package org.pillarone.riskanalytics.core.queue
 
-import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 
 import java.util.concurrent.CopyOnWriteArraySet
 
-@CompileStatic
-class QueueNotifyingSupport<T extends IQueueEntry> {
+class QueueNotifyingSupport<Q extends IQueueEntry> {
     private static final Log LOG = LogFactory.getLog(QueueNotifyingSupport)
     private final Set<QueueListener> listeners = new CopyOnWriteArraySet<QueueListener>()
 
-    void addQueueListener(QueueListener listener) {
+    void addQueueListener(QueueListener<Q> listener) {
         synchronized (listeners) {
             listeners.add(listener)
         }
     }
 
-    void removeQueueListener(QueueListener listener) {
+    void removeQueueListener(QueueListener<Q> listener) {
         synchronized (listeners) {
             listeners.remove(listener)
         }
     }
 
-    void notifyStarting(T queueEntry) {
+    void notifyStarting(Q queueEntry) {
         synchronized (listeners) {
             listeners.each { QueueListener listener ->
                 doExceptionSave {
@@ -53,7 +51,7 @@ class QueueNotifyingSupport<T extends IQueueEntry> {
         }
     }
 
-    void notifyOffered(T queueEntry) {
+    void notifyOffered(Q queueEntry) {
         synchronized (listeners) {
             listeners.each { QueueListener listener ->
                 doExceptionSave {

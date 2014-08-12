@@ -5,13 +5,13 @@ import org.pillarone.riskanalytics.core.queue.IQueueTaskListener
 
 import java.util.concurrent.CopyOnWriteArraySet
 
-class BasicQueueTaskFuture implements IQueueTaskFuture {
+class BasicUploadTaskFuture implements IQueueTaskFuture {
 
     private final UploadQueueTaskContext context
     private volatile boolean canceled = false
     private final Set<IQueueTaskListener> taskListeners = new CopyOnWriteArraySet<IQueueTaskListener>()
 
-    BasicQueueTaskFuture(UploadQueueTaskContext context) {
+    BasicUploadTaskFuture(UploadQueueTaskContext context) {
         this.context = context
     }
 
@@ -24,7 +24,7 @@ class BasicQueueTaskFuture implements IQueueTaskFuture {
 
     void failed(List<String> errors) {
         context.uploadState = UploadState.ERROR
-        context.errors.addAll(errors)
+        errors.each { context.addError(it) }
         notifyUploadListeners()
     }
 

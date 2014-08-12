@@ -16,18 +16,24 @@ public class UploadInfo implements Serializable {
     private String quarter;
     private boolean allowOverwrite;
     private String destination;
+    private String username;
 
-    public UploadInfo(UUID uuid, long simulationId, String quarter, boolean allowOverwrite, String destination) {
+    public UploadInfo(UUID uuid, long simulationId, String quarter, boolean allowOverwrite, String destination, String username) {
         this.simulationId = simulationId;
         this.quarter = quarter;
         this.allowOverwrite = allowOverwrite;
         this.destination = destination;
+        this.username = username;
         Preconditions.checkNotNull(uuid);
         this.uuid = uuid;
     }
 
     public UUID getUuid() {
         return uuid;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     public long getSimulationId() {

@@ -29,19 +29,19 @@ class DefaultUploadStrategy implements IUploadStrategy {
         UploadInfo uploadInfo = createUploadInfo(context.configuration)
         UploadTaskFuture future = new UploadTaskFuture(context, uploadInfo.uuid)
         backgroundService.execute("upload $uploadInfo") {
-        }
-        //this call has to block
-        try {
-            uploadService.startUpload(uploadInfo)
-            future.done()
-        } catch (UploadException uploadException) {
-            log.log(Level.WARNING, "upload failed for $uploadInfo", uploadException)
-            future.failed(uploadException.errors)
+            //this call has to block
+            try {
+                uploadService.startUpload(uploadInfo)
+                future.done()
+            } catch (UploadException uploadException) {
+                log.log(Level.WARNING, "upload failed for $uploadInfo", uploadException)
+                future.failed(uploadException.errors)
+            }
         }
         return future
     }
 
     private static UploadInfo createUploadInfo(UploadConfiguration configuration) {
-        new UploadInfo(UUID.randomUUID(), configuration.simulation.id, null, configuration.allowOverwrite, configuration.destination)
+        new UploadInfo(UUID.randomUUID(), configuration.simulation.id, null, configuration.allowOverwrite, configuration.destination, configuration.username)
     }
 }

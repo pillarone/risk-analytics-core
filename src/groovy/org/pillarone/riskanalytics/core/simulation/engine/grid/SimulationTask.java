@@ -151,6 +151,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
             simulationConfiguration.getSimulation().save();
             return jobsToNodes;
         } catch (Exception e) {
+            getSimulation().delete();
             simulationErrors.add(e);
             if (!cancelled) {
                 setSimulationState(SimulationState.ERROR);
@@ -208,6 +209,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
                         Thread.currentThread().interrupt();
                         break;
                     }
+                    LOG.debug("got new message. messageCount: " + messageCount.get() + "/totalMessageCount: " + totalMessageCount);
                     if (System.currentTimeMillis() - timeout > MESSAGE_TIMEOUT) {
                         error = true;
                         simulationErrors.add(new TimeoutException("Not all messages received - timeout reached"));
@@ -241,6 +243,7 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
             LOG.info("Task completed in " + (System.currentTimeMillis() - time) + "ms");
             return true;
         } catch (Exception e) {
+            getSimulation().delete();
             simulationErrors.add(e);
             if (!cancelled) {
                 setSimulationState(SimulationState.ERROR);
@@ -252,6 +255,8 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
 
     public synchronized void onMessage(Object serializable) {
         ResultTransferObject result = (ResultTransferObject) serializable;
+        LOG.debug("got result from resultTransferListener: " + result.getProgress() + "Will now write result ....");
+        long before = System.currentTimeMillis();
         if (!jobIds.contains(result.getJobIdentifier())) {
             return;
         }
@@ -261,6 +266,8 @@ public class SimulationTask extends GridTaskAdapter<SimulationConfiguration, Obj
         PathMapping pm = simulationConfiguration.getMappingCache().lookupPath(rd.getPath());
         rd.setPathId(pm.pathID());
         resultWriter.writeResult(result);
+        long diff = System.currentTimeMillis() - before;
+        LOG.debug("wrote result in " + diff + " ms");
         progress.put(result.getJobIdentifier(), result.getProgress());
         notify();
     }

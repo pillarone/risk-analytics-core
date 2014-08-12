@@ -1,35 +1,33 @@
-package org.pillarone.riskanalytics.core.simulation.engine
+package org.pillarone.riskanalytics.core.queue
 
-import org.pillarone.riskanalytics.core.simulation.engine.grid.SimulationTask
-import org.pillarone.riskanalytics.core.user.Person
-
-class QueueEntry implements Comparable<QueueEntry> {
+class BasicQueueEntry<K> implements IQueueEntry<K> {
     final UUID id
     final Date offeredAt
     int priority
-    final SimulationTask simulationTask
-    final Person offeredBy
     final long offeredNanoTime
+    private final IQueueTaskContext<K> context
 
-    QueueEntry(SimulationConfiguration simulationConfiguration, int priority, Person offeredBy) {
-        this.simulationTask = new SimulationTask(simulationConfiguration: simulationConfiguration)
-        this.offeredBy = offeredBy
+    BasicQueueEntry(IQueueTaskContext<K> context, int priority) {
         this.priority = priority
+        this.context = context
         id = UUID.randomUUID()
         offeredAt = new Date()
         offeredNanoTime = System.nanoTime()
     }
 
-    QueueEntry(UUID id) {
+    BasicQueueEntry(UUID id) {
+        this.context = null
         this.id = id
         this.priority = 0
-        this.simulationTask = null
-        this.offeredBy = null
         offeredAt = null
         offeredNanoTime = System.nanoTime()
     }
 
-    int compareTo(QueueEntry o) {
+    IQueueTaskContext<K> getContext() {
+        return context
+    }
+
+    int compareTo(IQueueEntry<K> o) {
         if (priority.equals(o.priority)) {
             return offeredNanoTime.compareTo(o.offeredNanoTime)
         }
@@ -40,7 +38,7 @@ class QueueEntry implements Comparable<QueueEntry> {
         if (this.is(o)) return true
         if (getClass() != o.class) return false
 
-        QueueEntry that = (QueueEntry) o
+        BasicQueueEntry that = (BasicQueueEntry) o
 
         if (id != that.id) return false
 
@@ -49,10 +47,5 @@ class QueueEntry implements Comparable<QueueEntry> {
 
     int hashCode() {
         return id.hashCode()
-    }
-
-    @Override
-    String toString() {
-        id
     }
 }

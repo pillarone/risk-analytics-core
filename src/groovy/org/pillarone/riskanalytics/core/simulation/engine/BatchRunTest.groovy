@@ -5,6 +5,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.pillarone.riskanalytics.core.batch.BatchRunService
+import org.pillarone.riskanalytics.core.queue.QueueListener
 import org.pillarone.riskanalytics.core.simulation.item.Batch
 
 import java.util.concurrent.CountDownLatch
@@ -16,12 +17,12 @@ abstract class BatchRunTest extends ModelTest {
     @Before
     void addListener() {
         listener = new MyListener()
-        simulationQueueService.addSimulationQueueListener(listener)
+        simulationQueueService.addQueueListener(listener)
     }
 
     @After
     void removeListener() {
-        simulationQueueService.removeSimulationQueueListener(listener)
+        simulationQueueService.removeQueueListener(listener)
         listener = null
     }
 
@@ -34,8 +35,8 @@ abstract class BatchRunTest extends ModelTest {
         batchRunService.runBatch(batch)
         assert batch.executed
         assert listener.offered.size() == 1
-        QueueEntry entry = listener.offered.first()
-        assert entry.simulationTask.simulation.parameterization == run.parameterization
+        SimulationQueueEntry entry = listener.offered.first()
+        assert entry.context.simulationTask.simulation.parameterization == run.parameterization
         //wait to finish simulation
         listener.waitUntilFinished()
     }
@@ -49,17 +50,17 @@ abstract class BatchRunTest extends ModelTest {
     }
 
 
-    static class MyListener implements ISimulationQueueListener {
+    static class MyListener implements QueueListener<SimulationQueueEntry> {
         CountDownLatch latch = new CountDownLatch(1)
 
-        List<QueueEntry> offered = []
+        List<SimulationQueueEntry> offered = []
 
         void waitUntilFinished() {
             latch.await()
         }
 
         @Override
-        void starting(QueueEntry entry) {}
+        void starting(SimulationQueueEntry entry) {}
 
         @Override
         void finished(UUID id) {
@@ -70,7 +71,7 @@ abstract class BatchRunTest extends ModelTest {
         void removed(UUID id) {}
 
         @Override
-        void offered(QueueEntry entry) {
+        void offered(SimulationQueueEntry entry) {
             offered << entry
         }
     }

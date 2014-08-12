@@ -6,11 +6,13 @@ import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguratio
 
 class ImportStructureInTransaction {
 
-    public static void importStructure(SimulationConfiguration configuration) {
+    static void importStructure(SimulationConfiguration configuration) {
         ModelStructureDAO.withTransaction { status ->
             List<String> modelFilter = new ArrayList<String>(1)
             String modelName = configuration.simulation.modelClass.simpleName
-            modelFilter.add(modelName.substring(0, modelName.lastIndexOf("Model")))
+            int indexOfModel = modelName.lastIndexOf("Model")
+            String withoutModel = indexOfModel == -1 ? modelName : modelName.substring(0, indexOfModel)
+            modelFilter.add(withoutModel)
             new ModelStructureImportService().compareFilesAndWriteToDB(modelFilter)
         }
     }

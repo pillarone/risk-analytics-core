@@ -16,7 +16,7 @@ class ModellingItemUpdater {
         target.modificationDate = source.modificationDate
         target.creator = source.creator
         target.lastUpdater = source.lastUpdater
-        target.tags = source.tags
+        target.tags = new ArrayList(source.tags ?: [])
         target.valid = source.valid
         target.status = source.status
         target.dealId = source.dealId
@@ -48,7 +48,7 @@ class ModellingItemUpdater {
         target.parameterization = createOrUpdateModellingItem(source.parameterization, target.parameterization)
         target.template = createOrUpdateModellingItem(source.resultConfiguration, target.template)
         target.batch = createOrUpdateModellingItem(source.batch, target.batch)
-        target.tags = source.tags
+        target.tags = new ArrayList(source.tags ?: [])
         target.modelClass = source.modelClass
         target.modelVersionNumber = source.modelVersionNumber?.clone()
         target.end = source.end
@@ -58,6 +58,25 @@ class ModellingItemUpdater {
         target.creator = source.creator
         target.numberOfIterations = source.numberOfIterations
         target.randomSeed = source.randomSeed
+        return target
+    }
+
+    static SimulationProfile createOrUpdateModellingItem(SimulationProfileCacheItem source, SimulationProfile target) {
+        if (!source) {
+            return null
+        }
+        target = target ?: new SimulationProfile(source.name, source.modelClass)
+        target.name = source.name
+        target.id = source.id
+        target.template = createOrUpdateModellingItem(source.template, target.template)
+        target.modelClass = source.modelClass
+        target.creationDate = source.creationDate
+        target.modificationDate = source.modificationDate
+        target.creator = source.creator
+        target.lastUpdater = source.lastUpdater
+        target.numberOfIterations = source.numberOfIterations
+        target.randomSeed = source.randomSeed
+        target.forPublic = source.forPublic
         return target
     }
 
@@ -74,7 +93,7 @@ class ModellingItemUpdater {
         target.modificationDate = source.modificationDate
         target.creator = source.creator
         target.lastUpdater = source.lastUpdater
-        target.tags = source.tags
+        target.tags = new ArrayList<>(source.tags ?: [])
         target.valid = source.valid
         target.status = source.status
         return target

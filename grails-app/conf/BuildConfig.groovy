@@ -28,7 +28,6 @@ grails.project.dependency.resolution = {
         runtime ":release:3.0.1", {
             exclude "groovy"
         }
-        compile ":quartz:1.0.1"
         runtime ":spring-security-core:2.0-RC2"
         runtime ":tomcat:7.0.42"
 

@@ -14,6 +14,9 @@ import org.pillarone.riskanalytics.core.remoting.IResultService
 import org.pillarone.riskanalytics.core.remoting.ITransactionService
 import org.pillarone.riskanalytics.core.remoting.impl.ResultService
 import org.pillarone.riskanalytics.core.simulation.engine.MappingCache
+import org.pillarone.riskanalytics.core.upload.LogOnlyUploadStrategy
+import org.pillarone.riskanalytics.core.upload.artisan.DefaultUploadService
+import org.pillarone.riskanalytics.core.upload.artisan.DefaultUploadStrategy
 import org.pillarone.riskanalytics.core.util.GrailsConfigValidator
 import org.springframework.remoting.rmi.RmiProxyFactoryBean
 import org.springframework.remoting.rmi.RmiServiceExporter
@@ -27,7 +30,6 @@ class RiskAnalyticsCoreGrailsPlugin {
     // the other plugins this plugin depends on
     def dependsOn = [
             "backgroundThread": "1.3",
-            "quartz": "1.0.1",
             "springSecurityCore": "2.0-RC2",
             "release": "3.0.1"
     ]
@@ -52,6 +54,13 @@ Persistence & Simulation engine.
     }
 
     def doWithSpring = {
+        uploadStrategy(DefaultUploadStrategy) {
+            backgroundService = ref('backgroundService')
+            uploadService = ref('uploadService')
+        }
+        //TODO overwrite it in the resource.groovy of AllianzART to use the rmi service
+        uploadService(DefaultUploadService)
+
         ConfigObject config = application.config
 
         traceLogManager(TraceLogManager)
@@ -108,7 +117,7 @@ Persistence & Simulation engine.
         failoverSpi(GridNeverFailoverSpi)
         collisionSpi(GridFifoQueueCollisionSpi) {
             parallelJobsNumber = config.containsKey("numberOfParallelJobsPerNode") ?
-                    config."numberOfParallelJobsPerNode" : 100
+                config."numberOfParallelJobsPerNode" : 100
         }
         grid(GridSpringBean) {
             configuration = ref('grid.cfg')

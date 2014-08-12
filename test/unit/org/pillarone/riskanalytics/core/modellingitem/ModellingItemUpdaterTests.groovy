@@ -137,6 +137,51 @@ class ModellingItemUpdaterTests {
     }
 
     @Test
+    void testCopySimulationProfile() {
+        assert !ModellingItemUpdater.createOrUpdateModellingItem(null, new SimulationProfile('name', CoreModel))
+        SimulationProfileCacheItem source = new SimulationProfileCacheItem(
+                100l,
+                new DateTime(), new DateTime(),
+                new Person(), new Person(),
+                'name',
+                CoreModel,
+                23,
+                435,
+                true,
+                new ResultConfigurationCacheItem(1l, 'name', EmptyModel, null),
+        )
+
+        SimulationProfile result = ModellingItemUpdater.createOrUpdateModellingItem(source, null)
+        assert !result.is(source)
+        assert source.name == result.name
+        assert source.id == result.id
+        assert source.template.id == result.template.id
+        assert source.modelClass == result.modelClass
+        assert source.creationDate == result.creationDate
+        assert source.modificationDate == result.modificationDate
+        assert source.creator == result.creator
+        assert source.lastUpdater == result.lastUpdater
+        assert source.numberOfIterations == result.numberOfIterations
+        assert source.randomSeed == result.randomSeed
+        assert source.forPublic == result.forPublic
+
+        SimulationProfile toUpdate = new SimulationProfile('toUpdate', EmptyModel)
+        result = ModellingItemUpdater.createOrUpdateModellingItem(source, toUpdate)
+        assert !result.is(source)
+        assert result.is(toUpdate)
+        assert source.name == result.name
+        assert source.id == result.id
+        assert source.template.id == result.template.id
+        assert source.modelClass == result.modelClass
+        assert source.creationDate == result.creationDate
+        assert source.modificationDate == result.modificationDate
+        assert source.creator == result.creator
+        assert source.numberOfIterations == result.numberOfIterations
+        assert source.randomSeed == result.randomSeed
+        assert source.forPublic == result.forPublic
+    }
+
+    @Test
     void testCopyResource() {
         assert !ModellingItemUpdater.createOrUpdateModellingItem(null, new Resource('name', CoreModel))
 

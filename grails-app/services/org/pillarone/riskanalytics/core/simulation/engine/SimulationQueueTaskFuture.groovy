@@ -26,13 +26,20 @@ class SimulationQueueTaskFuture implements IQueueTaskFuture {
 
     @Override
     void listenAsync(IQueueTaskListener uploadTaskListener) {
-        gridTaskFuture.listenAsync(new TaskListener(uploadTaskListener, this))
+        TaskListener taskListener = new TaskListener(uploadTaskListener, this)
+        gridListeners.put(uploadTaskListener, taskListener)
+        gridTaskFuture.listenAsync(taskListener)
     }
 
     @Override
     void cancel() {
         context.simulationTask.cancel()
+        apply()
         gridTaskFuture.cancel()
+    }
+
+    private apply() {
+        gridListeners.keySet().each { it.apply(this) }
     }
 
     private static class TaskListener extends CI1<GridTaskFuture> {

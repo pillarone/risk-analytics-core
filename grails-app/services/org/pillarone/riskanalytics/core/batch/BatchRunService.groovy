@@ -1,11 +1,13 @@
 package org.pillarone.riskanalytics.core.batch
 
+import grails.plugin.springsecurity.SpringSecurityService
 import org.pillarone.riskanalytics.core.output.SimulationRun
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationQueueService
 import org.pillarone.riskanalytics.core.simulation.item.*
 import org.pillarone.riskanalytics.core.simulation.item.parameter.ParameterHolder
 import org.pillarone.riskanalytics.core.simulationprofile.SimulationProfileService
+import org.pillarone.riskanalytics.core.user.UserManagement
 
 import java.text.SimpleDateFormat
 
@@ -13,6 +15,7 @@ class BatchRunService {
 
     SimulationQueueService simulationQueueService
     SimulationProfileService simulationProfileService
+    SpringSecurityService springSecurityService
 
     private static
     final String BATCH_SIMNAME_STAMP_FORMAT = System.getProperty("BatchRunService.BATCH_SIMNAME_STAMP_FORMAT", "yyyyMMdd HH:mm:ss z")
@@ -43,14 +46,18 @@ class BatchRunService {
 
     private void offer(List<Simulation> simulationRuns) {
         List<SimulationConfiguration> configurations = simulationRuns.findAll { Simulation simulationRun -> shouldRun(simulationRun) }.collect {
-            new SimulationConfiguration(it)
+            new SimulationConfiguration(it, currentUsername)
         }
         configurations.each { start(it) }
     }
 
+    private String getCurrentUsername() {
+        UserManagement.currentUser?.username
+    }
+
     private void offer(Simulation simulation) {
         if (shouldRun(simulation)) {
-            start(new SimulationConfiguration(simulation))
+            start(new SimulationConfiguration(simulation, currentUsername))
         }
     }
 

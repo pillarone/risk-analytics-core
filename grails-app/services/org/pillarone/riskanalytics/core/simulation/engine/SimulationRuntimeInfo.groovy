@@ -1,4 +1,5 @@
 package org.pillarone.riskanalytics.core.simulation.engine
+
 import com.google.common.base.Preconditions
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
@@ -25,6 +26,7 @@ class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo>, IRunti
     private String username
     private List<Throwable> simulationErrors
     private long offeredNanoTime
+    boolean deleted = false
 
     SimulationRuntimeInfo(UUID id) {
         this.id = Preconditions.checkNotNull(id)
@@ -156,4 +158,6 @@ class SimulationRuntimeInfo implements Comparable<SimulationRuntimeInfo>, IRunti
         }
         return priority.compareTo(o.priority)
     }
+
+
 }

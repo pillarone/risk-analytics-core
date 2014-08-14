@@ -8,16 +8,18 @@ class SimulationRuntimeService extends AbstractRuntimeService<SimulationQueueEnt
     SimulationQueueService simulationQueueService
 
     private final IRuntimeInfoListener addOrRemoveLockedTagListener = new AddOrRemoveLockedTagListener()
+    private final IRuntimeInfoListener setDeletedFlagListener = new SetDeletedFlagListener()
 
     @Override
     void postConstruct() {
         addRuntimeInfoListener(addOrRemoveLockedTagListener)
-
+        addRuntimeInfoListener(setDeletedFlagListener)
     }
 
     @Override
     void preDestroy() {
         removeRuntimeInfoListener(addOrRemoveLockedTagListener)
+        removeRuntimeInfoListener(setDeletedFlagListener)
     }
 
     @Override

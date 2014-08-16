@@ -3,7 +3,6 @@ package org.pillarone.riskanalytics.core.simulation.engine
 import models.core.CoreModel
 import org.junit.Test
 import org.pillarone.riskanalytics.core.fileimport.FileImportService
-import org.pillarone.riskanalytics.core.output.OutputStrategy
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
 import org.pillarone.riskanalytics.core.simulation.item.ResultConfiguration
 import org.pillarone.riskanalytics.core.simulation.item.Simulation
@@ -26,7 +25,7 @@ class SimulationConfigurationTests {
         simulation.template.load()
 
         simulation.keyFiguresToPreCalculate = [:]
-        SimulationConfiguration configuration = new SimulationConfiguration(simulation)
+        SimulationConfiguration configuration = new SimulationConfiguration(simulation, null)
         configuration.prepareSimulationForGrid()
 
         assertNotSame(simulation, configuration.simulation)

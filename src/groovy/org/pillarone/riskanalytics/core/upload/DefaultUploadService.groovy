@@ -1,4 +1,4 @@
-package org.pillarone.riskanalytics.core.upload.artisan
+package org.pillarone.riskanalytics.core.upload
 
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory

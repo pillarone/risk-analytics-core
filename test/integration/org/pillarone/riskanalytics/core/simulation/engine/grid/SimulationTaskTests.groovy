@@ -7,7 +7,6 @@ import org.gridgain.grid.kernal.GridRichNodeImpl
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import org.pillarone.riskanalytics.core.output.OutputStrategy
 import org.pillarone.riskanalytics.core.simulation.engine.SimulationConfiguration
 import org.pillarone.riskanalytics.core.simulation.engine.grid.mapping.AbstractNodeMappingStrategy
 import org.pillarone.riskanalytics.core.simulation.item.Parameterization
@@ -177,7 +176,7 @@ class SimulationTaskTests {
         simulation.parameterization = new Parameterization("test")
         simulation.template = new ResultConfiguration('heinz', CoreModel)
         simulation.periodCount = 1
-        SimulationConfiguration configuration = new SimulationConfiguration(simulation)
+        SimulationConfiguration configuration = new SimulationConfiguration(simulation, null)
         assertNull simulation.start
         assertNull simulation.end
         return configuration

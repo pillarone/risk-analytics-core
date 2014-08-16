@@ -29,16 +29,17 @@ public class SimulationConfiguration implements Serializable, Cloneable {
     ICollectorOutputStrategy outputStrategy
     ResultData resultDataSource
     //the user who offered this task to the queue.
-    String username
+    final String username
 
 
-    SimulationConfiguration(Simulation simulation, ICollectorOutputStrategy outputStrategy) {
+    SimulationConfiguration(Simulation simulation, ICollectorOutputStrategy outputStrategy, String username = null) {
         this.simulation = simulation
         this.outputStrategy = outputStrategy
+        this.username = username
     }
 
-    SimulationConfiguration(Simulation simulation) {
-        this(simulation, new DBOutput())
+    SimulationConfiguration(Simulation simulation, String username = null) {
+        this(simulation, new DBOutput(), username)
     }
 /**
  * This creates a new Simulation instance based on the existing one, which only contains the necessary info for the

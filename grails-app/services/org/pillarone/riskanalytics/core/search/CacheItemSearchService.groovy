@@ -76,8 +76,8 @@ class CacheItemSearchService {
             for (ResultConfigurationDAO dao in ResultConfigurationDAO.list()) {
                 cache.add(CacheItemMapper.getModellingItem(dao))
             }
-
-            for (SimulationRun dao in SimulationRun.list().findAll { !it.toBeDeleted }) {
+            // Spotted by Dierk Koenig 2014-10-23, below is more efficient than list().findAll { !it.toBeDeleted }
+            for (SimulationRun dao in SimulationRun.findAllByToBeDeleted(false)){
                 cache.add(CacheItemMapper.getModellingItem(dao))
             }
             for (ResourceDAO dao in ResourceDAO.list()) {

@@ -36,7 +36,7 @@ class ResultService implements IResultService {
             List<TagInfo> tags = dao.tags*.getTag().name as List<TagInfo>;
             result << new ParameterizationInfo(
                     parameterizationId: dao.id, name: dao.name, version: dao.itemVersion,
-                    comment: dao.comment, user: dao.lastUpdater?.username, status: dao.status,
+                    comment: dao.comment, user: dao.creator?.username, status: dao.status,
                     tags: tags
 
             )

@@ -104,6 +104,14 @@ class CacheItemSearchService {
 
     synchronized List<CacheItem> search(List<ISearchFilter> filters) {
 
+        for( ISearchFilter filter : filters ){
+            if( filter instanceof AllFieldsFilter ){
+
+                String query = (filter as AllFieldsFilter)?.query
+                LOG.info("Filter: '$query'")
+            }
+        }
+
         long t
         long start
 
